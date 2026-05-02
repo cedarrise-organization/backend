@@ -1,0 +1,45 @@
+import express from "express";
+import cors from "cors";
+import errorHandler from "./middleware/errorHandler.middleware.js";
+import { connectRedis } from "./configs/cache.config.js";
+import { bullBoardAdapter } from "./configs/bull-board.config.js";
+// import featureRouter from "./modules/feature/feature.routes.js";
+// import "./queues/workers/feature.worker.js"
+import "dotenv/config";
+
+const app = express();
+
+const whitelist = [`http://localhost:${process.env.PORT}`];
+const corsOptions = {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allowed?: boolean) => void,
+  ) {
+    if (whitelist.indexOf(origin || "") !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+  credentials: true, //Allow cookies/auth headers
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400, // Cache preflight requests for 24 hours
+};
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
+
+// (async () => {
+//   await connectRedis();
+// })();
+
+//ROUTES
+/* app.use("/", featureRouter); */
+// app.use("/queues", bullBoardAdapter.getRouter());
+
+//GLOBAL ERROR HANDLER
+app.use(errorHandler);
+
+export default app;
