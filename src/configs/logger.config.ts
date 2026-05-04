@@ -1,6 +1,5 @@
-import "dotenv/config";
 import winston from "winston";
-import { Logtail } from "@logtail/node";
+// import { Logtail } from "@logtail/node";
 // import { LogtailTransport } from "@logtail/winston";
 
 // Create a Logtail client

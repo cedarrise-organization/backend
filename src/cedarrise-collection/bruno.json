@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "cedarrise-collection",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

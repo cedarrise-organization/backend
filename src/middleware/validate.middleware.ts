@@ -1,7 +1,7 @@
 import * as z from "zod";
 import { Request, Response, NextFunction } from "express";
 import { ValidationError } from "../lib/error.js";
-import logger from "../configs/logger.config.js";
+// import logger from "../configs/logger.config.js";
 
 export const validateRequest =
   <T>(schema: z.ZodType<T>) =>

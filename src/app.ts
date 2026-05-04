@@ -3,9 +3,9 @@ import cors from "cors";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { connectRedis } from "./configs/cache.config.js";
 import { bullBoardAdapter } from "./configs/bull-board.config.js";
+import adminRouter from "./modules/admin/admin.routes.js"
 // import featureRouter from "./modules/feature/feature.routes.js";
 // import "./queues/workers/feature.worker.js"
-import "dotenv/config";
 
 const app = express();
 
@@ -37,6 +37,7 @@ app.use(cors(corsOptions));
 
 //ROUTES
 /* app.use("/", featureRouter); */
+app.use("/api/v1/admin", adminRouter)
 // app.use("/queues", bullBoardAdapter.getRouter());
 
 //GLOBAL ERROR HANDLER

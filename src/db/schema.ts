@@ -1,3 +1,70 @@
-// export * from "../modules/feature/feature.model";
-// OR
-// Define schemas here
+import * as p from "drizzle-orm/pg-core";
+import { index, primaryKey} from "drizzle-orm/pg-core";
+
+// TIMESTAMPS
+const timestamps = {
+  updatedAt: p.timestamp("updated_at"),
+  createdAt: p.timestamp("created_at").defaultNow().notNull(),
+  deletedAt: p.timestamp("deleted_at"),
+};
+
+// USERS
+export const users = p.pgTable(
+  "users",
+  {
+    id: p.uuid().primaryKey().notNull(),
+    name: p.text().notNull(),
+    email: p.text().notNull().unique(),
+    password: p.text().notNull(),
+    department: p.text().notNull(),
+    ...timestamps,
+  },
+  (table) => [index("user_name_idx").on(table.name)],
+);
+
+// ROLES
+export const roles = p.pgTable(
+  "roles",
+  {
+    id: p.uuid().primaryKey().notNull(),
+    name: p.text().notNull(), // volunteer, admin, superadmin
+    description: p.text(),
+    isDefault: p.boolean("is_default").default(false),
+    ...timestamps,
+  },
+  (table) => [index("role_name_idx").on(table.name)],
+);
+
+// PERMISSIONS 
+export const permissions = p.pgTable(
+  "permissions",
+  {
+    id: p.uuid().primaryKey().notNull(),
+    name: p.text().notNull().unique(), // create, read, update, delete
+    description: p.text(),
+    ...timestamps,
+  },
+  (table) => [index("permission_name_idx").on(table.name)],
+);
+
+// USERROLES
+export const userroles = p.pgTable("userroles", {
+  userId: p.uuid("user_id").references(() => users.id).notNull(),
+  roleId: p.uuid("role_id").references(() => roles.id).notNull(),
+  description: p.text(),
+  assignedAt: p.timestamp("assigned_at").defaultNow().notNull(),
+  assignedBy: p.text("assigned_by"),
+},
+(table) => [
+  primaryKey({ columns: [table.userId, table.roleId] }),
+]
+);
+
+// ROLEPERMISSIONS
+export const rolepermissions = p.pgTable("rolepermissions", {
+  roleId: p.uuid("role_id").references(() => roles.id).notNull(),
+  permissionId: p.uuid("permission_id").references(() => permissions.id).notNull(),
+},
+(table) => [
+  primaryKey({ columns: [table.roleId, table.permissionId] }),
+]);
