@@ -21,8 +21,8 @@ const errorHandler = (err: Error, req: Request, res: Response, next: NextFunctio
   }
 
   // bug
-  logger.error(`Unhandled error`, { err });
-  console.log(`Unhandled error`, { err })
+  logger.error(`Unhandled error`, { err: err.message });
+  console.log(`Unhandled error`, err )
   res.status(500).json({
     status: false,
     error: {

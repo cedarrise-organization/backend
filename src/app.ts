@@ -31,9 +31,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
-// (async () => {
-//   await connectRedis();
-// })();
+(async () => {
+  await connectRedis();
+})();
 
 //ROUTES
 /* app.use("/", featureRouter); */
