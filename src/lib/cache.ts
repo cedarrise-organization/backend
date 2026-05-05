@@ -2,7 +2,7 @@ import redisClient from "../configs/cache.config.js";
 import crypto from "crypto";
 
 export const CACHE_TTL = {
-  PERMISSIONS: 300, // 5 mins
+  PERMISSIONS: 600, // 10 mins
   /*
     ...other TTLs
     */

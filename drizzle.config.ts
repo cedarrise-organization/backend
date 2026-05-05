@@ -1,9 +1,4 @@
 import { defineConfig } from "drizzle-kit";
-import dotenv from "dotenv";
-
-dotenv.config({
-  path: "./.env"
-});
 
 const dbMap = new Map([
   ["development", process.env.PG_DATABASE_DEV_URL!.toString()],
