@@ -2,6 +2,8 @@ import db from "../configs/db.config.js";
 import { eq, sql } from "drizzle-orm";
 import { roles, userroles } from "../db/schema.js";
 import { NotFoundError } from "../lib/error.js";
+import { appEvents } from "../lib/events.js";
+import { ADMIN_EVENTS } from "../events/admin.events.js";
 
 // write event emmitters for this
 export const getAllRoles = async () => {
@@ -47,7 +49,9 @@ export const roleAction = async (userId: string, options: any) => {
       .delete(userroles)
       .where(sql`${userroles.roleId} = ${role_[0].id} AND ${userroles.userId} = ${userId}`);
 
-    return { 
+    appEvents.emit(ADMIN_EVENTS.REVOKE_ROLE, { role: rolename, user: userId });
+
+    return {
       code: 200,
       message: `Role ${rolename} revoked successfully`,
     };
@@ -66,6 +70,8 @@ export const roleAction = async (userId: string, options: any) => {
       roleId: role_[0].id,
     })
     .returning();
+
+  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, user: userId });
 
   return {
     code: 200,
