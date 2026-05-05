@@ -1,5 +1,5 @@
 import * as p from "drizzle-orm/pg-core";
-import { index, primaryKey} from "drizzle-orm/pg-core";
+import { index, primaryKey, unique} from "drizzle-orm/pg-core";
 
 // TIMESTAMPS
 const timestamps = {
@@ -27,7 +27,7 @@ export const roles = p.pgTable(
   "roles",
   {
     id: p.uuid().primaryKey().notNull(),
-    name: p.text().notNull(), // volunteer, admin, superadmin
+    name: p.text().notNull().unique(), // volunteer, admin, superadmin
     description: p.text(),
     isDefault: p.boolean("is_default").default(false),
     ...timestamps,
@@ -49,8 +49,14 @@ export const permissions = p.pgTable(
 
 // USERROLES
 export const userroles = p.pgTable("userroles", {
-  userId: p.uuid("user_id").references(() => users.id).notNull(),
-  roleId: p.uuid("role_id").references(() => roles.id).notNull(),
+  userId: p.uuid("user_id").references(() => users.id, {
+    onUpdate: 'cascade',
+    onDelete: 'set null'
+  }).notNull(),
+  roleId: p.uuid("role_id").references(() => roles.id,  {
+    onUpdate: 'cascade',
+    onDelete: 'set null'
+  }).notNull(),
   description: p.text(),
   assignedAt: p.timestamp("assigned_at").defaultNow().notNull(),
   assignedBy: p.text("assigned_by"),
@@ -62,9 +68,16 @@ export const userroles = p.pgTable("userroles", {
 
 // ROLEPERMISSIONS
 export const rolepermissions = p.pgTable("rolepermissions", {
-  roleId: p.uuid("role_id").references(() => roles.id).notNull(),
-  permissionId: p.uuid("permission_id").references(() => permissions.id).notNull(),
+  roleId: p.uuid("role_id").references(() => roles.id, {
+    onUpdate: 'cascade',
+    onDelete: 'set null'
+  }).notNull(),
+  permissionId: p.uuid("permission_id").references(() => permissions.id, {
+    onUpdate: 'cascade',
+    onDelete: 'set null'
+  }).notNull(),
 },
 (table) => [
   primaryKey({ columns: [table.roleId, table.permissionId] }),
+  unique().on(table.roleId, table.permissionId)
 ]);

@@ -1,10 +1,25 @@
+import { permission } from "node:process";
 import db from "./configs/db.config.js";
 import logger from "./configs/logger.config.js";
 import { users, roles, permissions, rolepermissions, userroles } from "./db/schema.js";
 import { eq, sql } from "drizzle-orm";
 
-// reconfigure upserts
-export const seedRoles = async () => {
+// clear tables
+const clearTables = async () => {
+  try {
+    await db.delete(users);
+    await db.delete(roles);
+    await db.delete(permissions);
+    await db.delete(rolepermissions);
+    await db.delete(userroles);
+  } catch {
+    console.log("Could not delete all tables");
+  }
+};
+
+// there is no need for upserts
+// however the code remains for reference purposes
+const seedRoles = async () => {
   // insert roles
   const newRoles = await db
     .insert(roles)
@@ -23,7 +38,14 @@ export const seedRoles = async () => {
         name: "superadmin",
       },
     ])
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: roles.name,
+      set: {
+        id: sql`excluded.id`,
+        name: sql`excluded.name`,
+        isDefault: sql`excluded.is_default`,
+      },
+    })
     .returning();
   logger.info("new roles:", { roles: newRoles });
 
@@ -48,25 +70,41 @@ export const seedRoles = async () => {
         name: "delete",
       },
     ])
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: permissions.name,
+      set: {
+        id: sql`excluded.id`,
+        name: sql`excluded.name`,
+      },
+    })
     .returning();
   logger.info("new permissions:", { permissions: newPermissions });
 
-  const newRolePermissions = await db.insert(rolepermissions).values([
-    { roleId: newRoles[2]!.id, permissionId: newPermissions[0]!.id }, // superad+create
-    { roleId: newRoles[2]!.id, permissionId: newPermissions[1]!.id }, // superad+read
-    { roleId: newRoles[2]!.id, permissionId: newPermissions[2]!.id }, // superad+update
-    { roleId: newRoles[2]!.id, permissionId: newPermissions[3]!.id }, // superad+delete
-    { roleId: newRoles[1]!.id, permissionId: newPermissions[0]!.id }, // admin+create
-    { roleId: newRoles[1]!.id, permissionId: newPermissions[1]!.id }, // admin+read
-    { roleId: newRoles[1]!.id, permissionId: newPermissions[2]!.id }, // admin+update
-    { roleId: newRoles[0]!.id, permissionId: newPermissions[0]!.id }, // volunteer+create
-    { roleId: newRoles[0]!.id, permissionId: newPermissions[1]!.id }, // volunteer+create
-  ]);
+  const newRolePermissions = await db
+    .insert(rolepermissions)
+    .values([
+      { roleId: newRoles[2]!.id, permissionId: newPermissions[0]!.id }, // superad+create
+      { roleId: newRoles[2]!.id, permissionId: newPermissions[1]!.id }, // superad+read
+      { roleId: newRoles[2]!.id, permissionId: newPermissions[2]!.id }, // superad+update
+      { roleId: newRoles[2]!.id, permissionId: newPermissions[3]!.id }, // superad+delete
+      { roleId: newRoles[1]!.id, permissionId: newPermissions[0]!.id }, // admin+create
+      { roleId: newRoles[1]!.id, permissionId: newPermissions[1]!.id }, // admin+read
+      { roleId: newRoles[1]!.id, permissionId: newPermissions[2]!.id }, // admin+update
+      { roleId: newRoles[0]!.id, permissionId: newPermissions[0]!.id }, // volunteer+create
+      { roleId: newRoles[0]!.id, permissionId: newPermissions[1]!.id }, // volunteer+create
+    ])
+    .onConflictDoUpdate({
+      target: [rolepermissions.roleId, rolepermissions.permissionId],
+      set: {
+        roleId: sql`excluded.role_id`,
+        permissionId: sql`excluded.permission_id`,
+      },
+    })
+    .returning();
   logger.info("role permissions:", { rolepermissions: newRolePermissions });
 };
 
-export const seedUsers = async () => {
+const seedUsers = async () => {
   // insert new Users
   const volunteerUser = await db
     .insert(users)
@@ -79,7 +117,16 @@ export const seedUsers = async () => {
         department: "ASH",
       },
     ])
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: users.email,
+      set: {
+        id: sql`excluded.id`,
+        name: sql`excluded.name`,
+        email: sql`excluded.email`,
+        password: sql`excluded.password`,
+        department: sql`excluded.department`,
+      },
+    })
     .returning();
   logger.info("new users:", { users: volunteerUser });
 
@@ -111,7 +158,16 @@ export const seedUsers = async () => {
         department: "ASH",
       },
     ])
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: users.email,
+      set: {
+        id: sql`excluded.id`,
+        name: sql`excluded.name`,
+        email: sql`excluded.email`,
+        password: sql`excluded.password`,
+        department: sql`excluded.department`,
+      },
+    })
     .returning();
   logger.info("new users:", { users: adminUser });
 
@@ -143,7 +199,16 @@ export const seedUsers = async () => {
         department: "ASH",
       },
     ])
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: users.email,
+      set: {
+        id: sql`excluded.id`,
+        name: sql`excluded.name`,
+        email: sql`excluded.email`,
+        password: sql`excluded.password`,
+        department: sql`excluded.department`,
+      },
+    })
     .returning();
   logger.info("new users:", { users: superadminUser });
 
@@ -165,7 +230,12 @@ export const seedUsers = async () => {
   logger.info("new user role created:", { superadminUserRole });
 };
 
+console.log("Clearing tables...");
+await clearTables();
+console.log("Tables cleared");
+
+console.log("running roles scripts...");
 await seedRoles();
-console.log("running roles scripts");
+
+console.log("running user scripts...");
 await seedUsers();
-console.log("running user scripts");
