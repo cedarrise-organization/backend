@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:3000/api/v1/admin/users/eb0c38d4-6cb7-4c7b-8f75-986426cb1e60/roles/action?action=assign&rolename=superadmin
+  url: {{baseUrl}}/api/v1/admin/users/:userId/roles/action?action=assign&rolename=superadmin
   body: none
   auth: inherit
 }
@@ -13,6 +13,38 @@ post {
 params:query {
   action: assign
   rolename: superadmin
+}
+
+params:path {
+  userId: eb0c38d4-6cb7-4c7b-8f75-986426cb1e60
+}
+
+docs {
+  # Assign or Revoke a User's Role
+
+  Assigns or revokes a role for a specific user.
+
+  ## Authorization
+  Requires `update` permission.
+
+  ## Path Parameters
+  | Parameter | Type   | Required | Description                              |
+  |-----------|--------|----------|------------------------------------------|
+  | userId    | string | Yes      | UUID of the user to modify roles for     |
+
+  ## Query Parameters
+  | Parameter | Type   | Required | Allowed Values       | Description                          |
+  |-----------|--------|----------|----------------------|--------------------------------------|
+  | action    | string | Yes      | `assign`, `revoke`   | Whether to assign or revoke the role |
+  | rolename  | string | Yes      | `admin`, `superadmin`| The role to assign or revoke         |
+
+  ## Validation
+  - `userId` must be a valid UUID.
+  - `action` must be one of: `assign`, `revoke`.
+  - `rolename` must be one of: `admin`, `superadmin`.
+
+  ## Response
+  Returns the result of the role action operation.
 }
 
 settings {

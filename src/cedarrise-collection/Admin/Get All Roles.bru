@@ -1,13 +1,25 @@
 meta {
   name: Get All Roles
   type: http
-  seq: 2
+  seq: 1
 }
 
 get {
-  url: http://localhost:3000/api/v1/admin/roles
+  url: {{baseUrl}}/api/v1/admin/roles
   body: none
   auth: inherit
+}
+
+docs {
+  # Get All Roles
+
+  Lists all available roles and their associated permissions.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Response
+  Returns an array of role objects, each containing the role name and its permissions.
 }
 
 settings {

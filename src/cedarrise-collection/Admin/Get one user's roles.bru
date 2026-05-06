@@ -1,13 +1,37 @@
 meta {
   name: Get one user's roles
   type: http
-  seq: 3
+  seq: 2
 }
 
 get {
-  url: http://localhost:3000/api/v1/admin/users/eb0c38d4-6cb7-4c7b-8f75-986426cb1e60/roles
+  url: {{baseUrl}}/api/v1/admin/users/:userId/roles
   body: none
   auth: inherit
+}
+
+params:path {
+  userId: eb0c38d4-6cb7-4c7b-8f75-986426cb1e60
+}
+
+docs {
+  # Get One User's Roles
+
+  Retrieves all roles assigned to a specific user.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Path Parameters
+  | Parameter | Type   | Required | Description                        |
+  |-----------|--------|----------|------------------------------------|
+  | userId    | string | Yes      | UUID of the user to look up roles for |
+
+  ## Validation
+  - `userId` must be a valid UUID.
+
+  ## Response
+  Returns the list of roles assigned to the specified user.
 }
 
 settings {
