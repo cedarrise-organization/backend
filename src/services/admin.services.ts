@@ -49,7 +49,7 @@ export const roleAction = async (userId: string, options: any) => {
       .delete(userroles)
       .where(sql`${userroles.roleId} = ${role_[0].id} AND ${userroles.userId} = ${userId}`);
 
-    appEvents.emit(ADMIN_EVENTS.REVOKE_ROLE, { role: rolename, user: userId });
+    appEvents.emit(ADMIN_EVENTS.REVOKE_ROLE, { role: rolename, userId });
 
     return {
       code: 200,
@@ -71,7 +71,7 @@ export const roleAction = async (userId: string, options: any) => {
     })
     .returning();
 
-  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, user: userId });
+  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, userId });
 
   return {
     code: 200,
