@@ -1,0 +1,51 @@
+services:
+   cedarrise-postgres-db:
+      image: postgres:18-alpine
+      container_name: cedarrise-postgres-db
+      restart: unless-stopped
+      env_file:
+         - ./.env
+      environment:
+         POSTGRES_USER: postgres
+         POSTGRES_PASSWORD: 1234
+         POSTGRES_DB: cedar
+      ports:
+         - "5434:5432"
+      volumes:
+         - cedarrise-postgres-db-data:/var/lib/postgresql
+      healthcheck:
+         test: [CMD-SHELL, pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB]
+         interval: 10s
+         timeout: 5s
+         retries: 3
+         start_period: 10s
+
+   cedarrise-db-setup:
+      build:
+         context: .
+         dockerfile: Dockerfile
+      container_name: cedarrise-db-setup
+      depends_on:
+         cedarrise-postgres-db:
+            condition: service_healthy
+      env_file:
+         - ./.env
+      environment:
+         - PG_DATABASE_DEV_URL=postgresql://postgres:1234@cedarrise-postgres-db:5432/cedar
+      restart: no
+
+   cedarrise-redis:
+      image: redis:8-alpine
+      container_name: cedarrise-redis
+      restart: unless-stopped
+      ports:
+         - "6383:6379"
+      healthcheck:
+         test: [CMD, redis-cli, ping]
+         interval: 10s
+         timeout: 5s
+         retries: 3
+         start_period: 5s
+
+volumes:
+   cedarrise-postgres-db-data:
