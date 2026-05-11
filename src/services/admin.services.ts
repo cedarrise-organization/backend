@@ -149,8 +149,16 @@ export const listAllUsers = async () => {
 };
 
 export const deleteUser = async (userId: string) => {
-  await db.delete(users).where(eq(users.id, userId));
-
+  const [oldUser] = await db.delete(users).where(eq(users.id, userId)).returning();
+   
+  if(!oldUser){
+    throw new Error("Could not delete user")
+  }
+  
+  appEvents.emit(ADMIN_EVENTS.DELETE_USER, {
+    deletedUser: oldUser.id
+  })
+  
   return {
     code: 200,
     message: "User deleted",

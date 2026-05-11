@@ -6,6 +6,7 @@ export const ADMIN_EVENTS = {
   ASSIGN_ROLE: "admin:role-assigned",
   REVOKE_ROLE: "admin:role-revoked",
   CREATE_USER: "admin:create-user",
+  DELETE_USER: "admin:delete-user"
 } as const;
 
 // LOG ASSIGNED ROLE
@@ -67,6 +68,15 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
   logger.info(`New user created`, {
     name: data.name,
     userId: data.userId,
+    // correlationId: data.correlationId
+  });
+});
+
+// LOG DELETED USER
+appEvents.on(ADMIN_EVENTS.DELETE_USER, async (data) => {
+  logger.info(`user deleted`, {
+    deletedUser: data.name,
+    // originator: data.id
     // correlationId: data.correlationId
   });
 });
