@@ -51,11 +51,11 @@ export const permissions = p.pgTable(
 export const userroles = p.pgTable("userroles", {
   userId: p.uuid("user_id").references(() => users.id, {
     onUpdate: 'cascade',
-    onDelete: 'set null'
+    onDelete: 'cascade'
   }).notNull(),
   roleId: p.uuid("role_id").references(() => roles.id,  {
     onUpdate: 'cascade',
-    onDelete: 'set null'
+    onDelete: 'cascade'
   }).notNull(),
   description: p.text(),
   assignedAt: p.timestamp("assigned_at").defaultNow().notNull(),
@@ -70,11 +70,11 @@ export const userroles = p.pgTable("userroles", {
 export const rolepermissions = p.pgTable("rolepermissions", {
   roleId: p.uuid("role_id").references(() => roles.id, {
     onUpdate: 'cascade',
-    onDelete: 'set null'
+    onDelete: 'cascade'
   }).notNull(),
   permissionId: p.uuid("permission_id").references(() => permissions.id, {
     onUpdate: 'cascade',
-    onDelete: 'set null'
+    onDelete: 'cascade'
   }).notNull(),
 },
 (table) => [

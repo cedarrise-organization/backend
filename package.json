@@ -1,62 +1,62 @@
 {
-	"name": "ts-node-template",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"build": "npm install --include=dev && npx tsc",
-		"start": "node --env-file=.env dist/index.js",
-		"dev": "tsx watch --env-file=.env src/index.ts",
-		"watch": "tsc -w",
-		"db:push": "drizzle-kit push",
-		"db:generate": "drizzle-kit generate",
-		"db:studio": "drizzle-kit studio",
-		"db:migrate": "drizzle-kit migrate",
-		"db:seed": "tsx src/db/seedScript.ts",
-		"db:gen-mig": "drizzle-kit generate && drizzle-kit migrate"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/MaxKolbe/ts-node-template.git"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"type": "module",
-	"bugs": {
-		"url": "https://github.com/MaxKolbe/ts-node-template/issues"
-	},
-	"homepage": "https://github.com/MaxKolbe/ts-node-template#readme",
-	"dependencies": {
-		"@bull-board/api": "7.0.0",
-		"@bull-board/express": "7.0.0",
-		"@logtail/node": "0.5.8",
-		"@logtail/winston": "0.5.8",
-		"bcryptjs": "3.0.3",
-		"bullmq": "5.76.6",
-		"cookie-parser": "1.4.7",
-		"cors": "2.8.6",
-		"drizzle-kit": "0.31.10",
-		"drizzle-orm": "0.45.2",
-		"ejs": "5.0.2",
-		"express": "5.2.1",
-		"jsonwebtoken": "9.0.3",
-		"nodemailer": "8.0.7",
-		"pg": "8.20.0",
-		"redis": "5.12.1",
-		"tsx": "4.21.0",
-		"winston": "3.19.0",
-		"zod": "4.4.3"
-	},
-	"devDependencies": {
-		"@types/cookie-parser": "1.4.10",
-		"@types/cors": "2.8.19",
-		"@types/express": "5.0.6",
-		"@types/jsonwebtoken": "9.0.10",
-		"@types/node": "25.6.2",
-		"@types/nodemailer": "8.0.0",
-		"@types/pg": "8.20.0",
-		"typescript": "5.9.3",
-		"vitest": "4.1.5"
-	}
+  "name": "ts-node-template",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install --include=dev && npx tsc",
+    "start": "node --env-file=.env dist/index.js",
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "watch": "tsc -w",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:studio": "drizzle-kit studio",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx --env-file=.env src/db/seedScript.ts",
+    "db:gen-mig": "drizzle-kit generate && drizzle-kit migrate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxKolbe/ts-node-template.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/MaxKolbe/ts-node-template/issues"
+  },
+  "homepage": "https://github.com/MaxKolbe/ts-node-template#readme",
+  "dependencies": {
+    "@bull-board/api": "7.0.0",
+    "@bull-board/express": "7.0.0",
+    "@logtail/node": "0.5.8",
+    "@logtail/winston": "0.5.8",
+    "bcryptjs": "3.0.3",
+    "bullmq": "5.76.6",
+    "cookie-parser": "1.4.7",
+    "cors": "2.8.6",
+    "drizzle-kit": "0.31.10",
+    "drizzle-orm": "0.45.2",
+    "ejs": "5.0.2",
+    "express": "5.2.1",
+    "jsonwebtoken": "9.0.3",
+    "nodemailer": "8.0.7",
+    "pg": "8.20.0",
+    "redis": "5.12.1",
+    "tsx": "4.21.0",
+    "winston": "3.19.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "1.4.10",
+    "@types/cors": "2.8.19",
+    "@types/express": "5.0.6",
+    "@types/jsonwebtoken": "9.0.10",
+    "@types/node": "25.6.2",
+    "@types/nodemailer": "8.0.0",
+    "@types/pg": "8.20.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.5"
+  }
 }
