@@ -2,11 +2,14 @@
 import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authorize } from "../../middleware/auth.middleware.js";
-import { userIdSchema, roleActionSchema } from "./admin.schema.js";
+import { userIdSchema, roleActionSchema, newUserSchema } from "./admin.schema.js";
 import {
   getUserRolesController,
   getAllRolesController,
   roleActionController,
+  listAllUsersController,
+  createUserController,
+  deleteUserController,
 } from "./admin.controller.js";
 const router = express.Router();
 
@@ -15,18 +18,32 @@ router.get("/roles", authorize("read"), getAllRolesController);
 
 // List a user's roles
 router.get(
-  "/users/:userId/roles",
+  "/roles/:userId",
   authorize("read"),
   validateRequest(userIdSchema),
   getUserRolesController,
 );
 
 // Assign/Revoke a user's role
-router.post(
-  "/users/:userId/roles/action",
+router.patch(
+  "/roles/:userId/action",
   authorize("update"),
   validateRequest(roleActionSchema),
   roleActionController,
+);
+
+// Create a new user
+router.post("/users", authorize("create"), validateRequest(newUserSchema), createUserController);
+
+// List all users
+router.get("/users", authorize("read"), listAllUsersController);
+
+// Delete a user
+router.delete(
+  "/users/:userId",
+  authorize("delete"),
+  validateRequest(userIdSchema),
+  deleteUserController,
 );
 
 export default router;

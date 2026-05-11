@@ -33,7 +33,7 @@ export const authorize =
       // }
 
       // const userPermissions = await getUserPermissions(req.user.id)
-      const userPermissions = await getUserPermissions("ca6be9d2-331d-40ea-b53f-9f01fdbeb806");
+      const userPermissions = await getUserPermissions("6182432f-d9cc-445f-953a-fdd5a367a565");
 
       const missing = requiredPermissions.filter((p) => !userPermissions.includes(p));
 

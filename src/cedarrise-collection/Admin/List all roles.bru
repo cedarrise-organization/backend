@@ -1,5 +1,5 @@
 meta {
-  name: Get All Roles
+  name: List all roles
   type: http
   seq: 1
 }
@@ -10,19 +10,23 @@ get {
   auth: inherit
 }
 
-docs {
-  # Get All Roles
-
-  Lists all available roles and their associated permissions.
-
-  ## Authorization
-  Requires `read` permission.
-
-  ## Response
-  Returns an array of role objects, each containing the role name and its permissions.
+vars:pre-request {
+  baseUrl: http://localhost:3000
 }
 
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  # Get All Roles
+  
+  Lists all available roles and their associated permissions.
+  
+  ## Authorization
+  Requires `read` permission.
+  
+  ## Response
+  Returns an array of role objects, each containing the role name and its permissions.
 }

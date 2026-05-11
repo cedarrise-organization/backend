@@ -1,0 +1,52 @@
+meta {
+  name: Create user
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/admin/users
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  name: Max
+  email: max@gmail.com
+  password: 1234
+  department: ASH
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Create User
+  
+  Creates a new user account and automatically assigns the default role (`volunteer`).
+  
+  ## Authorization
+  Requires `create` permission.
+  
+  ## Request Body (`form-urlencoded`)
+  
+  | Field        | Type   | Required | Constraints                                        |
+  |--------------|--------|----------|----------------------------------------------------|
+  | name         | string | Yes      | Minimum 3 characters. Stored as lowercase.         |
+  | email        | string | Yes      | Must be a valid email. Stored as lowercase/trimmed. |
+  | password     | string | Yes      | Minimum 8 characters.                              |
+  | department   | string | Yes      | One of: `TACOTS`, `ASH`, `CAPACITY BUILDING`, `OUTREACHES` |
+  
+  ## Response
+  Returns the newly created user object.
+  
+  ## Errors
+  - `409 Conflict` — Email already exists.
+  - `400 Bad Request` — Validation failed (missing/invalid fields).
+}

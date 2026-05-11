@@ -8,5 +8,5 @@ await db.execute("SELECT 1");
 logger.info("Drizzle connected successfully");
 
 app.listen(port, () => {
-	logger.info(`Server running on port: ${port}`);
+	logger.info(`Server running on port:${port}`);
 });

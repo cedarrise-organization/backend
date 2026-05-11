@@ -1,0 +1,44 @@
+meta {
+  name: Delete user
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/admin/users/:userId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  userId: ef2c74d5-128c-4728-abe2-d4a0f99f56c0
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete one user
+  
+  Deletes a user.
+  
+  ## Authorization
+  Requires `delete` permission.
+  
+  ## Path Parameters
+  | Parameter | Type   | Required | Description                        |
+  |-----------|--------|----------|------------------------------------|
+  | userId    | string | Yes      | UUID of the user to delete|
+  
+  ## Validation
+  - `userId` must be a valid UUID.
+  
+  ## Response
+  Returns a success message
+}
