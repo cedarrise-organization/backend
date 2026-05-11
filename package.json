@@ -4,7 +4,6 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npm install --include=dev && npx tsc",
 		"start": "node --env-file=.env dist/index.js",
 		"dev": "tsx watch --env-file=.env src/index.ts",
