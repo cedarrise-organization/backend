@@ -1,6 +1,6 @@
 import db from "./db.js";
 import logger from "../configs/logger.config.js";
-import { users, roles, permissions, rolepermissions, userroles } from "./schema.js";
+import { users, roles, permissions, rolepermissions, userroles } from "./models/auth.js";
 import { eq, sql } from "drizzle-orm";
 
 // clear tables
