@@ -13,7 +13,7 @@ FROM base AS deps
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml drizzle.config.ts ./
+COPY package.json pnpm-lock.yaml drizzle.config.ts tsconfig.json ./
 COPY src ./src
 
 # Install only production dependencies with BuildKit cache
