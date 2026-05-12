@@ -1,11 +1,15 @@
 //ROUTES
 import express from "express";
-import { exampleAuthScema } from "./auth.schema.js";
+import { userSchema } from "./auth.schema.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
+import { loginController, logoutController } from "./auth.controller.js";
 
 const router = express.Router();
 
-router.post("/");
-router.post("/");
-router.post("/");
-router.post("/");
+// Logs a user in
+router.post("/login", validateRequest(userSchema), loginController);
+
+// Logs a user out
+router.post("/logout", logoutController);
+
+export default router;

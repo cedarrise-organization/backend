@@ -1,5 +1,12 @@
 import * as z from "zod";
 
+export const userSchema = z.object({
+  body: z.object({
+    email: z.email().transform((v) => v.toLowerCase().trim()),
+    password: z.string().min(8),
+  }),
+});
+
 export const exampleAuthScema = z.object({
   body: z.object({
     email: z.email("Must be a valid email").transform((v) => v.toLowerCase().trim()),
@@ -11,3 +18,4 @@ export const exampleAuthScema = z.object({
       .regex(/[0-9]/, "Must contain a number"),
   }),
 });
+

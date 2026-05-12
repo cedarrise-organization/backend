@@ -2,6 +2,7 @@ import db from "./db.js";
 import logger from "../configs/logger.config.js";
 import { users, roles, permissions, rolepermissions, userroles } from "./models/auth.js";
 import { eq, sql } from "drizzle-orm";
+import { hashPassword } from "../utils/password.util.js";
 
 // clear tables
 const clearTables = async () => {
@@ -112,7 +113,7 @@ const seedUsers = async () => {
         id: sql`uuid_generate_v4()`,
         name: "user1",
         email: "user1@gmail.com",
-        password: "user1",
+        password: await hashPassword("12345678"),
         department: "ASH",
       },
     ])
@@ -153,7 +154,7 @@ const seedUsers = async () => {
         id: sql`uuid_generate_v4()`,
         name: "user2",
         email: "user2@gmail.com",
-        password: "user2",
+        password: await hashPassword("12345678"),
         department: "ASH",
       },
     ])
@@ -194,7 +195,7 @@ const seedUsers = async () => {
         id: sql`uuid_generate_v4()`,
         name: "user3",
         email: "user3@gmail.com",
-        password: "user3",
+        password: await hashPassword("12345678"),
         department: "ASH",
       },
     ])

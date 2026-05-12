@@ -1,0 +1,38 @@
+meta {
+  name: Logout
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/logout
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Logout
+  
+  Logs the current user out by revoking their refresh token. The server reads the `cedarrefresh` cookie and deletes the corresponding token from the database.
+  
+  ## Authorization
+  Requires an active session — the `cedarrefresh` HTTP-only cookie must be present.
+  
+  ## Request Body
+  None.
+  
+  ## Response
+  Returns a `200` success message: `"Logged out successfully"`.
+  
+  ## Errors
+  - `401 Unauthorized` — Missing or invalid refresh token cookie.
+}

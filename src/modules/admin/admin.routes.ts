@@ -1,7 +1,7 @@
 //ROUTES
 import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
-import { authorize } from "../../middleware/auth.middleware.js";
+import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import { userIdSchema, roleActionSchema, newUserSchema } from "./admin.schema.js";
 import {
   listUserRolesController,
@@ -11,7 +11,9 @@ import {
   createUserController,
   deleteUserController,
 } from "./admin.controller.js";
+
 const router = express.Router();
+router.use(authenticate());
 
 // List all roles and their permissions
 router.get("/roles", authorize("read"), listAllRolesController);

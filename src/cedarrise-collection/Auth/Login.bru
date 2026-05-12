@@ -1,0 +1,48 @@
+meta {
+  name: Login
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/login
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  email: user3@gmail.com
+  password: 12345678
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Login
+  
+  Authenticates a user with their email and password. On success, sets `cedaraccess` and `cedarrefresh` HTTP-only cookies on the response.
+  
+  ## Authorization
+  None — this is a public endpoint.
+  
+  ## Request Body (`form-urlencoded`)
+  
+  | Field    | Type   | Required | Constraints                                        |
+  |----------|--------|----------|----------------------------------------------------|
+  | email    | string | Yes      | Must be a valid email. Stored as lowercase/trimmed. |
+  | password | string | Yes      | Minimum 8 characters.                              |
+  
+  ## Response
+  Returns the authenticated user object. Access and refresh tokens are set as HTTP-only cookies (`cedaraccess`, `cedarrefresh`).
+  
+  ## Errors
+  - `400 Bad Request` — Validation failed (missing/invalid fields).
+  - `404 Not Found` — Invalid credentials (wrong email or password).
+}

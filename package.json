@@ -34,7 +34,7 @@
     "@logtail/winston": "0.5.8",
     "bcryptjs": "3.0.3",
     "bullmq": "5.76.6",
-    "cookie-parser": "1.4.7",
+    "cookie-parser": "^1.4.7",
     "cors": "2.8.6",
     "drizzle-kit": "0.31.10",
     "drizzle-orm": "0.45.2",
@@ -46,7 +46,7 @@
     "redis": "5.12.1",
     "tsx": "4.21.0",
     "winston": "3.19.0",
-    "zod": "4.4.3"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cookie-parser": "1.4.10",
