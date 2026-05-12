@@ -47,7 +47,7 @@ export const cacheGetOrSet = async <T>(
   if (cached !== null) return cached;
 
   //2. Try to acquire lock
-  const lockKey = `docuchat:lock:${key}`;
+  const lockKey = `cedarrise:lock:${key}`;
   const acquired = await redisClient.set(lockKey, "1", { EX: 5, condition: "NX" }); // Expires in 5s, set only if it does NOT already exist
 
   if (acquired) {
