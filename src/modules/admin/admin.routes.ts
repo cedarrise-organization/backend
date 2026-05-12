@@ -4,8 +4,8 @@ import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authorize } from "../../middleware/auth.middleware.js";
 import { userIdSchema, roleActionSchema, newUserSchema } from "./admin.schema.js";
 import {
-  getUserRolesController,
-  getAllRolesController,
+  listUserRolesController,
+  listAllRolesController,
   roleActionController,
   listAllUsersController,
   createUserController,
@@ -14,14 +14,14 @@ import {
 const router = express.Router();
 
 // List all roles and their permissions
-router.get("/roles", authorize("read"), getAllRolesController);
+router.get("/roles", authorize("read"), listAllRolesController);
 
 // List a user's roles
 router.get(
   "/roles/:userId",
   authorize("read"),
   validateRequest(userIdSchema),
-  getUserRolesController,
+  listUserRolesController,
 );
 
 // Assign/Revoke a user's role

@@ -3,16 +3,16 @@ import { Request, Response, NextFunction } from "express";
 import { successResponse } from "../../utils/responseHandler.js";
 import {
   createUser,
-  getAllRoles,
-  getUserRoles,
+  listAllRoles,
+  listUserRoles,
   listAllUsers,
   roleAction,
   deleteUser,
 } from "../../services/admin.services.js";
 
-export const getAllRolesController = async (req: Request, res: Response, next: NextFunction) => {
+export const listAllRolesController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const response = await getAllRoles();
+    const response = await listAllRoles();
 
     return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
@@ -20,10 +20,10 @@ export const getAllRolesController = async (req: Request, res: Response, next: N
   }
 };
 
-export const getUserRolesController = async (req: Request, res: Response, next: NextFunction) => {
+export const listUserRolesController = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.params.userId!.toString();
   try {
-    const response = await getUserRoles(userId);
+    const response = await listUserRoles(userId);
 
     return successResponse(res, response.code, response.message, response.data);
   } catch (err) {

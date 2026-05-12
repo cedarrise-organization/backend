@@ -6,7 +6,7 @@ import { hashPassword } from "../utils/password.util.js";
 import { roles, userroles, users } from "../db/models/auth.js";
 import { conflictError } from "../lib/error.js";
 
-export const getAllRoles = async () => {
+export const listAllRoles = async () => {
   const appRoles = await db.select().from(roles);
 
   return {
@@ -16,7 +16,7 @@ export const getAllRoles = async () => {
   };
 };
 
-export const getUserRoles = async (userId: string) => {
+export const listUserRoles = async (userId: string) => {
   const userRoles = await db
     .select({
       id: roles.id,
@@ -139,7 +139,7 @@ export const createUser = async (options: {
 };
 
 export const listAllUsers = async () => {
-  const allUsers = await db.select({ name: users.name, email: users.email }).from(users);
+  const allUsers = await db.select({ id: users.id, name: users.name, email: users.email }).from(users);
 
   return {
     code: 200,
