@@ -3,7 +3,7 @@ import db from "../db/db.js";
 import { eq, sql } from "drizzle-orm";
 import { users, refreshtoken } from "../db/models/auth.js";
 import { appEvents } from "../lib/events.js";
-import { AUTH_EVENTS } from "../events/auth,events.js";
+import { AUTH_EVENTS } from "../events/auth.events.js";
 import { UnauthorizedError, ValidationError } from "../lib/error.js";
 import { verifyPassword } from "../utils/password.util.js";
 import {
