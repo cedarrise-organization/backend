@@ -1,0 +1,54 @@
+meta {
+  name: Send feedback from homepage
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/feedback/home
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "user@example.com",
+    "feedback": "This is a sample feedback message that must be at least ten characters long."
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+docs {
+  # Send Feedback from Homepage
+  
+  This endpoint allows users to submit feedback directly from the homepage. The feedback is sent as an email to the system administrator.
+  
+  ## Endpoint
+  `POST /api/v1/feedback/home`
+  
+  ## Request Body
+  The request expects a JSON object with the following fields:
+  
+  | Field | Type | Required | Description |
+  | :--- | :--- | :--- | :--- |
+  | `email` | string | Yes | The email address of the user submitting feedback. |
+  | `feedback` | string | Yes | The feedback message (Min: 10 characters, Max: 500 characters). |
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "Feedback email sent successully"
+    }
+    ```
+  
+  ## Error Responses
+  - **400 Bad Request**: Validation failed (e.g., invalid email, feedback too short/long).
+  - **500 Internal Server Error**: Failed to send the email.
+}
+

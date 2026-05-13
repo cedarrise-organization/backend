@@ -18,7 +18,7 @@ export const exampleQuery = z.object({
 });
 
 export const exampleParam = z.object({
-  body: z.object({
+  params: z.object({
     exampleId: z.uuid("Invalid ID"),
   }),
 });

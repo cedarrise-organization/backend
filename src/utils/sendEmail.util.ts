@@ -3,9 +3,9 @@ import logger from "../configs/logger.config.js";
 
 // Create a transporter using SMTP
 const transporter = nodemailer.createTransport({
-  host: "smtp.example.com",
-  port: 587, // Usually, port 465 for SSL or 587 for TLS
-  secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
+  host: "smtp.gmail.com", //  "smtp.example.com",
+  port: 465, // Usually, port 465 for SSL or 587 for TLS
+  secure: true, // use STARTTLS (upgrade connection to TLS after connecting)
   auth: {
     user: process.env.SMTP_USER_EMAIL,
     pass: process.env.SMTP_PASS,
@@ -42,21 +42,23 @@ export const sendEmail = async (
     logger.info("Message sent successfully", {
       messageId: info.messageId,
     });
+
+    return info;
   } catch (err: any) {
     switch (err.code) {
       case "ECONNECTION":
       case "ETIMEDOUT":
-        logger.error("Network error - retry later:", { err: err.message });
+        logger.error("Network error - retry later:", { err: err.message, recipient });
         // sendEmail(  recipient, subject, textBody, htmlBody)
         break;
       case "EAUTH":
-        logger.error("Authentication failed:", { err: err.message });
+        logger.error("Authentication failed:", { err: err.message, recipient });
         break;
       case "EENVELOPE":
-        logger.error("Invalid recipients:", { err: err.rejected });
+        logger.error("Invalid recipients:", { err: err.rejected, recipient });
         break;
       default:
-        logger.error("Error while sending mail:", { err: err.message });
+        logger.error("Error while sending mail:", { err: err.message, recipient });
     }
   }
 };

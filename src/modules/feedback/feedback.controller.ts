@@ -1,0 +1,35 @@
+import { Request, Response, NextFunction } from "express";
+import { sendEmail } from "../../utils/sendEmail.util.js";
+import logger from "../../configs/logger.config.js";
+import { successResponse } from "../../utils/responseHandler.js";
+import { errorResponse } from "../../lib/error.js";
+
+export const sendFeedbackMailController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { email, feedback } = req.body;
+
+  try {
+    const info = await sendEmail(
+      process.env.SMTP_USER_EMAIL!,
+      `Feedback submitted by ${email}`,
+      feedback,
+    );
+
+    if (!info) {
+      throw new errorResponse("Feedback email not sent. Try again.", "EMAIL_ERROR");
+    }
+
+    logger.info("Feedback email sent successully", {
+      sender: email,
+      info,
+      // correlationId
+    });
+
+    return successResponse(res, 200, "Feedback email sent successully");
+  } catch (err) {
+    next(err);
+  }
+};

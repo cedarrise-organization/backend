@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { connectRedis } from "./configs/cache.config.js";
 import { bullBoardAdapter } from "./configs/bull-board.config.js";
+import feedbackRouter from "./modules/feedback/feedback.routes.js";
 import adminRouter from "./modules/admin/admin.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
 // import featureRouter from "./modules/feature/feature.routes.js";
@@ -42,6 +43,7 @@ app.use(cors(corsOptions));
 /* app.use("/", featureRouter); */
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/feedback", feedbackRouter);
 // app.use("/queues", bullBoardAdapter.getRouter());
 
 //GLOBAL ERROR HANDLER

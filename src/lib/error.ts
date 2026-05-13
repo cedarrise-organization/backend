@@ -44,5 +44,8 @@ export class conflictError extends AppError {
   }
 }
 
-
-
+export class errorResponse extends AppError {
+    constructor(message: string, code: string) {
+    super(message, 500, code);
+  }
+}
