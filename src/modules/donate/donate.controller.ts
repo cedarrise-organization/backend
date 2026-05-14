@@ -1,6 +1,6 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { initialtize, verifyTransaction } from "../../services/donate.service.js";
+import { initialtize, verifyTransaction } from "../../services/donate.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 import { trackTransactionStatus } from "../../lib/https/trackTransactionStatus.js";
 

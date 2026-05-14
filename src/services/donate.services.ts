@@ -1,5 +1,5 @@
-import { DONATE_EVENTS } from "../events/donate.event.js";
 import { appEvents } from "../lib/events.js";
+import { DONATE_EVENTS } from "../events/donate.event.js";
 import { callPaystackApi } from "../lib/https/paystackClient.js";
 
 export const initialtize = async (body: {

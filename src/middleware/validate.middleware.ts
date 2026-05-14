@@ -10,6 +10,7 @@ export const validateRequest =
       body: req.body,
       query: req.query,
       params: req.params,
+      file: req.file
     });
 
     if (!result.success) {
