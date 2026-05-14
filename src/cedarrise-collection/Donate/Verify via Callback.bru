@@ -1,0 +1,84 @@
+meta {
+  name: Verify via Callback
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/donate/callback?reference={{reference}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  reference: {{reference}}
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Verify Donation via Callback
+  
+  Verifies a Paystack transaction using the reference returned after payment. This endpoint is hit when the donor is redirected back from Paystack's checkout page to the configured callback URL.
+  
+  ## Endpoint
+  `GET /api/v1/donate/callback`
+  
+  ## Authorization
+  None — this is a public endpoint.
+  
+  ## Query Parameters
+  
+  | Parameter | Type   | Required | Description                                                      |
+  | :-------- | :----- | :------- | :--------------------------------------------------------------- |
+  | reference | string | Yes      | The unique transaction reference provided by Paystack at initialization. |
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "Transaction verified successfully",
+      "data": {
+        "status": true,
+        "message": "Verification successful",
+        "data": {
+          "status": "success",
+          "reference": "abc123ref",
+          "amount": 90000,
+          "customer": { "email": "donor@example.com" },
+          "metadata": { "name": "John Doe", "comment": "Keep it up" }
+        }
+      }
+    }
+    ```
+  
+  ## Error Responses
+  - **400 Bad Request**: Missing or invalid `reference` query parameter.
+  - **202 Accepted**: Transaction is still `pending`, `processing`, or `ongoing`.
+  - **500 Internal Server Error**: Transaction was `abandoned`, `failed`, or `reversed`.
+  
+  ## Transaction Status Mapping
+  
+  | Paystack Status | HTTP Code | Outcome                    |
+  | :-------------- | :-------- | :------------------------- |
+  | success         | 200       | Donation verified.          |
+  | pending         | 202       | Donation still pending.     |
+  | processing      | 202       | Donation being processed.   |
+  | ongoing         | 202       | Donation ongoing.           |
+  | abandoned       | 500       | Donation attempt abandoned. |
+  | failed          | 500       | Donation attempt failed.    |
+  | reversed        | 500       | Donation was reversed.      |
+  
+  ## Notes
+  - On a `success` status, a `donation:success` event is emitted internally which persists the donor record to the `donors` table.
+  - The donor record stores: amount (converted back from kobo to Naira), email, name, and comment.
+}

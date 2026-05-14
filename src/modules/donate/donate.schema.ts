@@ -13,5 +13,10 @@ export const donateSchema = z.object({
   }),
 });
 
-export type Donation = z.infer<typeof donateSchema>;
+export const verifySchema = z.object({
+  query: z.object({
+    reference: z.string()
+  }),
+});
+
 // create custom types for request bodies with enums

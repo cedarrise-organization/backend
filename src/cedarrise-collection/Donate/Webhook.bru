@@ -1,0 +1,83 @@
+meta {
+  name: Webhook
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/donate/webhook
+  body: json
+  auth: inherit
+}
+
+headers {
+  x-paystack-signature: {{paystackSignature}}
+}
+
+body:json {
+  {
+    "event": "charge.success",
+    "data": {
+      "reference": "abc123ref",
+      "status": "success",
+      "amount": 90000,
+      "customer": {
+        "email": "donor@example.com"
+      },
+      "metadata": {
+        "name": "John Doe",
+        "comment": "Keep it up"
+      }
+    }
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Paystack Webhook
+
+  Receives Paystack webhook event notifications. This endpoint is called directly by Paystack's servers when a transaction event occurs (e.g., a successful charge).
+
+  ## Endpoint
+  `POST /api/v1/donate/webhook`
+
+  ## Authorization
+  Paystack signature verification — the `x-paystack-signature` header must contain a valid HMAC SHA-512 hash of the request body, signed with the Paystack secret key.
+
+  ## Request Headers
+
+  | Header               | Type   | Required | Description                                         |
+  | :------------------- | :----- | :------- | :-------------------------------------------------- |
+  | x-paystack-signature | string | Yes      | HMAC SHA-512 signature of the JSON payload.          |
+
+  ## Request Body (`JSON`)
+  The body is a Paystack event object. The structure varies by event type, but a typical `charge.success` event includes:
+
+  | Field              | Type   | Description                          |
+  | :----------------- | :----- | :----------------------------------- |
+  | event              | string | Event type (e.g., `charge.success`). |
+  | data.reference     | string | Transaction reference.               |
+  | data.status        | string | Transaction status.                  |
+  | data.amount        | number | Amount in kobo.                      |
+  | data.customer      | object | Customer details.                    |
+  | data.metadata      | object | Custom metadata (name, comment).     |
+
+  ## Response
+  - **Status Code**: `200 OK`
+  - Returns immediately to acknowledge receipt.
+
+  ## Error Responses
+  - **401 Unauthorized**: Missing or invalid `x-paystack-signature` header.
+
+  ## Notes
+  - This endpoint is intended to be called by Paystack servers only — not by clients.
+  - The webhook middleware (`verifyPaystackHook`) validates the signature before the controller executes.
+}

@@ -54,7 +54,7 @@ app.use("/api/v1/feedback", feedbackRouter);
 // HANDLER FOR UNKNOWN ROUTES
 app.use((req, res) => {
   res.status(404).json({
-    success: false,
+    success: false, 
     error: { code: "NOT_FOUND", message: `Route ${req.path} not found` },
   });
 });

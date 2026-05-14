@@ -43,9 +43,3 @@ export class conflictError extends AppError {
     super(message, 409, "CONFLICT");
   }
 }
-
-export class errorResponse extends AppError {
-    constructor(message: string, code: string) {
-    super(message, 500, code);
-  }
-}

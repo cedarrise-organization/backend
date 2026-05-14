@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { sendEmail } from "../../utils/sendEmail.util.js";
 import logger from "../../configs/logger.config.js";
 import { successResponse } from "../../utils/responseHandler.js";
-import { errorResponse } from "../../lib/error.js";
 
 export const sendFeedbackMailController = async (
   req: Request,
@@ -19,7 +18,13 @@ export const sendFeedbackMailController = async (
     );
 
     if (!info) {
-      throw new errorResponse("Feedback email not sent. Try again.", "EMAIL_ERROR");
+      return res.status(500).json({
+        status: false,
+        error: {
+          code: 500,
+          message: "Feedback email not sent.",
+        },
+      });
     }
 
     logger.info("Feedback email sent successully", {

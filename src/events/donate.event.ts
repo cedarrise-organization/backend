@@ -20,14 +20,14 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       comment: data.comment,
     });
 
-    logger.info("Donor created!", {
+    logger.info("Donotion record created!", {
       email: data.email,
       // correlationId
     });
 
     //could send email thanking them for their donation
   } catch (err) {
-    logger.info("Failed to create D=donor", {
+    logger.info("Failed to create Donation record", {
       email: data.email,
       // correlationId
     });

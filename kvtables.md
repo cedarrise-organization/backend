@@ -68,11 +68,18 @@
 
 # Feature Events (`FEATURE_EVENTS`)
 
+| Constant          | Event String       | Emitted When                     |
+| :---------------- | :----------------- | :------------------------------- |
+| `DONATION_MADE`   | `donation:success` | A donation was made successfully |
+| `DONATION_FAILED` | `donation:failed`  | A donation attempt failed        |
+
+---
+
+# Feature Events (`FEATURE_EVENTS`)
+
 | Constant         | Event String     | Emitted When                 |
 | :--------------- | :--------------- | :--------------------------- |
 | `FEATURE_ACTION` | `feature:action` | Template / placeholder event |
-
----
 
 # BullMQ Queues
 
