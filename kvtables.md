@@ -23,15 +23,18 @@
 | Values      | TTL            | Source         |
 | :---------- | :------------- | :------------- |
 | PERMISSIONS | 600s (10 mins) | `lib/cache.ts` |
+| BLOGS       | 3600s (1 hr)   | `lib/cache.ts` |
 
 ---
 
 # Cache Key Patterns
 
-| Key Pattern                      | Description                                                      | Source               |
-| :------------------------------- | :--------------------------------------------------------------- | :------------------- |
-| `cedarrise:permissions:{userId}` | Stores a user's resolved permission names                        | `utils/rbac.util.ts` |
-| `cedarrise:lock:{key}`           | Distributed lock for cache-aside stampede prevention (5s expiry) | `lib/cache.ts`       |
+| Key Pattern                              | Description                                                      | Source                     |
+| :--------------------------------------- | :--------------------------------------------------------------- | :------------------------- |
+| `cedarrise:permissions:{userId}`         | Stores a user's resolved permission names                        | `utils/rbac.util.ts`       |
+| `cedarrise:lock:{key}`                   | Distributed lock for cache-aside stampede prevention (5s expiry) | `lib/cache.ts`             |
+| `cedarrise:blogs:list:{page}:{limit}`    | Cached paginated blog list. Set on read.                         | `services/blog.services.ts` |
+| `cedarrise:blogs:single:{id}`            | Cached single blog post. Set on read/create, deleted on update/delete. | `services/blog.services.ts` |
 
 ---
 
@@ -66,7 +69,7 @@
 
 ---
 
-# Feature Events (`FEATURE_EVENTS`)
+# DONATION Events (`FEATURE_EVENTS`)
 
 | Constant          | Event String       | Emitted When                     |
 | :---------------- | :----------------- | :------------------------------- |
@@ -96,6 +99,14 @@
 | Access Token           | 15 minutes | `JWT_ACCESS_SECRET`  |
 | Refresh Token          | 7 days     | `JWT_REFRESH_SECRET` |
 | Refresh Token (DB row) | 7 days     | —                    |
+
+---
+
+# CLOUDINARY FOLDERS
+
+| PAGE  | PATH                       |
+| :---- | :------------------------- |
+| Blogs | /Cedarrise Initiative/BLOG |
 
 ---
 

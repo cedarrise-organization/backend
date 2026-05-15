@@ -50,7 +50,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/donate", donateRouter);
 app.use("/api/v1/feedback", feedbackRouter);
-app.use("/api/v1/blog", blogRouter);
+app.use("/api/v1/blogs", blogRouter);
 // app.use("/queues", bullBoardAdapter.getRouter());
 
 // HANDLER FOR UNKNOWN ROUTES

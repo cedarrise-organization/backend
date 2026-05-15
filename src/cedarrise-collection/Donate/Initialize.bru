@@ -14,7 +14,7 @@ body:json {
   {
     "amount": 900,
     "email": "maximilianogbuabor@gmail.com",
-    "name": "buuty",
+    "name": "kolbe",
     "comment": "Love your work"
   }
 }
@@ -30,24 +30,24 @@ settings {
 
 docs {
   # Initialize Donation
-
+  
   Initializes a donation transaction via the Paystack payment gateway. Returns an authorization URL that the client should redirect the donor to in order to complete payment.
-
+  
   ## Endpoint
   `POST /api/v1/donate`
-
+  
   ## Authorization
   None — this is a public endpoint.
-
+  
   ## Request Body (`JSON`)
-
+  
   | Field   | Type   | Required | Description                                                        |
   | :------ | :----- | :------- | :----------------------------------------------------------------- |
   | amount  | number | Yes      | Donation amount in Naira. Minimum of 100 (₦100). Converted to kobo server-side. |
   | email   | string | Yes      | Email address of the donor. Must be a valid email.                 |
   | name    | string | Yes      | Name of the donor. Minimum 3 characters.                           |
   | comment | string | No       | Optional message or comment from the donor.                        |
-
+  
   ## Success Response
   - **Status Code**: `200 OK`
   - **Body**:
@@ -62,11 +62,11 @@ docs {
       }
     }
     ```
-
+  
   ## Error Responses
   - **400 Bad Request**: Validation failed (e.g., amount below 100, invalid email, name too short).
   - **500 Internal Server Error**: Paystack API call failed.
-
+  
   ## Notes
   - The `amount` is transformed from Naira to kobo (multiplied by 100) before being sent to Paystack.
   - On successful payment, the donor is redirected to the configured `PAYSTACK_CALLBACK` URL with a `reference` query parameter.

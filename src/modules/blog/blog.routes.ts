@@ -1,30 +1,49 @@
 //ROUTES
 import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
-import { blogBodySchema, blogParamSchema, blogQuerySchema } from "./blog.schema.js";
+import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
-  listBlogController,
+  blogBodySchema,
+  updateBlogSchema,
+  blogParamSchema,
+  blogQuerySchema,
+} from "./blog.schema.js";
+import {
+  listBlogsController,
   getSingleBlogController,
   createBlogController,
   deleteBlogController,
   updateBlogController,
 } from "./blog.controller.js";
 import { upload } from "../../configs/multer.config.js";
+
 const router = express.Router();
 
 // List published blog posts
-router.get("/", listBlogController);
+router.get("/", validateRequest(blogQuerySchema), listBlogsController);
 
 // Get single post
-router.get("/:id", getSingleBlogController);
+router.get("/:id", validateRequest(blogParamSchema), getSingleBlogController);
 
 // Create blog post (draft)
-router.post("/", upload.single("file"), validateRequest(blogBodySchema), createBlogController);
+router.post(
+  "/",
+  authenticate(),
+  upload.single("file"),
+  validateRequest(blogBodySchema),
+  createBlogController,
+);
 
 // Delete blog post
-router.delete("/:id", deleteBlogController);
+router.delete("/:id", authenticate(), validateRequest(blogParamSchema), deleteBlogController);
 
 // Update post content or publish
-router.patch("/:id", updateBlogController);
+router.patch(
+  "/:id",
+  authenticate(),
+  upload.single("file"),
+  validateRequest(updateBlogSchema),
+  updateBlogController,
+);
 
 export default router;

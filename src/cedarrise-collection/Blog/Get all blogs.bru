@@ -1,0 +1,71 @@
+meta {
+  name: Get all blogs
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/blogs?page=1&limit=20
+  body: none
+  auth: inherit
+}
+
+query {
+  page: 1
+  limit: 20
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get All Blogs
+  
+  Retrieves a paginated list of all published blog posts, ordered by date and ID ascending.
+  
+  ## Endpoint
+  `GET /api/v1/blogs`
+  
+  ## Authorization
+  None — this is a public endpoint.
+  
+  ## Query Parameters
+  
+  | Param | Type   | Required | Default | Constraints         | Description                     |
+  | :---- | :----- | :------- | :------ | :------------------ | :------------------------------ |
+  | page  | number | No       | 1       | Integer             | The page number to retrieve.    |
+  | limit | number | No       | 20      | Integer, 1–100      | Number of blog posts per page.  |
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "Blogs found successfully",
+      "data": [
+        {
+          "id": "uuid",
+          "title": "Blog Title",
+          "description": "Blog description",
+          "documentUrl": "https://res.cloudinary.com/...",
+          "publicId": "Cedarrise Initiative/BLOG/...",
+          "date": "2026-01-01T00:00:00.000Z"
+        }
+      ]
+    }
+    ```
+  
+  ## Error Responses
+  - **400 Bad Request**: Validation failed (e.g., `page` or `limit` is not a valid integer, `limit` exceeds 100).
+  
+  ## Notes
+  - Results are cached under `cedarrise:blogs:list:{page}:{limit}` with a 1-hour TTL.
+  - Results are ordered by `date ASC`, then `id ASC`.
+}

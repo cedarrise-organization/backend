@@ -1,0 +1,79 @@
+meta {
+  name: Create blog post
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/blogs
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  title: Second Test Blog
+  description: A huge Description of my second test blog
+  file: @file(C:\Users\Maxmillian\Desktop\The cat.pdf)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Create Blog Post
+  
+  Creates a new blog post with a title, optional description, and an attached document file. The file is uploaded to Cloudinary under the `/Cedarrise Initiative/BLOG` folder.
+  
+  ## Endpoint
+  `POST /api/v1/blogs`
+  
+  ## Authorization
+  Inherited — requires authentication.
+  
+  ## Request Body (`multipart/form-data`)
+  
+  | Field       | Type   | Required | Constraints                                    | Description                     |
+  | :---------- | :----- | :------- | :--------------------------------------------- | :------------------------------ |
+  | title       | string | Yes      | Minimum 3 characters                           | The title of the blog post.     |
+  | description | string | No       | —                                              | An optional blog description.   |
+  | file        | file   | Yes      | PDF, DOC, DOCX, XLS, or XLSX. Max size: 20 MB. | The document file for the blog. |
+  
+  ### Accepted MIME Types
+  - `application/pdf`
+  - `application/msword`
+  - `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+  - `application/vnd.ms-excel`
+  - `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+  
+  ## Success Response
+  - **Status Code**: `201 Created`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "Blog created successfully",
+      "data": {
+        "id": "uuid",
+        "title": "Second Test Blog",
+        "description": "A huge Description of my second test blog",
+        "documentUrl": "https://res.cloudinary.com/...",
+        "publicId": "Cedarrise Initiative/BLOG/...",
+        "date": "2026-01-01T00:00:00.000Z"
+      }
+    }
+    ```
+  
+  ## Error Responses
+  - **400 Bad Request**: Validation failed (e.g., title too short, missing file, unsupported MIME type, file exceeds 20 MB).
+  - **500 Internal Server Error**: Cloudinary upload failed.
+  
+  ## Notes
+  - The file field name must be `file` (used by multer's `upload.single("file")`).
+  - The newly created blog is immediately cached under `cedarrise:blogs:single:{id}` with a 1-hour TTL.
+}

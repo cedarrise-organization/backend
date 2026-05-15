@@ -1,0 +1,74 @@
+meta {
+  name: Update blog post
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/blogs/{{id}}
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  title: My new blog
+  description: A desc of my new blog
+  file: @file(C:\Users\Maxmillian\Desktop\Bootcamp\w4d1_vectors.pdf)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  id: 62fb7517-e28a-45ad-852b-269b75f19309
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Update Blog Post
+  
+  Updates an existing blog post's title, description, and/or attached document. All fields are optional — only provided fields are updated.
+  
+  ## Endpoint
+  `PATCH /api/v1/blogs/:id`
+  
+  ## Authorization
+  Inherited — requires authentication.
+  
+  ## Path Parameters
+  
+  | Param | Type   | Required | Constraints | Description                    |
+  | :---- | :----- | :------- | :---------- | :----------------------------- |
+  | id    | string | Yes      | Valid UUID   | The unique ID of the blog post. |
+  
+  ## Request Body (`multipart/form-data`)
+  
+  | Field       | Type   | Required | Constraints | Description                                  |
+  | :---------- | :----- | :------- | :---------- | :------------------------------------------- |
+  | title       | string | No       | —           | Updated title for the blog post.             |
+  | description | string | No       | —           | Updated description for the blog post.       |
+  | file        | file   | No       | Max: 20 MB  | Replacement document file. Old file is deleted from Cloudinary. |
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "Blog post updated successfully",
+      "data": null
+    }
+    ```
+  
+  ## Error Responses
+  - **400 Bad Request**: Validation failed (e.g., `id` is not a valid UUID).
+  - **500 Internal Server Error**: Blog not found, or Cloudinary upload/delete failed.
+  
+  ## Notes
+  - If a new `file` is provided, the existing document is first deleted from Cloudinary before the new one is uploaded.
+  - If only `title` and/or `description` are provided (no file), only the text fields are updated.
+  - If neither `title` nor `description` is provided and no file is attached, the endpoint returns `200 OK` with no changes.
+  - The cache entry `cedarrise:blogs:single:{id}` is invalidated after a successful update.
+}
