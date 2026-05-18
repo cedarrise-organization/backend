@@ -1,7 +1,7 @@
 //ROUTES
 import express from "express";
-import { validateRequest } from "../../middleware/validate.middleware.js";
-import { authenticate, authorize } from "../../middleware/auth.middleware.js";
+import { validateRequest } from "../../../middleware/validate.middleware.js";
+import { authenticate, authorize } from "../../../middleware/auth.middleware.js";
 import {
   blogBodySchema,
   updateBlogSchema,
@@ -15,7 +15,7 @@ import {
   deleteBlogController,
   updateBlogController,
 } from "./blog.controller.js";
-import { upload } from "../../configs/multer.config.js";
+import { upload } from "../../../configs/multer.config.js";
 
 const router = express.Router();
 

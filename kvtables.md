@@ -33,8 +33,8 @@
 | :--------------------------------------- | :--------------------------------------------------------------- | :------------------------- |
 | `cedarrise:permissions:{userId}`         | Stores a user's resolved permission names                        | `utils/rbac.util.ts`       |
 | `cedarrise:lock:{key}`                   | Distributed lock for cache-aside stampede prevention (5s expiry) | `lib/cache.ts`             |
-| `cedarrise:blogs:list:{page}:{limit}`    | Cached paginated blog list. Set on read.                         | `services/blog.services.ts` |
-| `cedarrise:blogs:single:{id}`            | Cached single blog post. Set on read/create, deleted on update/delete. | `services/blog.services.ts` |
+| `cedarrise:blogs:list:{page}:{limit}`    | Cached paginated blog list. Set on read.                         | `services/clientside/blog.services.ts` |
+| `cedarrise:blogs:single:{id}`            | Cached single blog post. Set on read/create, deleted on update/delete. | `services/clientside/blog.services.ts` |
 
 ---
 

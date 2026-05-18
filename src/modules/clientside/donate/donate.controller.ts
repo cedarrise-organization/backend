@@ -1,8 +1,8 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { initialtize, verifyTransaction } from "../../services/donate.services.js";
-import { successResponse } from "../../utils/responseHandler.js";
-import { trackTransactionStatus } from "../../lib/https/trackTransactionStatus.js";
+import { initialtize, verifyTransaction } from "../../../services/clientside/donate.services.js";
+import { successResponse } from "../../../utils/responseHandler.js";
+import { trackTransactionStatus } from "../../../lib/https/trackTransactionStatus.js";
 
 export const initializeController = async (req: Request, res: Response, next: NextFunction) => {
   const { amount, email, name, comment } = req.body;

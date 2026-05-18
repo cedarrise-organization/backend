@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { sendEmail } from "../../utils/sendEmail.util.js";
-import logger from "../../configs/logger.config.js";
-import { successResponse } from "../../utils/responseHandler.js";
+import { sendEmail } from "../../../utils/sendEmail.util.js";
+import logger from "../../../configs/logger.config.js";
+import { successResponse } from "../../../utils/responseHandler.js";
 
 export const sendFeedbackMailController = async (
   req: Request,

@@ -6,9 +6,9 @@ import {
   createBlog,
   updateBlog,
   deleteBlog,
-} from "../../services/blog.services.js";
-import { ValidationError } from "../../lib/error.js";
-import { successResponse } from "../../utils/responseHandler.js";
+} from "../../../services/clientside/blog.services.js"
+import { ValidationError } from "../../../lib/error.js";
+import { successResponse } from "../../../utils/responseHandler.js";
 
 export const listBlogsController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;

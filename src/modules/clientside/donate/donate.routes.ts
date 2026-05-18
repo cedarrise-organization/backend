@@ -1,7 +1,7 @@
 import express from "express";
 import { donateSchema, verifySchema } from "./donate.schema.js";
-import { validateRequest } from "../../middleware/validate.middleware.js";
-import { verifyPaystackHook } from "../../middleware/verifyWebhook.middleware.js";
+import { validateRequest } from "../../../middleware/validate.middleware.js";
+import { verifyPaystackHook } from "../../../middleware/verifyWebhook.middleware.js";
 import {
   initializeController,
   verifyController,
