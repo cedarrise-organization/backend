@@ -5,6 +5,7 @@ import { Request } from "express";
 import { blogs } from "../db/models/blogs.js";
 import { UploadApiResponse } from "cloudinary";
 import { CACHE_TTL, cacheDel, cacheGet, cacheSet } from "../lib/cache.js";
+import logger from "../configs/logger.config.js";
 
 export const listBlogs = async (page: number, limit: number) => {
   /// cache
@@ -133,7 +134,10 @@ export const deleteBlog = async (id: string) => {
   });
 
   if (deleteResponse.result !== "ok") {
-    // emit error
+    logger.error("Blog pdf was not deleted from s3", {
+      publicId: blogs.publicId,
+      event: "delete_blog",
+    });
   }
 
   await db.delete(blogs).where(eq(blogs.id, id));
@@ -177,7 +181,10 @@ export const updateBlog = async (
     });
 
     if (deleteResponse.result !== "ok") {
-      // emit error
+      logger.error("Blog pdf was not deleted from s3", {
+        publicId: blogs.publicId,
+        event: "update_blog",
+      });
     }
     const uploadResponse = await new Promise<UploadApiResponse | undefined>((resolve, reject) => {
       cloudinary.uploader

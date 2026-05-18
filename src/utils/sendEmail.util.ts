@@ -15,9 +15,9 @@ const transporter = nodemailer.createTransport({
 // optional
 try {
   await transporter.verify();
-  logger.info("Server is ready to take our messages");
+  logger.info("Send Email function is ready. Server ready.");
 } catch (err: any) {
-  logger.info("Verification failed:", { err: err.message });
+  logger.info("Send Email Verification failed:", { err: err.message });
 }
 
 export const sendEmail = async (
