@@ -20,10 +20,11 @@
 
 # Cache Time-To-Live
 
-| Values      | TTL            | Source         |
-| :---------- | :------------- | :------------- |
-| PERMISSIONS | 600s (10 mins) | `lib/cache.ts` |
-| BLOGS       | 3600s (1 hr)   | `lib/cache.ts` |
+| Values      | TTL             | Source         |
+| :---------- | :-------------- | :------------- |
+| PERMISSIONS | 600s (10 mins)  | `lib/cache.ts` |
+| BLOGS       | 3600s (1 hr)    | `lib/cache.ts` |
+| GALLERY     | 43200s (12 hrs) | `lib/cache.ts` |
 
 ---
 
@@ -35,6 +36,10 @@
 | `cedarrise:lock:{key}`                   | Distributed lock for cache-aside stampede prevention (5s expiry) | `lib/cache.ts`             |
 | `cedarrise:blogs:list:{page}:{limit}`    | Cached paginated blog list. Set on read.                         | `services/clientside/blog.services.ts` |
 | `cedarrise:blogs:single:{id}`            | Cached single blog post. Set on read/create, deleted on update/delete. | `services/clientside/blog.services.ts` |
+| `cedarrise:gallery:ash`                  | Cached ASH program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:tacots`               | Cached TACOTS program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:outreaches`           | Cached Outreaches program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:capacity`             | Cached Capacity Building program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
 
 ---
 
@@ -104,9 +109,13 @@
 
 # CLOUDINARY FOLDERS
 
-| PAGE  | PATH                       |
-| :---- | :------------------------- |
-| Blogs | /Cedarrise Initiative/BLOG |
+| PAGE              | PATH                                    |
+| :---------------- | :-------------------------------------- |
+| Blogs             | `/Cedarrise Initiative/BLOG`             |
+| Carousel — ASH    | `Cedarrise Initiative/ASH`              |
+| Carousel — TACOTS | `Cedarrise Initiative/TACOTS`           |
+| Carousel — Outreaches | `Cedarrise Initiative/OUTREACHES`   |
+| Carousel — Capacity Building | `Cedarrise Initiative/CAPACITY BUILDING` |
 
 ---
 

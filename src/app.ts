@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { connectRedis } from "./configs/cache.config.js";
 import { bullBoardAdapter } from "./configs/bull-board.config.js";
+import carouselRouter from "./modules/clientside/carousels/carousels.routes.js";
 import feedbackRouter from "./modules/clientside/feedback/feedback.routes.js";
 import donateRouter from "./modules/clientside/donate/donate.routes.js";
 import blogRouter from "./modules/clientside/blog/blog.routes.js";
@@ -48,9 +49,10 @@ app.use(cors(corsOptions));
 /* app.use("/", featureRouter); */
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/donate", donateRouter);
 app.use("/api/v1/feedback", feedbackRouter);
-app.use("/api/v1/blogs", blogRouter);
+app.use("/api/v1/carousels", carouselRouter);
 // app.use("/queues", bullBoardAdapter.getRouter());
 
 // HANDLER FOR UNKNOWN ROUTES

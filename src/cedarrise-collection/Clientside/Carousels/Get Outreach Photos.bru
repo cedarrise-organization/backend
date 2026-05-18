@@ -1,0 +1,59 @@
+meta {
+  name: Get Outreach Photos
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/carousels/outreaches
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Outreach Photos
+  
+  Retrieves all photo URLs from the **Outreaches** program gallery, sourced from Cloudinary. Results are returned in descending order by upload date (most recent first), up to a maximum of 200 photos.
+  
+  ## Endpoint
+  `GET /api/v1/carousels/outreaches`
+  
+  ## Authorization
+  None — this is a public endpoint.
+  
+  ## Query Parameters
+  None.
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "OUTREACHES photo urls found successfully",
+      "data": [
+        {
+          "public_id": "PAT_8056_result_bbbbb",
+          "url": "https://res.cloudinary.com/..."
+        }
+      ]
+    }
+    ```
+  
+  ## Error Responses
+  None expected under normal operation. Cloudinary connectivity issues will result in a `500 Internal Server Error`.
+  
+  ## Notes
+  - Results are cached under `cedarrise:gallery:outreaches` with a 12-hour TTL (`CACHE_TTL.GALLERY`).
+  - The Cloudinary source folder is `Cedarrise Initiative/OUTREACHES`.
+  - Max results per request: **200**.
+}
