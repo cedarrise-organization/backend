@@ -1,0 +1,293 @@
+//MODELS
+import * as z from "zod";
+import {
+  textSchema,
+  optionalTextSchema,
+  genderSchema,
+  nigerianStateSchema,
+  classSchema,
+  yesNoSchema,
+  numericSchema,
+  statusSchema,
+  imageFileSchema,
+  resultFileSchema,
+  idSchema,
+  baseQueryBody,
+  academicSessionSchema,
+  rating1To10Schema,
+  rating1To5Schema,
+} from "../../db/globalschema/global.schema.js";
+
+export const ashTermSchema = z.enum(["TERM 1", "TERM 2", "TERM 3"]);
+
+export const ashStudentBody = z.object({
+  programType: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["ONLINE", "OFFLINE"])),
+  firstName: textSchema,
+  middleName: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+  surname: textSchema,
+  gender: genderSchema,
+  age: z.coerce.number().int().min(6).max(18),
+  dob: z.coerce.date(),
+  primaryLanguage: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["ENGLISH", "IGBO", "HAUSA", "YORUBA", "PIDGIN ENGLISH", "OTHER"]),
+  ),
+  homeAddress: textSchema,
+  studentPhone: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+
+  schoolName: textSchema,
+  schoolTown: textSchema,
+  schoolLga: textSchema,
+  schoolState: nigerianStateSchema,
+  currentClass: classSchema,
+  classPositionLastTerm: textSchema,
+
+  prevAfterschoolProgram: yesNoSchema,
+  reasonForJoining: textSchema,
+
+  fathersName: textSchema,
+  fathersPhone: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+  fathersOccupation: textSchema,
+  mothersName: textSchema,
+  mothersPhone: textSchema,
+  mothersOccupation: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+
+  guardianName: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+  guardianRelationship: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z
+      .enum([
+        "BROTHER",
+        "SISTER",
+        "AUNTY",
+        "UNCLE",
+        "GRANDMOTHER",
+        "GRANDFATHER",
+        "COUSIN",
+        "OTHER",
+      ])
+      .optional(),
+  ),
+  guardianPhone: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+  guardianOccupation: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+
+  householdIncomeRange: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["NO STABLE INCOME", "< ₦100K", "₦100K-₦300K", "₦300K-₦600K", "₦600K-₦1M"]).optional(),
+  ),
+  hasLearningCondition: z.enum(["NO", "YES", "NOT SURE"]),
+  learningConditions: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z
+      .array(
+        z.enum([
+          "LEARNING DIFFICULTY",
+          "VISION IMPAIRMENT",
+          "HEARING IMPAIRMENT",
+          "ATTENTION DIFFICULTY",
+          "PHYSICAL DISABILITY",
+          "OTHER",
+        ]),
+      )
+      .optional(),
+  ),
+
+  parentConsent: z.coerce.boolean().default(false),
+  declarationConfirmed: z.coerce.boolean().default(false),
+
+  assignedMentor: z.preprocess((val) => (val === "" ? undefined : val), optionalTextSchema),
+  pretestScore: numericSchema.optional(),
+  status: statusSchema.default("pending").optional(),
+});
+
+export type AshstudentbodyType = z.infer<typeof ashStudentBody>;
+
+export const createAshStudentSchema = z.object({
+  body: ashStudentBody,
+  files: z.object({
+    passportPhoto: imageFileSchema,
+    lastResult: resultFileSchema.optional(),
+    parentSignature: imageFileSchema,
+  }),
+});
+
+export const updateAshStudentSchema = z.object({
+  body: ashStudentBody.partial(),
+  files: z
+    .object({
+      passportPhoto: imageFileSchema.optional(),
+      lastResult: resultFileSchema.optional(),
+      parentSignature: imageFileSchema.optional(),
+    })
+    .optional(),
+});
+
+export const ashStudentParamsSchema = idSchema;
+
+export const ashStudentQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+    status: statusSchema.optional(),
+  }),
+});
+
+export const ashTermlyTrackingBody = z.object({
+  studentId: z.uuid("Invalid ID"),
+  academicSession: academicSessionSchema,
+  term: ashTermSchema,
+  schoolName: textSchema,
+
+  schoolNumeracyScore: numericSchema.optional(),
+  schoolLiteracyScore: numericSchema.optional(),
+  schoolAverage: numericSchema.optional(),
+  schoolPosition: optionalTextSchema,
+
+  pretestNumeracyScore: numericSchema.optional(),
+  pretestLiteracyScore: numericSchema.optional(),
+  pretestAverage: numericSchema.optional(),
+
+  midtestNumeracyScore: numericSchema.optional(),
+  midtestLiteracyScore: numericSchema.optional(),
+  midtestAverage: numericSchema.optional(),
+
+  posttestNumeracyScore: numericSchema.optional(),
+  posttestLiteracyScore: numericSchema.optional(),
+  posttestAverage: numericSchema.optional(),
+
+  disciplineRating: rating1To5Schema,
+  responsibilityRating: rating1To5Schema,
+  leadershipRating: rating1To5Schema,
+
+  notableAchievements: optionalTextSchema,
+  challengesObserved: optionalTextSchema,
+  nextTermRecommendations: optionalTextSchema,
+  mentorName: textSchema,
+});
+
+export const createAshTermlyTrackingSchema = z.object({
+  body: ashTermlyTrackingBody,
+  file: resultFileSchema,
+});
+
+export const updateAshTermlyTrackingSchema = z.object({
+  body: ashTermlyTrackingBody.partial(),
+  file: resultFileSchema.optional(),
+});
+
+export const ashTermlyTrackingParamsSchema = idSchema;
+
+export const ashTermlyTrackingQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+    academicSession: academicSessionSchema.optional(),
+    term: ashTermSchema.optional(),
+  }),
+});
+
+export const ashWeeklyAttendanceBody = z.object({
+  sessionDate: z.coerce.date(),
+  studentsInAttendance: z.array(z.uuid("Invalid ID")).min(1),
+  studentsMentored: z.array(z.uuid("Invalid ID")).min(1),
+  sessionsConducted: z
+    .array(z.enum(["PERFORMANCE ART", "SKILLS TRAINING", "FORMATIVE TALKS"]))
+    .optional(),
+  sessionDetails: optionalTextSchema,
+  volunteersInAttendance: textSchema,
+  programReview: optionalTextSchema,
+});
+
+export const createAshWeeklyAttendanceSchema = z.object({
+  body: ashWeeklyAttendanceBody,
+});
+
+export const updateAshWeeklyAttendanceSchema = z.object({
+  body: ashWeeklyAttendanceBody.partial(),
+});
+
+export const ashWeeklyAttendanceParamsSchema = idSchema;
+
+export const ashWeeklyAttendanceQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+  }),
+});
+
+export const ashExitBody = z.object({
+  studentId: z.uuid("Invalid ID"),
+  ageAtExit: z.coerce.number().int().min(6).max(18),
+  schoolName: textSchema,
+  classAtExit: classSchema,
+  durationInProgram: z.enum([
+    "LESS THAN 6 MONTHS",
+    "6 MONTHS–1 YEAR",
+    "1 YEAR",
+    "2 YEARS",
+    "3 YEARS",
+    "4 YEARS",
+    "5 YEARS",
+    "6 YEARS",
+    "7 YEARS",
+    "8 YEARS",
+    "9 YEARS",
+    "10 YEARS",
+    "11 YEARS",
+    "12 YEARS",
+  ]),
+  exitReason: z.enum([
+    "COMPLETED",
+    "GRADUATED",
+    "MOVED",
+    "PERSONAL / FAMILY",
+    "COULD NOT ATTEND",
+    "DROPPED OUT",
+    "OTHER",
+  ]),
+  academicImpactRating: rating1To10Schema,
+  areasOfImprovement: z
+    .array(
+      z.enum([
+        "LITERACY",
+        "NUMERACY",
+        "VOCATIONAL",
+        "DIGITAL LITERACY",
+        "SOFT SKILLS",
+        "CHARACTER",
+        "OTHER",
+      ]),
+    )
+    .optional(),
+  mentorshipReceived: z.enum(["REGULARLY", "OFTEN", "OCCASIONALLY", "RARELY", "NEVER"]),
+  mentorshipImpactRating: rating1To10Schema.optional(),
+  postAshStatus: z.enum([
+    "CONTINUING SCHOOL",
+    "COMPLETED SCHOOL",
+    "UNIVERSITY",
+    "VOCATIONAL",
+    "EMPLOYED",
+    "NOT IN TRAINING",
+  ]),
+  institutionName: optionalTextSchema,
+  courseOfStudy: optionalTextSchema,
+  vocationalSkill: optionalTextSchema,
+  enjoyedMost: optionalTextSchema,
+  programImpact: optionalTextSchema,
+  improvementSuggestions: optionalTextSchema,
+  facilitatorName: textSchema,
+  exitDate: z.coerce.date(),
+});
+
+export const createAshExitSchema = z.object({
+  body: ashExitBody,
+});
+
+export const updateAshExitSchema = z.object({
+  body: ashExitBody.partial(),
+});
+
+export const ashExitParamsSchema = idSchema;
+
+export const ashExitQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+  }),
+});

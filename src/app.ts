@@ -10,6 +10,7 @@ import donateRouter from "./modules/clientside/donate/donate.routes.js";
 import blogRouter from "./modules/clientside/blog/blog.routes.js";
 import adminRouter from "./modules/admin/admin.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
+import ashRouter from "./modules/ash/ash.routes.js";
 import "./events/admin.events.js";
 import "./events/donate.event.js";
 import "./events/auth.events.js";
@@ -53,6 +54,7 @@ app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/donate", donateRouter);
 app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/carousels", carouselRouter);
+app.use("/api/v1/ash", ashRouter);
 // app.use("/queues", bullBoardAdapter.getRouter());
 
 // HANDLER FOR UNKNOWN ROUTES

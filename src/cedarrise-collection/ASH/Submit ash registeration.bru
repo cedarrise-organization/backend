@@ -1,0 +1,61 @@
+meta {
+  name: Submit ash registeration
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/ash/registeration
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  programType: ,
+  firstName: ,
+  middleName: ,
+  surname: ,
+  gender: ,
+  age: ,
+  dob: ,
+  primaryLanguage: ,
+  homeAddress: ,
+  studentPhone: ,
+  passportPhoto: ,
+  schoolName: ,
+  schoolTown: ,
+  schoolLga: ,
+  schoolState: ,
+  currentClass: ,
+  classPositionLastTerm: ,
+  lastResult: ,
+  prevAfterschoolProgram: ,
+  reasonForJoining: ,
+  fathersName: ,
+  fathersPhone: ,
+  fathersOccupation: ,
+  mothersName: ,
+  mothersPhone: ,
+  mothersOccupation: ,
+  guardianName: ,
+  guardianRelationship: ,
+  guardianPhone: ,
+  guardianOccupation: ,
+  householdIncomeRange: ,
+  hasLearningCondition: ,
+  learningConditions: ,
+  parentConsent: ,
+  declarationConfirmed: ,
+  parentSignature: ,
+  assignedMentor: ,
+  pretestScore: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
