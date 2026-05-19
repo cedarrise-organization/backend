@@ -30,16 +30,16 @@
 
 # Cache Key Patterns
 
-| Key Pattern                              | Description                                                      | Source                     |
-| :--------------------------------------- | :--------------------------------------------------------------- | :------------------------- |
-| `cedarrise:permissions:{userId}`         | Stores a user's resolved permission names                        | `utils/rbac.util.ts`       |
-| `cedarrise:lock:{key}`                   | Distributed lock for cache-aside stampede prevention (5s expiry) | `lib/cache.ts`             |
-| `cedarrise:blogs:list:{page}:{limit}`    | Cached paginated blog list. Set on read.                         | `services/clientside/blog.services.ts` |
-| `cedarrise:blogs:single:{id}`            | Cached single blog post. Set on read/create, deleted on update/delete. | `services/clientside/blog.services.ts` |
-| `cedarrise:gallery:ash`                  | Cached ASH program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
-| `cedarrise:gallery:tacots`               | Cached TACOTS program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
-| `cedarrise:gallery:outreaches`           | Cached Outreaches program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
-| `cedarrise:gallery:capacity`             | Cached Capacity Building program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
+| Key Pattern                           | Description                                                                        | Source                                      |
+| :------------------------------------ | :--------------------------------------------------------------------------------- | :------------------------------------------ |
+| `cedarrise:permissions:{userId}`      | Stores a user's resolved permission names                                          | `utils/rbac.util.ts`                        |
+| `cedarrise:lock:{key}`                | Distributed lock for cache-aside stampede prevention (5s expiry)                   | `lib/cache.ts`                              |
+| `cedarrise:blogs:list:{page}:{limit}` | Cached paginated blog list. Set on read.                                           | `services/clientside/blog.services.ts`      |
+| `cedarrise:blogs:single:{id}`         | Cached single blog post. Set on read/create, deleted on update/delete.             | `services/clientside/blog.services.ts`      |
+| `cedarrise:gallery:ash`               | Cached ASH program photo URLs (public_id + secure_url). Set on read.               | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:tacots`            | Cached TACOTS program photo URLs (public_id + secure_url). Set on read.            | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:outreaches`        | Cached Outreaches program photo URLs (public_id + secure_url). Set on read.        | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:capacity`          | Cached Capacity Building program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
 
 ---
 
@@ -109,12 +109,12 @@
 
 # CLOUDINARY FOLDERS
 
-| PAGE              | PATH                                    |
-| :---------------- | :-------------------------------------- |
-| Blogs             | `/Cedarrise Initiative/BLOG`             |
-| Carousel — ASH    | `Cedarrise Initiative/ASH`              |
-| Carousel — TACOTS | `Cedarrise Initiative/TACOTS`           |
-| Carousel — Outreaches | `Cedarrise Initiative/OUTREACHES`   |
+| PAGE                         | PATH                                     |
+| :--------------------------- | :--------------------------------------- |
+| Blogs                        | `/Cedarrise Initiative/BLOG`             |
+| Carousel — ASH               | `Cedarrise Initiative/ASH`               |
+| Carousel — TACOTS            | `Cedarrise Initiative/TACOTS`            |
+| Carousel — Outreaches        | `Cedarrise Initiative/OUTREACHES`        |
 | Carousel — Capacity Building | `Cedarrise Initiative/CAPACITY BUILDING` |
 
 ---

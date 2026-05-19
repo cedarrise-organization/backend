@@ -2,6 +2,7 @@ import { AshstudentbodyType } from "../modules/ash/ash.schema.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { ashStudent } from "../db/models/admin.js";
 import { UploadApiResponse } from "cloudinary";
+import { CACHE_TTL, cacheSet } from "../lib/cache.js";
 import { Request } from "express";
 import { sql } from "drizzle-orm";
 import db from "../db/db.js";
@@ -28,6 +29,10 @@ export const submitRegisteration = async (req: Request, options: AshstudentbodyT
   const signatureUpload: any = signatureFile
     ? await uploadToCloudinary(signatureFile, "/Cedarrise Initiative/ASH-ASSETS/SIGNATURES")
     : null;
+
+  if (!passportUpload || !signatureUpload) {
+    throw new Error(`Could not upload passport or signature`);
+  }
 
   const [newAshStudent] = await db
     .insert(ashStudent)
@@ -73,7 +78,11 @@ export const submitRegisteration = async (req: Request, options: AshstudentbodyT
       pretestScore: options.pretestScore,
     })
     .returning();
- // cache
+
+  /// cache set
+  await cacheSet(`cedarrise:ash:ashStudent:${newAshStudent?.id}`, newAshStudent, CACHE_TTL.FORM_DATA);
+  ///
+
   return {
     code: 201,
     message: "Ash registeration form submitted successfully",
