@@ -5,49 +5,49 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/api/v1/ash/registeration
+  url: {{baseUrl}}/api/v1/ash/registration
   body: multipartForm
   auth: inherit
 }
 
 body:multipart-form {
-  programType: ,
-  firstName: ,
-  middleName: ,
-  surname: ,
-  gender: ,
-  age: ,
-  dob: ,
-  primaryLanguage: ,
-  homeAddress: ,
-  studentPhone: ,
-  passportPhoto: ,
-  schoolName: ,
-  schoolTown: ,
-  schoolLga: ,
-  schoolState: ,
-  currentClass: ,
-  classPositionLastTerm: ,
-  lastResult: ,
-  prevAfterschoolProgram: ,
-  reasonForJoining: ,
-  fathersName: ,
-  fathersPhone: ,
-  fathersOccupation: ,
-  mothersName: ,
-  mothersPhone: ,
-  mothersOccupation: ,
-  guardianName: ,
-  guardianRelationship: ,
-  guardianPhone: ,
-  guardianOccupation: ,
-  householdIncomeRange: ,
-  hasLearningCondition: ,
-  learningConditions: ,
-  parentConsent: ,
-  declarationConfirmed: ,
-  parentSignature: ,
-  assignedMentor: ,
+  programType: ONLINE
+  firstName: Max
+  middleName: 
+  surname: Ogb
+  gender: MALE
+  age: 10
+  dob: 2003-03-03
+  primaryLanguage: ENGLISH
+  homeAddress: 9A
+  studentPhone: 
+  passportPhoto: @file(C:\Users\Maxmillian\Pictures\WhatsApp Image 2026-04-24 at 9.50.21 AM.jpeg)
+  schoolName: Naim
+  schoolTown: Naim
+  schoolLga: Naim
+  schoolState: ABIA
+  currentClass: JSS2
+  classPositionLastTerm: 2
+  lastResult: 
+  prevAfterschoolProgram: NO
+  reasonForJoining: Naim
+  fathersName: Naim
+  fathersPhone: 
+  fathersOccupation: Naim
+  mothersName: Naim
+  mothersPhone: 08033212393
+  mothersOccupation: Naim
+  guardianName: 
+  guardianRelationship: 
+  guardianPhone: 
+  guardianOccupation: 
+  householdIncomeRange: 
+  hasLearningCondition: NO
+  learningConditions: 
+  parentConsent: true
+  declarationConfirmed: true
+  parentSignature: @file(C:\Users\Maxmillian\Pictures\WhatsApp Image 2026-04-24 at 9.50.21 AM.jpeg)
+  assignedMentor: 
   pretestScore: 
 }
 
@@ -58,4 +58,104 @@ vars:pre-request {
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  # Submit ASH Registration
+
+  Registers a new student into the ASH programme. Accepts a multipart form that includes student bio-data, academic information, parental/guardian contacts, household details, and required file uploads (passport photo and parent signature).
+
+  On success, the student record is inserted into the database and cached. The endpoint returns the newly created student object with a `201 Created` status.
+
+  ## Authorization
+  No authentication is required for this endpoint (public form submission).
+
+  ## Request Body (`multipart/form-data`)
+
+  ### Programme & Personal Details
+
+  | Field           | Type   | Required | Constraints / Allowed Values                                                                 |
+  |-----------------|--------|----------|---------------------------------------------------------------------------------------------|
+  | programType     | string | Yes      | One of: `ONLINE`, `OFFLINE`                                                                  |
+  | firstName       | string | Yes      | Non-empty text                                                                               |
+  | middleName      | string | No       | Optional text                                                                                |
+  | surname         | string | Yes      | Non-empty text                                                                               |
+  | gender          | string | Yes      | One of: `MALE`, `FEMALE`                                                                     |
+  | age             | number | Yes      | Integer between `6` and `18` (inclusive)                                                     |
+  | dob             | date   | Yes      | ISO date string — e.g. `2003-03-03` should follow `YYYY-MM-DD` format                                                       |
+  | primaryLanguage | string | Yes      | One of: `ENGLISH`, `IGBO`, `HAUSA`, `YORUBA`, `PIDGIN ENGLISH`, `OTHER`                     |
+  | homeAddress     | string | Yes      | Non-empty text                                                                               |
+  | studentPhone    | string | No       | Optional phone number                                                                        |
+
+  ### Academic Information
+
+  | Field                 | Type   | Required | Constraints / Allowed Values                                                                                               |
+  |-----------------------|--------|----------|----------------------------------------------------------------------------------------------------------------------------|
+  | schoolName            | string | Yes      | Non-empty text                                                                                                             |
+  | schoolTown            | string | Yes      | Non-empty text                                                                                                             |
+  | schoolLga             | string | Yes      | Non-empty text                                                                                                             |
+  | schoolState           | string | Yes      | Valid Nigerian state name (e.g. `ABIA`, `LAGOS`, `FCT`, etc.)                                                              |
+  | currentClass          | string | Yes      | One of: `PRIMARY 3`, `PRIMARY 4`, `PRIMARY 5`, `PRIMARY 6`, `JSS1`, `JSS2`, `JSS3`, `SS1`, `SS2`, `SS3`                  |
+  | classPositionLastTerm | string | Yes      | Non-empty text (e.g. `2`, `5th`)                                                                                          |
+  | prevAfterschoolProgram| string | Yes      | One of: `YES`, `NO`                                                                                                        |
+  | reasonForJoining      | string | Yes      | Non-empty text                                                                                                             |
+
+  ### Parent / Guardian Information
+
+  | Field                | Type   | Required | Constraints / Allowed Values                                                                                 |
+  |----------------------|--------|----------|--------------------------------------------------------------------------------------------------------------|
+  | fathersName          | string | Yes      | Non-empty text                                                                                               |
+  | fathersPhone         | string | No       | Optional phone number                                                                                        |
+  | fathersOccupation    | string | Yes      | Non-empty text                                                                                               |
+  | mothersName          | string | Yes      | Non-empty text                                                                                               |
+  | mothersPhone         | string | Yes      | Non-empty phone number                                                                                       |
+  | mothersOccupation    | string | No       | Optional text                                                                                                |
+  | guardianName         | string | No       | Optional text                                                                                                |
+  | guardianRelationship | string | No       | One of: `BROTHER`, `SISTER`, `AUNTY`, `UNCLE`, `GRANDMOTHER`, `GRANDFATHER`, `COUSIN`, `OTHER` (optional)   |
+  | guardianPhone        | string | No       | Optional phone number                                                                                        |
+  | guardianOccupation   | string | No       | Optional text                                                                                                |
+
+  ### Household & Learning Details
+
+  | Field                | Type    | Required | Constraints / Allowed Values                                                                                                     |
+  |----------------------|---------|----------|----------------------------------------------------------------------------------------------------------------------------------|
+  | householdIncomeRange | string  | No       | One of: `NO STABLE INCOME`, `< ₦100K`, `₦100K-₦300K`, `₦300K-₦600K`, `₦600K-₦1M` (optional)                                  |
+  | hasLearningCondition | string  | Yes      | One of: `YES`, `NO`, `NOT SURE`                                                                                                  |
+  | learningConditions   | array   | No       | Array of: `LEARNING DIFFICULTY`, `VISION IMPAIRMENT`, `HEARING IMPAIRMENT`, `ATTENTION DIFFICULTY`, `PHYSICAL DISABILITY`, `OTHER` |
+
+  ### Consent & Declaration
+
+  | Field                | Type    | Required | Constraints                              |
+  |----------------------|---------|----------|------------------------------------------|
+  | parentConsent        | boolean | Yes      | Must be `true`. Defaults to `false`.     |
+  | declarationConfirmed | boolean | Yes      | Must be `true`. Defaults to `false`.     |
+
+  ### Administrative Fields (Internal Use)
+
+  | Field          | Type   | Required | Constraints                        |
+  |----------------|--------|----------|------------------------------------|
+  | assignedMentor | string | No       | Optional — assigned after intake   |
+  | pretestScore   | number | No       | Optional numeric score             |
+
+  ## File Uploads
+
+  | Field           | MIME Types Accepted        | Required | Notes                                      |
+  |-----------------|----------------------------|----------|--------------------------------------------|
+  | passportPhoto   | `image/*` (JPEG, PNG, etc.)| **Yes**  | Uploaded to `/Cedarrise Initiative/ASH-ASSETS/PASSPORTS` on Cloudinary |
+  | lastResult      | PDF, image                 | No       | Student's last school result. Uploaded to `/Cedarrise Initiative/ASH-ASSETS/RESULTS`  |
+  | parentSignature | `image/*` (JPEG, PNG, etc.)| **Yes**  | Uploaded to `/Cedarrise Initiative/ASH-ASSETS/SIGNATURES` on Cloudinary |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created ASH student record.
+
+  The created record is also cached under the key `cedarrise:ash:ashStudent:<id>` using the `FORM_DATA` TTL.
+
+  ## Errors
+
+  | Status | Description                                                                 |
+  |--------|-----------------------------------------------------------------------------|
+  | `400 Bad Request`        | Validation failed — missing required fields or invalid enum values. |
+  | `400 Bad Request`        | No files were attached to the request.                              |
+  | `500 Internal Server Error` | Cloudinary upload failed for `passportPhoto` or `parentSignature`. |
 }

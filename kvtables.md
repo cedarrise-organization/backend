@@ -25,6 +25,7 @@
 | PERMISSIONS | 600s (10 mins)  | `lib/cache.ts` |
 | BLOGS       | 3600s (1 hr)    | `lib/cache.ts` |
 | GALLERY     | 43200s (12 hrs) | `lib/cache.ts` |
+| FORM_DATA   | 1800 (30 mins)  | `lib/cache.ts` |
 
 ---
 
@@ -40,6 +41,7 @@
 | `cedarrise:gallery:tacots`            | Cached TACOTS program photo URLs (public_id + secure_url). Set on read.            | `services/clientside/carousels.services.ts` |
 | `cedarrise:gallery:outreaches`        | Cached Outreaches program photo URLs (public_id + secure_url). Set on read.        | `services/clientside/carousels.services.ts` |
 | `cedarrise:gallery:capacity`          | Cached Capacity Building program photo URLs (public_id + secure_url). Set on read. | `services/clientside/carousels.services.ts` |
+| `cedarrise:ash:ashStudent:{id}`       | Cached newly registered ASH student record. Set on create.                         | `services/ash.services.ts`                  |
 
 ---
 
@@ -109,13 +111,16 @@
 
 # CLOUDINARY FOLDERS
 
-| PAGE                         | PATH                                     |
-| :--------------------------- | :--------------------------------------- |
-| Blogs                        | `/Cedarrise Initiative/BLOG`             |
-| Carousel — ASH               | `Cedarrise Initiative/ASH`               |
-| Carousel — TACOTS            | `Cedarrise Initiative/TACOTS`            |
-| Carousel — Outreaches        | `Cedarrise Initiative/OUTREACHES`        |
-| Carousel — Capacity Building | `Cedarrise Initiative/CAPACITY BUILDING` |
+| PAGE                         | PATH                                          |
+| :--------------------------- | :-------------------------------------------- |
+| Blogs                        | `/Cedarrise Initiative/BLOG`                  |
+| Carousel — ASH               | `Cedarrise Initiative/ASH`                    |
+| Carousel — TACOTS            | `Cedarrise Initiative/TACOTS`                 |
+| Carousel — Outreaches        | `Cedarrise Initiative/OUTREACHES`             |
+| Carousel — Capacity Building | `Cedarrise Initiative/CAPACITY BUILDING`      |
+| ASH — Passport Photos        | `/Cedarrise Initiative/ASH-ASSETS/PASSPORTS`  |
+| ASH — Last Results           | `/Cedarrise Initiative/ASH-ASSETS/RESULTS`    |
+| ASH — Parent Signatures      | `/Cedarrise Initiative/ASH-ASSETS/SIGNATURES` |
 
 ---
 

@@ -72,7 +72,10 @@ export const resultFileSchema = z.array(
   }),
 );
 export const textSchema = z.string().transform((v) => v.trim());
-export const optionalTextSchema = textSchema.optional();
+export const optionalTextSchema = z.preprocess(
+  (v) => (v === "" ? undefined : v),
+  textSchema.optional(),
+);
 
 export const emailSchema = z.email().transform((v) => v.toLowerCase().trim());
 
