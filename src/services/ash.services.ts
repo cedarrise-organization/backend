@@ -18,15 +18,15 @@ export const submitRegisteration = async (req: Request, options: AshstudentbodyT
   const signatureFile = files.parentSignature?.[0];
 
   const passportUpload: any = passportFile
-    ? await uploadToCloudinary(passportFile, "/Cedarrise Initiative/ASH/PASSPORTS")
+    ? await uploadToCloudinary(passportFile, "/Cedarrise Initiative/ASH-ASSETS/PASSPORTS")
     : null;
 
   const resultUpload: any = resultFile
-    ? await uploadToCloudinary(resultFile, "/Cedarrise Initiative/ASH/RESULTS")
+    ? await uploadToCloudinary(resultFile, "/Cedarrise Initiative/ASH-ASSETS/RESULTS")
     : null;
 
   const signatureUpload: any = signatureFile
-    ? await uploadToCloudinary(signatureFile, "/Cedarrise Initiative/ASH/SIGNATURES")
+    ? await uploadToCloudinary(signatureFile, "/Cedarrise Initiative/ASH-ASSETS/SIGNATURES")
     : null;
 
   const [newAshStudent] = await db

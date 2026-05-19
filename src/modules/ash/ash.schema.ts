@@ -291,3 +291,83 @@ export const ashExitQuerySchema = z.object({
     ...baseQueryBody,
   }),
 });
+
+export const ashProgramFeedbackBody = z.object({
+  studentFirstName: textSchema,
+  studentSurname: textSchema,
+  schoolName: textSchema,
+  currentClass: z.enum([
+    "PRIMARY 3",
+    "PRIMARY 4",
+    "PRIMARY 5",
+    "PRIMARY 6",
+    "JSS1",
+    "JSS2",
+    "JSS3",
+    "SS1",
+    "SS2",
+    "SS3",
+  ]),
+  attendanceFrequency: z.enum(["EVERY WEEK", "MOST WEEKS", "SOMETIMES", "RARELY"]),
+  enjoyedParts: z
+    .array(
+      z.enum([
+        "ACADEMIC TUTORING",
+        "LITERACY",
+        "NUMERACY",
+        "PERFORMANCE ARTS",
+        "SKILLS TRAINING",
+        "MENTORSHIP",
+        "GROUP ACTIVITIES",
+      ]),
+    )
+    .optional(),
+  learningImprovementRating: rating1To5Schema,
+  confidenceRating: rating1To5Schema,
+  volunteerSupportRating: rating1To5Schema,
+  studentEnjoyedMost: optionalTextSchema,
+  studentImprovementSuggestions: optionalTextSchema,
+
+  parentGuardianName: textSchema,
+  parentGuardianRelationship: z.enum(["FATHER", "MOTHER", "GUARDIAN", "RELATIVE"]),
+  parentPhone: optionalTextSchema,
+  childBenefited: z.enum(["YES – GREATLY", "YES – SOMEWHAT", "NOT SURE", "NO"]),
+  academicImprovementNoticed: z
+    .enum(["YES – SIGNIFICANT", "YES – SOME", "NO NOTICEABLE CHANGE", "NOT SURE"])
+    .optional(),
+  confidenceBehaviorChange: z
+    .enum(["YES – VERY POSITIVE", "SOME IMPROVEMENT", "NO CHANGE", "NOT SURE"])
+    .optional(),
+  mostValuableAspects: z
+    .array(
+      z.enum([
+        "ACADEMIC TUTORING",
+        "LITERACY & NUMERACY",
+        "MENTORSHIP",
+        "SKILLS TRAINING",
+        "PERFORMANCE ARTS",
+        "POSITIVE ENVIRONMENT",
+      ]),
+    )
+    .optional(),
+  parentSatisfactionRating: rating1To5Schema.optional(),
+  programImpactOnChild: optionalTextSchema,
+  parentImprovementSuggestions: optionalTextSchema,
+  additionalComments: optionalTextSchema,
+});
+
+export const createAshProgramFeedbackSchema = z.object({
+  body: ashProgramFeedbackBody,
+});
+
+export const updateAshProgramFeedbackSchema = z.object({
+  body: ashProgramFeedbackBody.partial(),
+});
+
+export const ashProgramFeedbackParamsSchema = idSchema;
+
+export const ashProgramFeedbackQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+  }),
+});
