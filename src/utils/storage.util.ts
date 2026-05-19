@@ -21,7 +21,10 @@ export const uploadToCloudinary = (
   });
 };
 
-export const deleteFromCloudinary = (publicId: string, resource_type: string) => {
+export const deleteFromCloudinary = (
+  publicId: string,
+  resource_type: string,
+): Promise<{ result: string }> => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.destroy(
       publicId,
@@ -36,13 +39,17 @@ export const deleteFromCloudinary = (publicId: string, resource_type: string) =>
   });
 };
 
-export const searchCloudinary = async (searchQuery: string, maxResults: number) => {
+export const searchCloudinary = async (
+  searchQuery: string,
+  maxResults: number,
+): Promise<{ public_id: string; url: string }[]> => {
   const results = await cloudinary.search
     .expression(searchQuery)
     .sort_by("created_at", "desc") // most recent photos first
     .max_results(maxResults)
     .execute();
 
+  // same syntax as ..{return {..}}
   const result = results.resources.map((file: any) => ({
     public_id: file.public_id,
     url: file.secure_url,

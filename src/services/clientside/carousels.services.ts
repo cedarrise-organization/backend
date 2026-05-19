@@ -1,5 +1,6 @@
 import cloudinary from "../../configs/cloudinary.config.js";
 import { CACHE_TTL, cacheGet, cacheSet } from "../../lib/cache.js";
+import { searchCloudinary } from "../../utils/storage.util.js";
 
 export const ashCarousel = async () => {
   /// cache
@@ -15,17 +16,7 @@ export const ashCarousel = async () => {
   }
   ///
 
-  const results = await cloudinary.search
-    .expression(`asset_folder:"Cedarrise Initiative/ASH"`)
-    .sort_by("created_at", "desc") // most recent photos first
-    .max_results(200)
-    .execute();
-
-  // same syntax as ..{return {..}}
-  const ashPhotos = results.resources.map((file: any) => ({
-    public_id: file.public_id,
-    url: file.secure_url,
-  }));
+  const ashPhotos = await searchCloudinary(`asset_folder:"Cedarrise Initiative/ASH"`, 200);
 
   // cache set
   await cacheSet(key, ashPhotos, CACHE_TTL.GALLERY);
@@ -51,17 +42,7 @@ export const tacotsCarousel = async () => {
   }
   ///
 
-  const results = await cloudinary.search
-    .expression(`asset_folder:"Cedarrise Initiative/TACOTS"`)
-    .sort_by("created_at", "desc") // most recent photos first
-    .max_results(200)
-    .execute();
-
-  // same syntax as ..{return {..}}
-  const tacotsPhotos = results.resources.map((file: any) => ({
-    public_id: file.public_id,
-    url: file.secure_url,
-  }));
+  const tacotsPhotos = await searchCloudinary(`asset_folder:"Cedarrise Initiative/TACOTS"`, 200);
 
   // cache set
   await cacheSet(key, tacotsPhotos, CACHE_TTL.GALLERY);
@@ -87,17 +68,10 @@ export const outreachCarousel = async () => {
   }
   ///
 
-  const results = await cloudinary.search
-    .expression(`asset_folder:"Cedarrise Initiative/OUTREACHES"`)
-    .sort_by("created_at", "desc") // most recent photos first
-    .max_results(200)
-    .execute();
-
-  // same syntax as ..{return {..}}
-  const outreachPhotos = results.resources.map((file: any) => ({
-    public_id: file.public_id,
-    url: file.secure_url,
-  }));
+  const outreachPhotos = await searchCloudinary(
+    `asset_folder:"Cedarrise Initiative/OUTREACHES"`,
+    200,
+  );
 
   // cache set
   await cacheSet(key, outreachPhotos, CACHE_TTL.GALLERY);
@@ -123,17 +97,10 @@ export const capacityCarousel = async () => {
   }
   ///
 
-  const results = await cloudinary.search
-    .expression(`asset_folder:"Cedarrise Initiative/CAPACITY BUILDING"`)
-    .sort_by("created_at", "desc") // most recent photos first
-    .max_results(200)
-    .execute();
-
-  // same syntax as ..{return {..}}
-  const capacityPhotos = results.resources.map((file: any) => ({
-    public_id: file.public_id,
-    url: file.secure_url,
-  }));
+  const capacityPhotos = await searchCloudinary(
+    `asset_folder:"Cedarrise Initiative/CAPACITY BUILDING"`,
+    200,
+  );
 
   // cache set
   await cacheSet(key, capacityPhotos, CACHE_TTL.GALLERY);

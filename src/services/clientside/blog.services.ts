@@ -1,11 +1,16 @@
 import db from "../../db/db.js";
+import logger from "../../configs/logger.config.js";
 import cloudinary from "../../configs/cloudinary.config.js";
-import { asc, eq, sql } from "drizzle-orm";
-import { Request } from "express";
+import { CACHE_TTL, cacheDel, cacheGet, cacheSet } from "../../lib/cache.js";
+import {
+  uploadToCloudinary,
+  searchCloudinary,
+  deleteFromCloudinary,
+} from "../../utils/storage.util.js";
 import { blogs } from "../../db/models/blogs.js";
 import { UploadApiResponse } from "cloudinary";
-import { CACHE_TTL, cacheDel, cacheGet, cacheSet } from "../../lib/cache.js";
-import logger from "../../configs/logger.config.js";
+import { asc, eq, sql } from "drizzle-orm";
+import { Request } from "express";
 
 export const listBlogs = async (page: number, limit: number) => {
   /// cache
@@ -65,22 +70,7 @@ export const getSingleBlog = async (id: string) => {
 };
 
 export const createBlog = async (req: Request, title: string, description: string) => {
-  const response = await new Promise<UploadApiResponse | undefined>((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream(
-        {
-          folder: "/Cedarrise Initiative/BLOG",
-          resource_type: "auto",
-        },
-        (error, uploadResult) => {
-          if (error) {
-            return reject(error);
-          }
-          return resolve(uploadResult);
-        },
-      )
-      .end(req.file?.buffer);
-  });
+  const response = await uploadToCloudinary(req.file!, "/Cedarrise Initiative/BLOG");
 
   if (!response) {
     throw new Error("Could not upload pdf");
@@ -118,20 +108,7 @@ export const deleteBlog = async (id: string) => {
     throw new Error("Blog not found");
   }
 
-  const deleteResponse = await new Promise<any>((resolve, reject) => {
-    cloudinary.uploader.destroy(
-      blog.publicId,
-      {
-        resource_type: "image",
-      },
-      (error, deleteResult) => {
-        if (error) {
-          return reject(error);
-        }
-        return resolve(deleteResult);
-      },
-    );
-  });
+  const deleteResponse = await deleteFromCloudinary(blog.publicId, "image");
 
   if (deleteResponse.result !== "ok") {
     logger.error("Blog pdf was not deleted from s3", {
@@ -165,43 +142,16 @@ export const updateBlog = async (
       throw new Error("Blog not found");
     }
 
-    const deleteResponse = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader.destroy(
-        blog!.publicId,
-        {
-          resource_type: "image",
-        },
-        (error, deleteResult) => {
-          if (error) {
-            return reject(error);
-          }
-          return resolve(deleteResult);
-        },
-      );
-    });
-
+    const deleteResponse = await deleteFromCloudinary(blog.publicId, "image");
+    
     if (deleteResponse.result !== "ok") {
       logger.error("Blog pdf was not deleted from s3", {
         publicId: blogs.publicId,
         event: "update_blog",
       });
     }
-    const uploadResponse = await new Promise<UploadApiResponse | undefined>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: "/Cedarrise Initiative/BLOG",
-            resource_type: "auto",
-          },
-          (error, uploadResult) => {
-            if (error) {
-              return reject(error);
-            }
-            return resolve(uploadResult);
-          },
-        )
-        .end(req.file?.buffer);
-    });
+
+    const uploadResponse = await uploadToCloudinary(req.file, "/Cedarrise Initiative/BLOG")
 
     if (!uploadResponse) {
       throw new Error("Could not upload pdf");
@@ -217,7 +167,7 @@ export const updateBlog = async (
   if (title === undefined && description === undefined) {
     return {
       code: 200,
-      message: "Blog post updated successfully",
+      message: "Update submission should include at least one field"
     };
   }
 
