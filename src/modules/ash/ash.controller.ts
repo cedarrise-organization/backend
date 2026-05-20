@@ -1,6 +1,6 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { submitRegisteration } from "../../services/ash.services.js";
+import { submitFeedback, submitRegisteration } from "../../services/ash.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
 
@@ -88,8 +88,66 @@ export const submitRegisterationController = async (
       pretestScore,
     });
 
-    return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
+  }
+};
+
+export const submitFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const {
+    studentFirstName,
+    studentSurname,
+    schoolName,
+    currentClass,
+    attendanceFrequency,
+    enjoyedParts,
+    learningImprovementRating,
+    confidenceRating,
+    volunteerSupportRating,
+    studentEnjoyedMost,
+    studentImprovementSuggestions,
+    parentGuardianName,
+    parentGuardianRelationship,
+    parentPhone,
+    childBenefited,
+    academicImprovementNoticed,
+    confidenceBehaviorChange,
+    mostValuableAspects,
+    parentSatisfactionRating,
+    programImpactOnChild,
+    parentImprovementSuggestions,
+    additionalComments,
+  } = req.body;
+
+  try {
+    const response = await submitFeedback(req, {
+    studentFirstName,
+    studentSurname,
+    schoolName,
+    currentClass,
+    attendanceFrequency,
+    enjoyedParts,
+    learningImprovementRating,
+    confidenceRating,
+    volunteerSupportRating,
+    studentEnjoyedMost,
+    studentImprovementSuggestions,
+    parentGuardianName,
+    parentGuardianRelationship,
+    parentPhone,
+    childBenefited,
+    academicImprovementNoticed,
+    confidenceBehaviorChange,
+    mostValuableAspects,
+    parentSatisfactionRating,
+    programImpactOnChild,
+    parentImprovementSuggestions,
+    additionalComments,
+  })
+
+     return successResponse(res, response.code, response.message, response.data)
+  } catch (error) {
+    next(error);
   }
 };

@@ -22,17 +22,15 @@ export const ashTermSchema = z.enum(["TERM 1", "TERM 2", "TERM 3"]);
 
 // ASH STUDENT
 export const ashStudentBody = z.object({
-  programType: z.preprocess((v) => (v === "" ? undefined : v), z.enum(["ONLINE", "OFFLINE"])),
+  programType: z.enum(["ONLINE", "OFFLINE"]),
   firstName: textSchema,
   middleName: optionalTextSchema,
   surname: textSchema,
   gender: genderSchema,
   age: z.coerce.number().int().min(6).max(18),
   dob: z.coerce.date(),
-  primaryLanguage: z.preprocess(
-    (v) => (v === "" ? undefined : v),
-    z.enum(["ENGLISH", "IGBO", "HAUSA", "YORUBA", "PIDGIN ENGLISH", "OTHER"]),
-  ),
+  primaryLanguage: z.enum(["ENGLISH", "IGBO", "HAUSA", "YORUBA", "PIDGIN ENGLISH", "OTHER"]),
+
   homeAddress: textSchema,
   studentPhone: optionalTextSchema,
 
@@ -132,7 +130,6 @@ export const ashStudentQuerySchema = z.object({
 });
 //
 
-
 // ASH FEEDBACK
 export const ashProgramFeedbackBody = z.object({
   studentFirstName: textSchema,
@@ -151,19 +148,22 @@ export const ashProgramFeedbackBody = z.object({
     "SS3",
   ]),
   attendanceFrequency: z.enum(["EVERY WEEK", "MOST WEEKS", "SOMETIMES", "RARELY"]),
-  enjoyedParts: z
-    .array(
-      z.enum([
-        "ACADEMIC TUTORING",
-        "LITERACY",
-        "NUMERACY",
-        "PERFORMANCE ARTS",
-        "SKILLS TRAINING",
-        "MENTORSHIP",
-        "GROUP ACTIVITIES",
-      ]),
-    )
-    .optional(),
+  enjoyedParts: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "ACADEMIC TUTORING",
+          "LITERACY",
+          "NUMERACY",
+          "PERFORMANCE ARTS",
+          "SKILLS TRAINING",
+          "MENTORSHIP",
+          "GROUP ACTIVITIES",
+        ]),
+      )
+      .optional(),
+  ),
   learningImprovementRating: rating1To5Schema,
   confidenceRating: rating1To5Schema,
   volunteerSupportRating: rating1To5Schema,
@@ -173,30 +173,37 @@ export const ashProgramFeedbackBody = z.object({
   parentGuardianName: textSchema,
   parentGuardianRelationship: z.enum(["FATHER", "MOTHER", "GUARDIAN", "RELATIVE"]),
   parentPhone: optionalTextSchema,
-  childBenefited: z.enum(["YES – GREATLY", "YES – SOMEWHAT", "NOT SURE", "NO"]),
-  academicImprovementNoticed: z
-    .enum(["YES – SIGNIFICANT", "YES – SOME", "NO NOTICEABLE CHANGE", "NOT SURE"])
-    .optional(),
-  confidenceBehaviorChange: z
-    .enum(["YES – VERY POSITIVE", "SOME IMPROVEMENT", "NO CHANGE", "NOT SURE"])
-    .optional(),
-  mostValuableAspects: z
-    .array(
-      z.enum([
-        "ACADEMIC TUTORING",
-        "LITERACY & NUMERACY",
-        "MENTORSHIP",
-        "SKILLS TRAINING",
-        "PERFORMANCE ARTS",
-        "POSITIVE ENVIRONMENT",
-      ]),
-    )
-    .optional(),
+  childBenefited: z.enum(["YES - GREATLY", "YES - SOMEWHAT", "NOT SURE", "NO"]),
+  academicImprovementNoticed: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES - SIGNIFICANT", "YES - SOME", "NO NOTICEABLE CHANGE", "NOT SURE"]).optional(),
+  ),
+  confidenceBehaviorChange: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES - VERY POSITIVE", "SOME IMPROVEMENT", "NO CHANGE", "NOT SURE"]).optional(),
+  ),
+  mostValuableAspects: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "ACADEMIC TUTORING",
+          "LITERACY & NUMERACY",
+          "MENTORSHIP",
+          "SKILLS TRAINING",
+          "PERFORMANCE ARTS",
+          "POSITIVE ENVIRONMENT",
+        ]),
+      )
+      .optional(),
+  ),
   parentSatisfactionRating: rating1To5Schema.optional(),
   programImpactOnChild: optionalTextSchema,
   parentImprovementSuggestions: optionalTextSchema,
   additionalComments: optionalTextSchema,
 });
+
+export type AshprogramfeedbackType = z.infer<typeof ashProgramFeedbackBody>;
 
 export const createAshProgramFeedbackSchema = z.object({
   body: ashProgramFeedbackBody,

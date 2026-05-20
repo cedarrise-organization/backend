@@ -1,6 +1,6 @@
-import { AshstudentbodyType } from "../modules/ash/ash.schema.js";
+import { AshstudentbodyType, AshprogramfeedbackType } from "../modules/ash/ash.schema.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
-import { ashStudent } from "../db/models/admin.js";
+import { ashStudent, ashProgramFeedback } from "../db/models/admin.js";
 import { UploadApiResponse } from "cloudinary";
 import { CACHE_TTL, cacheSet } from "../lib/cache.js";
 import { Request } from "express";
@@ -80,12 +80,61 @@ export const submitRegisteration = async (req: Request, options: AshstudentbodyT
     .returning();
 
   /// cache set
-  await cacheSet(`cedarrise:ash:ashStudent:${newAshStudent?.id}`, newAshStudent, CACHE_TTL.FORM_DATA);
+  await cacheSet(
+    `cedarrise:ash:ashStudent:${newAshStudent?.id}`,
+    newAshStudent,
+    CACHE_TTL.FORM_DATA,
+  );
   ///
 
   return {
     code: 201,
     message: "Ash registeration form submitted successfully",
     data: newAshStudent,
+  };
+};
+
+export const submitFeedback = async (req: Request, options: AshprogramfeedbackType) => {
+  const [newAshProgramFeedback] = await db
+    .insert(ashProgramFeedback)
+    .values({
+      id: sql`uuid_generate_v4()`,
+      studentFirstName: options.studentFirstName,
+      studentSurname: options.studentSurname,
+      schoolName: options.schoolName,
+      currentClass: options.currentClass,
+      attendanceFrequency: options.attendanceFrequency,
+      enjoyedParts: options.enjoyedParts,
+      learningImprovementRating: options.learningImprovementRating,
+      confidenceRating: options.confidenceRating,
+      volunteerSupportRating: options.volunteerSupportRating,
+      studentEnjoyedMost: options.studentEnjoyedMost,
+      studentImprovementSuggestions: options.studentImprovementSuggestions,
+      parentGuardianName: options.parentGuardianName,
+      parentGuardianRelationship: options.parentGuardianRelationship,
+      parentPhone: options.parentPhone,
+      childBenefited: options.childBenefited,
+      academicImprovementNoticed: options.academicImprovementNoticed,
+      confidenceBehaviorChange: options.confidenceBehaviorChange,
+      mostValuableAspects: options.mostValuableAspects,
+      parentSatisfactionRating: options.parentSatisfactionRating,
+      programImpactOnChild: options.programImpactOnChild,
+      parentImprovementSuggestions: options.parentImprovementSuggestions,
+      additionalComments: options.additionalComments,
+    })
+    .returning();
+
+  /// cache set
+  await cacheSet(
+    `cedarrise:ash:ashProgramFeedback:${newAshProgramFeedback?.id}`,
+    newAshProgramFeedback,
+    CACHE_TTL.FORM_DATA,
+  );
+  ///
+
+  return {
+    code: 201,
+    message: "Ash Program feedback form submitted successfully",
+    data: newAshProgramFeedback,
   };
 };

@@ -11,6 +11,10 @@ import blogRouter from "./modules/clientside/blog/blog.routes.js";
 import adminRouter from "./modules/admin/admin.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
 import ashRouter from "./modules/ash/ash.routes.js";
+import tacotsRouter from "./modules/tacots/tacots.routes.js";
+import capacityRouter from "./modules/capacity/capacity.routes.js";
+import volunteerRouter from "./modules/volunteer/volunteer.routes.js";
+import outreachRouter from "./modules/outreaches/outreaches.routes.js";
 import "./events/admin.events.js";
 import "./events/donate.event.js";
 import "./events/auth.events.js";
@@ -54,7 +58,11 @@ app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/donate", donateRouter);
 app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/carousels", carouselRouter);
-app.use("/api/v1/ash", ashRouter);
+app.use("/api/v1/forms/ash", ashRouter);
+app.use("/api/v1/forms/tacots", tacotsRouter);
+app.use("/api/v1/forms/volunteer", volunteerRouter);
+app.use("/api/v1/forms/outreaches", outreachRouter);
+app.use("/api/v1/forms/capacity-building", capacityRouter);
 // app.use("/queues", bullBoardAdapter.getRouter());
 
 // HANDLER FOR UNKNOWN ROUTES
