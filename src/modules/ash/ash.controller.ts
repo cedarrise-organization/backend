@@ -47,7 +47,7 @@ export const submitRegisterationController = async (
     pretestScore,
   } = req.body;
 
-  if (!req.files) throw new ValidationError("Please upload a file");
+  if (!req.files) throw new ValidationError("Please upload the relevant file");
 
   try {
     const response = await submitRegisteration(req, {
@@ -146,7 +146,7 @@ export const submitFeedbackController = async (req: Request, res: Response, next
     additionalComments,
   })
 
-     return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);
   }

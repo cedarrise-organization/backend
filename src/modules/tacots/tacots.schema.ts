@@ -15,92 +15,12 @@ import {
   academicSessionSchema,
   rating1To10Schema,
   rating1To5Schema,
-  adminStatusSchema
+  adminStatusSchema,
 } from "../../db/globalschema/global.schema.js";
 
 export const tacotsAcademicTermSchema = z.enum(["1ST TERM", "2ND TERM", "3RD TERM"]);
 
-export const tacotsFeedbackBody = z.object({
-  studentFirstName: textSchema,
-  studentSurname: textSchema,
-  currentSchool: textSchema,
-  currentClass: z.enum([
-    "PRIMARY 4",
-    "PRIMARY 5",
-    "PRIMARY 6",
-    "JSS1",
-    "JSS2",
-    "JSS3",
-    "SS1",
-    "SS2",
-    "SS3",
-  ]),
-  scholarshipHelpedStay: z.enum(["YES – VERY MUCH", "YES – SOMEWHAT", "NOT SURE", "NO"]),
-  mostHelpfulSupport: z
-    .array(
-      z.enum([
-        "TUITION SUPPORT",
-        "BOOKS AND LEARNING MATERIALS",
-        "SCHOOL SUPPLIES",
-        "MENTORSHIP",
-        "ENCOURAGEMENT AND GUIDANCE",
-      ]),
-    )
-    .optional(),
-  studyMotivationRating: rating1To5Schema,
-  mentorshipImpactRating: rating1To5Schema,
-  currentChallenges: z
-    .array(
-      z.enum([
-        "DIFFICULTY UNDERSTANDING SUBJECTS",
-        "FINANCIAL CHALLENGES",
-        "LACK OF MATERIALS",
-        "TRANSPORTATION",
-        "FAMILY RESPONSIBILITIES",
-        "OTHER",
-      ]),
-    )
-    .optional(),
-  likedMost: optionalTextSchema,
-  studentImprovementSuggestions: optionalTextSchema,
-
-  parentGuardianName: textSchema,
-  parentGuardianRelationship: z.enum(["FATHER", "MOTHER", "GUARDIAN", "RELATIVE"]),
-  parentPhone: optionalTextSchema,
-  scholarshipReducedBurden: z.enum([
-    "YES – SIGNIFICANTLY",
-    "YES – SOMEWHAT",
-    "NOT REALLY",
-    "NOT SURE",
-  ]),
-  academicImprovementNoticed: z
-    .enum(["YES – SIGNIFICANT", "YES – SOME", "NO NOTICEABLE CHANGE", "NOT SURE"])
-    .optional(),
-  attitudeChangeNoticed: z
-    .enum(["YES – VERY POSITIVE", "SOME IMPROVEMENT", "NO CHANGE", "NOT SURE"])
-    .optional(),
-  parentSatisfactionRating: rating1To5Schema.optional(),
-  programImpactOnFamily: optionalTextSchema,
-  parentImprovementSuggestions: optionalTextSchema,
-  additionalComments: optionalTextSchema,
-});
-
-export const createTacotsFeedbackSchema = z.object({
-  body: tacotsFeedbackBody,
-});
-
-export const updateTacotsFeedbackSchema = z.object({
-  body: tacotsFeedbackBody.partial(),
-});
-
-export const tacotsFeedbackParamsSchema = idSchema;
-
-export const tacotsFeedbackQuerySchema = z.object({
-  query: z.object({
-    ...baseQueryBody,
-  }),
-});
-
+// RECCOMENDATION
 export const tacotsRecommendationBody = z.object({
   firstName: textSchema,
   middleName: optionalTextSchema,
@@ -116,9 +36,10 @@ export const tacotsRecommendationBody = z.object({
     "OTHER RELIGIONS",
     "NO RELIGION",
   ]),
-  catholicSacraments: z
-    .array(z.enum(["BAPTISM", "FIRST HOLY COMMUNION", "CONFIRMATION", "NONE YET"]))
-    .optional(),
+  catholicSacraments: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.array(z.enum(["BAPTISM", "FIRST HOLY COMMUNION", "CONFIRMATION", "NONE YET"])).optional(),
+  ),
   parishAttended: optionalTextSchema,
   diocese: optionalTextSchema,
   primaryLanguage: z.enum(["ENGLISH", "IGBO", "HAUSA", "YORUBA", "PIDGIN ENGLISH", "OTHER"]),
@@ -146,9 +67,12 @@ export const tacotsRecommendationBody = z.object({
 
   guardianName: optionalTextSchema,
   guardianPhone: optionalTextSchema,
-  guardianRelationship: z
-    .enum(["GRANDPARENT", "AUNT/UNCLE", "SIBLING", "RELATION", "COMMUNITY GUARDIAN", "OTHER"])
-    .optional(),
+  guardianRelationship: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .enum(["GRANDPARENT", "AUNT/UNCLE", "SIBLING", "RELATION", "COMMUNITY GUARDIAN", "OTHER"])
+      .optional(),
+  ),
   guardianOccupation: optionalTextSchema,
   guardianAddress: optionalTextSchema,
 
@@ -171,9 +95,9 @@ export const tacotsRecommendationBody = z.object({
   annualHouseholdIncome: z.enum([
     "NO STABLE INCOME",
     "< ₦100,000",
-    "₦100,000–₦300,000",
-    "₦300,001–₦600,000",
-    "₦600,001–₦1,000,000",
+    "₦100,000-₦300,000",
+    "₦300,001-₦600,000",
+    "₦600,001-₦1,000,000",
     "ABOVE ₦1,000,000",
   ]),
   incomeSources: z.array(
@@ -226,8 +150,9 @@ export const tacotsRecommendationBody = z.object({
   careerGoal: textSchema,
   studentStatement: optionalTextSchema,
   declarationConfirmed: z.boolean().default(false),
-  adminStatus: adminStatusSchema.default("KEEP IN VIEW").optional(),
 });
+
+export type TacotsrecommendationbodyType = z.infer<typeof tacotsRecommendationBody>;
 
 export const createTacotsRecommendationSchema = z.object({
   body: tacotsRecommendationBody,
@@ -255,6 +180,100 @@ export const tacotsRecommendationQuerySchema = z.object({
     adminStatus: adminStatusSchema.optional(),
   }),
 });
+
+// FEEDBACK
+export const tacotsFeedbackBody = z.object({
+  studentFirstName: textSchema,
+  studentSurname: textSchema,
+  currentSchool: textSchema,
+  currentClass: z.enum([
+    "PRIMARY 4",
+    "PRIMARY 5",
+    "PRIMARY 6",
+    "JSS1",
+    "JSS2",
+    "JSS3",
+    "SS1",
+    "SS2",
+    "SS3",
+  ]),
+  scholarshipHelpedStay: z.enum(["YES - VERY MUCH", "YES - SOMEWHAT", "NOT SURE", "NO"]),
+  mostHelpfulSupport: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "TUITION SUPPORT",
+          "BOOKS AND LEARNING MATERIALS",
+          "SCHOOL SUPPLIES",
+          "MENTORSHIP",
+          "ENCOURAGEMENT AND GUIDANCE",
+        ]),
+      )
+      .optional(),
+  ),
+  studyMotivationRating: rating1To5Schema,
+  mentorshipImpactRating: rating1To5Schema,
+  currentChallenges: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "DIFFICULTY UNDERSTANDING SUBJECTS",
+          "FINANCIAL CHALLENGES",
+          "LACK OF MATERIALS",
+          "TRANSPORTATION",
+          "FAMILY RESPONSIBILITIES",
+          "OTHER",
+        ]),
+      )
+      .optional(),
+  ),
+  likedMost: optionalTextSchema,
+  studentImprovementSuggestions: optionalTextSchema,
+
+  parentGuardianName: textSchema,
+  parentGuardianRelationship: z.enum(["FATHER", "MOTHER", "GUARDIAN", "RELATIVE"]),
+  parentPhone: optionalTextSchema,
+  scholarshipReducedBurden: z.enum([
+    "YES - SIGNIFICANTLY",
+    "YES - SOMEWHAT",
+    "NOT REALLY",
+    "NOT SURE",
+  ]),
+  academicImprovementNoticed: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES - SIGNIFICANT", "YES - SOME", "NO NOTICEABLE CHANGE", "NOT SURE"]).optional(),
+  ),
+  attitudeChangeNoticed: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES - VERY POSITIVE", "SOME IMPROVEMENT", "NO CHANGE", "NOT SURE"]).optional(),
+  ),
+  parentSatisfactionRating: rating1To5Schema.optional(),
+  programImpactOnFamily: optionalTextSchema,
+  parentImprovementSuggestions: optionalTextSchema,
+  additionalComments: optionalTextSchema,
+});
+
+export type TacotsfeedbackbodyType = z.infer<typeof tacotsFeedbackBody>
+
+export const createTacotsFeedbackSchema = z.object({
+  body: tacotsFeedbackBody,
+});
+
+export const updateTacotsFeedbackSchema = z.object({
+  body: tacotsFeedbackBody.partial(),
+});
+
+export const tacotsFeedbackParamsSchema = idSchema;
+
+export const tacotsFeedbackQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+  }),
+});
+
+// ONBOARDING
 
 export const tacotsOnboardingBody = z.object({
   studentId: z.uuid("Invalid ID"),

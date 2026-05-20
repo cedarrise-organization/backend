@@ -1,23 +1,195 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
 import { successResponse } from "../../utils/responseHandler.js";
-import { submitReccomendation } from "../../services/tacots.services.js";
+import { submitRecommendation, submitFeedback } from "../../services/tacots.services.js";
 import { ValidationError } from "../../lib/error.js";
 
-export const submitReccomendationController = async (
+export const submitRecommendationController = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const {} = req.body;
+  const {
+    firstName,
+    middleName,
+    surname,
+    gender,
+    age,
+    dob,
+    religion,
+    catholicSacraments,
+    parishAttended,
+    diocese,
+    primaryLanguage,
+    phoneNumber,
+    nationality,
+    stateOfOrigin,
+    lga,
+    homeAddress,
+    schoolName,
+    schoolTown,
+    schoolState,
+    lastYearAttended,
+    lastClass,
+    classPositionLastTerm,
+    lastTermAverage,
+    fathersName,
+    fathersOccupation,
+    fathersPhone,
+    mothersName,
+    mothersOccupation,
+    mothersPhone,
+    parentsAddress,
+    guardianName,
+    guardianPhone,
+    guardianRelationship,
+    guardianOccupation,
+    guardianAddress,
+    householdSize,
+    numSiblings,
+    familyPosition,
+    specialCircumstances,
+    annualHouseholdIncome,
+    incomeSources,
+    numIncomeEarners,
+    avgMonthlyIncome,
+    livesWith,
+    residenceType,
+    hasElectricity,
+    recommenderFirstName,
+    recommenderLastName,
+    recommenderPhone,
+    recommenderAddress,
+    childBackgroundNotes,
+    supportTypesNeeded,
+    otherImportantInfo,
+    disciplineRating,
+    responsibilityRating,
+    careerGoal,
+    studentStatement,
+    declarationConfirmed,
+  } = req.body;
 
-  if (!req.files) throw new ValidationError("Please upload a file");
+  if (!req.files) throw new ValidationError("Please upload the file");
 
   try {
-    // const response = await submitReccomendation(req, {}); 
+    const response = await submitRecommendation(req, {
+      firstName,
+      middleName,
+      surname,
+      gender,
+      age,
+      dob,
+      religion,
+      catholicSacraments,
+      parishAttended,
+      diocese,
+      primaryLanguage,
+      phoneNumber,
+      nationality,
+      stateOfOrigin,
+      lga,
+      homeAddress,
+      schoolName,
+      schoolTown,
+      schoolState,
+      lastYearAttended,
+      lastClass,
+      classPositionLastTerm,
+      lastTermAverage,
+      fathersName,
+      fathersOccupation,
+      fathersPhone,
+      mothersName,
+      mothersOccupation,
+      mothersPhone,
+      parentsAddress,
+      guardianName,
+      guardianPhone,
+      guardianRelationship,
+      guardianOccupation,
+      guardianAddress,
+      householdSize,
+      numSiblings,
+      familyPosition,
+      specialCircumstances,
+      annualHouseholdIncome,
+      incomeSources,
+      numIncomeEarners,
+      avgMonthlyIncome,
+      livesWith,
+      residenceType,
+      hasElectricity,
+      recommenderFirstName,
+      recommenderLastName,
+      recommenderPhone,
+      recommenderAddress,
+      childBackgroundNotes,
+      supportTypesNeeded,
+      otherImportantInfo,
+      disciplineRating,
+      responsibilityRating,
+      careerGoal,
+      studentStatement,
+      declarationConfirmed,
+    });
 
-    // return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
+  }
+};
+
+export const submitFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const {
+    studentFirstName,
+    studentSurname,
+    currentSchool,
+    currentClass,
+    scholarshipHelpedStay,
+    mostHelpfulSupport,
+    studyMotivationRating,
+    mentorshipImpactRating,
+    currentChallenges,
+    likedMost,
+    studentImprovementSuggestions,
+    parentGuardianName,
+    parentGuardianRelationship,
+    parentPhone,
+    scholarshipReducedBurden,
+    academicImprovementNoticed,
+    attitudeChangeNoticed,
+    parentSatisfactionRating,
+    programImpactOnFamily,
+    parentImprovementSuggestions,
+    additionalComments,
+  } = req.body;
+  try {
+    const response = await submitFeedback(req, {
+      studentFirstName,
+      studentSurname,
+      currentSchool,
+      currentClass,
+      scholarshipHelpedStay,
+      mostHelpfulSupport,
+      studyMotivationRating,
+      mentorshipImpactRating,
+      currentChallenges,
+      likedMost,
+      studentImprovementSuggestions,
+      parentGuardianName,
+      parentGuardianRelationship,
+      parentPhone,
+      scholarshipReducedBurden,
+      academicImprovementNoticed,
+      attitudeChangeNoticed,
+      parentSatisfactionRating,
+      programImpactOnFamily,
+      parentImprovementSuggestions,
+      additionalComments,
+    });
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
   }
 };
