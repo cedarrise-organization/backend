@@ -1,7 +1,7 @@
 //ROUTES
 import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
-import { submitRegisterationController, submitFeedbackController } from "./ash.controller.js";
+import { submitRegistrationController, submitFeedbackController } from "./ash.controller.js";
 import { upload } from "../../configs/multer.config.js";
 import { createAshStudentSchema, createAshProgramFeedbackSchema } from "./ash.schema.js";
 
@@ -16,7 +16,7 @@ router.post(
     { name: "parentSignature", maxCount: 1 },
   ]),
   validateRequest(createAshStudentSchema),
-  submitRegisterationController,
+  submitRegistrationController,
 );
 
 // Submit ASH Program Feedback

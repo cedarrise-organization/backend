@@ -1,10 +1,10 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { submitFeedback, submitRegisteration } from "../../services/ash.services.js";
+import { submitFeedback, submitRegistration } from "../../services/ash.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
 
-export const submitRegisterationController = async (
+export const submitRegistrationController = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -50,7 +50,7 @@ export const submitRegisterationController = async (
   if (!req.files) throw new ValidationError("Please upload the relevant file");
 
   try {
-    const response = await submitRegisteration(req, {
+    const response = await submitRegistration(req, {
       programType,
       firstName,
       middleName,
@@ -121,7 +121,7 @@ export const submitFeedbackController = async (req: Request, res: Response, next
   } = req.body;
 
   try {
-    const response = await submitFeedback(req, {
+    const response = await submitFeedback({
     studentFirstName,
     studentSurname,
     schoolName,

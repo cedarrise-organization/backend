@@ -165,7 +165,7 @@ export const submitFeedbackController = async (req: Request, res: Response, next
     additionalComments,
   } = req.body;
   try {
-    const response = await submitFeedback(req, {
+    const response = await submitFeedback({
       studentFirstName,
       studentSurname,
       currentSchool,

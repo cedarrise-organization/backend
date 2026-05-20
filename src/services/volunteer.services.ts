@@ -1,5 +1,5 @@
-import { uploadToCloudinary } from "../utils/storage.util.js";
-import { UploadApiResponse } from "cloudinary";
+import { volunteerFeedback, volunteerRegistration } from "../db/models/admin.js";
+import { cacheSet, CACHE_TTL } from "../lib/cache.js";
 import {
   VolunteerregistrationbodyType,
   VolunteerfeedbackbodyType,
@@ -7,8 +7,6 @@ import {
 import { Request } from "express";
 import { sql } from "drizzle-orm";
 import db from "../db/db.js";
-import { volunteerFeedback, volunteerRegistration } from "../db/models/admin.js";
-import { cacheSet, CACHE_TTL } from "../lib/cache.js";
 
 export const submitRegistration = async (req: Request, options: VolunteerregistrationbodyType) => {
   const [newVolunteerSubmission] = await db
@@ -46,7 +44,7 @@ export const submitRegistration = async (req: Request, options: Volunteerregistr
 
   /// cache set
   await cacheSet(
-    `cedarrise:volunteer:volunteerSubmission:${newVolunteerSubmission?.id}`,
+    `cedarrise:volunteer:voluntee:${newVolunteerSubmission?.id}`,
     newVolunteerSubmission,
     CACHE_TTL.FORM_DATA,
   );

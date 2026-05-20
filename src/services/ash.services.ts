@@ -1,13 +1,13 @@
 import { AshstudentbodyType, AshprogramfeedbackType } from "../modules/ash/ash.schema.js";
-import { uploadToCloudinary } from "../utils/storage.util.js";
 import { ashStudent, ashProgramFeedback } from "../db/models/admin.js";
+import { uploadToCloudinary } from "../utils/storage.util.js";
 import { UploadApiResponse } from "cloudinary";
 import { CACHE_TTL, cacheSet } from "../lib/cache.js";
 import { Request } from "express";
 import { sql } from "drizzle-orm";
 import db from "../db/db.js";
 
-export const submitRegisteration = async (req: Request, options: AshstudentbodyType) => {
+export const submitRegistration = async (req: Request, options: AshstudentbodyType) => {
   const files = req.files as {
     passportPhoto: Express.Multer.File[];
     lastResult?: Express.Multer.File[];
@@ -94,7 +94,7 @@ export const submitRegisteration = async (req: Request, options: AshstudentbodyT
   };
 };
 
-export const submitFeedback = async (req: Request, options: AshprogramfeedbackType) => {
+export const submitFeedback = async (options: AshprogramfeedbackType) => {
   const [newAshProgramFeedback] = await db
     .insert(ashProgramFeedback)
     .values({

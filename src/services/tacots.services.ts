@@ -1,11 +1,11 @@
 import { UploadApiResponse } from "cloudinary";
+import { tacotsRecommendation, tacotsFeedback } from "../db/models/admin.js";
+import { uploadToCloudinary } from "../utils/storage.util.js";
+import { cacheSet, CACHE_TTL } from "../lib/cache.js";
 import {
   TacotsrecommendationbodyType,
   TacotsfeedbackbodyType,
 } from "../modules/tacots/tacots.schema.js";
-import { tacotsRecommendation, tacotsFeedback } from "../db/models/admin.js";
-import { uploadToCloudinary } from "../utils/storage.util.js";
-import { cacheSet, CACHE_TTL } from "../lib/cache.js";
 import { Request } from "express";
 import { sql } from "drizzle-orm";
 import db from "../db/db.js";
@@ -113,7 +113,7 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
   };
 };
 
-export const submitFeedback = async (req: Request, options: TacotsfeedbackbodyType) => {
+export const submitFeedback = async (options: TacotsfeedbackbodyType) => {
   const [newTacotsFeedback] = await db
     .insert(tacotsFeedback)
     .values({
@@ -144,7 +144,7 @@ export const submitFeedback = async (req: Request, options: TacotsfeedbackbodyTy
 
   /// cache set
   await cacheSet(
-    `cedarrise:tacots:tacotsFeedback:${newTacotsFeedback?.id}`,
+    `cedarrise:tacots:feedback:${newTacotsFeedback?.id}`,
     newTacotsFeedback,
     CACHE_TTL.FORM_DATA,
   );
