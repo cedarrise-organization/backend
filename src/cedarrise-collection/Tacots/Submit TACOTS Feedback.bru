@@ -1,0 +1,101 @@
+meta {
+  name: Submit TACOTS Feedback
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/tacots/feedback
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "studentFirstName": "Max",
+    "studentSurname": "Ogb",
+    "currentSchool": "Naim Academy",
+    "currentClass": "SS1",
+    "scholarshipHelpedStay": "YES - VERY MUCH",
+    "mostHelpfulSupport": ["TUITION SUPPORT", "MENTORSHIP"],
+    "studyMotivationRating": 4,
+    "mentorshipImpactRating": 5,
+    "currentChallenges": ["DIFFICULTY UNDERSTANDING SUBJECTS"],
+    "likedMost": "",
+    "studentImprovementSuggestions": "",
+    "parentGuardianName": "Mrs Ogb",
+    "parentGuardianRelationship": "MOTHER",
+    "parentPhone": "",
+    "scholarshipReducedBurden": "YES - SIGNIFICANTLY",
+    "academicImprovementNoticed": "YES - SOME",
+    "attitudeChangeNoticed": "SOME IMPROVEMENT",
+    "parentSatisfactionRating": 4,
+    "programImpactOnFamily": "",
+    "parentImprovementSuggestions": "",
+    "additionalComments": ""
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit TACOTS Feedback
+
+  Submits a combined student-and-parent feedback form for the TACOTS scholarship programme. The form captures the student's experience of the scholarship support alongside the parent/guardian's assessment of the programme's impact on the family.
+
+  On success, the feedback record is stored in the database. The endpoint returns the newly created feedback object with a `201 Created` status.
+
+  ## Authorization
+  No authentication is required for this endpoint (public form submission).
+
+  ## Request Body (`application/json`)
+
+  ### Student Section
+
+  | Field                          | Type   | Required | Constraints / Allowed Values                                                                                                                          |
+  |--------------------------------|--------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | studentFirstName               | string | Yes      | Non-empty text                                                                                                                                        |
+  | studentSurname                 | string | Yes      | Non-empty text                                                                                                                                        |
+  | currentSchool                  | string | Yes      | Non-empty text                                                                                                                                        |
+  | currentClass                   | string | Yes      | One of: `PRIMARY 4`, `PRIMARY 5`, `PRIMARY 6`, `JSS1`, `JSS2`, `JSS3`, `SS1`, `SS2`, `SS3`                                                           |
+  | scholarshipHelpedStay          | string | Yes      | One of: `YES - VERY MUCH`, `YES - SOMEWHAT`, `NOT SURE`, `NO`                                                                                         |
+  | mostHelpfulSupport             | array  | No       | Array of: `TUITION SUPPORT`, `BOOKS AND LEARNING MATERIALS`, `SCHOOL SUPPLIES`, `MENTORSHIP`, `ENCOURAGEMENT AND GUIDANCE` (optional)                 |
+  | studyMotivationRating          | number | Yes      | Integer from `1` to `5`                                                                                                                               |
+  | mentorshipImpactRating         | number | Yes      | Integer from `1` to `5`                                                                                                                               |
+  | currentChallenges              | array  | No       | Array of: `DIFFICULTY UNDERSTANDING SUBJECTS`, `FINANCIAL CHALLENGES`, `LACK OF MATERIALS`, `TRANSPORTATION`, `FAMILY RESPONSIBILITIES`, `OTHER` (optional) |
+  | likedMost                      | string | No       | Optional free text                                                                                                                                    |
+  | studentImprovementSuggestions  | string | No       | Optional free text                                                                                                                                    |
+
+  ### Parent / Guardian Section
+
+  | Field                        | Type   | Required | Constraints / Allowed Values                                                                             |
+  |------------------------------|--------|----------|----------------------------------------------------------------------------------------------------------|
+  | parentGuardianName           | string | Yes      | Non-empty text                                                                                           |
+  | parentGuardianRelationship   | string | Yes      | One of: `FATHER`, `MOTHER`, `GUARDIAN`, `RELATIVE`                                                       |
+  | parentPhone                  | string | No       | Optional phone number                                                                                    |
+  | scholarshipReducedBurden     | string | Yes      | One of: `YES - SIGNIFICANTLY`, `YES - SOMEWHAT`, `NOT REALLY`, `NOT SURE`                               |
+  | academicImprovementNoticed   | string | No       | One of: `YES - SIGNIFICANT`, `YES - SOME`, `NO NOTICEABLE CHANGE`, `NOT SURE` (optional)                |
+  | attitudeChangeNoticed        | string | No       | One of: `YES - VERY POSITIVE`, `SOME IMPROVEMENT`, `NO CHANGE`, `NOT SURE` (optional)                   |
+  | parentSatisfactionRating     | number | No       | Integer from `1` to `5` (optional)                                                                       |
+  | programImpactOnFamily        | string | No       | Optional free text                                                                                       |
+  | parentImprovementSuggestions | string | No       | Optional free text                                                                                       |
+  | additionalComments           | string | No       | Optional free text                                                                                       |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created TACOTS feedback record.
+
+  ## Errors
+
+  | Status                      | Description                                                           |
+  |-----------------------------|-----------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
+  | `500 Internal Server Error` | Unexpected server error.                                              |
+}

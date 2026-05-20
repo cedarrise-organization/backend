@@ -1,0 +1,208 @@
+meta {
+  name: Submit TACOTS Recommendation
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/tacots/reccomendation
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  firstName: Max
+  middleName: 
+  surname: Ogb
+  gender: MALE
+  age: 14
+  dob: 2010-06-15
+  religion: CHRISTIAN / CATHOLIC
+  catholicSacraments: BAPTISM
+  parishAttended: 
+  diocese: 
+  primaryLanguage: ENGLISH
+  phoneNumber: 
+  nationality: Nigerian
+  stateOfOrigin: ABIA
+  lga: Aba North
+  homeAddress: 9A Example Street
+  schoolName: Naim Academy
+  schoolTown: Aba
+  schoolState: ABIA
+  lastYearAttended: 2024
+  lastClass: JSS3
+  classPositionLastTerm: 3
+  lastTermAverage: 75
+  fathersName: Mr Ogb
+  fathersOccupation: Trader
+  fathersPhone: 08012345678
+  mothersName: Mrs Ogb
+  mothersOccupation: Teacher
+  mothersPhone: 08087654321
+  parentsAddress: 9A Example Street
+  guardianName: 
+  guardianPhone: 
+  guardianRelationship: 
+  guardianOccupation: 
+  guardianAddress: 
+  householdSize: 5
+  numSiblings: 3
+  familyPosition: 2ND
+  specialCircumstances: LOW FAMILY INCOME
+  annualHouseholdIncome: ₦100,000-₦300,000
+  incomeSources: TRADING / SMALL BUSINESS
+  numIncomeEarners: 2
+  avgMonthlyIncome: 25000
+  livesWith: BOTH PARENTS
+  residenceType: RENTED APARTMENT
+  hasElectricity: SOMETIMES
+  recommenderFirstName: Sister
+  recommenderLastName: Mary
+  recommenderPhone: 08011223344
+  recommenderAddress: Parish House, Aba
+  childBackgroundNotes: Hardworking student from a low-income household.
+  supportTypesNeeded: TUITION (SCHOOL FEES)
+  otherImportantInfo: 
+  disciplineRating: 4
+  responsibilityRating: 4
+  careerGoal: Engineer
+  studentStatement: 
+  declarationConfirmed: true
+  passportPhoto: @file(C:\Users\Maxmillian\Pictures\example.jpeg)
+  lastResult: @file(C:\Users\Maxmillian\Pictures\example.pdf)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit TACOTS Recommendation
+
+  Submits a community recommendation for a student to be considered for the TACOTS scholarship programme. Accepts a multipart form containing student bio-data, school records, family/guardian details, household socioeconomic information, recommender details, and required file uploads (passport photo and last school result).
+
+  On success, the recommendation record is saved to the database. The endpoint returns the newly created TACOTS recommendation object with a `201 Created` status.
+
+  ## Authorization
+  No authentication is required for this endpoint (public form submission).
+
+  ## Request Body (`multipart/form-data`)
+
+  ### Personal Details
+
+  | Field           | Type   | Required | Constraints / Allowed Values                                                                                   |
+  |-----------------|--------|----------|----------------------------------------------------------------------------------------------------------------|
+  | firstName       | string | Yes      | Non-empty text                                                                                                 |
+  | middleName      | string | No       | Optional text                                                                                                  |
+  | surname         | string | Yes      | Non-empty text                                                                                                 |
+  | gender          | string | Yes      | One of: `MALE`, `FEMALE`                                                                                       |
+  | age             | number | Yes      | Integer, minimum `6`                                                                                           |
+  | dob             | date   | Yes      | ISO date string — `YYYY-MM-DD` format                                                                          |
+  | religion        | string | Yes      | One of: `CHRISTIAN / CATHOLIC`, `CHRISTIAN / ANGLICAN`, `CHRISTIAN / OTHER`, `MUSLIM`, `OTHER RELIGIONS`, `NO RELIGION` |
+  | catholicSacraments | array | No    | Array of: `BAPTISM`, `FIRST HOLY COMMUNION`, `CONFIRMATION`, `NONE YET` (optional)                            |
+  | parishAttended  | string | No       | Optional text                                                                                                  |
+  | diocese         | string | No       | Optional text                                                                                                  |
+  | primaryLanguage | string | Yes      | One of: `ENGLISH`, `IGBO`, `HAUSA`, `YORUBA`, `PIDGIN ENGLISH`, `OTHER`                                       |
+  | phoneNumber     | string | No       | Optional phone number                                                                                          |
+  | nationality     | string | Yes      | Non-empty text                                                                                                 |
+  | stateOfOrigin   | string | Yes      | Valid Nigerian state (e.g. `ABIA`, `LAGOS`, `FCT`)                                                             |
+  | lga             | string | Yes      | Non-empty text                                                                                                 |
+  | homeAddress     | string | Yes      | Non-empty text                                                                                                 |
+
+  ### Academic Records
+
+  | Field                  | Type   | Required | Constraints / Allowed Values                                                                                              |
+  |------------------------|--------|----------|---------------------------------------------------------------------------------------------------------------------------|
+  | schoolName             | string | Yes      | Non-empty text                                                                                                            |
+  | schoolTown             | string | Yes      | Non-empty text                                                                                                            |
+  | schoolState            | string | Yes      | Valid Nigerian state                                                                                                      |
+  | lastYearAttended       | number | Yes      | Integer — e.g. `2024`                                                                                                     |
+  | lastClass              | string | Yes      | One of: `PRIMARY 3`, `PRIMARY 4`, `PRIMARY 5`, `PRIMARY 6`, `JSS1`, `JSS2`, `JSS3`, `SS1`, `SS2`, `SS3`                 |
+  | classPositionLastTerm  | string | Yes      | Non-empty text (e.g. `3`, `5th`)                                                                                          |
+  | lastTermAverage        | number | No       | Optional numeric score                                                                                                    |
+
+  ### Parent Information
+
+  | Field             | Type   | Required | Constraints / Allowed Values |
+  |-------------------|--------|----------|------------------------------|
+  | fathersName       | string | Yes      | Non-empty text               |
+  | fathersOccupation | string | Yes      | Non-empty text               |
+  | fathersPhone      | string | Yes      | Non-empty phone number       |
+  | mothersName       | string | Yes      | Non-empty text               |
+  | mothersOccupation | string | Yes      | Non-empty text               |
+  | mothersPhone      | string | Yes      | Non-empty phone number       |
+  | parentsAddress    | string | Yes      | Non-empty text               |
+
+  ### Guardian Information (Optional)
+
+  | Field                | Type   | Required | Constraints / Allowed Values                                                                         |
+  |----------------------|--------|----------|------------------------------------------------------------------------------------------------------|
+  | guardianName         | string | No       | Optional text                                                                                        |
+  | guardianPhone        | string | No       | Optional phone number                                                                                |
+  | guardianRelationship | string | No       | One of: `GRANDPARENT`, `AUNT/UNCLE`, `SIBLING`, `RELATION`, `COMMUNITY GUARDIAN`, `OTHER` (optional) |
+  | guardianOccupation   | string | No       | Optional text                                                                                        |
+  | guardianAddress      | string | No       | Optional text                                                                                        |
+
+  ### Household & Socioeconomic Information
+
+  | Field                  | Type   | Required | Constraints / Allowed Values                                                                                                                                               |
+  |------------------------|--------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | householdSize          | number | Yes      | Integer, minimum `2`                                                                                                                                                       |
+  | numSiblings            | number | Yes      | Integer, minimum `0`                                                                                                                                                       |
+  | familyPosition         | string | Yes      | One of: `1ST`, `2ND`, `3RD`, `4TH`, `5TH`, `6TH`, `7TH`, `8TH`, `9TH`, `10TH`, `OTHER`                                                                                  |
+  | specialCircumstances   | string | Yes      | One of: `ORPHAN`, `SINGLE-PARENT`, `LOW FAMILY INCOME`, `NONE`, `OTHER`                                                                                                   |
+  | annualHouseholdIncome  | string | Yes      | One of: `NO STABLE INCOME`, `< ₦100,000`, `₦100,000-₦300,000`, `₦300,001-₦600,000`, `₦600,001-₦1,000,000`, `ABOVE ₦1,000,000`                                           |
+  | incomeSources          | array  | Yes      | Array of: `FARMING`, `TRADING / SMALL BUSINESS`, `SALARY / FORMAL EMPLOYMENT`, `ARTISAN / SKILLED LABOUR`, `DAILY WAGE WORK`, `SUPPORT FROM RELATIVE`, `GOVERNMENT SUPPORT`, `NO REGULAR INCOME`, `OTHER` |
+  | numIncomeEarners       | string | Yes      | One of: `NONE`, `1`, `2`, `3`, `MORE THAN 3`                                                                                                                              |
+  | avgMonthlyIncome       | number | No       | Optional numeric value                                                                                                                                                     |
+  | livesWith              | string | Yes      | One of: `BOTH PARENTS`, `MOTHER ONLY`, `FATHER ONLY`, `GRANDPARENT`, `OTHER RELATIVE`, `GUARDIAN`, `ALONE`                                                                |
+  | residenceType          | string | Yes      | One of: `FAMILY HOUSE`, `RENTED APARTMENT`, `SHARED ACCOMMODATION`, `TEMPORARY SHELTER`, `OTHER`                                                                          |
+  | hasElectricity         | string | Yes      | One of: `YES`, `NO`, `SOMETIMES`                                                                                                                                           |
+
+  ### Recommender Details
+
+  | Field                | Type   | Required | Constraints / Allowed Values                                                                        |
+  |----------------------|--------|----------|-----------------------------------------------------------------------------------------------------|
+  | recommenderFirstName | string | Yes      | Non-empty text                                                                                      |
+  | recommenderLastName  | string | Yes      | Non-empty text                                                                                      |
+  | recommenderPhone     | string | Yes      | Non-empty phone number                                                                              |
+  | recommenderAddress   | string | Yes      | Non-empty text                                                                                      |
+  | childBackgroundNotes | string | Yes      | Non-empty description of the child's background                                                     |
+  | supportTypesNeeded   | array  | Yes      | Array of: `TUITION (SCHOOL FEES)`, `SCHOOL RESOURCES`, `TRANSPORTATION`, `OTHER`                   |
+  | otherImportantInfo   | string | No       | Optional free text                                                                                  |
+
+  ### Student Assessment & Declaration
+
+  | Field                | Type    | Required | Constraints / Allowed Values        |
+  |----------------------|---------|----------|-------------------------------------|
+  | disciplineRating     | number  | Yes      | Integer from `1` to `5`             |
+  | responsibilityRating | number  | Yes      | Integer from `1` to `5`             |
+  | careerGoal           | string  | Yes      | Non-empty text                      |
+  | studentStatement     | string  | No       | Optional free text                  |
+  | declarationConfirmed | boolean | Yes      | Must be `true`. Defaults to `false` |
+
+  ## File Uploads
+
+  | Field         | MIME Types Accepted         | Required   | Notes                                                                  |
+  |---------------|-----------------------------|------------|------------------------------------------------------------------------|
+  | passportPhoto | `image/*` (JPEG, PNG, etc.) | **Yes**    | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/PASSPORTS` on Cloudinary |
+  | lastResult    | PDF, image                  | **Yes**    | Student's last school result. Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/RESULTS` on Cloudinary |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created TACOTS recommendation record.
+
+  ## Errors
+
+  | Status                      | Description                                                           |
+  |-----------------------------|-----------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
+  | `400 Bad Request`           | No files were attached to the request.                                |
+  | `500 Internal Server Error` | Cloudinary upload failed for `passportPhoto` or `lastResult`.         |
+}

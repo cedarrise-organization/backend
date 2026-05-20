@@ -1,0 +1,103 @@
+meta {
+  name: Submit ASH Feedback
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/ash/feedback
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "studentFirstName": "Max",
+    "studentSurname": "Ogb",
+    "schoolName": "Naim Academy",
+    "currentClass": "JSS2",
+    "attendanceFrequency": "EVERY WEEK",
+    "enjoyedParts": ["ACADEMIC TUTORING", "MENTORSHIP"],
+    "learningImprovementRating": 4,
+    "confidenceRating": 4,
+    "volunteerSupportRating": 5,
+    "studentEnjoyedMost": "",
+    "studentImprovementSuggestions": "",
+    "parentGuardianName": "Mrs Ogb",
+    "parentGuardianRelationship": "MOTHER",
+    "parentPhone": "",
+    "childBenefited": "YES - GREATLY",
+    "academicImprovementNoticed": "YES - SOME",
+    "confidenceBehaviorChange": "SOME IMPROVEMENT",
+    "mostValuableAspects": ["MENTORSHIP", "ACADEMIC TUTORING"],
+    "parentSatisfactionRating": 5,
+    "programImpactOnChild": "",
+    "parentImprovementSuggestions": "",
+    "additionalComments": ""
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit ASH Program Feedback
+
+  Submits a combined student-and-parent feedback form for the ASH after-school programme. The form collects the student's self-reported experience alongside the parent/guardian's observations of the child's progress.
+
+  On success, the feedback record is stored in the database. The endpoint returns the newly created feedback object with a `201 Created` status.
+
+  ## Authorization
+  No authentication is required for this endpoint (public form submission).
+
+  ## Request Body (`application/json`)
+
+  ### Student Section
+
+  | Field                          | Type    | Required | Constraints / Allowed Values                                                                                               |
+  |--------------------------------|---------|----------|----------------------------------------------------------------------------------------------------------------------------|
+  | studentFirstName               | string  | Yes      | Non-empty text                                                                                                             |
+  | studentSurname                 | string  | Yes      | Non-empty text                                                                                                             |
+  | schoolName                     | string  | Yes      | Non-empty text                                                                                                             |
+  | currentClass                   | string  | Yes      | One of: `PRIMARY 3`, `PRIMARY 4`, `PRIMARY 5`, `PRIMARY 6`, `JSS1`, `JSS2`, `JSS3`, `SS1`, `SS2`, `SS3`                  |
+  | attendanceFrequency            | string  | Yes      | One of: `EVERY WEEK`, `MOST WEEKS`, `SOMETIMES`, `RARELY`                                                                 |
+  | enjoyedParts                   | array   | No       | Array of: `ACADEMIC TUTORING`, `LITERACY`, `NUMERACY`, `PERFORMANCE ARTS`, `SKILLS TRAINING`, `MENTORSHIP`, `GROUP ACTIVITIES` |
+  | learningImprovementRating      | number  | Yes      | Integer from `1` to `5`                                                                                                    |
+  | confidenceRating               | number  | Yes      | Integer from `1` to `5`                                                                                                    |
+  | volunteerSupportRating         | number  | Yes      | Integer from `1` to `5`                                                                                                    |
+  | studentEnjoyedMost             | string  | No       | Optional free text                                                                                                         |
+  | studentImprovementSuggestions  | string  | No       | Optional free text                                                                                                         |
+
+  ### Parent / Guardian Section
+
+  | Field                        | Type    | Required | Constraints / Allowed Values                                                                                                    |
+  |------------------------------|---------|----------|---------------------------------------------------------------------------------------------------------------------------------|
+  | parentGuardianName           | string  | Yes      | Non-empty text                                                                                                                  |
+  | parentGuardianRelationship   | string  | Yes      | One of: `FATHER`, `MOTHER`, `GUARDIAN`, `RELATIVE`                                                                             |
+  | parentPhone                  | string  | No       | Optional phone number                                                                                                           |
+  | childBenefited               | string  | Yes      | One of: `YES - GREATLY`, `YES - SOMEWHAT`, `NOT SURE`, `NO`                                                                    |
+  | academicImprovementNoticed   | string  | No       | One of: `YES - SIGNIFICANT`, `YES - SOME`, `NO NOTICEABLE CHANGE`, `NOT SURE` (optional)                                       |
+  | confidenceBehaviorChange     | string  | No       | One of: `YES - VERY POSITIVE`, `SOME IMPROVEMENT`, `NO CHANGE`, `NOT SURE` (optional)                                          |
+  | mostValuableAspects          | array   | No       | Array of: `ACADEMIC TUTORING`, `LITERACY & NUMERACY`, `MENTORSHIP`, `SKILLS TRAINING`, `PERFORMANCE ARTS`, `POSITIVE ENVIRONMENT` |
+  | parentSatisfactionRating     | number  | No       | Integer from `1` to `5` (optional)                                                                                              |
+  | programImpactOnChild         | string  | No       | Optional free text                                                                                                              |
+  | parentImprovementSuggestions | string  | No       | Optional free text                                                                                                              |
+  | additionalComments           | string  | No       | Optional free text                                                                                                              |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created ASH feedback record.
+
+  ## Errors
+
+  | Status                      | Description                                                           |
+  |-----------------------------|-----------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
+  | `500 Internal Server Error` | Unexpected server error.                                              |
+}

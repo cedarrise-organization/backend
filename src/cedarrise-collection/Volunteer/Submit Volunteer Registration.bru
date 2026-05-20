@@ -1,0 +1,121 @@
+meta {
+  name: Submit Volunteer Registration
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/volunteer/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "firstName": "Jane",
+    "middleName": "",
+    "surname": "Doe",
+    "gender": "FEMALE",
+    "dob": "1998-04-10",
+    "age": 27,
+    "phoneNumber": "08011223344",
+    "emailAddress": "jane.doe@example.com",
+    "homeAddress": "5 Sample Street",
+    "city": "Lagos",
+    "state": "LAGOS",
+    "occupation": "Teacher",
+    "highestEducation": "UNDERGRADUATE",
+    "reasonForVolunteering": "I want to give back to the community.",
+    "volunteerAreas": ["ASH"],
+    "skillsToContribute": ["TEACHING", "MENTORING"],
+    "availability": ["WEEKENDS"],
+    "commitmentDuration": "6 MONTHS",
+    "ashInterest": "YES",
+    "ashSaturdayAvailability": "EVERY SATURDAY",
+    "ashAcademicArea": "BOTH",
+    "ashExtracurricular": ["DRAMA / THEATRE"],
+    "safeguardingAgreement": "YES",
+    "mediaConsent": true,
+    "additionalInfo": "",
+    "registrationDate": "2026-05-20"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit Volunteer Registration
+
+  Registers a new volunteer with the Cedarrise Initiative. Accepts a JSON body containing the volunteer's personal details, areas of interest, skills, and availability preferences.
+
+  On success, the volunteer record is saved to the database and the endpoint returns the newly created object with a `201 Created` status.
+
+  ## Authorization
+  No authentication is required for this endpoint (public form submission).
+
+  ## Request Body (`application/json`)
+
+  ### Personal Details
+
+  | Field             | Type    | Required | Constraints / Allowed Values                                                                              |
+  |-------------------|---------|----------|-----------------------------------------------------------------------------------------------------------|
+  | firstName         | string  | Yes      | Non-empty text                                                                                            |
+  | middleName        | string  | No       | Optional text                                                                                             |
+  | surname           | string  | Yes      | Non-empty text                                                                                            |
+  | gender            | string  | Yes      | One of: `MALE`, `FEMALE`                                                                                  |
+  | dob               | date    | Yes      | ISO date string — `YYYY-MM-DD` format                                                                     |
+  | age               | number  | Yes      | Integer, minimum `16`                                                                                     |
+  | phoneNumber       | string  | Yes      | Non-empty phone number                                                                                    |
+  | emailAddress      | string  | Yes      | Valid email address                                                                                       |
+  | homeAddress       | string  | Yes      | Non-empty text                                                                                            |
+  | city              | string  | Yes      | Non-empty text                                                                                            |
+  | state             | string  | Yes      | Valid Nigerian state (e.g. `LAGOS`, `ABIA`, `FCT`)                                                        |
+  | occupation        | string  | No       | Optional text                                                                                             |
+  | highestEducation  | string  | No       | One of: `SECONDARY SCHOOL`, `DIPLOMA / CERTIFICATE`, `UNDERGRADUATE`, `POSTGRADUATE`, `OTHER` (optional) |
+
+  ### Volunteer Preferences
+
+  | Field                  | Type   | Required | Constraints / Allowed Values                                                                             |
+  |------------------------|--------|----------|----------------------------------------------------------------------------------------------------------|
+  | reasonForVolunteering  | string | Yes      | Non-empty text                                                                                           |
+  | volunteerAreas         | array  | Yes      | Array of: `ASH`, `TACOTS`, `CAPACITY BUILDING`, `CEDAR OUTREACHES`, `ADMINISTRATIVE SUPPORT`            |
+  | skillsToContribute     | array  | No       | Array of: `TEACHING`, `MENTORING`, `PUBLIC SPEAKING`, `CREATIVE ARTS`, `DIGITAL / ICT`, `WRITING`, `PROJECT COORDINATION`, `COMMUNITY MOBILIZATION`, `ADMIN`, `GRAPHICS DESIGN`, `PHOTOGRAPHY / VIDEOGRAPHY`, `SOCIAL MEDIA`, `DATA MANAGEMENT`, `OTHER` (optional) |
+  | availability           | array  | Yes      | Array of: `WEEKDAYS`, `WEEKENDS`, `OCCASIONAL EVENTS`, `FLEXIBLE`                                       |
+  | commitmentDuration     | string | No       | One of: `3 MONTHS`, `6 MONTHS`, `1 YEAR`, `MORE THAN 1 YEAR` (optional)                                 |
+
+  ### ASH-Specific Preferences
+
+  | Field                    | Type   | Required | Constraints / Allowed Values                                                                                  |
+  |--------------------------|--------|----------|---------------------------------------------------------------------------------------------------------------|
+  | ashInterest              | string | No       | One of: `YES`, `NO` (optional)                                                                                |
+  | ashSaturdayAvailability  | string | No       | One of: `EVERY SATURDAY`, `TWO SATURDAYS A MONTH`, `ONE SATURDAY A MONTH`, `OCCASIONALLY` (optional)         |
+  | ashAcademicArea          | string | No       | One of: `LITERACY (READING & WRITING)`, `NUMERACY (MATHEMATICS)`, `BOTH` (optional)                          |
+  | ashExtracurricular       | array  | No       | Array of: `DRAMA / THEATRE`, `MUSIC / SINGING`, `DANCE`, `PUBLIC SPEAKING`, `CREATIVE WRITING`, `SPORTS / GAMES`, `DIGITAL SKILLS`, `ARTS AND CRAFTS` (optional) |
+
+  ### Consent & Administrative
+
+  | Field                 | Type    | Required | Constraints / Allowed Values           |
+  |-----------------------|---------|----------|----------------------------------------|
+  | safeguardingAgreement | string  | Yes      | One of: `YES`, `NO`                    |
+  | mediaConsent          | boolean | Yes      | `true` or `false`. Defaults to `false` |
+  | additionalInfo        | string  | No       | Optional free text                     |
+  | registrationDate      | date    | Yes      | ISO date string — `YYYY-MM-DD` format  |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created volunteer registration record.
+
+  ## Errors
+
+  | Status                      | Description                                                         |
+  |-----------------------------|---------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values. |
+  | `500 Internal Server Error` | Unexpected server error.                                            |
+}
