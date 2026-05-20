@@ -69,8 +69,8 @@ body:multipart-form {
   careerGoal: Engineer
   studentStatement: 
   declarationConfirmed: true
-  passportPhoto: @file(C:\Users\Maxmillian\Pictures\example.jpeg)
-  lastResult: @file(C:\Users\Maxmillian\Pictures\example.pdf)
+  passportPhoto: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  lastResult: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
 }
 
 vars:pre-request {
@@ -84,18 +84,18 @@ settings {
 
 docs {
   # Submit TACOTS Recommendation
-
+  
   Submits a community recommendation for a student to be considered for the TACOTS scholarship programme. Accepts a multipart form containing student bio-data, school records, family/guardian details, household socioeconomic information, recommender details, and required file uploads (passport photo and last school result).
-
+  
   On success, the recommendation record is saved to the database. The endpoint returns the newly created TACOTS recommendation object with a `201 Created` status.
-
+  
   ## Authorization
   No authentication is required for this endpoint (public form submission).
-
+  
   ## Request Body (`multipart/form-data`)
-
+  
   ### Personal Details
-
+  
   | Field           | Type   | Required | Constraints / Allowed Values                                                                                   |
   |-----------------|--------|----------|----------------------------------------------------------------------------------------------------------------|
   | firstName       | string | Yes      | Non-empty text                                                                                                 |
@@ -114,9 +114,9 @@ docs {
   | stateOfOrigin   | string | Yes      | Valid Nigerian state (e.g. `ABIA`, `LAGOS`, `FCT`)                                                             |
   | lga             | string | Yes      | Non-empty text                                                                                                 |
   | homeAddress     | string | Yes      | Non-empty text                                                                                                 |
-
+  
   ### Academic Records
-
+  
   | Field                  | Type   | Required | Constraints / Allowed Values                                                                                              |
   |------------------------|--------|----------|---------------------------------------------------------------------------------------------------------------------------|
   | schoolName             | string | Yes      | Non-empty text                                                                                                            |
@@ -126,9 +126,9 @@ docs {
   | lastClass              | string | Yes      | One of: `PRIMARY 3`, `PRIMARY 4`, `PRIMARY 5`, `PRIMARY 6`, `JSS1`, `JSS2`, `JSS3`, `SS1`, `SS2`, `SS3`                 |
   | classPositionLastTerm  | string | Yes      | Non-empty text (e.g. `3`, `5th`)                                                                                          |
   | lastTermAverage        | number | No       | Optional numeric score                                                                                                    |
-
+  
   ### Parent Information
-
+  
   | Field             | Type   | Required | Constraints / Allowed Values |
   |-------------------|--------|----------|------------------------------|
   | fathersName       | string | Yes      | Non-empty text               |
@@ -138,9 +138,9 @@ docs {
   | mothersOccupation | string | Yes      | Non-empty text               |
   | mothersPhone      | string | Yes      | Non-empty phone number       |
   | parentsAddress    | string | Yes      | Non-empty text               |
-
+  
   ### Guardian Information (Optional)
-
+  
   | Field                | Type   | Required | Constraints / Allowed Values                                                                         |
   |----------------------|--------|----------|------------------------------------------------------------------------------------------------------|
   | guardianName         | string | No       | Optional text                                                                                        |
@@ -148,9 +148,9 @@ docs {
   | guardianRelationship | string | No       | One of: `GRANDPARENT`, `AUNT/UNCLE`, `SIBLING`, `RELATION`, `COMMUNITY GUARDIAN`, `OTHER` (optional) |
   | guardianOccupation   | string | No       | Optional text                                                                                        |
   | guardianAddress      | string | No       | Optional text                                                                                        |
-
+  
   ### Household & Socioeconomic Information
-
+  
   | Field                  | Type   | Required | Constraints / Allowed Values                                                                                                                                               |
   |------------------------|--------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
   | householdSize          | number | Yes      | Integer, minimum `2`                                                                                                                                                       |
@@ -164,9 +164,9 @@ docs {
   | livesWith              | string | Yes      | One of: `BOTH PARENTS`, `MOTHER ONLY`, `FATHER ONLY`, `GRANDPARENT`, `OTHER RELATIVE`, `GUARDIAN`, `ALONE`                                                                |
   | residenceType          | string | Yes      | One of: `FAMILY HOUSE`, `RENTED APARTMENT`, `SHARED ACCOMMODATION`, `TEMPORARY SHELTER`, `OTHER`                                                                          |
   | hasElectricity         | string | Yes      | One of: `YES`, `NO`, `SOMETIMES`                                                                                                                                           |
-
+  
   ### Recommender Details
-
+  
   | Field                | Type   | Required | Constraints / Allowed Values                                                                        |
   |----------------------|--------|----------|-----------------------------------------------------------------------------------------------------|
   | recommenderFirstName | string | Yes      | Non-empty text                                                                                      |
@@ -176,9 +176,9 @@ docs {
   | childBackgroundNotes | string | Yes      | Non-empty description of the child's background                                                     |
   | supportTypesNeeded   | array  | Yes      | Array of: `TUITION (SCHOOL FEES)`, `SCHOOL RESOURCES`, `TRANSPORTATION`, `OTHER`                   |
   | otherImportantInfo   | string | No       | Optional free text                                                                                  |
-
+  
   ### Student Assessment & Declaration
-
+  
   | Field                | Type    | Required | Constraints / Allowed Values        |
   |----------------------|---------|----------|-------------------------------------|
   | disciplineRating     | number  | Yes      | Integer from `1` to `5`             |
@@ -186,20 +186,20 @@ docs {
   | careerGoal           | string  | Yes      | Non-empty text                      |
   | studentStatement     | string  | No       | Optional free text                  |
   | declarationConfirmed | boolean | Yes      | Must be `true`. Defaults to `false` |
-
+  
   ## File Uploads
-
+  
   | Field         | MIME Types Accepted         | Required   | Notes                                                                  |
   |---------------|-----------------------------|------------|------------------------------------------------------------------------|
   | passportPhoto | `image/*` (JPEG, PNG, etc.) | **Yes**    | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/PASSPORTS` on Cloudinary |
   | lastResult    | PDF, image                  | **Yes**    | Student's last school result. Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/RESULTS` on Cloudinary |
-
+  
   ## Response
-
+  
   **`201 Created`** — Returns the newly created TACOTS recommendation record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                                           |
   |-----------------------------|-----------------------------------------------------------------------|
   | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |

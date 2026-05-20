@@ -38,8 +38,6 @@ export const submitRegistrationController = async (
     registrationDate,
   } = req.body;
 
-  if (!req.files) throw new ValidationError("Please upload a file");
-
   try {
     const response = await submitRegistration(req, {
       firstName,

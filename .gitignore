@@ -3,3 +3,7 @@ node_modules
 dist
 drizzle
 doodle.js
+
+#  run check for if ash student, volunteer or tacots exists wth status accepted
+#  also maybe transform names to lowercase
+#  consider handling photo uploads in a queue or event

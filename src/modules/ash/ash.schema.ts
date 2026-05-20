@@ -76,7 +76,14 @@ export const ashStudentBody = z.object({
   ),
   hasLearningCondition: z.enum(["NO", "YES", "NOT SURE"]),
   learningConditions: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+      (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([

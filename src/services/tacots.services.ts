@@ -40,7 +40,7 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
       surname: options.surname,
       gender: options.gender,
       age: options.age,
-      dob: sql`TO_DATE(${options.dob}, 'DD-MM-YYYY')`,
+      dob: sql`TO_DATE(${options.dob}, 'YYYY-MM-DD')`,
       religion: options.religion,
       catholicSacraments: options.catholicSacraments,
       parishAttended: options.parishAttended,

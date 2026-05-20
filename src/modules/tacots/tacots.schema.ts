@@ -37,7 +37,14 @@ export const tacotsRecommendationBody = z.object({
     "NO RELIGION",
   ]),
   catholicSacraments: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  },
     z.array(z.enum(["BAPTISM", "FIRST HOLY COMMUNION", "CONFIRMATION", "NONE YET"])).optional(),
   ),
   parishAttended: optionalTextSchema,
@@ -100,7 +107,15 @@ export const tacotsRecommendationBody = z.object({
     "₦600,001-₦1,000,000",
     "ABOVE ₦1,000,000",
   ]),
-  incomeSources: z.array(
+  incomeSources: z.preprocess(
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  }, z.array(
     z.enum([
       "FARMING",
       "TRADING / SMALL BUSINESS",
@@ -112,7 +127,7 @@ export const tacotsRecommendationBody = z.object({
       "NO REGULAR INCOME",
       "OTHER",
     ]),
-  ),
+  ),), 
   numIncomeEarners: z.enum(["NONE", "1", "2", "3", "MORE THAN 3"]),
   avgMonthlyIncome: numericSchema.optional(),
 
@@ -140,16 +155,24 @@ export const tacotsRecommendationBody = z.object({
   recommenderAddress: textSchema,
 
   childBackgroundNotes: textSchema,
-  supportTypesNeeded: z.array(
+  supportTypesNeeded: z.preprocess(
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  }, z.array(
     z.enum(["TUITION (SCHOOL FEES)", "SCHOOL RESOURCES", "TRANSPORTATION", "OTHER"]),
-  ),
+  ),),
   otherImportantInfo: optionalTextSchema,
 
   disciplineRating: rating1To5Schema,
   responsibilityRating: rating1To5Schema,
   careerGoal: textSchema,
   studentStatement: optionalTextSchema,
-  declarationConfirmed: z.boolean().default(false),
+  declarationConfirmed: z.coerce.boolean().default(false),
 });
 
 export type TacotsrecommendationbodyType = z.infer<typeof tacotsRecommendationBody>;

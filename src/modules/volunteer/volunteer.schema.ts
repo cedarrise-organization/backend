@@ -37,7 +37,14 @@ export const volunteerRegistrationBody = z.object({
     z.enum(["ASH", "TACOTS", "CAPACITY BUILDING", "CEDAR OUTREACHES", "ADMINISTRATIVE SUPPORT"]),
   ),
   skillsToContribute: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  },
     z
       .array(
         z.enum([
@@ -59,7 +66,15 @@ export const volunteerRegistrationBody = z.object({
       )
       .optional(),
   ),
-  availability: z.array(z.enum(["WEEKDAYS", "WEEKENDS", "OCCASIONAL EVENTS", "FLEXIBLE"])),
+  availability: z.preprocess(
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  }, z.array(z.enum(["WEEKDAYS", "WEEKENDS", "OCCASIONAL EVENTS", "FLEXIBLE"])),),
   commitmentDuration: z.preprocess(
     (v) => (v === "" ? undefined : v),
     z.enum(["3 MONTHS", "6 MONTHS", "1 YEAR", "MORE THAN 1 YEAR"]).optional(),
@@ -76,7 +91,14 @@ export const volunteerRegistrationBody = z.object({
     z.enum(["LITERACY (READING & WRITING)", "NUMERACY (MATHEMATICS)", "BOTH"]).optional(),
   ),
   ashExtracurricular: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  },
     z
       .array(
         z.enum([
@@ -140,7 +162,14 @@ export const volunteerFeedbackBody = z.object({
     z.enum(["YES - VERY STRONG", "YES - SOME", "NOT SURE", "NO"]).optional(),
   ),
   waysProgramHelped: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  },
     z
       .array(
         z.enum([
@@ -154,7 +183,14 @@ export const volunteerFeedbackBody = z.object({
       .optional(),
   ),
   activitiesInvolvedIn: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  },
     z
       .array(
         z.enum([
@@ -175,7 +211,14 @@ export const volunteerFeedbackBody = z.object({
     z.enum(["YES", "SOMEWHAT", "NO"]).optional(),
   ),
   skillsGained: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+    if (v === "" || v == null) return undefined;
+    // already an array
+    if (Array.isArray(v)) return v;
+    // single string value
+    if (typeof v === "string") return [v];
+    return v;
+  },
     z
       .array(
         z.enum([

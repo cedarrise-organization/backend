@@ -44,7 +44,7 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
       surname: options.surname,
       gender: options.gender,
       age: options.age,
-      dob: sql`TO_DATE(${options.dob}, 'DD-MM-YYYY')`,
+      dob: sql`TO_DATE(${options.dob}, 'YYYY-MM-DD')`,
       primaryLanguage: options.primaryLanguage,
       homeAddress: options.homeAddress,
       studentPhone: options.studentPhone,

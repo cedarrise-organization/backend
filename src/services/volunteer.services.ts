@@ -17,7 +17,7 @@ export const submitRegistration = async (req: Request, options: Volunteerregistr
       middleName: options.middleName,
       surname: options.surname,
       gender: options.gender,
-      dob: sql`TO_DATE(${options.dob}, 'DD-MM-YYYY')`,
+      dob: sql`TO_DATE(${options.dob}, 'YYYY-MM-DD')`,
       age: options.age,
       phoneNumber: options.phoneNumber,
       emailAddress: options.emailAddress,
@@ -38,7 +38,7 @@ export const submitRegistration = async (req: Request, options: Volunteerregistr
       safeguardingAgreement: options.safeguardingAgreement,
       mediaConsent: options.mediaConsent,
       additionalInfo: options.additionalInfo,
-      registrationDate: sql`TO_DATE(${options.registrationDate}, 'DD-MM-YYYY')`,
+      registrationDate: sql`TO_DATE(${options.registrationDate}, 'YYYY-MM-DD')`,
     })
     .returning();
 
@@ -82,7 +82,7 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
       continueVolunteering: options.continueVolunteering,
       wouldRecommend: options.wouldRecommend,
       additionalComments: options.additionalComments,
-      submissionDate: sql`TO_DATE(${options.submissionDate}, 'DD-MM-YYYY')`,
+      submissionDate: sql`TO_DATE(${options.submissionDate}, 'YYYY-MM-DD')`,
     })
     .returning();
 
