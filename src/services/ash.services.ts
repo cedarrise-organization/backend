@@ -126,7 +126,7 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
 
   /// cache set
   await cacheSet(
-    `cedarrise:ash:ashProgramFeedback:${newAshProgramFeedback?.id}`,
+    `cedarrise:ash:feedback:${newAshProgramFeedback?.id}`,
     newAshProgramFeedback,
     CACHE_TTL.FORM_DATA,
   );
