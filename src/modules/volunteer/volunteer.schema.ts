@@ -10,9 +10,8 @@ import {
   idSchema,
   baseQueryBody,
   rating1To5Schema,
-  emailSchema
+  emailSchema,
 } from "../../db/globalschema/global.schema.js";
-
 
 export const volunteerRegistrationBody = z.object({
   firstName: textSchema,
@@ -27,62 +26,79 @@ export const volunteerRegistrationBody = z.object({
   city: textSchema,
   state: nigerianStateSchema,
   occupation: optionalTextSchema,
-  highestEducation: z
-    .enum(["SECONDARY SCHOOL", "DIPLOMA / CERTIFICATE", "UNDERGRADUATE", "POSTGRADUATE", "OTHER"])
-    .optional(),
+  highestEducation: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .enum(["SECONDARY SCHOOL", "DIPLOMA / CERTIFICATE", "UNDERGRADUATE", "POSTGRADUATE", "OTHER"])
+      .optional(),
+  ),
   reasonForVolunteering: textSchema,
   volunteerAreas: z.array(
     z.enum(["ASH", "TACOTS", "CAPACITY BUILDING", "CEDAR OUTREACHES", "ADMINISTRATIVE SUPPORT"]),
   ),
-  skillsToContribute: z
-    .array(
-      z.enum([
-        "TEACHING",
-        "MENTORING",
-        "PUBLIC SPEAKING",
-        "CREATIVE ARTS",
-        "DIGITAL / ICT",
-        "WRITING",
-        "PROJECT COORDINATION",
-        "COMMUNITY MOBILIZATION",
-        "ADMIN",
-        "GRAPHICS DESIGN",
-        "PHOTOGRAPHY / VIDEOGRAPHY",
-        "SOCIAL MEDIA",
-        "DATA MANAGEMENT",
-        "OTHER",
-      ]),
-    )
-    .optional(),
+  skillsToContribute: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "TEACHING",
+          "MENTORING",
+          "PUBLIC SPEAKING",
+          "CREATIVE ARTS",
+          "DIGITAL / ICT",
+          "WRITING",
+          "PROJECT COORDINATION",
+          "COMMUNITY MOBILIZATION",
+          "ADMIN",
+          "GRAPHICS DESIGN",
+          "PHOTOGRAPHY / VIDEOGRAPHY",
+          "SOCIAL MEDIA",
+          "DATA MANAGEMENT",
+          "OTHER",
+        ]),
+      )
+      .optional(),
+  ),
   availability: z.array(z.enum(["WEEKDAYS", "WEEKENDS", "OCCASIONAL EVENTS", "FLEXIBLE"])),
-  commitmentDuration: z.enum(["3 MONTHS", "6 MONTHS", "1 YEAR", "MORE THAN 1 YEAR"]).optional(),
+  commitmentDuration: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["3 MONTHS", "6 MONTHS", "1 YEAR", "MORE THAN 1 YEAR"]).optional(),
+  ),
   ashInterest: yesNoSchema.optional(),
-  ashSaturdayAvailability: z
-    .enum(["EVERY SATURDAY", "TWO SATURDAYS A MONTH", "ONE SATURDAY A MONTH", "OCCASIONALLY"])
-    .optional(),
-  ashAcademicArea: z
-    .enum(["LITERACY (READING & WRITING)", "NUMERACY (MATHEMATICS)", "BOTH"])
-    .optional(),
-  ashExtracurricular: z
-    .array(
-      z.enum([
-        "DRAMA / THEATRE",
-        "MUSIC / SINGING",
-        "DANCE",
-        "PUBLIC SPEAKING",
-        "CREATIVE WRITING",
-        "SPORTS / GAMES",
-        "DIGITAL SKILLS",
-        "ARTS AND CRAFTS",
-      ]),
-    )
-    .optional(),
+  ashSaturdayAvailability: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .enum(["EVERY SATURDAY", "TWO SATURDAYS A MONTH", "ONE SATURDAY A MONTH", "OCCASIONALLY"])
+      .optional(),
+  ),
+  ashAcademicArea: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["LITERACY (READING & WRITING)", "NUMERACY (MATHEMATICS)", "BOTH"]).optional(),
+  ),
+  ashExtracurricular: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "DRAMA / THEATRE",
+          "MUSIC / SINGING",
+          "DANCE",
+          "PUBLIC SPEAKING",
+          "CREATIVE WRITING",
+          "SPORTS / GAMES",
+          "DIGITAL SKILLS",
+          "ARTS AND CRAFTS",
+        ]),
+      )
+      .optional(),
+  ),
   safeguardingAgreement: yesNoSchema,
   mediaConsent: z.boolean().default(false),
   additionalInfo: optionalTextSchema,
   registrationDate: z.coerce.date(),
-  status: statusSchema.default("pending").optional(),
 });
+
+export type VolunteerregistrationbodyType = z.infer<typeof volunteerRegistrationBody>;
 
 export const createVolunteerRegistrationSchema = z.object({
   body: volunteerRegistrationBody,
@@ -111,59 +127,85 @@ export const volunteerFeedbackBody = z.object({
     "CEDAR OUTREACHES",
   ]),
   specificProgramDetails: optionalTextSchema,
-  volunteerDuration: z.enum(["< 3 MONTHS", "3–6 MONTHS", "6 MONTHS–1 YEAR", "> 1 YEAR"]).optional(),
+  volunteerDuration: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["< 3 MONTHS", "3-6 MONTHS", "6 MONTHS-1 YEAR", "> 1 YEAR"]).optional(),
+  ),
   overallExperienceRating: rating1To5Schema,
   roleClarityRating: rating1To5Schema,
   teamSupportRating: rating1To5Schema,
   organizationRating: rating1To5Schema,
-  programMadeImpact: z.enum(["YES – VERY STRONG", "YES – SOME", "NOT SURE", "NO"]).optional(),
-  waysProgramHelped: z
-    .array(
-      z.enum([
-        "IMPROVED ACADEMIC SUPPORT",
-        "STUDENT CONFIDENCE",
-        "MENTORSHIP",
-        "SKILLS DEVELOPMENT",
-        "UNDERSERVED COMMUNITIES",
-      ]),
-    )
-    .optional(),
-  activitiesInvolvedIn: z
-    .array(
-      z.enum([
-        "TEACHING / TUTORING",
-        "MENTORING",
-        "EXTRACURRICULAR",
-        "COMMUNITY OUTREACH",
-        "EVENT SUPPORT",
-        "COORDINATION",
-        "TRAINING",
-        "OTHER",
-      ]),
-    )
-    .optional(),
-  skillsDeveloped: z.enum(["YES", "SOMEWHAT", "NO"]).optional(),
-  skillsGained: z
-    .array(
-      z.enum([
-        "TEACHING",
-        "COMMUNICATION",
-        "LEADERSHIP",
-        "MENTORSHIP",
-        "TEAMWORK",
-        "COMMUNITY ENGAGEMENT",
-        "FACILITATION",
-      ]),
-    )
-    .optional(),
+  programMadeImpact: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES - VERY STRONG", "YES - SOME", "NOT SURE", "NO"]).optional(),
+  ),
+  waysProgramHelped: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "IMPROVED ACADEMIC SUPPORT",
+          "STUDENT CONFIDENCE",
+          "MENTORSHIP",
+          "SKILLS DEVELOPMENT",
+          "UNDERSERVED COMMUNITIES",
+        ]),
+      )
+      .optional(),
+  ),
+  activitiesInvolvedIn: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "TEACHING / TUTORING",
+          "MENTORING",
+          "EXTRACURRICULAR",
+          "COMMUNITY OUTREACH",
+          "EVENT SUPPORT",
+          "COORDINATION",
+          "TRAINING",
+          "OTHER",
+        ]),
+      )
+      .optional(),
+  ),
+  skillsDeveloped: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES", "SOMEWHAT", "NO"]).optional(),
+  ),
+  skillsGained: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "TEACHING",
+          "COMMUNICATION",
+          "LEADERSHIP",
+          "MENTORSHIP",
+          "TEAMWORK",
+          "COMMUNITY ENGAGEMENT",
+          "FACILITATION",
+        ]),
+      )
+      .optional(),
+  ),
   enjoyedMost: optionalTextSchema,
   challengesExperienced: optionalTextSchema,
   improvementSuggestions: optionalTextSchema,
-  continueVolunteering: z.enum(["YES", "MAYBE", "NO"]).optional(),
-  wouldRecommend: z.enum(["YES", "MAYBE", "NO"]).optional(),
+  continueVolunteering: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES", "MAYBE", "NO"]).optional(),
+  ),
+  wouldRecommend: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES", "MAYBE", "NO"]).optional(),
+  ),
   additionalComments: optionalTextSchema,
   submissionDate: z.coerce.date(),
 });
+
+export type VolunteerfeedbackbodyType = z.infer<typeof volunteerFeedbackBody>;
 
 export const createVolunteerFeedbackSchema = z.object({
   body: volunteerFeedbackBody,
@@ -180,4 +222,3 @@ export const volunteerFeedbackQuerySchema = z.object({
     ...baseQueryBody,
   }),
 });
-

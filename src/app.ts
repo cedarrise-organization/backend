@@ -60,7 +60,7 @@ app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/carousels", carouselRouter);
 app.use("/api/v1/forms/ash", ashRouter);
 app.use("/api/v1/forms/tacots", tacotsRouter);
-app.use("/api/v1/forms/volunteer", volunteerRouter);
+app.use("/api/v1/volunteer", volunteerRouter);
 app.use("/api/v1/forms/outreaches", outreachRouter);
 app.use("/api/v1/forms/capacity-building", capacityRouter);
 // app.use("/queues", bullBoardAdapter.getRouter());
