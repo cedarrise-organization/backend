@@ -2,7 +2,6 @@
 	"name": "ts-node-template",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
 	"scripts": {
 		"build": "npm install --include=dev && npx tsc",
 		"start": "node --env-file=.env dist/index.js",
