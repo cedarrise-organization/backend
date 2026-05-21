@@ -12,13 +12,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// optional
-try {
-  await transporter.verify();
-  logger.info("Send Email function is ready. Server ready.");
-} catch (err: any) {
-  logger.info("Send Email Verification failed:", { err: err.message });
-}
+// optional - uncomment in prod
+// try {
+//   await transporter.verify();
+//   logger.info("Send Email function is ready. Server ready.");
+// } catch (err: any) {
+//   logger.info("Send Email Verification failed:", { err: err.message });
+// }
 
 export const sendEmail = async (
   recipient: string,

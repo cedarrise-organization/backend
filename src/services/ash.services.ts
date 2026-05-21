@@ -10,11 +10,11 @@ import db from "../db/db.js";
 const sortMap = {
   firstName: ashStudent.firstName,
   surname: ashStudent.surname,
-  createdAt: ashStudent.createdAt,
-  schoolState: ashStudent.schoolState,
-  assignedMentor: ashStudent.assignedMentor,
-  currentClass: ashStudent.currentClass,
   gender: ashStudent.gender,
+  schoolState: ashStudent.schoolState,
+  currentClass: ashStudent.currentClass,
+  assignedMentor: ashStudent.assignedMentor,
+  createdAt: ashStudent.createdAt,
 } as const;
 
 export const submitRegistration = async (req: Request, options: AshstudentbodyType) => {
@@ -162,7 +162,7 @@ export const getRegistration = async (id: string) => {
     };
   }
   ///
-  
+
   const [ashstudent] = await db.select().from(ashStudent).where(eq(ashStudent.id, id));
 
   /// cache set

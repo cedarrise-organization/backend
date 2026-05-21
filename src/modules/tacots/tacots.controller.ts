@@ -1,8 +1,13 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
 import { successResponse } from "../../utils/responseHandler.js";
-import { submitRecommendation, submitFeedback } from "../../services/tacots.services.js";
 import { ValidationError } from "../../lib/error.js";
+import {
+  submitRecommendation,
+  listRecommendations,
+  getRecommendation,
+  submitFeedback,
+} from "../../services/tacots.services.js";
 
 export const submitRecommendationController = async (
   req: Request,
@@ -140,6 +145,34 @@ export const submitRecommendationController = async (
   }
 };
 
+export const listRecommendationsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { page, limit, status, sortBy } = req.qtransformed;
+  try {
+    const response = await listRecommendations(page, limit, status, sortBy);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRecommendationController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await getRecommendation(id);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const submitFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const {
     studentFirstName,
@@ -189,6 +222,15 @@ export const submitFeedbackController = async (req: Request, res: Response, next
       additionalComments,
     });
     return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const example = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // const response = await example();
+    // return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);
   }

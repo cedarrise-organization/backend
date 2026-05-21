@@ -104,9 +104,9 @@ export const listRegistrationsController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const {page, limit, status, sort} = req.qtransformed
+  const {page, limit, status, sortBy} = req.qtransformed
   try {
-    const response = await listRegistrations(page, limit, status, sort);
+    const response = await listRegistrations(page, limit, status, sortBy);
     return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);

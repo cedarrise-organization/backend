@@ -1,11 +1,11 @@
 meta {
-  name: List all registrations
+  name: List all recommendations
   type: http
-  seq: 3
+  seq: 5
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/ash/registration?page=&limit=&status=&sortBy=
+  url: {{baseUrl}}/api/v1/forms/tacots/recommendation?page=&limit=&status=&sortBy=firstName
   body: none
   auth: inherit
 }
@@ -14,7 +14,7 @@ params:query {
   page: 
   limit: 
   status: 
-  sortBy: 
+  sortBy: firstName
 }
 
 vars:pre-request {

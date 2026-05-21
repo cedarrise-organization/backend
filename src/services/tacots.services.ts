@@ -1,14 +1,25 @@
 import { UploadApiResponse } from "cloudinary";
 import { tacotsRecommendation, tacotsFeedback } from "../db/models/admin.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
-import { cacheSet, CACHE_TTL } from "../lib/cache.js";
+import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import {
   TacotsrecommendationbodyType,
   TacotsfeedbackbodyType,
 } from "../modules/tacots/tacots.schema.js";
 import { Request } from "express";
-import { sql } from "drizzle-orm";
+import { sql, asc, eq } from "drizzle-orm";
 import db from "../db/db.js";
+
+const sortMap = {
+  firstName: tacotsRecommendation.firstName,
+  surname: tacotsRecommendation.surname,
+  stateOfOrigin: tacotsRecommendation.stateOfOrigin,
+  lga: tacotsRecommendation.lga,
+  gender: tacotsRecommendation.gender,
+  schoolName: tacotsRecommendation.schoolName,
+  lastClass: tacotsRecommendation.lastClass,
+  createdAt: tacotsRecommendation.createdAt,
+} as const;
 
 export const submitRecommendation = async (req: Request, options: TacotsrecommendationbodyType) => {
   const files = req.files as {
@@ -111,6 +122,78 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
     message: "Tacots reccomendation form submitted successfully",
     data: newTacotsRecommendation,
   };
+};
+
+export const listRecommendations = async (
+  page: number,
+  limit: number,
+  status: string,
+  sortBy: keyof typeof sortMap,
+) => {
+  /// cache
+    const key = `cedarrise:tacots:tacotsRecommendations:${page}:${limit}:${status}:${sortBy}`;
+    const cacheRes = await cacheGet<any>(key);
+    if (cacheRes) {
+      return {
+        code: 200,
+        message: "Tacots beneficiaries found successfully",
+        data: cacheRes,
+      };
+    }
+    ///
+  
+    const sortColumn = sortMap[sortBy] ?? tacotsRecommendation.createdAt;
+  
+    const tacotsBeneficiaries = await db
+      .select()
+      .from(tacotsRecommendation)
+      .orderBy(
+        sql`
+          CASE
+            WHEN ${tacotsRecommendation.adminStatus} = ${status} THEN 0
+            ELSE 1
+          END
+        `,
+        asc(sortColumn),
+      )
+      .limit(limit)
+      .offset((page - 1) * limit);
+  
+    /// cache set
+    await cacheSet(key, tacotsBeneficiaries, CACHE_TTL.FORM_DATA);
+    ///
+  
+    return {
+      code: 200,
+      message: "Ash beneficiaries found successfully",
+      data: tacotsBeneficiaries,
+    };
+};
+
+export const getRecommendation = async (id: string) => {
+  /// cache
+    const key = `cedarrise:tacots:tacotsRecommendation:${id}`;
+    const cacheRes = await cacheGet<any>(key);
+    if (cacheRes) {
+      return {
+        code: 200,
+        message: "Tacots beneficiary found successfully",
+        data: cacheRes,
+      };
+    }
+    ///
+  
+    const [tacotBeneficiary] = await db.select().from(tacotsRecommendation).where(eq(tacotsRecommendation.id, id));
+  
+    /// cache set
+    await cacheSet(key, tacotBeneficiary, CACHE_TTL.FORM_DATA);
+    ///
+  
+    return {
+      code: 200,
+      message: "Tacots beneficiary found successfully",
+      data: tacotBeneficiary,
+    };
 };
 
 export const submitFeedback = async (options: TacotsfeedbackbodyType) => {

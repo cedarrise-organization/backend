@@ -38,13 +38,13 @@ export const tacotsRecommendationBody = z.object({
   ]),
   catholicSacraments: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  },
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z.array(z.enum(["BAPTISM", "FIRST HOLY COMMUNION", "CONFIRMATION", "NONE YET"])).optional(),
   ),
   parishAttended: optionalTextSchema,
@@ -109,25 +109,27 @@ export const tacotsRecommendationBody = z.object({
   ]),
   incomeSources: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  }, z.array(
-    z.enum([
-      "FARMING",
-      "TRADING / SMALL BUSINESS",
-      "SALARY / FORMAL EMPLOYMENT",
-      "ARTISAN / SKILLED LABOUR",
-      "DAILY WAGE WORK",
-      "SUPPORT FROM RELATIVE",
-      "GOVERNMENT SUPPORT",
-      "NO REGULAR INCOME",
-      "OTHER",
-    ]),
-  ),), 
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z.array(
+      z.enum([
+        "FARMING",
+        "TRADING / SMALL BUSINESS",
+        "SALARY / FORMAL EMPLOYMENT",
+        "ARTISAN / SKILLED LABOUR",
+        "DAILY WAGE WORK",
+        "SUPPORT FROM RELATIVE",
+        "GOVERNMENT SUPPORT",
+        "NO REGULAR INCOME",
+        "OTHER",
+      ]),
+    ),
+  ),
   numIncomeEarners: z.enum(["NONE", "1", "2", "3", "MORE THAN 3"]),
   avgMonthlyIncome: numericSchema.optional(),
 
@@ -157,15 +159,15 @@ export const tacotsRecommendationBody = z.object({
   childBackgroundNotes: textSchema,
   supportTypesNeeded: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  }, z.array(
-    z.enum(["TUITION (SCHOOL FEES)", "SCHOOL RESOURCES", "TRANSPORTATION", "OTHER"]),
-  ),),
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z.array(z.enum(["TUITION (SCHOOL FEES)", "SCHOOL RESOURCES", "TRANSPORTATION", "OTHER"])),
+  ),
   otherImportantInfo: optionalTextSchema,
 
   disciplineRating: rating1To5Schema,
@@ -200,7 +202,22 @@ export const tacotsRecommendationParamsSchema = idSchema;
 export const tacotsRecommendationQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
-    adminStatus: adminStatusSchema.optional(),
+    status: adminStatusSchema,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "firstName",
+          "surname",
+          "createdAt",
+          "stateOfOrigin",
+          "lga",
+          "schoolName",
+          "gender",
+          "lastClass",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });
 
@@ -278,7 +295,7 @@ export const tacotsFeedbackBody = z.object({
   additionalComments: optionalTextSchema,
 });
 
-export type TacotsfeedbackbodyType = z.infer<typeof tacotsFeedbackBody>
+export type TacotsfeedbackbodyType = z.infer<typeof tacotsFeedbackBody>;
 
 export const createTacotsFeedbackSchema = z.object({
   body: tacotsFeedbackBody,
