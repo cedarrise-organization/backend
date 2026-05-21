@@ -13,6 +13,7 @@ import {
   emailSchema,
 } from "../../db/globalschema/global.schema.js";
 
+// REGISTRATION
 export const volunteerRegistrationBody = z.object({
   firstName: textSchema,
   middleName: optionalTextSchema,
@@ -38,13 +39,13 @@ export const volunteerRegistrationBody = z.object({
   ),
   skillsToContribute: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  },
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -68,13 +69,15 @@ export const volunteerRegistrationBody = z.object({
   ),
   availability: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  }, z.array(z.enum(["WEEKDAYS", "WEEKENDS", "OCCASIONAL EVENTS", "FLEXIBLE"])),),
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z.array(z.enum(["WEEKDAYS", "WEEKENDS", "OCCASIONAL EVENTS", "FLEXIBLE"])),
+  ),
   commitmentDuration: z.preprocess(
     (v) => (v === "" ? undefined : v),
     z.enum(["3 MONTHS", "6 MONTHS", "1 YEAR", "MORE THAN 1 YEAR"]).optional(),
@@ -92,13 +95,13 @@ export const volunteerRegistrationBody = z.object({
   ),
   ashExtracurricular: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  },
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -135,10 +138,26 @@ export const volunteerRegistrationParamsSchema = idSchema;
 export const volunteerRegistrationQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
-    status: statusSchema.optional(),
+    status: statusSchema,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "firstName",
+          "surname",
+          "emailAddress",
+          "phoneNumber",
+          "state",
+          "registrationDate",
+          "volunteerAreas",
+          "createdAt",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });
 
+// FEEDBACK
 export const volunteerFeedbackBody = z.object({
   firstName: textSchema,
   surname: textSchema,
@@ -163,13 +182,13 @@ export const volunteerFeedbackBody = z.object({
   ),
   waysProgramHelped: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  },
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -184,13 +203,13 @@ export const volunteerFeedbackBody = z.object({
   ),
   activitiesInvolvedIn: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  },
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -212,13 +231,13 @@ export const volunteerFeedbackBody = z.object({
   ),
   skillsGained: z.preprocess(
     (v) => {
-    if (v === "" || v == null) return undefined;
-    // already an array
-    if (Array.isArray(v)) return v;
-    // single string value
-    if (typeof v === "string") return [v];
-    return v;
-  },
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([

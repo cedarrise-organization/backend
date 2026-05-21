@@ -1,12 +1,23 @@
-import { volunteerFeedback, volunteerRegistration } from "../db/models/admin.js";
-import { cacheSet, CACHE_TTL } from "../lib/cache.js";
+import { volunteerRegistration, volunteerFeedback } from "../db/models/admin.js";
+import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import {
   VolunteerregistrationbodyType,
   VolunteerfeedbackbodyType,
 } from "../modules/volunteer/volunteer.schema.js";
 import { Request } from "express";
-import { sql } from "drizzle-orm";
+import { sql, asc, eq } from "drizzle-orm";
 import db from "../db/db.js";
+
+const sortMap = {
+  firstName: volunteerRegistration.firstName,
+  surname: volunteerRegistration.surname,
+  emailAddress: volunteerRegistration.emailAddress,
+  phoneNumber: volunteerRegistration.phoneNumber,
+  state: volunteerRegistration.state,
+  registrationDate: volunteerRegistration.registrationDate,
+  volunteerAreas: volunteerRegistration.volunteerAreas,
+  createdAt: volunteerRegistration.createdAt,
+} as const;
 
 export const submitRegistration = async (req: Request, options: VolunteerregistrationbodyType) => {
   const [newVolunteerSubmission] = await db
@@ -54,6 +65,78 @@ export const submitRegistration = async (req: Request, options: Volunteerregistr
     code: 201,
     message: "Volunteer registration form submitted successfully",
     data: newVolunteerSubmission,
+  };
+};
+
+export const listVolunteers = async (
+  page: number,
+  limit: number,
+  status: string,
+  sortBy: keyof typeof sortMap,
+) => {
+  /// cache
+  const key = `cedarrise:volunteer:volunteers:${page}:${limit}:${status}:${sortBy}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Volunteers found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const sortColumn = sortMap[sortBy] ?? volunteerRegistration.createdAt;
+
+  const volunteers = await db
+    .select()
+    .from(volunteerRegistration)
+    .orderBy(
+      sql`
+        CASE
+          WHEN ${volunteerRegistration.status} = ${status} THEN 0
+          ELSE 1
+        END
+      `,
+      asc(sortColumn),
+    )
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, volunteers, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Volunteers found successfully",
+    data: volunteers,
+  };
+};
+
+export const getVolunteer = async (id: string) => {
+  /// cache
+  const key = `cedarrise:volunteer:voluntee:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Volunteer found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [volunteer] = await db.select().from(volunteerRegistration).where(eq(volunteerRegistration.id, id));
+
+  /// cache set
+  await cacheSet(key, volunteer, CACHE_TTL.FORM_DATA);
+  /// 
+
+  return {
+    code: 200,
+    message: "Volunteer found successfully",
+    data: volunteer,
   };
 };
 
