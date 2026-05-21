@@ -76,7 +76,7 @@ export const ashStudentBody = z.object({
   ),
   hasLearningCondition: z.enum(["NO", "YES", "NOT SURE"]),
   learningConditions: z.preprocess(
-      (v) => {
+    (v) => {
       if (v === "" || v == null) return undefined;
       // already an array
       if (Array.isArray(v)) return v;
@@ -132,7 +132,21 @@ export const ashStudentParamsSchema = idSchema;
 export const ashStudentQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
-    status: statusSchema.optional(),
+    status: statusSchema,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "firstName",
+          "surname",
+          "createdAt",
+          "schoolState",
+          "assignedMentor",
+          "currentClass",
+          "gender",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });
 //

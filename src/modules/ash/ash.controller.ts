@@ -1,8 +1,13 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { submitFeedback, submitRegistration } from "../../services/ash.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
+import {
+  submitRegistration,
+  listRegistrations,
+  getRegistration,
+  submitFeedback,
+} from "../../services/ash.services.js";
 
 export const submitRegistrationController = async (
   req: Request,
@@ -94,6 +99,34 @@ export const submitRegistrationController = async (
   }
 };
 
+export const listRegistrationsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const {page, limit, status, sort} = req.qtransformed
+  try {
+    const response = await listRegistrations(page, limit, status, sort);
+    return successResponse(res, response.code, response.message, response.data)
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRegistrationController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id  = (req as any).params.id.toString()
+  try {
+    const response = await getRegistration(id);
+    return successResponse(res, response.code, response.message, response.data)
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const submitFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const {
     studentFirstName,
@@ -122,31 +155,40 @@ export const submitFeedbackController = async (req: Request, res: Response, next
 
   try {
     const response = await submitFeedback({
-    studentFirstName,
-    studentSurname,
-    schoolName,
-    currentClass,
-    attendanceFrequency,
-    enjoyedParts,
-    learningImprovementRating,
-    confidenceRating,
-    volunteerSupportRating,
-    studentEnjoyedMost,
-    studentImprovementSuggestions,
-    parentGuardianName,
-    parentGuardianRelationship,
-    parentPhone,
-    childBenefited,
-    academicImprovementNoticed,
-    confidenceBehaviorChange,
-    mostValuableAspects,
-    parentSatisfactionRating,
-    programImpactOnChild,
-    parentImprovementSuggestions,
-    additionalComments,
-  })
+      studentFirstName,
+      studentSurname,
+      schoolName,
+      currentClass,
+      attendanceFrequency,
+      enjoyedParts,
+      learningImprovementRating,
+      confidenceRating,
+      volunteerSupportRating,
+      studentEnjoyedMost,
+      studentImprovementSuggestions,
+      parentGuardianName,
+      parentGuardianRelationship,
+      parentPhone,
+      childBenefited,
+      academicImprovementNoticed,
+      confidenceBehaviorChange,
+      mostValuableAspects,
+      parentSatisfactionRating,
+      programImpactOnChild,
+      parentImprovementSuggestions,
+      additionalComments,
+    });
 
-    return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const example = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // const response = await example();
+    // return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);
   }

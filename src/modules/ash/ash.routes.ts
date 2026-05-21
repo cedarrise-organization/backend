@@ -1,9 +1,19 @@
 //ROUTES
 import express from "express";
-import { validateRequest } from "../../middleware/validate.middleware.js";
-import { submitRegistrationController, submitFeedbackController } from "./ash.controller.js";
 import { upload } from "../../configs/multer.config.js";
-import { createAshStudentSchema, createAshProgramFeedbackSchema } from "./ash.schema.js";
+import { validateRequest } from "../../middleware/validate.middleware.js";
+import {
+  createAshStudentSchema,
+  ashStudentQuerySchema,
+  ashStudentParamsSchema,
+  createAshProgramFeedbackSchema,
+} from "./ash.schema.js";
+import {
+  submitRegistrationController,
+  listRegistrationsController,
+  getRegistrationController,
+  submitFeedbackController,
+} from "./ash.controller.js";
 
 const router = express.Router();
 
@@ -18,6 +28,12 @@ router.post(
   validateRequest(createAshStudentSchema),
   submitRegistrationController,
 );
+
+// List all registrations (paginated, filterable)
+router.get("/registration", validateRequest(ashStudentQuerySchema), listRegistrationsController);
+
+// Get full registration detail
+router.get("/registration/:id", validateRequest(ashStudentParamsSchema), getRegistrationController);
 
 // Submit ASH Program Feedback
 router.post("/feedback", validateRequest(createAshProgramFeedbackSchema), submitFeedbackController);

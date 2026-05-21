@@ -1,0 +1,21 @@
+meta {
+  name: Get full registration detail
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/registration/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 8d9d02ef-fd6d-4cc4-953c-147037e7b290
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

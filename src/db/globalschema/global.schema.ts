@@ -1,10 +1,19 @@
 import * as z from "zod";
 
 // CONSTS
+const optionalQueryNumber = (defaultValue: number) =>
+  z.preprocess((v) => {
+    if (v === "" || v === undefined || Number.isNaN(Number(v))) {
+      return undefined;
+    }
+
+    return v;
+  }, z.coerce.number().int().min(1).max(100).default(defaultValue));
+
 export const paginationQuerySchema = z.object({
   query: z.object({
     page: z.coerce.number().int().min(1).default(1),
-    limit: z.coerce.number().int().min(1).max(100).default(20),
+    limit: z.coerce.number().int().min(1).max(100).default(25),
     search: z.string().trim().optional(),
   }),
 });
@@ -16,8 +25,8 @@ export const idSchema = z.object({
 });
 
 export const baseQueryBody = {
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  page: optionalQueryNumber(1),
+  limit: optionalQueryNumber(25),
   search: z.string().trim().optional(),
 };
 
@@ -83,9 +92,15 @@ export const genderSchema = z.enum(["MALE", "FEMALE"]);
 
 export const yesNoSchema = z.enum(["YES", "NO"]);
 
-export const statusSchema = z.enum(["accepted", "rejected", "pending"]);
+export const statusSchema = z.preprocess(
+  (v) => (v === "" ? undefined : v),
+  z.enum(["accepted", "rejected", "pending"]).default("pending"),
+);
 
-export const adminStatusSchema = z.enum(["NOT SELECTED", "KEEP IN VIEW", "SELECTED"]);
+export const adminStatusSchema = z.preprocess(
+  (v) => (v === "" ? undefined : v),
+  z.enum(["NOT SELECTED", "KEEP IN VIEW", "SELECTED"]).default("KEEP IN VIEW"),
+);
 
 export const academicSessionSchema = z.enum([
   "2024/25",

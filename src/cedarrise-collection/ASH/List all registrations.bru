@@ -1,0 +1,22 @@
+meta {
+  name: List all registrations
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/registration
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  page: 
+  status: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

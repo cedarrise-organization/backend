@@ -2,10 +2,20 @@ import { AshstudentbodyType, AshprogramfeedbackType } from "../modules/ash/ash.s
 import { ashStudent, ashProgramFeedback } from "../db/models/admin.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { UploadApiResponse } from "cloudinary";
-import { CACHE_TTL, cacheSet } from "../lib/cache.js";
+import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { Request } from "express";
-import { sql } from "drizzle-orm";
+import { sql, asc, eq } from "drizzle-orm";
 import db from "../db/db.js";
+
+const sortMap = {
+  firstName: ashStudent.firstName,
+  surname: ashStudent.surname,
+  createdAt: ashStudent.createdAt,
+  schoolState: ashStudent.schoolState,
+  assignedMentor: ashStudent.assignedMentor,
+  currentClass: ashStudent.currentClass,
+  gender: ashStudent.gender,
+} as const;
 
 export const submitRegistration = async (req: Request, options: AshstudentbodyType) => {
   const files = req.files as {
@@ -91,6 +101,78 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
     code: 201,
     message: "Ash registeration form submitted successfully",
     data: newAshStudent,
+  };
+};
+
+export const listRegistrations = async (
+  page: number,
+  limit: number,
+  status: string,
+  sortBy: keyof typeof sortMap,
+) => {
+  /// cache
+  const key = `cedarrise:ash:ashStudents:${page}:${limit}:${status}:${sortBy}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Ash students found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const sortColumn = sortMap[sortBy] ?? ashStudent.createdAt;
+
+  const ashStudents = await db
+    .select()
+    .from(ashStudent)
+    .orderBy(
+      sql`
+        CASE
+          WHEN ${ashStudent.status} = ${status} THEN 0
+          ELSE 1
+        END
+      `,
+      asc(sortColumn),
+    )
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, ashStudents, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash students found successfully",
+    data: ashStudents,
+  };
+};
+
+export const getRegistration = async (id: string) => {
+  /// cache
+  const key = `cedarrise:ash:ashStudent:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Ash student found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+  
+  const [ashstudent] = await db.select().from(ashStudent).where(eq(ashStudent.id, id));
+
+  /// cache set
+  await cacheSet(key, ashstudent, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash student found successfully",
+    data: ashstudent,
   };
 };
 
