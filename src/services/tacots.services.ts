@@ -131,69 +131,72 @@ export const listRecommendations = async (
   sortBy: keyof typeof sortMap,
 ) => {
   /// cache
-    const key = `cedarrise:tacots:tacotsRecommendations:${page}:${limit}:${status}:${sortBy}`;
-    const cacheRes = await cacheGet<any>(key);
-    if (cacheRes) {
-      return {
-        code: 200,
-        message: "Tacots beneficiaries found successfully",
-        data: cacheRes,
-      };
-    }
-    ///
-  
-    const sortColumn = sortMap[sortBy] ?? tacotsRecommendation.createdAt;
-  
-    const tacotsBeneficiaries = await db
-      .select()
-      .from(tacotsRecommendation)
-      .orderBy(
-        sql`
+  const key = `cedarrise:tacots:tacotsRecommendations:${page}:${limit}:${status}:${sortBy}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Tacots beneficiaries found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const sortColumn = sortMap[sortBy] ?? tacotsRecommendation.createdAt;
+
+  const tacotsBeneficiaries = await db
+    .select()
+    .from(tacotsRecommendation)
+    .orderBy(
+      sql`
           CASE
             WHEN ${tacotsRecommendation.adminStatus} = ${status} THEN 0
             ELSE 1
           END
         `,
-        asc(sortColumn),
-      )
-      .limit(limit)
-      .offset((page - 1) * limit);
-  
-    /// cache set
-    await cacheSet(key, tacotsBeneficiaries, CACHE_TTL.FORM_DATA);
-    ///
-  
-    return {
-      code: 200,
-      message: "Ash beneficiaries found successfully",
-      data: tacotsBeneficiaries,
-    };
+      asc(sortColumn),
+    )
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, tacotsBeneficiaries, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash beneficiaries found successfully",
+    data: tacotsBeneficiaries,
+  };
 };
 
 export const getRecommendation = async (id: string) => {
   /// cache
-    const key = `cedarrise:tacots:tacotsRecommendation:${id}`;
-    const cacheRes = await cacheGet<any>(key);
-    if (cacheRes) {
-      return {
-        code: 200,
-        message: "Tacots beneficiary found successfully",
-        data: cacheRes,
-      };
-    }
-    ///
-  
-    const [tacotBeneficiary] = await db.select().from(tacotsRecommendation).where(eq(tacotsRecommendation.id, id));
-  
-    /// cache set
-    await cacheSet(key, tacotBeneficiary, CACHE_TTL.FORM_DATA);
-    ///
-  
+  const key = `cedarrise:tacots:tacotsRecommendation:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
     return {
       code: 200,
       message: "Tacots beneficiary found successfully",
-      data: tacotBeneficiary,
+      data: cacheRes,
     };
+  }
+  ///
+
+  const [tacotBeneficiary] = await db
+    .select()
+    .from(tacotsRecommendation)
+    .where(eq(tacotsRecommendation.id, id));
+
+  /// cache set
+  await cacheSet(key, tacotBeneficiary, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots beneficiary found successfully",
+    data: tacotBeneficiary,
+  };
 };
 
 export const submitFeedback = async (options: TacotsfeedbackbodyType) => {
@@ -237,5 +240,65 @@ export const submitFeedback = async (options: TacotsfeedbackbodyType) => {
     code: 201,
     message: "Tacots feedback form submitted successfully",
     data: newTacotsFeedback,
+  };
+};
+
+export const listFeedback = async (page: number, limit: number) => {
+  /// cache
+  const key = `cedarrise:tacots:feedback:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Tacots feedback found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const feedback = await db
+    .select()
+    .from(tacotsFeedback)
+    .orderBy(tacotsFeedback.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots feedback found successfully",
+    data: feedback,
+  };
+};
+
+export const getFeedback = async (id: string) => {
+  /// cache
+  const key = `cedarrise:tacots:feedback:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Single feedback found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [feedback] = await db
+    .select()
+    .from(tacotsFeedback)
+    .where(eq(tacotsFeedback.id, id));
+
+  /// cache set
+  await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Single feedback found successfully",
+    data: feedback,
   };
 };

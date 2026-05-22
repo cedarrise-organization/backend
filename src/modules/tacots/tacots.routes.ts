@@ -7,12 +7,16 @@ import {
   createTacotsFeedbackSchema,
   tacotsRecommendationParamsSchema,
   tacotsRecommendationQuerySchema,
+  tacotsFeedbackQuerySchema,
+  tacotsFeedbackParamsSchema,
 } from "./tacots.schema.js";
 import {
   submitRecommendationController,
   listRecommendationsController,
   getRecommendationController,
   submitFeedbackController,
+  listFeedbackController,
+  getFeedbackController,
 } from "./tacots.controller.js";
 
 const router = express.Router();
@@ -44,5 +48,11 @@ router.get(
 
 // Submit ASH TACOTS Feedback
 router.post("/feedback", validateRequest(createTacotsFeedbackSchema), submitFeedbackController);
+
+// List TACOTS feedback submissions
+router.get("/feedback", validateRequest(tacotsFeedbackQuerySchema), listFeedbackController);
+
+// Get full TACOTS feedback submission
+router.get("/feedback/:id", validateRequest(tacotsFeedbackParamsSchema), getFeedbackController);
 
 export default router;

@@ -7,6 +7,8 @@ import {
   listRecommendations,
   getRecommendation,
   submitFeedback,
+  listFeedback,
+  getFeedback,
 } from "../../services/tacots.services.js";
 
 export const submitRecommendationController = async (
@@ -221,6 +223,26 @@ export const submitFeedbackController = async (req: Request, res: Response, next
       parentImprovementSuggestions,
       additionalComments,
     });
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const { page, limit } = req.qtransformed;
+  try {
+    const response = await listFeedback(page, limit);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await getFeedback(id);
     return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
