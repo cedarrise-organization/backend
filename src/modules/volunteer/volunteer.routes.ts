@@ -6,12 +6,16 @@ import {
   listVolunteersController,
   getVolunteerController,
   submitVolunteerFeedbackController,
+  listFeedbackController,
+  getFeedbackController,
 } from "./volunteer.controller.js";
 import {
   createVolunteerRegistrationSchema,
   volunteerRegistrationQuerySchema,
   volunteerRegistrationParamsSchema,
   createVolunteerFeedbackSchema,
+  volunteerFeedbackParamsSchema,
+  volunteerFeedbackQuerySchema,
 } from "./volunteer.schema.js";
 import { upload } from "../../configs/multer.config.js";
 
@@ -37,4 +41,9 @@ router.post(
   submitVolunteerFeedbackController,
 );
 
+// List volunteer feedback submissions
+router.get("/", validateRequest(volunteerFeedbackQuerySchema), listFeedbackController);
+
+// Get single volunteer feedback submission
+router.get("/:id", validateRequest(volunteerFeedbackParamsSchema), getFeedbackController);
 export default router;

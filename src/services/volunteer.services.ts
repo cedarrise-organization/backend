@@ -127,11 +127,14 @@ export const getVolunteer = async (id: string) => {
   }
   ///
 
-  const [volunteer] = await db.select().from(volunteerRegistration).where(eq(volunteerRegistration.id, id));
+  const [volunteer] = await db
+    .select()
+    .from(volunteerRegistration)
+    .where(eq(volunteerRegistration.id, id));
 
   /// cache set
   await cacheSet(key, volunteer, CACHE_TTL.FORM_DATA);
-  /// 
+  ///
 
   return {
     code: 200,
@@ -181,5 +184,65 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
     code: 201,
     message: "Volunteer Feedback form submitted successfully",
     data: newVolunteerFeedback,
+  };
+};
+
+export const listFeedback = async (page: number, limit: number) => {
+  /// cache
+  const key = `cedarrise:volunteer:feedback:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Volunteer feedback successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const feedback = await db
+    .select()
+    .from(volunteerFeedback)
+    .orderBy(volunteerFeedback.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Volunteer feedback successfully",
+    data: feedback,
+  };
+};
+
+export const getFeedback = async (id: string) => {
+  /// cache
+  const key = `cedarrise:volunteer:feedback:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Single volunteer feedback found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [feedback] = await db
+    .select()
+    .from(volunteerFeedback)
+    .where(eq(volunteerFeedback.id, id));
+
+  /// cache set
+  await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Single volunteer feedback found successfully",
+    data: feedback,
   };
 };

@@ -7,6 +7,8 @@ import {
   listVolunteers,
   getVolunteer,
   submitVolunteerFeedback,
+  listFeedback,
+  getFeedback,
 } from "../../services/volunteer.services.js";
 
 export const submitRegistrationController = async (
@@ -77,11 +79,12 @@ export const submitRegistrationController = async (
     next(err);
   }
 };
+
 export const listVolunteersController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, status, sortBy } = req.qtransformed;
   try {
     const response = await listVolunteers(page, limit, status, sortBy);
-    return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
@@ -91,7 +94,7 @@ export const getVolunteerController = async (req: Request, res: Response, next: 
   const id = (req as any).params.id.toString();
   try {
     const response = await getVolunteer(id);
-    return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
@@ -149,6 +152,26 @@ export const submitVolunteerFeedbackController = async (
       additionalComments,
       submissionDate,
     });
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const { page, limit } = req.qtransformed;
+  try {
+    const response = await listFeedback(page, limit);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await getFeedback(id);
     return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
