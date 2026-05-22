@@ -7,12 +7,16 @@ import {
   ashStudentQuerySchema,
   ashStudentParamsSchema,
   createAshProgramFeedbackSchema,
+  ashProgramFeedbackQuerySchema,
+  ashProgramFeedbackParamsSchema,
 } from "./ash.schema.js";
 import {
   submitRegistrationController,
   listRegistrationsController,
   getRegistrationController,
   submitFeedbackController,
+  listFeedbackController,
+  getFeedbackController,
 } from "./ash.controller.js";
 
 const router = express.Router();
@@ -37,5 +41,11 @@ router.get("/registration/:id", validateRequest(ashStudentParamsSchema), getRegi
 
 // Submit ASH Program Feedback
 router.post("/feedback", validateRequest(createAshProgramFeedbackSchema), submitFeedbackController);
+
+// List ASH feedback submissions
+router.get("/feedback", validateRequest(ashProgramFeedbackQuerySchema), listFeedbackController);
+
+// Get full ASH feedback submission detail
+router.get("/feedback/:id", validateRequest(ashProgramFeedbackParamsSchema), getFeedbackController);
 
 export default router;

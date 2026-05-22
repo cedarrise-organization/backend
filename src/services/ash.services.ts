@@ -220,3 +220,60 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
     data: newAshProgramFeedback,
   };
 };
+
+export const listFeedback = async (page: number, limit: number) => {
+  /// cache
+  const key = `cedarrise:ash:feedback:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Ash program feedback found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const allProgramFeedback = await db
+    .select()
+    .from(ashProgramFeedback)
+    .orderBy(ashProgramFeedback.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, allProgramFeedback, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash program feedback found successfully",
+    data: allProgramFeedback,
+  };
+};
+
+export const getFeedback = async (id: string) => {
+  /// cache
+  const key = `cedarrise:ash:feedback:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Single Feeback found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [feedback] = await db.select().from(ashProgramFeedback).where(eq(ashProgramFeedback.id, id));
+
+  /// cache set
+  await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Single Feeback found successfully",
+    data: feedback,
+  };
+};

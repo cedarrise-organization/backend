@@ -7,6 +7,8 @@ import {
   listRegistrations,
   getRegistration,
   submitFeedback,
+  listFeedback,
+  getFeedback,
 } from "../../services/ash.services.js";
 
 export const submitRegistrationController = async (
@@ -104,10 +106,10 @@ export const listRegistrationsController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const {page, limit, status, sortBy} = req.qtransformed
+  const { page, limit, status, sortBy } = req.qtransformed;
   try {
     const response = await listRegistrations(page, limit, status, sortBy);
-    return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
@@ -118,10 +120,10 @@ export const getRegistrationController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const id  = (req as any).params.id.toString()
+  const id = (req as any).params.id.toString();
   try {
     const response = await getRegistration(id);
-    return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
@@ -179,6 +181,26 @@ export const submitFeedbackController = async (req: Request, res: Response, next
       additionalComments,
     });
 
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const { page, limit } = req.qtransformed;
+  try {
+    const response = await listFeedback(page, limit);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await getFeedback(id);
     return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
