@@ -1,0 +1,47 @@
+meta {
+  name: Get ASH feedback detail
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/feedback/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 8d9d02ef-fd6d-4cc4-953c-147037e7b290
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get ASH Feedback Detail
+
+  Retrieves the full detail of a single ASH programme feedback submission by its unique identifier.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                        |
+  |-----------|--------|----------|------------------------------------|
+  | id        | string | Yes      | UUID of the feedback submission    |
+
+  ## Response
+
+  **`200 OK`** — Returns the complete ASH feedback record.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).             |
+  | `500 Internal Server Error` | Unexpected server error.                                |
+}

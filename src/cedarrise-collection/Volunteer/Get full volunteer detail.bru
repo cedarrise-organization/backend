@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/tacots/recommendation/{{id}}
+  url: {{baseUrl}}/api/v1/volunteer/{{id}}
   body: none
   auth: inherit
 }
@@ -18,4 +18,30 @@ vars:pre-request {
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  # Get Full Volunteer Detail
+
+  Retrieves the complete detail of a single volunteer registration by its unique identifier. Returns all personal information, volunteer preferences, ASH-specific details, and consent/administrative fields.
+
+  ## Authorization
+  Requires 'read' permission
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                              |
+  |-----------|--------|----------|------------------------------------------|
+  | id        | string | Yes      | UUID of the volunteer registration       |
+
+  ## Response
+
+  **`200 OK`** — Returns the complete volunteer registration record.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).             |
+  | `500 Internal Server Error` | Unexpected server error.                                |
 }

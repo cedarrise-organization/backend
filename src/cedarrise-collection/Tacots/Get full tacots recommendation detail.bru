@@ -1,0 +1,47 @@
+meta {
+  name: Get full recommendation detail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/tacots/recommendation/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Full TACOTS Recommendation Detail
+
+  Retrieves the complete detail of a single TACOTS scholarship recommendation by its unique identifier. Returns all student bio-data, academic records, family/guardian information, household socioeconomic data, recommender details, file URLs, and student assessment fields.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                                |
+  |-----------|--------|----------|--------------------------------------------|
+  | id        | string | Yes      | UUID of the TACOTS recommendation record   |
+
+  ## Response
+
+  **`200 OK`** — Returns the complete TACOTS recommendation record including all uploaded file URLs.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |
+  | `500 Internal Server Error` | Unexpected server error.                                |
+}

@@ -1,0 +1,47 @@
+meta {
+  name: Get TACOTS feedback detail
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/tacots/feedback/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get TACOTS Feedback Detail
+
+  Retrieves the full detail of a single TACOTS scholarship programme feedback submission by its unique identifier.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                        |
+  |-----------|--------|----------|------------------------------------|
+  | id        | string | Yes      | UUID of the feedback submission    |
+
+  ## Response
+
+  **`200 OK`** — Returns the complete TACOTS feedback record.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |
+  | `500 Internal Server Error` | Unexpected server error.                                |
+}

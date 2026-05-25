@@ -27,3 +27,44 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # List All Volunteers
+
+  Returns a paginated list of volunteer registrations. Results can be sorted by various fields.
+
+  ## Authorization
+  Requires 'read' permission
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default     | Description / Allowed Values                                                                                                                  |
+  |-----------|--------|----------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`         | Page number (integer ≥ 1)                                                                                                                     |
+  | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                                               |
+  | status    | string | No       | `pending`   | One of: `accepted`, `rejected`, `pending`                                                                                                     |
+  | sortBy    | string | No       | `createdAt` | One of: `firstName`, `surname`, `emailAddress`, `phoneNumber`, `state`, `registrationDate`, `volunteerAreas`, `createdAt`                     |
+
+  ## Response
+
+  **`200 OK`** — Returns a paginated array of volunteer registration records.
+
+  ```json
+  {
+    "success": true,
+    "data": [ ... ],
+    "meta":  "pagination": {
+      "page": 1,
+      "limit": 25,
+      "total": 42
+    }
+  }
+  ```
+
+  ## Errors
+
+  | Status                      | Description                                           |
+  |-----------------------------|-------------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. unknown `sortBy` key). |
+  | `500 Internal Server Error` | Unexpected server error.                              |
+}

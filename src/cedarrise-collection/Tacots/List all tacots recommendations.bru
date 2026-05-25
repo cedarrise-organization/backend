@@ -1,0 +1,70 @@
+meta {
+  name: List all recommendations
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/tacots/forms/recommendation?page=&limit=&status=&sortBy=firstName
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+  status: 
+  sortBy: firstName
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  page: 
+  status: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List All TACOTS Recommendations
+
+  Returns a paginated list of TACOTS scholarship recommendation submissions. Results can be filtered by admin selection status and sorted by various fields.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default        | Description / Allowed Values                                                                                            |
+  |-----------|--------|----------|----------------|-------------------------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`            | Page number (integer ≥ 1)                                                                                               |
+  | limit     | number | No       | `25`           | Items per page (integer, 1–100)                                                                                         |
+  | status    | string | No       | `KEEP IN VIEW` | One of: `NOT SELECTED`, `KEEP IN VIEW`, `SELECTED`                                                                      |
+  | sortBy    | string | No       | `createdAt`    | One of: `firstName`, `surname`, `createdAt`, `stateOfOrigin`, `lga`, `schoolName`, `gender`, `lastClass`                |
+
+  ## Response
+
+  **`200 OK`** — Returns a paginated array of TACOTS recommendation records.
+
+  ```json
+  {
+    "success": true,
+    "data": [ ... ],
+    "meta": "pagination": {
+      "page": 1,
+      "limit": 25,
+      "total": 42
+    }
+  }
+  ```
+
+  ## Errors
+
+  | Status                      | Description                                           |
+  |-----------------------------|-------------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. unknown `sortBy` key). |
+  | `500 Internal Server Error` | Unexpected server error.                              |
+}

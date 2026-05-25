@@ -1,0 +1,66 @@
+meta {
+  name: List ASH feedback submissions
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/feedback?page=&limit=&search=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+  search: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  page: 
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List ASH Feedback Submissions
+
+  Returns a paginated list of ASH programme feedback submissions. Results can be paginated via `page` and `limit` query parameters.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default | Description                                    |
+  |-----------|--------|----------|---------|------------------------------------------------|
+  | page      | number | No       | `1`     | Page number (integer ≥ 1)                      |
+  | limit     | number | No       | `25`    | Items per page (integer, 1–100)                |
+
+  ## Response
+
+  **`200 OK`** — Returns a paginated array of ASH feedback records.
+
+  ```json
+  {
+    "success": true,
+    "data": [ ... ],
+    "meta": "pagination": {
+      "page": 1,
+      "limit": 25,
+      "total": 42
+    }
+  }
+  ```
+
+  ## Errors
+
+  | Status                      | Description                                         |
+  |-----------------------------|-----------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. non-numeric `page`). |
+  | `500 Internal Server Error` | Unexpected server error.                            |
+}
