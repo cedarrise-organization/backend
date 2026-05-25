@@ -1,24 +1,17 @@
 meta {
-  name: List volunteer feedback submissions
+  name: List all volunteer feedback
   type: http
-  seq: 3
+  seq: 6
 }
 
 get {
-  url: {{baseUrl}}/api/v1/volunteer/feedback?page=&limit=&search=
+  url: {{baseUrl}}/api/v1/volunteer/all/feedback
   body: none
   auth: inherit
 }
 
-params:query {
-  page: 
-  limit: 
-  search: 
-}
-
 vars:pre-request {
   baseUrl: http://localhost:3000
-  page: 
 }
 
 settings {
@@ -28,23 +21,23 @@ settings {
 
 docs {
   # List Volunteer Feedback Submissions
-
+  
   Returns a paginated list of volunteer feedback submissions. Results can be paginated via `page` and `limit` query parameters.
-
+  
   ## Authorization
   No authentication is required for this endpoint.
-
+  
   ## Query Parameters
-
+  
   | Parameter | Type   | Required | Default | Description                                      |
   |-----------|--------|----------|---------|--------------------------------------------------|
   | page      | number | No       | `1`     | Page number (1-indexed, integer ≥ 1)             |
   | limit     | number | No       | `25`    | Items per page (integer, 1–100)                  |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns a paginated array of volunteer feedback records.
-
+  
   ```json
   {
     "success": true,
@@ -56,9 +49,9 @@ docs {
     }
   }
   ```
-
+  
   ## Errors
-
+  
   | Status                      | Description                                         |
   |-----------------------------|-----------------------------------------------------|
   | `400 Bad Request`           | Invalid query parameters (e.g. non-numeric `page`). |

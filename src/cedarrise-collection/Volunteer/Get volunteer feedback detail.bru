@@ -1,7 +1,7 @@
 meta {
   name: Get volunteer feedback detail
   type: http
-  seq: 4
+  seq: 3
 }
 
 get {
@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 00b6963b-cd54-498e-a83f-ef52276d2c17
+  id: eaf0a7d1-b061-4cb5-a720-e7ad23cf6e16
   baseUrl: http://localhost:3000
 }
 
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get Volunteer Feedback Detail
-
+  
   Retrieves the full detail of a single volunteer feedback submission by its unique identifier.
-
+  
   ## Authorization
   Requires 'read' permission
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                        |
   |-----------|--------|----------|------------------------------------|
   | id        | string | Yes      | UUID of the feedback submission    |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete volunteer feedback record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |

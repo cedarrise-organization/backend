@@ -1,7 +1,7 @@
 meta {
   name: Get full volunteer detail
   type: http
-  seq: 5
+  seq: 4
 }
 
 get {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get Full Volunteer Detail
-
+  
   Retrieves the complete detail of a single volunteer registration by its unique identifier. Returns all personal information, volunteer preferences, ASH-specific details, and consent/administrative fields.
-
+  
   ## Authorization
   Requires 'read' permission
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                              |
   |-----------|--------|----------|------------------------------------------|
   | id        | string | Yes      | UUID of the volunteer registration       |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete volunteer registration record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).             |

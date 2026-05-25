@@ -84,7 +84,7 @@ export const listVolunteersController = async (req: Request, res: Response, next
   const { page, limit, status, sortBy } = req.qtransformed;
   try {
     const response = await listVolunteers(page, limit, status, sortBy);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -162,7 +162,7 @@ export const listFeedbackController = async (req: Request, res: Response, next: 
   const { page, limit } = req.qtransformed;
   try {
     const response = await listFeedback(page, limit);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }

@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get Full ASH Registration Detail
-
+  
   Retrieves the complete detail of a single ASH student registration by its unique identifier. Returns all student bio-data, academic information, parental/guardian contacts, household details, file URLs, and administrative fields.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                              |
   |-----------|--------|----------|------------------------------------------|
   | id        | string | Yes      | UUID of the ASH student registration     |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete ASH student registration record including all uploaded file URLs.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).             |              |

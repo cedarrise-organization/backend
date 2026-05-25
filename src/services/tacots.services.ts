@@ -138,6 +138,12 @@ export const listRecommendations = async (
       code: 200,
       message: "Tacots beneficiaries found successfully",
       data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
     };
   }
   ///
@@ -167,6 +173,12 @@ export const listRecommendations = async (
     code: 200,
     message: "Ash beneficiaries found successfully",
     data: tacotsBeneficiaries,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
   };
 };
 
@@ -252,6 +264,12 @@ export const listFeedback = async (page: number, limit: number) => {
       code: 200,
       message: "Tacots feedback found successfully",
       data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
     };
   }
   ///
@@ -271,6 +289,12 @@ export const listFeedback = async (page: number, limit: number) => {
     code: 200,
     message: "Tacots feedback found successfully",
     data: feedback,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
   };
 };
 
@@ -287,10 +311,7 @@ export const getFeedback = async (id: string) => {
   }
   ///
 
-  const [feedback] = await db
-    .select()
-    .from(tacotsFeedback)
-    .where(eq(tacotsFeedback.id, id));
+  const [feedback] = await db.select().from(tacotsFeedback).where(eq(tacotsFeedback.id, id));
 
   /// cache set
   await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);

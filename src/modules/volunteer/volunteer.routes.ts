@@ -42,8 +42,8 @@ router.post(
 );
 
 // List volunteer feedback submissions
-router.get("/", validateRequest(volunteerFeedbackQuerySchema), listFeedbackController);
+router.get("/all/feedback", validateRequest(volunteerFeedbackQuerySchema), listFeedbackController);
 
 // Get single volunteer feedback submission
-router.get("/:id", validateRequest(volunteerFeedbackParamsSchema), getFeedbackController);
+router.get("/feedback/:id", validateRequest(volunteerFeedbackParamsSchema), getFeedbackController);
 export default router;
