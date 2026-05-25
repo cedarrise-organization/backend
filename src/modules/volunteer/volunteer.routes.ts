@@ -1,6 +1,7 @@
 //ROUTES
 import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
+import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
   submitRegistrationController,
   listVolunteersController,
@@ -29,10 +30,22 @@ router.post(
 );
 
 // List volunteers (default filter: status=pending)
-router.get("/", validateRequest(volunteerRegistrationQuerySchema), listVolunteersController);
+router.get(
+  "/",
+  authenticate(),
+  authorize("read"),
+  validateRequest(volunteerRegistrationQuerySchema),
+  listVolunteersController,
+);
 
 // Get Full volunteer detail
-router.get("/:id", validateRequest(volunteerRegistrationParamsSchema), getVolunteerController);
+router.get(
+  "/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(volunteerRegistrationParamsSchema),
+  getVolunteerController,
+);
 
 // Submit volunteer feedback form
 router.post(
@@ -42,8 +55,20 @@ router.post(
 );
 
 // List volunteer feedback submissions
-router.get("/all/feedback", validateRequest(volunteerFeedbackQuerySchema), listFeedbackController);
+router.get(
+  "/all/feedback",
+  authenticate(),
+  authorize("read"),
+  validateRequest(volunteerFeedbackQuerySchema),
+  listFeedbackController,
+);
 
 // Get single volunteer feedback submission
-router.get("/feedback/:id", validateRequest(volunteerFeedbackParamsSchema), getFeedbackController);
+router.get(
+  "/feedback/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(volunteerFeedbackParamsSchema),
+  getFeedbackController,
+);
 export default router;

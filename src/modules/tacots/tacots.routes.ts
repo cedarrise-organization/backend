@@ -2,6 +2,7 @@
 import express from "express";
 import { upload } from "../../configs/multer.config.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
+import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
   createTacotsRecommendationSchema,
   createTacotsFeedbackSchema,
@@ -35,6 +36,8 @@ router.post(
 // List recommendations (filterable by admin_status)
 router.get(
   "/recommendation",
+  authenticate(),
+  authorize("read"),
   validateRequest(tacotsRecommendationQuerySchema),
   listRecommendationsController,
 );
@@ -42,6 +45,8 @@ router.get(
 // Get full recommendation detail
 router.get(
   "/recommendation/:id",
+  authenticate(),
+  authorize("read"),
   validateRequest(tacotsRecommendationParamsSchema),
   getRecommendationController,
 );
@@ -50,9 +55,21 @@ router.get(
 router.post("/feedback", validateRequest(createTacotsFeedbackSchema), submitFeedbackController);
 
 // List TACOTS feedback submissions
-router.get("/feedback", validateRequest(tacotsFeedbackQuerySchema), listFeedbackController);
+router.get(
+  "/feedback",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsFeedbackQuerySchema),
+  listFeedbackController,
+);
 
 // Get full TACOTS feedback submission
-router.get("/feedback/:id", validateRequest(tacotsFeedbackParamsSchema), getFeedbackController);
+router.get(
+  "/feedback/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsFeedbackParamsSchema),
+  getFeedbackController,
+);
 
 export default router;

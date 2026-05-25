@@ -84,6 +84,10 @@ export const refresh = async (rawRefreshToken: string) => {
   const [stored] = await db.select().from(refreshtoken).where(eq(refreshtoken.token, tokenHash));
 
   if (!stored || stored.expiresAt < new Date()) {
+    appEvents.emit(AUTH_EVENTS.AUTH_REFRESH_FAIL, {
+      userId: payload.sub,
+      reason: "refresh_token_expired",
+    });
     throw new UnauthorizedError("Refreshed token expired or revoked");
   }
 

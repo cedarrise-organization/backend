@@ -2,6 +2,7 @@
 import express from "express";
 import { upload } from "../../configs/multer.config.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
+import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
   createAshStudentSchema,
   ashStudentQuerySchema,
@@ -34,18 +35,42 @@ router.post(
 );
 
 // List all registrations (paginated, filterable)
-router.get("/registration", validateRequest(ashStudentQuerySchema), listRegistrationsController);
+router.get(
+  "/registration",
+  authenticate(),
+  authorize("read"),
+  validateRequest(ashStudentQuerySchema),
+  listRegistrationsController,
+);
 
 // Get full registration detail
-router.get("/registration/:id", validateRequest(ashStudentParamsSchema), getRegistrationController);
+router.get(
+  "/registration/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(ashStudentParamsSchema),
+  getRegistrationController,
+);
 
 // Submit ASH Program Feedback
 router.post("/feedback", validateRequest(createAshProgramFeedbackSchema), submitFeedbackController);
 
 // List ASH feedback submissions
-router.get("/feedback", validateRequest(ashProgramFeedbackQuerySchema), listFeedbackController);
+router.get(
+  "/feedback",
+  authenticate(),
+  authorize("read"),
+  validateRequest(ashProgramFeedbackQuerySchema),
+  listFeedbackController,
+);
 
 // Get full ASH feedback submission detail
-router.get("/feedback/:id", validateRequest(ashProgramFeedbackParamsSchema), getFeedbackController);
+router.get(
+  "/feedback/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(ashProgramFeedbackParamsSchema),
+  getFeedbackController,
+);
 
 export default router;
