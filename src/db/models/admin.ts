@@ -24,6 +24,7 @@ export const ashStudent = p.pgTable(
     homeAddress: p.text("home_address").notNull(),
     studentPhone: p.text("student_phone"),
     passportPhotoUrl: p.text("passport_photo_url").notNull(),
+    passportPhotoPublicId: p.text("passport_photo_public_id").notNull(),
 
     schoolName: p.text("school_name").notNull(),
     schoolTown: p.text("school_town").notNull(),
@@ -32,6 +33,7 @@ export const ashStudent = p.pgTable(
     currentClass: p.text("current_class").notNull(),
     classPositionLastTerm: p.text("class_position_last_term").notNull(),
     lastResultUrl: p.text("last_result_url"),
+    lastResultPublicId: p.text("last_result_public_id"),
 
     prevAfterschoolProgram: p.text("prev_afterschool_program").notNull(),
     reasonForJoining: p.text("reason_for_joining").notNull(),
@@ -55,6 +57,8 @@ export const ashStudent = p.pgTable(
     parentConsent: p.boolean("parent_consent").default(false).notNull(),
     declarationConfirmed: p.boolean("declaration_confirmed").default(false).notNull(),
     parentSignatureUrl: p.text("parent_signature_url").notNull(),
+    parentSignaturePublicId: p.text("parent_signature_public_id").notNull(),
+    
 
     assignedMentor: p.text("assigned_mentor"),
     pretestScore: p.numeric("pretest_score", {
@@ -139,6 +143,7 @@ export const ashTermlyTracking = p.pgTable(
     }),
 
     termResultUrl: p.text("term_result_url").notNull(),
+    termResultPublicId: p.text("term_result_public_id").notNull(),
 
     disciplineRating: p.integer("discipline_rating").notNull(),
     responsibilityRating: p.integer("responsibility_rating").notNull(),
@@ -600,6 +605,7 @@ export const outreachTracker = p.pgTable(
     challengesEncountered: p.text("challenges_encountered"),
     recommendations: p.text(),
     documentationUrl: p.text("documentation_url"),
+    documentationPublicId: p.text("documentation_public_id"),
 
     submittedBy: p.text("submitted_by").notNull(),
     submissionDate: p.date("submission_date").notNull(),
@@ -730,7 +736,9 @@ export const tacotsRecommendation = p.pgTable(
       mode: "number",
     }),
     passportPhotoUrl: p.text("passport_photo_url").notNull(),
+    passportPhotoPublicId: p.text("passport_photo_public_id").notNull(),
     lastResultUrl: p.text("last_result_url").notNull(),
+    lastResultPublicId: p.text("last_result_public_id").notNull(),
 
     fathersName: p.text("fathers_name").notNull(),
     fathersOccupation: p.text("fathers_occupation").notNull(),
@@ -874,7 +882,9 @@ export const tacotsOnboarding = p.pgTable(
       .default(false)
       .notNull(),
     parentSignatureUrl: p.text("parent_signature_url"),
+    parentSignaturePublicId: p.text("parent_signature_public_id"),
     admissionLetterUrl: p.text("admission_letter_url"),
+    admissionLetterPublicId: p.text("admission_letter_url_public_id"),
 
     programOfficerNotes: p.text("program_officer_notes"),
     supportTypesApproved: p.text("support_types_approved").array(),
@@ -963,6 +973,7 @@ export const tacotsTracking = p.pgTable(
     }).notNull(),
     studentPositionInClass: p.text("student_position_in_class").notNull(),
     termResultUrl: p.text("term_result_url").notNull(),
+    termResultPublicId: p.text("term_result_url_public_id").notNull(),
     academicComment: p.text("academic_comment"),
 
     socialBehaviorRating: p.integer("social_behavior_rating").notNull(),
@@ -995,6 +1006,7 @@ export const tacotsTracking = p.pgTable(
       mode: "number",
     }).notNull(),
     paymentEvidenceUrl: p.text("payment_evidence_url"),
+    paymentEvidencePublicId: p.text("payment_evidence_url_public_id"),
     financialNotes: p.text("financial_notes"),
 
     ...timestamps,
