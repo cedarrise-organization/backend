@@ -28,15 +28,15 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
   const resultFile = files.lastResult?.[0];
   const signatureFile = files.parentSignature?.[0];
 
-  const passportUpload: any = passportFile
+  const passportUpload: UploadApiResponse | undefined | null = passportFile
     ? await uploadToCloudinary(passportFile, "/Cedarrise Initiative/ASH-ASSETS/PASSPORTS")
     : null;
 
-  const resultUpload: any = resultFile
+  const resultUpload: UploadApiResponse | undefined | null = resultFile
     ? await uploadToCloudinary(resultFile, "/Cedarrise Initiative/ASH-ASSETS/RESULTS")
     : null;
 
-  const signatureUpload: any = signatureFile
+  const signatureUpload: UploadApiResponse | undefined | null = signatureFile
     ? await uploadToCloudinary(signatureFile, "/Cedarrise Initiative/ASH-ASSETS/SIGNATURES")
     : null;
 

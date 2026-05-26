@@ -22,7 +22,7 @@ export const listBlogsController = async (req: Request, res: Response, next: Nex
 };
 
 export const getSingleBlogController = async (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.id?.toString();
+  const id = req.params.id!.toString();
   try {
     const response = await getSingleBlog(id!);
     return successResponse(res, response.code, response.message, response.data);
@@ -44,7 +44,7 @@ export const createBlogController = async (req: Request, res: Response, next: Ne
 
 export const updateBlogController = async (req: Request, res: Response, next: NextFunction) => {
   const { title, description } = req.body;
-  const id = req.params.id?.toString();
+  const id = req.params.id!.toString();
   try {
     const response = await updateBlog(id!, req, title, description);
     return successResponse(res, response.code, response.message);
@@ -54,7 +54,7 @@ export const updateBlogController = async (req: Request, res: Response, next: Ne
 };
 
 export const deleteBlogController = async (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.id?.toString();
+  const id = req.params.id!.toString();
   try {
     const response = await deleteBlog(id!);
     return successResponse(res, response.code, response.message);

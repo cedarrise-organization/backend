@@ -56,7 +56,7 @@ export const createOutreachController = async (req: Request, res: Response, next
 };
 
 export const getOneOutreachController = async (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.id!.toString();
+  const id = (req as any).params.id.toString();
   try {
     const response = await getOneOutreach(id);
     return successResponse(res, response.code, response.message, response.data);
@@ -81,7 +81,7 @@ export const listAllOutreachController = async (
 };
 
 export const deleteOutreachController = async (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.id!.toString();
+  const id = (req as any).params.id.toString();
   try {
     const response = await deleteOutreach(id);
     return successResponse(res, response.code, response.message);

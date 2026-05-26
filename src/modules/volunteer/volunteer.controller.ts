@@ -46,7 +46,7 @@ export const submitRegistrationController = async (
   } = req.body;
 
   try {
-    const response = await submitRegistration(req, {
+    const response = await submitRegistration({
       firstName,
       middleName,
       surname,

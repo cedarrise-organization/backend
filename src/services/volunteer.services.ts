@@ -19,7 +19,7 @@ const sortMap = {
   createdAt: volunteerRegistration.createdAt,
 } as const;
 
-export const submitRegistration = async (req: Request, options: VolunteerregistrationbodyType) => {
+export const submitRegistration = async (options: VolunteerregistrationbodyType) => {
   const [newVolunteerSubmission] = await db
     .insert(volunteerRegistration)
     .values({

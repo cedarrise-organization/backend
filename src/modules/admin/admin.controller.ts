@@ -21,7 +21,7 @@ export const listAllRolesController = async (req: Request, res: Response, next: 
 };
 
 export const listUserRolesController = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.params.userId!.toString();
+  const userId = (req as any).params.userId.toString();
   try {
     const response = await listUserRoles(userId);
 
@@ -32,7 +32,7 @@ export const listUserRolesController = async (req: Request, res: Response, next:
 };
 
 export const roleActionController = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.params.userId!.toString();
+  const userId = (req as any).params.userId.toString();
   const { action, rolename } = req.qtransformed;
   try {
     const response = await roleAction(userId, { action, rolename });
@@ -62,7 +62,7 @@ export const listAllUsersController = async (req: Request, res: Response, next: 
 };
 
 export const deleteUserController = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.params.userId!.toString();
+  const userId = (req as any).params.userId.toString();
   try {
     const response = await deleteUser(userId);
     return successResponse(res, response.code, response.message);

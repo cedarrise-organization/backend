@@ -2,15 +2,15 @@ import db from "../../db/db.js";
 import logger from "../../configs/logger.config.js";
 import cloudinary from "../../configs/cloudinary.config.js";
 import { CACHE_TTL, cacheDel, cacheGet, cacheSet } from "../../lib/cache.js";
+import { blogs } from "../../db/models/blogs.js";
+import { UploadApiResponse } from "cloudinary";
+import { asc, eq, sql } from "drizzle-orm";
+import { Request } from "express";
 import {
   uploadToCloudinary,
   searchCloudinary,
   deleteFromCloudinary,
 } from "../../utils/storage.util.js";
-import { blogs } from "../../db/models/blogs.js";
-import { UploadApiResponse } from "cloudinary";
-import { asc, eq, sql } from "drizzle-orm";
-import { Request } from "express";
 
 export const listBlogs = async (page: number, limit: number) => {
   /// cache
@@ -70,7 +70,7 @@ export const getSingleBlog = async (id: string) => {
 };
 
 export const createBlog = async (req: Request, title: string, description: string) => {
-  const response = await uploadToCloudinary(req.file!, "/Cedarrise Initiative/BLOG");
+  const response = await uploadToCloudinary((req as any).file, "/Cedarrise Initiative/BLOG");
 
   if (!response) {
     throw new Error("Could not upload pdf");

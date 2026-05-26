@@ -30,11 +30,11 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
   const passportFile = files.passportPhoto?.[0];
   const resultFile = files.lastResult?.[0];
 
-  const passportUpload: any = passportFile
+  const passportUpload: UploadApiResponse | undefined | null = passportFile
     ? await uploadToCloudinary(passportFile, "/Cedarrise Initiative/TACOTS-ASSETS/PASSPORTS")
     : null;
 
-  const resultUpload: any = resultFile
+  const resultUpload: UploadApiResponse | undefined | null = resultFile
     ? await uploadToCloudinary(resultFile, "/Cedarrise Initiative/TACOTS-ASSETS/RESULTS")
     : null;
 
