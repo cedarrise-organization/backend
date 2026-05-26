@@ -71,6 +71,8 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
       lastTermAverage: options.lastTermAverage,
       passportPhotoUrl: passportUpload ? passportUpload.secure_url : "",
       lastResultUrl: resultUpload ? resultUpload.secure_url : "",
+      passportPhotoPublicId: passportUpload ? passportUpload.public_id : "",
+      lastResultPublicId: resultUpload ? resultUpload.public_id : "",
       fathersName: options.fathersName,
       fathersOccupation: options.fathersOccupation,
       fathersPhone: options.fathersPhone,

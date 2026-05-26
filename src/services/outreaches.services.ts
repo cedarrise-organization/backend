@@ -42,6 +42,7 @@ export const createOutreach = async (req: Request, options: OutreachtrackerbodyT
       submittedBy: options.submittedBy,
       submissionDate: sql`TO_DATE(${options.submissionDate}, YYYY-MM-DD)`,
       documentationUrl: documentUpload.secure_url,
+      documentationPublicId: documentUpload.public_id,
     })
     .returning();
 
@@ -126,17 +127,13 @@ export const getOneOutreach = async (id: string) => {
 };
 
 export const deleteOutreach = async (id: string) => {
-  const search = await searchCloudinary('placholder', 1)
+  const [search] = await db.select().from(outreachTracker).where(eq(outreachTracker.id, id))
 
-  if (!search) {
-    throw new Error("Document not found");
-  }
-
-  const deleteResponse = await deleteFromCloudinary(search[0]!.public_id, "image");
+  const deleteResponse = await deleteFromCloudinary(search!.documentationPublicId!, "image");
 
   if (deleteResponse.result !== "ok") {
     logger.error("Document was not deleted from s3", {
-      publicId: search[0]!.public_id,
+      publicId: search?.documentationPublicId,
       event: "delete_doc",
     });
   }

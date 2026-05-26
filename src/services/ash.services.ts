@@ -59,6 +59,7 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
       homeAddress: options.homeAddress,
       studentPhone: options.studentPhone,
       passportPhotoUrl: passportUpload ? passportUpload.secure_url : "",
+      passportPhotoPublicId: passportUpload ? passportUpload.public_id : "",
       schoolName: options.schoolName,
       schoolTown: options.schoolTown,
       schoolLga: options.schoolLga,
@@ -66,6 +67,7 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
       currentClass: options.currentClass,
       classPositionLastTerm: options.classPositionLastTerm,
       lastResultUrl: resultUpload ? resultUpload.secure_url : null,
+      lastResultPublicId: resultUpload ? resultUpload.public_id : null,
       prevAfterschoolProgram: options.prevAfterschoolProgram,
       reasonForJoining: options.reasonForJoining,
       fathersName: options.fathersName,
@@ -84,6 +86,7 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
       parentConsent: options.parentConsent,
       declarationConfirmed: options.declarationConfirmed,
       parentSignatureUrl: signatureUpload ? signatureUpload.secure_url : "",
+      parentSignaturePublicId: signatureUpload ? signatureUpload.public_id : "",
       assignedMentor: options.assignedMentor,
       pretestScore: options.pretestScore,
     })
