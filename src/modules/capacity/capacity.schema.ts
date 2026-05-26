@@ -63,10 +63,19 @@ export const capacityBuildingEvaluationBody = z.object({
 
   budgetAllocated: optionalTextSchema,
   budgetUtilized: optionalTextSchema,
-  wereResourcesAdequate: z.enum(["yes", "no"]).optional(),
+  wereResourcesAdequate: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["yes", "no"]).optional(),
+  ),
   inadequateResourcesExplanation: optionalTextSchema,
-  overallSuccess: z.enum(["Poor", "Fair", "Good", "Very Good", "Excellent"]).optional(),
-  recommendTheProgram: z.enum(["yes", "no"]).optional(),
+  overallSuccess: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["Poor", "Fair", "Good", "Very Good", "Excellent"]).optional(),
+  ),
+  recommendTheProgram: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["yes", "no"]).optional(),
+  ),
   improvementSuggestions: optionalTextSchema,
   recommendFuturePrograms: optionalTextSchema,
 
@@ -74,6 +83,8 @@ export const capacityBuildingEvaluationBody = z.object({
   role: textSchema,
   dateSubmitted: z.coerce.date(),
 });
+
+export type CapacitybuildingevaluationbodyType = z.infer<typeof capacityBuildingEvaluationBody>
 
 export const createCapacityBuildingEvaluationSchema = z.object({
   body: capacityBuildingEvaluationBody,
