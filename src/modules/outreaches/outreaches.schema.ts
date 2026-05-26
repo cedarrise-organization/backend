@@ -27,6 +27,8 @@ export const outreachTrackerBody = z.object({
   submissionDate: z.coerce.date(),
 });
 
+export type OutreachtrackerbodyType = z.infer<typeof outreachTrackerBody>;
+
 export const createOutreachTrackerSchema = z.object({
   body: outreachTrackerBody,
   file: uploadedFileSchema.optional(),
