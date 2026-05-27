@@ -277,6 +277,8 @@ export const ashTermlyTrackingBody = z.object({
   mentorName: textSchema,
 });
 
+export type AshtermlytrackingbodyType = z.infer<typeof ashTermlyTrackingBody>;
+
 export const createAshTermlyTrackingSchema = z.object({
   body: ashTermlyTrackingBody,
   file: resultFileSchema,
@@ -303,13 +305,16 @@ export const ashWeeklyAttendanceBody = z.object({
   sessionDate: z.coerce.date(),
   studentsInAttendance: z.array(z.uuid("Invalid ID")).min(1),
   studentsMentored: z.array(z.uuid("Invalid ID")).min(1),
-  sessionsConducted: z
-    .array(z.enum(["PERFORMANCE ART", "SKILLS TRAINING", "FORMATIVE TALKS"]))
-    .optional(),
+  sessionsConducted: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.array(z.enum(["PERFORMANCE ART", "SKILLS TRAINING", "FORMATIVE TALKS"])).optional(),
+  ),
   sessionDetails: optionalTextSchema,
   volunteersInAttendance: textSchema,
   programReview: optionalTextSchema,
 });
+
+export type AshweeklyattendancebodyType = z.infer<typeof ashWeeklyAttendanceBody>;
 
 export const createAshWeeklyAttendanceSchema = z.object({
   body: ashWeeklyAttendanceBody,
@@ -336,7 +341,7 @@ export const ashExitBody = z.object({
   classAtExit: classSchema,
   durationInProgram: z.enum([
     "LESS THAN 6 MONTHS",
-    "6 MONTHS–1 YEAR",
+    "6 MONTHS-1 YEAR",
     "1 YEAR",
     "2 YEARS",
     "3 YEARS",
@@ -360,19 +365,22 @@ export const ashExitBody = z.object({
     "OTHER",
   ]),
   academicImpactRating: rating1To10Schema,
-  areasOfImprovement: z
-    .array(
-      z.enum([
-        "LITERACY",
-        "NUMERACY",
-        "VOCATIONAL",
-        "DIGITAL LITERACY",
-        "SOFT SKILLS",
-        "CHARACTER",
-        "OTHER",
-      ]),
-    )
-    .optional(),
+  areasOfImprovement: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .array(
+        z.enum([
+          "LITERACY",
+          "NUMERACY",
+          "VOCATIONAL",
+          "DIGITAL LITERACY",
+          "SOFT SKILLS",
+          "CHARACTER",
+          "OTHER",
+        ]),
+      )
+      .optional(),
+  ),
   mentorshipReceived: z.enum(["REGULARLY", "OFTEN", "OCCASIONALLY", "RARELY", "NEVER"]),
   mentorshipImpactRating: rating1To10Schema.optional(),
   postAshStatus: z.enum([
@@ -392,6 +400,8 @@ export const ashExitBody = z.object({
   facilitatorName: textSchema,
   exitDate: z.coerce.date(),
 });
+
+export type AshexitbodyType = z.infer<typeof ashExitBody>;
 
 export const createAshExitSchema = z.object({
   body: ashExitBody,

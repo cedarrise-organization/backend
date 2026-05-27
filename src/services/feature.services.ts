@@ -4,6 +4,6 @@ import { Request } from "express";
 import { sql, eq } from "drizzle-orm";
 import db from "../db/db.js";
 
-export const capacity = async (req: Request, options: any) => {
+export const feature = async (req: Request, options: any) => {
  
 };

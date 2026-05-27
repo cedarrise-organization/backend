@@ -1,10 +1,22 @@
-import { AshstudentbodyType, AshprogramfeedbackType } from "../modules/ash/ash.schema.js";
-import { ashStudent, ashProgramFeedback } from "../db/models/admin.js";
-import { uploadToCloudinary } from "../utils/storage.util.js";
-import { UploadApiResponse } from "cloudinary";
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/storage.util.js";
 import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
-import { Request } from "express";
+import { UploadApiResponse } from "cloudinary";
 import { sql, asc, eq } from "drizzle-orm";
+import { Request } from "express";
+import {
+  ashStudent,
+  ashProgramFeedback,
+  ashTermlyTracking,
+  ashWeeklyAttendance,
+  ashExit,
+} from "../db/models/admin.js";
+import {
+  AshstudentbodyType,
+  AshprogramfeedbackType,
+  AshtermlytrackingbodyType,
+  AshweeklyattendancebodyType,
+  AshexitbodyType,
+} from "../modules/ash/ash.schema.js";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -17,6 +29,7 @@ const sortMap = {
   createdAt: ashStudent.createdAt,
 } as const;
 
+// ASH REGISTRATION
 export const submitRegistration = async (req: Request, options: AshstudentbodyType) => {
   const files = req.files as {
     passportPhoto: Express.Multer.File[];
@@ -191,6 +204,7 @@ export const getRegistration = async (id: string) => {
   };
 };
 
+// ASH FEEDBACK
 export const submitFeedback = async (options: AshprogramfeedbackType) => {
   const [newAshProgramFeedback] = await db
     .insert(ashProgramFeedback)
@@ -307,3 +321,146 @@ export const getFeedback = async (id: string) => {
     data: feedback,
   };
 };
+
+// ASH TRACKING
+export const submitTracking = async (req: Request, options: AshtermlytrackingbodyType) => {
+  const termResultUpload: UploadApiResponse | undefined = await uploadToCloudinary(
+    (req as any).file,
+    "/Cedarrise Initiative/ASH-ASSETS/TERMLY-RESULTS",
+  );
+
+  if (!termResultUpload) {
+    throw new Error(`Could not upload result`);
+  }
+
+  const [tracker] = await db
+    .insert(ashTermlyTracking)
+    .values({
+      id: sql`uuid_generate_v4()`,
+      studentId: options.studentId,
+      academicSession: options.academicSession,
+      term: options.term,
+      schoolName: options.schoolName,
+      schoolNumeracyScore: options.schoolNumeracyScore,
+      schoolLiteracyScore: options.schoolLiteracyScore,
+      schoolAverage: options.schoolAverage,
+      schoolPosition: options.schoolPosition,
+      pretestNumeracyScore: options.pretestNumeracyScore,
+      pretestLiteracyScore: options.pretestLiteracyScore,
+      pretestAverage: options.pretestAverage,
+      midtestNumeracyScore: options.midtestNumeracyScore,
+      midtestLiteracyScore: options.midtestLiteracyScore,
+      midtestAverage: options.midtestAverage,
+      posttestNumeracyScore: options.posttestNumeracyScore,
+      posttestLiteracyScore: options.posttestLiteracyScore,
+      posttestAverage: options.posttestAverage,
+      disciplineRating: options.disciplineRating,
+      responsibilityRating: options.responsibilityRating,
+      leadershipRating: options.leadershipRating,
+      notableAchievements: options.notableAchievements,
+      challengesObserved: options.challengesObserved,
+      nextTermRecommendations: options.nextTermRecommendations,
+      mentorName: options.mentorName,
+      termResultUrl: termResultUpload ? termResultUpload.secure_url : "",
+      termResultPublicId: termResultUpload ? termResultUpload.public_id : "",
+    })
+    .returning();
+
+  /// cache set
+  await cacheSet(`cedarrise:ash:termlytracking:${tracker?.id}`, tracker, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 201,
+    message: "Tracker form submitted successfully",
+    data: tracker,
+  };
+};
+
+export const listTracking = async (page: number, limit: number) => {};
+
+export const getTrack = async (id: string) => {};
+
+export const deleteTrack = async (id: string) => {};
+
+// ASH ATTENDANCE
+export const submitAttendance = async (options: AshweeklyattendancebodyType) => {
+  const [attendance] = await db
+    .insert(ashWeeklyAttendance)
+    .values({
+      id: sql`uuid_generate_v4()`,
+      sessionDate: sql`TO_DATE(${options.sessionDate}, 'YYYY-MM-DD')`,
+      studentsInAttendance: options.studentsInAttendance,
+      studentsMentored: options.studentsMentored,
+      sessionsConducted: options.sessionsConducted,
+      sessionDetails: options.sessionDetails,
+      volunteersInAttendance: options.volunteersInAttendance,
+      programReview: options.programReview,
+    })
+    .returning();
+
+  /// cache set
+  await cacheSet(
+    `cedarrise:ash:weeklyattendance:${attendance?.id}`,
+    attendance,
+    CACHE_TTL.FORM_DATA,
+  );
+  ///
+
+  return {
+    code: 201,
+    message: "Attendance form submitted successfully",
+    data: attendance,
+  };
+};
+
+export const listAttendance = async (page: number, limit: number) => {};
+
+export const getAttendance = async (id: string) => {};
+
+export const deleteAttendance = async (id: string) => {};
+
+// ASH EXIT
+export const submitExit = async (options: AshexitbodyType) => {
+  const [exit] = await db
+    .insert(ashExit)
+    .values({
+      id: sql`uuid_generate_v4()`,
+      studentId: options.studentId,
+      ageAtExit: options.ageAtExit,
+      schoolName: options.schoolName,
+      classAtExit: options.classAtExit,
+      durationInProgram: options.durationInProgram,
+      exitReason: options.exitReason,
+      academicImpactRating: options.academicImpactRating,
+      areasOfImprovement: options.areasOfImprovement,
+      mentorshipReceived: options.mentorshipReceived,
+      mentorshipImpactRating: options.mentorshipImpactRating,
+      postAshStatus: options.postAshStatus,
+      institutionName: options.institutionName,
+      courseOfStudy: options.courseOfStudy,
+      vocationalSkill: options.vocationalSkill,
+      enjoyedMost: options.enjoyedMost,
+      programImpact: options.programImpact,
+      improvementSuggestions: options.improvementSuggestions,
+      facilitatorName: options.facilitatorName,
+      exitDate: sql`TO_DATE(${options.exitDate}, 'YYYY-MM-DD')`,
+    })
+    .returning();
+
+  /// cache set
+  await cacheSet(`cedarrise:ash:exit:${exit?.id}`, exit, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 201,
+    message: "Exit form submitted successfully",
+    data: exit,
+  };
+};
+
+export const listExit = async (page: number, limit: number) => {};
+
+export const getExit = async (id: string) => {};
+
+export const deleteExit = async (id: string) => {};
