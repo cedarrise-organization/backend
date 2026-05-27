@@ -53,6 +53,8 @@
 | `cedarrise:volunteer:volunteers:{page}:{limit}:{status}:{sortBy}`         | Cached paginated volunteer list, sorted and filtered by status. Set on read.             | `services/volunteer.services.ts`            |
 | `cedarrise:volunteer:feedback:{id}`                                       | Cached single volunteer feedback record. Set on create and read.                         | `services/volunteer.services.ts`            |
 | `cedarrise:volunteer:feedback:{page}:{limit}`                             | Cached paginated volunteer feedback list. Set on read.                                   | `services/volunteer.services.ts`            |
+| `cedarrise:capacity:evaluation:{id}`                                      | Cached single capacity building evaluation record. Set on create and read, deleted on delete. | `services/capacity.services.ts`             |
+| `cedarrise:capacity:evaluation:{page}:{limit}`                            | Cached paginated capacity building evaluation list. Set on read.                         | `services/capacity.services.ts`             |
 
 ---
 

@@ -1,0 +1,178 @@
+meta {
+  name: Submit capacity building evaluation
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/capacity-building
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "programName": "Digital Skills Bootcamp",
+    "programType": "Professional Program",
+    "programDate": "2026-05-20",
+    "location": "Abuja, Nigeria",
+    "programCoordinator": "Jane Doe",
+    "numberOfSponsors": 3,
+    "listOfSponsors": "TechCorp, EduFund, GreenVentures",
+    "sponsorshipType": "Financial",
+    "partnerOrganizations": "Code Academy NG",
+    "partnershipLevel": "Implementation",
+    "numberOfParticipants": 45,
+    "targetAudience": "Young professionals aged 18-30",
+    "numberOfFacilitators": 5,
+    "numberOfVolunteers": 10,
+    "participantEngagementLevel": "high",
+    "programObjectives": "Equip participants with web development skills",
+    "objectiveAchievement": "Fully achieved",
+    "programOutcome": "40 out of 45 participants completed the programme",
+    "programImpact": "Increased employment readiness among participants",
+    "majorActivities": "Workshops, hands-on coding sessions, group projects",
+    "effectiveActivities": "Hands-on coding sessions",
+    "venueSuitability": 4,
+    "timeManagement": 5,
+    "resourceAvailability": 4,
+    "communicationAndCoordination": 5,
+    "teamworkAmongOrganizers": 4,
+    "challengesEncountered": "Limited internet access on day 2",
+    "challengesAddressed": "Switched to offline materials",
+    "lessonsLearned": "Always prepare offline backups",
+    "budgetAllocated": "₦2,500,000",
+    "budgetUtilized": "₦2,300,000",
+    "wereResourcesAdequate": "yes",
+    "inadequateResourcesExplanation": "",
+    "overallSuccess": "Very Good",
+    "recommendTheProgram": "yes",
+    "improvementSuggestions": "Include more networking sessions",
+    "recommendFuturePrograms": "Advanced web development bootcamp",
+    "name": "John Evaluator",
+    "role": "Program Manager",
+    "dateSubmitted": "2026-05-25"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit Capacity Building Program Evaluation
+
+  Submits a new capacity building programme evaluation form. The evaluation captures programme details, sponsorship information, participant metrics, logistics ratings, challenges, financial summary, and the evaluator's overall assessment.
+
+  On success, the evaluation record is inserted into the database and cached. The endpoint returns the newly created evaluation object with a `200 OK` status.
+
+  ## Authorization
+  Requires `create` permission.
+
+  ## Request Body (`application/json`)
+
+  ### Programme Details
+
+  | Field              | Type   | Required | Constraints / Allowed Values                                                                       |
+  |--------------------|--------|----------|-----------------------------------------------------------------------------------------------------|
+  | programName        | string | Yes      | Non-empty text                                                                                      |
+  | programType        | string | Yes      | One of: `Professional Program`, `Undergraduates Program`, `Secondary School Program`, `other`       |
+  | programDate        | date   | Yes      | ISO date string — `YYYY-MM-DD`                                                                      |
+  | location           | string | Yes      | Non-empty text                                                                                      |
+  | programCoordinator | string | Yes      | Non-empty text                                                                                      |
+
+  ### Sponsorship & Partnerships
+
+  | Field                | Type   | Required | Constraints / Allowed Values                                                                |
+  |----------------------|--------|----------|---------------------------------------------------------------------------------------------|
+  | numberOfSponsors     | number | Yes      | Numeric value                                                                               |
+  | listOfSponsors       | string | Yes      | Non-empty text                                                                              |
+  | sponsorshipType      | string | Yes      | One of: `Financial`, `Materials/Equipment`, `Venue Support`, `Technical Expertise`, `Other`  |
+  | partnerOrganizations | string | No       | Optional text                                                                               |
+  | partnershipLevel     | string | Yes      | One of: `Planning`, `Funding`, `Implementation`, `Monitoring & Evaluation`, `other`         |
+
+  ### Participant Metrics
+
+  | Field                | Type   | Required | Constraints / Allowed Values |
+  |----------------------|--------|----------|------------------------------|
+  | numberOfParticipants | number | Yes      | Numeric value                |
+  | targetAudience       | string | Yes      | Non-empty text               |
+  | numberOfFacilitators | number | Yes      | Numeric value                |
+  | numberOfVolunteers   | number | Yes      | Numeric value                |
+
+  ### Programme Assessment
+
+  | Field                      | Type   | Required | Constraints / Allowed Values                                    |
+  |----------------------------|--------|----------|-----------------------------------------------------------------|
+  | participantEngagementLevel | string | Yes      | One of: `low`, `moderate`, `high`                               |
+  | programObjectives          | string | No       | Optional text                                                   |
+  | objectiveAchievement       | string | Yes      | One of: `Fully achieved`, `Partially achieved`, `Not achieved`  |
+  | programOutcome             | string | No       | Optional text                                                   |
+  | programImpact              | string | No       | Optional text                                                   |
+  | majorActivities            | string | No       | Optional text                                                   |
+  | effectiveActivities        | string | No       | Optional text                                                   |
+
+  ### Logistics Ratings (1–5 scale)
+
+  | Field                         | Type   | Required | Constraints          |
+  |-------------------------------|--------|----------|----------------------|
+  | venueSuitability              | number | Yes      | Integer, 1–5         |
+  | timeManagement                | number | Yes      | Integer, 1–5         |
+  | resourceAvailability          | number | Yes      | Integer, 1–5         |
+  | communicationAndCoordination  | number | Yes      | Integer, 1–5         |
+  | teamworkAmongOrganizers       | number | Yes      | Integer, 1–5         |
+
+  ### Challenges & Lessons
+
+  | Field                 | Type   | Required | Constraints   |
+  |-----------------------|--------|----------|---------------|
+  | challengesEncountered | string | No       | Optional text |
+  | challengesAddressed   | string | No       | Optional text |
+  | lessonsLearned        | string | No       | Optional text |
+
+  ### Financial Summary
+
+  | Field                          | Type   | Required | Constraints / Allowed Values                              |
+  |--------------------------------|--------|----------|------------------------------------------------------------|
+  | budgetAllocated                | string | No       | Optional text                                              |
+  | budgetUtilized                 | string | No       | Optional text                                              |
+  | wereResourcesAdequate          | string | No       | One of: `yes`, `no` (optional)                             |
+  | inadequateResourcesExplanation | string | No       | Optional text — provide if `wereResourcesAdequate` is `no` |
+
+  ### Overall Assessment
+
+  | Field                   | Type   | Required | Constraints / Allowed Values                                |
+  |-------------------------|--------|----------|--------------------------------------------------------------|
+  | overallSuccess          | string | No       | One of: `Poor`, `Fair`, `Good`, `Very Good`, `Excellent`     |
+  | recommendTheProgram     | string | No       | One of: `yes`, `no`                                          |
+  | improvementSuggestions  | string | No       | Optional text                                                |
+  | recommendFuturePrograms | string | No       | Optional text                                                |
+
+  ### Evaluator Information
+
+  | Field         | Type   | Required | Constraints                  |
+  |---------------|--------|----------|------------------------------|
+  | name          | string | Yes      | Non-empty text               |
+  | role          | string | Yes      | Non-empty text               |
+  | dateSubmitted | date   | Yes      | ISO date string — `YYYY-MM-DD` |
+
+  ## Response
+
+  **`200 OK`** — Returns the newly created capacity building evaluation record.
+
+  The created record is also cached under the key `cedarrise:capacity:evaluation:<id>` using the `FORM_DATA` TTL.
+
+  ## Errors
+
+  | Status                      | Description                                                             |
+  |-----------------------------|-------------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.     |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                                |
+  | `403 Forbidden`             | Authenticated user lacks `create` permission.                           |
+  | `500 Internal Server Error` | Unexpected server error.                                                |
+}

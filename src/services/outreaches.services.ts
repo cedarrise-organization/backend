@@ -26,8 +26,8 @@ export const createOutreach = async (req: Request, options: OutreachtrackerbodyT
     .insert(outreachTracker)
     .values({
       id: sql`uuid_generate_v4()`,
-      outreachStartDate: sql`TO_DATE(${options.outreachStartDate}, YYYY-MM-DD)`,
-      outreachEndDate: sql`TO_DATE(${options.outreachEndDate}, YYYY-MM-DD)`,
+      outreachStartDate: sql`TO_DATE(${options.outreachStartDate}, 'YYYY-MM-DD')`,
+      outreachEndDate: sql`TO_DATE(${options.outreachEndDate}, 'YYYY-MM-DD')`,
       outreachState: options.outreachState,
       outreachLga: options.outreachLga,
       outreachCity: options.outreachCity,
@@ -40,7 +40,7 @@ export const createOutreach = async (req: Request, options: OutreachtrackerbodyT
       challengesEncountered: options.challengesEncountered,
       recommendations: options.recommendations,
       submittedBy: options.submittedBy,
-      submissionDate: sql`TO_DATE(${options.submissionDate}, YYYY-MM-DD)`,
+      submissionDate: sql`TO_DATE(${options.submissionDate}, 'YYYY-MM-DD')`,
       documentationUrl: documentUpload.secure_url,
       documentationPublicId: documentUpload.public_id,
     })

@@ -1,0 +1,69 @@
+meta {
+  name: List all evaluations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/capacity-building?page=&limit=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List All Capacity Building Evaluations
+
+  Returns a paginated list of capacity building programme evaluation submissions. Results are ordered by creation date in ascending order.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default | Description / Allowed Values          |
+  |-----------|--------|----------|---------|---------------------------------------|
+  | page      | number | No       | `1`     | Page number (integer ≥ 1)             |
+  | limit     | number | No       | `25`    | Items per page (integer, 1–100)       |
+
+  ## Response
+
+  **`200 OK`** — Returns a paginated array of capacity building evaluation records.
+
+  ```json
+  {
+    "success": true,
+    "data": [ ... ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25
+      }
+    }
+  }
+  ```
+
+  Results are cached under the key `cedarrise:capacity:evaluation:{page}:{limit}` using the `FORM_DATA` TTL.
+
+  ## Errors
+
+  | Status                      | Description                                           |
+  |-----------------------------|-------------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters.                             |
+  | `401 Unauthorized`          | Missing or invalid authentication token.              |
+  | `403 Forbidden`             | Authenticated user lacks `read` permission.           |
+  | `500 Internal Server Error` | Unexpected server error.                              |
+}

@@ -14,7 +14,7 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
       id: sql`uuid_generate_v4()`,
       programName: options.programName,
       programType: options.programType,
-      programDate: sql`TO_DATE(${options.programDate}, YYYY-MM-DD)`,
+      programDate: sql`TO_DATE(${options.programDate}, 'YYYY-MM-DD')`,
       location: options.location,
       programCoordinator: options.programCoordinator,
       numberOfSponsors: options.numberOfSponsors,
@@ -51,7 +51,7 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
       recommendFuturePrograms: options.recommendFuturePrograms,
       name: options.name,
       role: options.role,
-      dateSubmitted: sql`TO_DATE(${options.dateSubmitted}, YYYY-MM-DD)`,
+      dateSubmitted: sql`TO_DATE(${options.dateSubmitted}, 'YYYY-MM-DD')`,
     })
     .returning();
 

@@ -1,0 +1,51 @@
+meta {
+  name: Get evaluation detail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/capacity-building/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 67dd589c-348b-4f81-995b-9ab1a4e0f92d
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Capacity Building Evaluation Detail
+  
+  Retrieves the complete detail of a single capacity building programme evaluation by its unique identifier. Returns all programme details, sponsorship information, participant metrics, logistics ratings, challenges, financial summary, and evaluator information.
+  
+  ## Authorization
+  Requires `read` permission.
+  
+  ## Path Parameters
+  
+  | Parameter | Type   | Required | Description                                          |
+  |-----------|--------|----------|------------------------------------------------------|
+  | id        | string | Yes      | UUID of the capacity building evaluation record      |
+  
+  ## Response
+  
+  **`200 OK`** — Returns the complete capacity building evaluation record.
+  
+  The result is cached under the key `cedarrise:capacity:evaluation:<id>` using the `FORM_DATA` TTL.
+  
+  ## Errors
+  
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                 |
+  | `403 Forbidden`             | Authenticated user lacks `read` permission.              |
+  | `500 Internal Server Error` | Unexpected server error.                                 |
+}
