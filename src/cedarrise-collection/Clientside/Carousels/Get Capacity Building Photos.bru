@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/carousels/capacity-building?max=20
+  url: {{baseUrl}}/api/v1/carousels/capacity-building?limit=20
   body: none
   auth: inherit
 }
 
 params:query {
-  max: 20
+  limit: 20
 }
 
 vars:pre-request {
@@ -37,8 +37,8 @@ docs {
   ## Query Parameters
   | Parameter | Type   | Required | Default     | Description / Allowed Values | Limit  |
   |-----------|--------|----------|-------------|------------------------------|--------|
-  | max       | number | No       | `36`         | Page number (integer ≥ 18)  |   99   |
-  
+  | limit       | number | No       | `36`         | Page number (integer ≥ 18)  |   99   |
+
   ## Success Response
   - **Status Code**: `200 OK`
   - **Body**:

@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/carousels/ash?max=18
+  url: {{baseUrl}}/api/v1/carousels/ash?limit=18
   body: none
   auth: inherit
 }
 
 params:query {
-  max: 18
+  limit: 18
 }
 
 vars:pre-request {
@@ -37,7 +37,7 @@ docs {
   ## Query Parameters
   | Parameter | Type   | Required | Default     | Description / Allowed Values | Limit  |
   |-----------|--------|----------|-------------|------------------------------|--------|
-  | max       | number | No       | `36`         | Page number (integer ≥ 18)  |   99   |
+  | limit       | number | No       | `36`         | Page number (integer ≥ 18)  |   99   |
   
   ## Success Response
   - **Status Code**: `200 OK`
