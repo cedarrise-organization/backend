@@ -6,7 +6,7 @@
 		"build": "npm install --include=dev && npx tsc",
 		"start": "node --env-file=.env dist/index.js",
 		"dev": "tsx watch --env-file=.env src/index.ts",
-		"dev:docker-db": "docker compose up cederrise-postgres-db cedarrise-redis",
+		"dev:docker-db": "docker compose up cedarrise-postgres-db cedarrise-redis",
 		"watch": "tsc -w",
 		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",

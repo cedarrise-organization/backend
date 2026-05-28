@@ -19,26 +19,27 @@ import "./events/admin.events.js";
 import "./events/donate.event.js";
 import "./events/auth.events.js";
 // import featureRouter from "./modules/feature/feature.routes.js";
+
 // import "./queues/workers/feature.worker.js"
 
 const app = express();
 
-const whitelist = [`http://localhost:${process.env.PORT}`];
+const whitelist = [`http://localhost:3002`];
 const corsOptions = {
-  origin: function (
-    origin: string | undefined,
-    callback: (err: Error | null, allowed?: boolean) => void,
-  ) {
-    if (whitelist.indexOf(origin || "") !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-  credentials: true, //Allow cookies/auth headers
-  allowedHeaders: ["Content-Type", "Authorization"],
-  maxAge: 86400, // Cache preflight requests for 24 hours
+	origin: function (
+		origin: string | undefined,
+		callback: (err: Error | null, allowed?: boolean) => void,
+	) {
+		if (whitelist.indexOf(origin || "") !== -1 || !origin) {
+			callback(null, true);
+		} else {
+			callback(new Error("Not allowed by CORS"));
+		}
+	},
+	methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+	credentials: true, //Allow cookies/auth headers
+	allowedHeaders: ["Content-Type", "Authorization"],
+	maxAge: 86400, // Cache preflight requests for 24 hours
 };
 
 app.use(express.json());
@@ -47,7 +48,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 (async () => {
-  await connectRedis();
+	await connectRedis();
 })();
 
 //ROUTES
@@ -67,10 +68,10 @@ app.use("/api/v1/forms/capacity-building", capacityRouter);
 
 // HANDLER FOR UNKNOWN ROUTES
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: { code: "NOT_FOUND", message: `Route ${req.path} not found` },
-  });
+	res.status(404).json({
+		success: false,
+		error: { code: "NOT_FOUND", message: `Route ${req.path} not found` },
+	});
 });
 
 //GLOBAL ERROR HANDLER
