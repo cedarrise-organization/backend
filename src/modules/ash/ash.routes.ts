@@ -24,9 +24,11 @@ import {
   submitRegistrationController,
   listRegistrationsController,
   getRegistrationController,
+  deleteRegistrationController,
   submitFeedbackController,
   listFeedbackController,
   getFeedbackController,
+  deleteFeedbackController,
   submitTrackingController,
   listTrackingController,
   getTrackController,
@@ -73,6 +75,14 @@ router.get(
   getRegistrationController,
 );
 
+// Delete registration record
+router.delete(
+  "/registration/:id",
+  // authorize("delete"),
+  validateRequest(ashStudentParamsSchema),
+  deleteRegistrationController,
+);
+
 // Submit ASH Program Feedback
 router.post("/feedback", validateRequest(createAshProgramFeedbackSchema), submitFeedbackController);
 
@@ -92,6 +102,14 @@ router.get(
   authorize("read"),
   validateRequest(ashProgramFeedbackParamsSchema),
   getFeedbackController,
+);
+
+// Delete feedback record
+router.delete(
+  "/registration/:id",
+  authorize("delete"),
+  validateRequest(ashProgramFeedbackParamsSchema),
+  deleteFeedbackController,
 );
 
 // Submit ASH Termly Tracking record

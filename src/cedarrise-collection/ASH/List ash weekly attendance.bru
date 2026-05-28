@@ -1,0 +1,65 @@
+meta {
+  name: List ASH weekly attendance
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/attendance?page=&limit=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List ASH Weekly Attendance Records
+
+  Returns a paginated list of ASH weekly attendance records, ordered by creation date.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default | Description                     |
+  |-----------|--------|----------|---------|---------------------------------|
+  | page      | number | No       | `1`     | Page number (integer ≥ 1)       |
+  | limit     | number | No       | `25`    | Items per page (integer, 1–100) |
+
+  ## Response
+
+  **`200 OK`** — Returns a paginated array of ASH weekly attendance records.
+
+  ```json
+  {
+    "success": true,
+    "data": [ ... ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25
+      }
+    }
+  }
+  ```
+
+  ## Errors
+
+  | Status                      | Description                                         |
+  |-----------------------------|-----------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. non-numeric `page`). |
+  | `500 Internal Server Error` | Unexpected server error.                            |
+}

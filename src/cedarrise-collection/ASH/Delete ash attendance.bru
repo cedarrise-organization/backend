@@ -1,0 +1,47 @@
+meta {
+  name: Delete ASH attendance
+  type: http
+  seq: 16
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/forms/ash/attendance/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 2d5a5d06-78e7-44ea-a019-629460535794
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete ASH Attendance Record
+
+  Permanently deletes a single ASH weekly attendance record. The corresponding cache entry is also invalidated.
+
+  ## Authorization
+  Requires `delete` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                          |
+  |-----------|--------|----------|--------------------------------------|
+  | id        | string | Yes      | UUID of the weekly attendance record |
+
+  ## Response
+
+  **`200 OK`** — Confirmation that the record was deleted.
+
+  ## Errors
+
+  | Status                      | Description                                 |
+  |-----------------------------|---------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID). |
+  | `500 Internal Server Error` | Unexpected server error.                    |
+}

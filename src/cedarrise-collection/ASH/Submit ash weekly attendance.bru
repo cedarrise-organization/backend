@@ -1,0 +1,68 @@
+meta {
+  name: Submit ASH weekly attendance
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/ash/attendance
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "sessionDate": "2026-05-28",
+    "studentsInAttendance": ["8d9d02ef-fd6d-4cc4-953c-147037e7b290"],
+    "studentsMentored": ["8d9d02ef-fd6d-4cc4-953c-147037e7b290"],
+    "sessionsConducted": ["PERFORMANCE ART", "FORMATIVE TALKS"],
+    "sessionDetails": "",
+    "volunteersInAttendance": "Mr Ade, Mrs Bola",
+    "programReview": ""
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit ASH Weekly Attendance
+
+  Records a weekly attendance session for the ASH after-school programme. Captures which students attended, which were mentored, the sessions conducted, volunteers present, and an optional programme review.
+
+  On success, the attendance record is inserted into the database and cached. The endpoint returns the newly created record with a `201 Created` status.
+
+  ## Authorization
+  Requires `create` permission.
+
+  ## Request Body (`application/json`)
+
+  | Field                   | Type     | Required | Constraints / Allowed Values                                                           |
+  |-------------------------|----------|----------|----------------------------------------------------------------------------------------|
+  | sessionDate             | date     | Yes      | ISO date string — e.g. `2026-05-28` (format: `YYYY-MM-DD`)                            |
+  | studentsInAttendance    | array    | Yes      | Array of valid UUIDs referencing ASH student records (min 1)                           |
+  | studentsMentored        | array    | Yes      | Array of valid UUIDs referencing ASH student records (min 1)                           |
+  | sessionsConducted       | array    | No       | Array of: `PERFORMANCE ART`, `SKILLS TRAINING`, `FORMATIVE TALKS` (optional)          |
+  | sessionDetails          | string   | No       | Optional free text                                                                     |
+  | volunteersInAttendance  | string   | Yes      | Non-empty text — names of attending volunteers                                         |
+  | programReview           | string   | No       | Optional free text                                                                     |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created ASH weekly attendance record.
+
+  The created record is also cached under the key `cedarrise:ash:weeklyattendance:<id>` using the `FORM_DATA` TTL.
+
+  ## Errors
+
+  | Status                      | Description                                                           |
+  |-----------------------------|-----------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
+  | `500 Internal Server Error` | Unexpected server error.                                              |
+}

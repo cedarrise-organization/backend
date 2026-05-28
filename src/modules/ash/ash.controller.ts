@@ -6,9 +6,11 @@ import {
   submitRegistration,
   listRegistrations,
   getRegistration,
+  deleteRegistration,
   submitFeedback,
   listFeedback,
   getFeedback,
+  deleteFeedback,
   submitTracking,
   listTracking,
   getTrack,
@@ -142,6 +144,16 @@ export const getRegistrationController = async (
   }
 };
 
+export const deleteRegistrationController = async (req: Request, res: Response, next: NextFunction) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await deleteRegistration(id);
+    return successResponse(res, response.code, response.message)
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ASH FEEDBACK
 export const submitFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -221,6 +233,17 @@ export const getFeedbackController = async (req: Request, res: Response, next: N
   }
 };
 
+export const deleteFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await deleteFeedback(id);
+    return successResponse(res, response.code, response.message)
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // ASH TRACKING
 export const submitTrackingController = async (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -289,7 +312,7 @@ export const listTrackingController = async (req: Request, res: Response, next: 
   const { page, limit } = req.qtransformed;
   try {
     const response = await listTracking(page, limit);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    return successResponse(res, response.code, response.message, response.data, response.meta)
   } catch (error) {
     next(error);
   }
@@ -299,7 +322,7 @@ export const getTrackController = async (req: Request, res: Response, next: Next
   const id = (req as any).params.id.toString();
   try {
     const response = await getTrack(id);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);
   }
@@ -309,7 +332,7 @@ export const deleteTrackController = async (req: Request, res: Response, next: N
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteTrack(id);
-    // return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message)
   } catch (error) {
     next(error);
   }
@@ -350,7 +373,7 @@ export const listAttendanceController = async (req: Request, res: Response, next
   const { page, limit } = req.qtransformed;
   try {
     const response = await listAttendance(page, limit);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    return successResponse(res, response.code, response.message, response.data, response.meta)
   } catch (error) {
     next(error);
   }
@@ -360,7 +383,7 @@ export const getAttendanceController = async (req: Request, res: Response, next:
   const id = (req as any).params.id.toString();
   try {
     const response = await getAttendance(id);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);
   }
@@ -374,7 +397,7 @@ export const deleteAttendanceController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteAttendance(id);
-    // return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message)
   } catch (error) {
     next(error);
   }
@@ -433,7 +456,7 @@ export const listExitController = async (req: Request, res: Response, next: Next
   const { page, limit } = req.qtransformed;
   try {
     const response = await listExit(page, limit);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    return successResponse(res, response.code, response.message, response.data, response.meta)
   } catch (error) {
     next(error);
   }
@@ -443,7 +466,7 @@ export const getExitController = async (req: Request, res: Response, next: NextF
   const id = (req as any).params.id.toString();
   try {
     const response = await getExit(id);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);
   }
@@ -453,7 +476,7 @@ export const deleteExitController = async (req: Request, res: Response, next: Ne
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteExit(id);
-    // return successResponse(res, response.code, response.message, response.data)
+    return successResponse(res, response.code, response.message)
   } catch (error) {
     next(error);
   }

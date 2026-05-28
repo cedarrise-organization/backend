@@ -1,0 +1,47 @@
+meta {
+  name: Get ASH attendance detail
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/attendance/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 8d9d02ef-fd6d-4cc4-953c-147037e7b290
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get ASH Attendance Detail
+
+  Retrieves the full detail of a single ASH weekly attendance record by its unique identifier.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                              |
+  |-----------|--------|----------|------------------------------------------|
+  | id        | string | Yes      | UUID of the weekly attendance record     |
+
+  ## Response
+
+  **`200 OK`** — Returns the complete ASH weekly attendance record.
+
+  ## Errors
+
+  | Status                      | Description                                        |
+  |-----------------------------|----------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).        |
+  | `500 Internal Server Error` | Unexpected server error.                           |
+}

@@ -1,0 +1,54 @@
+meta {
+  name: Delete ASH feedback
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/forms/ash/registration/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 2d5a5d06-78e7-44ea-a019-629460535794
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete ASH Feedback
+
+  Permanently deletes a single ASH programme feedback record by its unique identifier. The corresponding cache entry is also invalidated.
+
+  ## Authorization
+  Requires `delete` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                        |
+  |-----------|--------|----------|------------------------------------|
+  | id        | string | Yes      | UUID of the feedback submission    |
+
+  ## Response
+
+  **`200 OK`** — Confirmation that the record was deleted.
+
+  ```json
+  {
+    "success": true,
+    "message": "Ash feedback data deleted successfully"
+  }
+  ```
+
+  ## Errors
+
+  | Status                      | Description                                        |
+  |-----------------------------|----------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).        |
+  | `500 Internal Server Error` | Unexpected server error.                           |
+}

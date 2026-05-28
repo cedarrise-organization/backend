@@ -1,6 +1,7 @@
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/storage.util.js";
 import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { UploadApiResponse } from "cloudinary";
+import { appEvents } from "../lib/events.js";
 import { sql, asc, eq } from "drizzle-orm";
 import { Request } from "express";
 import {
@@ -204,6 +205,29 @@ export const getRegistration = async (id: string) => {
   };
 };
 
+export const deleteRegistration = async (id: string) => {
+  // const [data] = await db
+  //   .select({
+  //     passportPhotoPublicId: ashStudent.passportPhotoPublicId,
+  //     lastResultPublicId: ashStudent.lastResultPublicId,
+  //     parentSignaturePublicId: ashStudent.parentSignaturePublicId,
+  //   })
+  //   .from(ashStudent)
+  //   .where(eq(ashStudent.id, id));
+
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+
+  await db.delete(ashStudent).where(eq(ashStudent.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:ash:ashStudent:${id}`);
+  ///
+  return {
+    code: 200,
+    message: "Ash student data deleted successfully",
+  };
+};
+
 // ASH FEEDBACK
 export const submitFeedback = async (options: AshprogramfeedbackType) => {
   const [newAshProgramFeedback] = await db
@@ -322,6 +346,19 @@ export const getFeedback = async (id: string) => {
   };
 };
 
+export const deleteFeedback = async (id: string) => {
+  await db.delete(ashProgramFeedback).where(eq(ashProgramFeedback.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:ash:feedback:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash feedback data deleted successfully",
+  };
+};
+
 // ASH TRACKING
 export const submitTracking = async (req: Request, options: AshtermlytrackingbodyType) => {
   const termResultUpload: UploadApiResponse | undefined = await uploadToCloudinary(
@@ -377,11 +414,87 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
   };
 };
 
-export const listTracking = async (page: number, limit: number) => {};
+export const listTracking = async (page: number, limit: number) => {
+  /// cache
+  const key = `cedarrise:ash:termlytracking:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Tracking data found successfully",
+      data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
+    };
+  }
+  ///
 
-export const getTrack = async (id: string) => {};
+  const tracking = await db
+    .select()
+    .from(ashTermlyTracking)
+    .orderBy(ashTermlyTracking.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
 
-export const deleteTrack = async (id: string) => {};
+  /// cache set
+  await cacheSet(key, tracking, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Tracking  data found successfully",
+    data: tracking,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
+  };
+};
+
+export const getTrack = async (id: string) => {
+  /// cache
+  const key = `cedarrise:ash:termlytracking:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Track data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [track] = await db.select().from(ashTermlyTracking).where(eq(ashTermlyTracking.id, id));
+
+  /// cache set
+  await cacheSet(key, track, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Track data found successfully",
+    data: track,
+  };
+};
+
+export const deleteTrack = async (id: string) => {
+  await db.delete(ashTermlyTracking).where(eq(ashTermlyTracking.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:ash:termlytracking:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash tracking data deleted successfully",
+  };
+};
 
 // ASH ATTENDANCE
 export const submitAttendance = async (options: AshweeklyattendancebodyType) => {
@@ -414,11 +527,90 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
   };
 };
 
-export const listAttendance = async (page: number, limit: number) => {};
+export const listAttendance = async (page: number, limit: number) => {
+  /// cache
+  const key = `cedarrise:ash:weeklyattendance:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Attendance data found successfully",
+      data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
+    };
+  }
+  ///
 
-export const getAttendance = async (id: string) => {};
+  const attendance = await db
+    .select()
+    .from(ashWeeklyAttendance)
+    .orderBy(ashWeeklyAttendance.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
 
-export const deleteAttendance = async (id: string) => {};
+  /// cache set
+  await cacheSet(key, attendance, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Attendance data found successfully",
+    data: attendance,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
+  };
+};
+
+export const getAttendance = async (id: string) => {
+  /// cache
+  const key = `cedarrise:ash:weeklyattendance:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Attendance found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [attendance] = await db
+    .select()
+    .from(ashWeeklyAttendance)
+    .where(eq(ashWeeklyAttendance.id, id));
+
+  /// cache set
+  await cacheSet(key, attendance, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Attendance found successfully",
+    data: attendance,
+  };
+};
+
+export const deleteAttendance = async (id: string) => {
+  await db.delete(ashWeeklyAttendance).where(eq(ashWeeklyAttendance.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:ash:weeklyattendance:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash attendance data deleted successfully",
+  };
+};
 
 // ASH EXIT
 export const submitExit = async (options: AshexitbodyType) => {
@@ -459,8 +651,84 @@ export const submitExit = async (options: AshexitbodyType) => {
   };
 };
 
-export const listExit = async (page: number, limit: number) => {};
+export const listExit = async (page: number, limit: number) => {
+  /// cache
+  const key = `cedarrise:ash:exit:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Exit data found successfully",
+      data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
+    };
+  }
+  ///
 
-export const getExit = async (id: string) => {};
+  const exit = await db
+    .select()
+    .from(ashExit)
+    .orderBy(ashExit.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
 
-export const deleteExit = async (id: string) => {};
+  /// cache set
+  await cacheSet(key, exit, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Exit data found successfully",
+    data: exit,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
+  };
+};
+
+export const getExit = async (id: string) => {
+  /// cache
+  const key = `cedarrise:ash:exit:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Exit found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [exit] = await db.select().from(ashExit).where(eq(ashExit.id, id));
+
+  /// cache set
+  await cacheSet(key, exit, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "exit found successfully",
+    data: exit,
+  };
+};
+
+export const deleteExit = async (id: string) => {
+  await db.delete(ashExit).where(eq(ashExit.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:ash:exit:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Ash exit data deleted successfully",
+  };
+};

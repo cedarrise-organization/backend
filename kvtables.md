@@ -45,6 +45,12 @@
 | `cedarrise:ash:ashStudents:{page}:{limit}:{status}:{sortBy}`              | Cached paginated ASH student list, sorted and filtered by status. Set on read.           | `services/ash.services.ts`                  |
 | `cedarrise:ash:feedback:{id}`                                             | Cached single ASH programme feedback record. Set on create and read.                     | `services/ash.services.ts`                  |
 | `cedarrise:ash:feedback:{page}:{limit}`                                   | Cached paginated ASH programme feedback list. Set on read.                               | `services/ash.services.ts`                  |
+| `cedarrise:ash:termlytracking:{id}`                                       | Cached single ASH termly tracking record. Set on create and read, deleted on delete.     | `services/ash.services.ts`                  |
+| `cedarrise:ash:termlytracking:{page}:{limit}`                             | Cached paginated ASH termly tracking list. Set on read.                                  | `services/ash.services.ts`                  |
+| `cedarrise:ash:weeklyattendance:{id}`                                     | Cached single ASH weekly attendance record. Set on create and read, deleted on delete.   | `services/ash.services.ts`                  |
+| `cedarrise:ash:weeklyattendance:{page}:{limit}`                           | Cached paginated ASH weekly attendance list. Set on read.                                | `services/ash.services.ts`                  |
+| `cedarrise:ash:exit:{id}`                                                 | Cached single ASH exit record. Set on create and read, deleted on delete.                | `services/ash.services.ts`                  |
+| `cedarrise:ash:exit:{page}:{limit}`                                       | Cached paginated ASH exit record list. Set on read.                                      | `services/ash.services.ts`                  |
 | `cedarrise:tacots:tacotsRecommendation:{id}`                              | Cached single TACOTS recommendation record. Set on create and read.                      | `services/tacots.services.ts`               |
 | `cedarrise:tacots:tacotsRecommendations:{page}:{limit}:{status}:{sortBy}` | Cached paginated TACOTS recommendation list, sorted and filtered by status. Set on read. | `services/tacots.services.ts`               |
 | `cedarrise:tacots:feedback:{id}`                                          | Cached single TACOTS feedback record. Set on create and read.                            | `services/tacots.services.ts`               |
@@ -135,6 +141,7 @@
 | ASH — Last Results           | `/Cedarrise Initiative/ASH-ASSETS/RESULTS`      |
 | ASH — Parent Signatures      | `/Cedarrise Initiative/ASH-ASSETS/SIGNATURES`   |
 | TACOTS — Passport Photos     | `/Cedarrise Initiative/TACOTS-ASSETS/PASSPORTS` |
+| ASH — Termly Results         | `/Cedarrise Initiative/ASH-ASSETS/TERMLY-RESULTS` |
 | TACOTS — Last Results        | `/Cedarrise Initiative/TACOTS-ASSETS/RESULTS`   |
 
 ---
