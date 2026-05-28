@@ -1,10 +1,9 @@
-import cloudinary from "../../configs/cloudinary.config.js";
 import { CACHE_TTL, cacheGet, cacheSet } from "../../lib/cache.js";
 import { searchCloudinary } from "../../utils/storage.util.js";
 
-export const ashCarousel = async () => {
+export const ashCarousel = async (max: number) => {
   /// cache
-  const key = `cedarrise:gallery:ash`;
+  const key = `cedarrise:gallery:ash:${max}`;
   const cacheRes = await cacheGet<any>(key);
 
   if (cacheRes) {
@@ -12,11 +11,14 @@ export const ashCarousel = async () => {
       code: 200,
       message: "ASH photo urls found successfully",
       data: cacheRes,
+      meta: {
+        numberOfPhotos: max,
+      },
     };
   }
   ///
 
-  const ashPhotos = await searchCloudinary(`asset_folder:"Cedarrise Initiative/ASH"`, 200);
+  const ashPhotos = await searchCloudinary(`asset_folder:"Cedarrise Initiative/ASH"`, max);
 
   // cache set
   await cacheSet(key, ashPhotos, CACHE_TTL.GALLERY);
@@ -25,12 +27,15 @@ export const ashCarousel = async () => {
     code: 200,
     message: "ASH photo urls found successfully",
     data: ashPhotos,
+    meta: {
+      numberOfPhotos: max,
+    },
   };
 };
 
-export const tacotsCarousel = async () => {
+export const tacotsCarousel = async (max: number) => {
   /// cache
-  const key = `cedarrise:gallery:tacots`;
+  const key = `cedarrise:gallery:tacots:${max}`;
   const cacheRes = await cacheGet<any>(key);
 
   if (cacheRes) {
@@ -38,11 +43,14 @@ export const tacotsCarousel = async () => {
       code: 200,
       message: "TACOTS photo urls found successfully",
       data: cacheRes,
+      meta: {
+        numberOfPhotos: max,
+      },
     };
   }
   ///
 
-  const tacotsPhotos = await searchCloudinary(`asset_folder:"Cedarrise Initiative/TACOTS"`, 200);
+  const tacotsPhotos = await searchCloudinary(`asset_folder:"Cedarrise Initiative/TACOTS"`, max);
 
   // cache set
   await cacheSet(key, tacotsPhotos, CACHE_TTL.GALLERY);
@@ -51,12 +59,15 @@ export const tacotsCarousel = async () => {
     code: 200,
     message: "TACOTS photo urls found successfully",
     data: tacotsPhotos,
+    meta: {
+      numberOfPhotos: max,
+    },
   };
 };
 
-export const outreachCarousel = async () => {
+export const outreachCarousel = async (max: number) => {
   /// cache
-  const key = `cedarrise:gallery:outreaches`;
+  const key = `cedarrise:gallery:outreaches:${max}`;
   const cacheRes = await cacheGet<any>(key);
 
   if (cacheRes) {
@@ -64,13 +75,16 @@ export const outreachCarousel = async () => {
       code: 200,
       message: "OUTREACHES photo urls found successfully",
       data: cacheRes,
+      meta: {
+        numberOfPhotos: max,
+      },
     };
   }
   ///
 
   const outreachPhotos = await searchCloudinary(
     `asset_folder:"Cedarrise Initiative/OUTREACHES"`,
-    200,
+    max,
   );
 
   // cache set
@@ -80,12 +94,15 @@ export const outreachCarousel = async () => {
     code: 200,
     message: "OUTREACHES photo urls found successfully",
     data: outreachPhotos,
+    meta: {
+      numberOfPhotos: max,
+    },
   };
 };
 
-export const capacityCarousel = async () => {
+export const capacityCarousel = async (max: number) => {
   /// cache
-  const key = `cedarrise:gallery:capacity`;
+  const key = `cedarrise:gallery:capacity:${max}`;
   const cacheRes = await cacheGet<any>(key);
 
   if (cacheRes) {
@@ -93,13 +110,16 @@ export const capacityCarousel = async () => {
       code: 200,
       message: "CAPACITY BUILDING photo urls found successfully",
       data: cacheRes,
+      meta: {
+        numberOfPhotos: max,
+      },
     };
   }
   ///
 
   const capacityPhotos = await searchCloudinary(
     `asset_folder:"Cedarrise Initiative/CAPACITY BUILDING"`,
-    200,
+    max,
   );
 
   // cache set
@@ -109,5 +129,8 @@ export const capacityCarousel = async () => {
     code: 200,
     message: "CAPACITY BUILDING photo urls found successfully",
     data: capacityPhotos,
+    meta: {
+      numberOfPhotos: max,
+    },
   };
 };

@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/carousels/ash
+  url: {{baseUrl}}/api/v1/carousels/ash?max=18
   body: none
   auth: inherit
+}
+
+params:query {
+  max: 18
 }
 
 vars:pre-request {
@@ -31,7 +35,9 @@ docs {
   None — this is a public endpoint.
   
   ## Query Parameters
-  None.
+  | Parameter | Type   | Required | Default     | Description / Allowed Values         |
+  |-----------|--------|----------|-------------|--------------------------------------|
+  | max       | number | No       | `36`         | Page number (integer ≥ 18)          |
   
   ## Success Response
   - **Status Code**: `200 OK`
@@ -45,7 +51,10 @@ docs {
           "public_id": "PAT_8056_result_bbbbb",
           "url": "https://res.cloudinary.com/..."
         }
-      ]
+      ],
+      "meta": {
+        numberOfPhotos: 18,
+      },
     }
     ```
   
