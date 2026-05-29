@@ -1,6 +1,19 @@
 import db from "./db.js";
 import logger from "../configs/logger.config.js";
 import { users, roles, permissions, rolepermissions, userroles } from "./models/auth.js";
+import {
+  ashStudent,
+  ashWeeklyAttendance,
+  ashProgramFeedback,
+  ashTermlyTracking,
+  ashExit,
+  capacityBuildingEvaluation,
+  tacotsExit,
+  tacotsOnboarding,
+  tacotsRecommendation,
+  tacotsTracking,
+  tacotsFeedback,
+} from "./models/admin.js";
 import { eq, sql } from "drizzle-orm";
 import { hashPassword } from "../utils/password.util.js";
 
@@ -12,6 +25,17 @@ const clearTables = async () => {
     await db.delete(permissions);
     await db.delete(rolepermissions);
     await db.delete(userroles);
+    await db.delete(ashStudent);
+    await db.delete(ashExit);
+    await db.delete(ashProgramFeedback);
+    await db.delete(ashTermlyTracking);
+    await db.delete(ashWeeklyAttendance);
+    await db.delete(capacityBuildingEvaluation);
+    await db.delete(tacotsExit);
+    await db.delete(tacotsOnboarding);
+    await db.delete(tacotsRecommendation);
+    await db.delete(tacotsTracking);
+    await db.delete(tacotsFeedback);
   } catch {
     console.log("Could not delete all tables");
   }
@@ -47,7 +71,7 @@ const seedRoles = async () => {
       },
     })
     .returning();
-  logger.info("new roles:", { roles: newRoles });
+  // logger.info("new roles:", { roles: newRoles });
 
   // insert roles
   const newPermissions = await db
@@ -78,7 +102,7 @@ const seedRoles = async () => {
       },
     })
     .returning();
-  logger.info("new permissions:", { permissions: newPermissions });
+  // logger.info("new permissions:", { permissions: newPermissions });
 
   const newRolePermissions = await db
     .insert(rolepermissions)
@@ -101,7 +125,7 @@ const seedRoles = async () => {
       },
     })
     .returning();
-  logger.info("role permissions:", { rolepermissions: newRolePermissions });
+  // logger.info("role permissions:", { rolepermissions: newRolePermissions });
 };
 
 const seedUsers = async () => {
@@ -128,7 +152,7 @@ const seedUsers = async () => {
       },
     })
     .returning();
-  logger.info("new users:", { users: volunteerUser });
+  logger.info("new user:", { users: volunteerUser });
 
   const volunteerRoleId = await db
     .select({
@@ -136,7 +160,7 @@ const seedUsers = async () => {
     })
     .from(roles)
     .where(eq(roles.name, "volunteer"));
-  logger.info("volunterr role id?:", { volunteerRoleId });
+  // logger.info("volunterr role id?:", { volunteerRoleId });
 
   const volunteerUserRole = await db
     .insert(userroles)
@@ -145,7 +169,7 @@ const seedUsers = async () => {
       roleId: `${volunteerRoleId[0]?.id}`,
     })
     .returning();
-  logger.info("new user role created:", { volunteerUserRole });
+  // logger.info("new user role created:", { volunteerUserRole });
   //
   const adminUser = await db
     .insert(users)
@@ -169,7 +193,7 @@ const seedUsers = async () => {
       },
     })
     .returning();
-  logger.info("new users:", { users: adminUser });
+  logger.info("new user:", { user: adminUser });
 
   const adminRoleId = await db
     .select({
@@ -177,7 +201,7 @@ const seedUsers = async () => {
     })
     .from(roles)
     .where(eq(roles.name, "admin"));
-  logger.info("volunterr role id?:", { adminRoleId });
+  // logger.info("admin role id?:", { adminRoleId });
 
   const adminUserRole = await db
     .insert(userroles)
@@ -186,7 +210,7 @@ const seedUsers = async () => {
       roleId: `${adminRoleId[0]?.id}`,
     })
     .returning();
-  logger.info("new user role created:", { adminUserRole });
+  // logger.info("new user role created:", { adminUserRole });
   //
   const superadminUser = await db
     .insert(users)
@@ -210,7 +234,7 @@ const seedUsers = async () => {
       },
     })
     .returning();
-  logger.info("new users:", { users: superadminUser });
+  logger.info("new user:", { users: superadminUser });
 
   const superadminRoleId = await db
     .select({
@@ -218,7 +242,7 @@ const seedUsers = async () => {
     })
     .from(roles)
     .where(eq(roles.name, "superadmin"));
-  logger.info("volunterr role id?:", { superadminRoleId });
+  // logger.info("superadmin role id?:", { superadminRoleId });
 
   const superadminUserRole = await db
     .insert(userroles)
@@ -227,7 +251,7 @@ const seedUsers = async () => {
       roleId: `${superadminRoleId[0]?.id}`,
     })
     .returning();
-  logger.info("new user role created:", { superadminUserRole });
+  // logger.info("new user role created:", { superadminUserRole });
 };
 
 console.log("Clearing tables...");

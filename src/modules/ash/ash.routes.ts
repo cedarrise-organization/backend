@@ -78,7 +78,8 @@ router.get(
 // Delete registration record
 router.delete(
   "/registration/:id",
-  // authorize("delete"),
+  authenticate(),
+  authorize("delete"),
   validateRequest(ashStudentParamsSchema),
   deleteRegistrationController,
 );
@@ -107,6 +108,7 @@ router.get(
 // Delete feedback record
 router.delete(
   "/registration/:id",
+  authenticate(),
   authorize("delete"),
   validateRequest(ashProgramFeedbackParamsSchema),
   deleteFeedbackController,
@@ -116,6 +118,7 @@ router.delete(
 router.post(
   "/tracking",
   upload.single("file"),
+  authenticate(),
   authorize("create"),
   validateRequest(createAshTermlyTrackingSchema),
   submitTrackingController,
@@ -124,6 +127,7 @@ router.post(
 // List termly tracking records (paginated)
 router.get(
   "/tracking",
+  authenticate(),
   authorize("read"),
   validateRequest(ashTermlyTrackingQuerySchema),
   listTrackingController,
@@ -132,6 +136,7 @@ router.get(
 // Get full tracking record detail
 router.get(
   "/tracking/:id",
+  authenticate(),
   authorize("read"),
   validateRequest(ashTermlyTrackingParamsSchema),
   getTrackController,
@@ -140,6 +145,7 @@ router.get(
 // Delete tracking record
 router.delete(
   "/tracking/:id",
+  authenticate(),
   authorize("delete"),
   validateRequest(ashTermlyTrackingParamsSchema),
   deleteTrackController,
@@ -148,6 +154,7 @@ router.delete(
 // Submit ASH Weekly Attendance
 router.post(
   "/attendance",
+  authenticate(),
   authorize("create"),
   validateRequest(createAshWeeklyAttendanceSchema),
   submitAttendanceController,
@@ -156,6 +163,7 @@ router.post(
 // List weekly attendance records
 router.get(
   "/attendance",
+  authenticate(),
   authorize("read"),
   validateRequest(ashWeeklyAttendanceQuerySchema),
   listAttendanceController,
@@ -164,6 +172,7 @@ router.get(
 // Get full attendance record detail
 router.get(
   "/attendance/:id",
+  authenticate(),
   authorize("read"),
   validateRequest(ashWeeklyAttendanceParamsSchema),
   getAttendanceController,
@@ -172,6 +181,7 @@ router.get(
 // Delete attendance record
 router.delete(
   "/attendance/:id",
+  authenticate(),
   authorize("delete"),
   validateRequest(ashWeeklyAttendanceParamsSchema),
   deleteAttendanceController,
@@ -180,20 +190,22 @@ router.delete(
 // Submit ASH Exit Form
 router.post(
   "/exit",
+  authenticate(),
   authorize("create"),
   validateRequest(createAshExitSchema),
   submitExitController,
 );
 
 // List exit records
-router.get("/exit", authorize("read"), validateRequest(ashExitQuerySchema), listExitController);
+router.get("/exit", authenticate(), authorize("read"), validateRequest(ashExitQuerySchema), listExitController);
 
 // Get full exit record detail
-router.get("/exit/:id", authorize("read"), validateRequest(ashExitParamsSchema), getExitController);
+router.get("/exit/:id", authenticate(), authorize("read"), validateRequest(ashExitParamsSchema), getExitController);
 
 // Delete exit record
 router.delete(
   "/exit/:id",
+  authenticate(),
   authorize("delete"),
   validateRequest(ashExitParamsSchema),
   deleteExitController,

@@ -5,20 +5,21 @@ import { appEvents } from "../lib/events.js";
 import { sql, asc, eq } from "drizzle-orm";
 import { Request } from "express";
 import {
-  ashStudent,
-  ashProgramFeedback,
-  ashTermlyTracking,
-  ashWeeklyAttendance,
-  ashExit,
-} from "../db/models/admin.js";
-import {
   AshstudentbodyType,
   AshprogramfeedbackType,
   AshtermlytrackingbodyType,
   AshweeklyattendancebodyType,
   AshexitbodyType,
 } from "../modules/ash/ash.schema.js";
+import {
+  ashStudent,
+  ashProgramFeedback,
+  ashTermlyTracking,
+  ashWeeklyAttendance,
+  ashExit,
+} from "../db/models/admin.js";
 import db from "../db/db.js";
+import logger from "../configs/logger.config.js";
 
 const sortMap = {
   firstName: ashStudent.firstName,
@@ -206,15 +207,39 @@ export const getRegistration = async (id: string) => {
 };
 
 export const deleteRegistration = async (id: string) => {
-  // const [data] = await db
-  //   .select({
-  //     passportPhotoPublicId: ashStudent.passportPhotoPublicId,
-  //     lastResultPublicId: ashStudent.lastResultPublicId,
-  //     parentSignaturePublicId: ashStudent.parentSignaturePublicId,
-  //   })
-  //   .from(ashStudent)
-  //   .where(eq(ashStudent.id, id));
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+  const [data] = await db
+    .select({
+      passportPhotoPublicId: ashStudent.passportPhotoPublicId,
+      lastResultPublicId: ashStudent.lastResultPublicId,
+      parentSignaturePublicId: ashStudent.parentSignaturePublicId,
+    })
+    .from(ashStudent)
+    .where(eq(ashStudent.id, id));
 
+  if (data?.passportPhotoPublicId) {
+    try {
+      await deleteFromCloudinary(data.passportPhotoPublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete passport photo for user ${id}`);
+    }
+  }
+
+  if (data?.parentSignaturePublicId) {
+    try {
+      await deleteFromCloudinary(data.parentSignaturePublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete parent signature for user ${id}`);
+    }
+  }
+
+  if (data?.lastResultPublicId) {
+    try {
+      await deleteFromCloudinary(data.lastResultPublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete last result for user ${id}`);
+    }
+  }
   // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
 
   await db.delete(ashStudent).where(eq(ashStudent.id, id));
@@ -484,6 +509,24 @@ export const getTrack = async (id: string) => {
 };
 
 export const deleteTrack = async (id: string) => {
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+  const [data] = await db
+    .select({
+      termResultPublicId: ashTermlyTracking.termResultPublicId,
+    })
+    .from(ashTermlyTracking)
+    .where(eq(ashTermlyTracking.id, id));
+
+  if (data?.termResultPublicId) {
+    try {
+      await deleteFromCloudinary(data.termResultPublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete term result for user ${id}`);
+    }
+  }
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+
+  // delete file from db
   await db.delete(ashTermlyTracking).where(eq(ashTermlyTracking.id, id));
 
   /// cache delete
