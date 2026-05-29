@@ -239,7 +239,14 @@ export const tacotsFeedbackBody = z.object({
   ]),
   scholarshipHelpedStay: z.enum(["YES - VERY MUCH", "YES - SOMEWHAT", "NOT SURE", "NO"]),
   mostHelpfulSupport: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -255,7 +262,14 @@ export const tacotsFeedbackBody = z.object({
   studyMotivationRating: rating1To5Schema,
   mentorshipImpactRating: rating1To5Schema,
   currentChallenges: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -319,35 +333,55 @@ export const tacotsOnboardingBody = z.object({
   onboardingDate: z.coerce.date(),
 
   hasMentalHealthDiagnosis: z.enum(["YES", "NO", "NOT SURE"]),
-  diagnosedConditions: z
-    .array(
+  diagnosedConditions: z.preprocess(
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z
+      .array(
+        z.enum([
+          "ADHD",
+          "AUTISM SPECTRUM",
+          "LEARNING DIFFICULTY",
+          "INTELLECTUAL DISABILITY",
+          "EMOTIONAL / BEHAVIORAL DISORDER",
+          "SPEECH OR LANGUAGE DELAY",
+          "ANXIETY OR DEPRESSION",
+          "NONE DIAGNOSED",
+          "OTHER",
+        ]),
+      )
+      .optional(),
+  ),
+  behavioralIndicators: z.preprocess(
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z.array(
       z.enum([
-        "ADHD",
-        "AUTISM SPECTRUM",
-        "LEARNING DIFFICULTY",
-        "INTELLECTUAL DISABILITY",
-        "EMOTIONAL / BEHAVIORAL DISORDER",
-        "SPEECH OR LANGUAGE DELAY",
-        "ANXIETY OR DEPRESSION",
-        "NONE DIAGNOSED",
+        "DIFFICULTY CONCENTRATING",
+        "EASILY DISTRACTED",
+        "RESTLESS / HYPERACTIVE",
+        "DIFFICULTY UNDERSTANDING LESSONS",
+        "DIFFICULTY READING OR WRITING",
+        "DIFFICULTY FOLLOWING INSTRUCTIONS",
+        "FREQUENT EMOTIONAL OUTBURSTS",
+        "SOCIAL WITHDRAWAL",
+        "AGGRESSIVE BEHAVIOR",
+        "NONE OF THE ABOVE",
         "OTHER",
       ]),
-    )
-    .optional(),
-  behavioralIndicators: z.array(
-    z.enum([
-      "DIFFICULTY CONCENTRATING",
-      "EASILY DISTRACTED",
-      "RESTLESS / HYPERACTIVE",
-      "DIFFICULTY UNDERSTANDING LESSONS",
-      "DIFFICULTY READING OR WRITING",
-      "DIFFICULTY FOLLOWING INSTRUCTIONS",
-      "FREQUENT EMOTIONAL OUTBURSTS",
-      "SOCIAL WITHDRAWAL",
-      "AGGRESSIVE BEHAVIOR",
-      "NONE OF THE ABOVE",
-      "OTHER",
-    ]),
+    ),
   ),
   focusAbilityRating: rating1To5Schema,
   emotionalStabilityRating: rating1To5Schema,
@@ -364,29 +398,49 @@ export const tacotsOnboardingBody = z.object({
     "STATUS UNKNOWN",
   ]),
   hasChronicCondition: z.enum(["NO", "YES", "NOT SURE"]),
-  chronicConditions: z
-    .array(
+  chronicConditions: z.preprocess(
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z
+      .array(
+        z.enum([
+          "ASTHMA",
+          "DIABETES",
+          "EPILEPSY",
+          "SICKLE CELL DISEASE",
+          "HEART CONDITION",
+          "PHYSICAL DISABILITY",
+          "VISION IMPAIRMENT",
+          "HEARING IMPAIRMENT",
+          "OTHER",
+        ]),
+      )
+      .optional(),
+  ),
+  allergies: z.preprocess(
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z.array(
       z.enum([
-        "ASTHMA",
-        "DIABETES",
-        "EPILEPSY",
-        "SICKLE CELL DISEASE",
-        "HEART CONDITION",
-        "PHYSICAL DISABILITY",
-        "VISION IMPAIRMENT",
-        "HEARING IMPAIRMENT",
+        "NO KNOWN ALLERGIES",
+        "FOOD ALLERGIES",
+        "DRUG ALLERGIES",
+        "ENVIRONMENTAL ALLERGIES",
         "OTHER",
       ]),
-    )
-    .optional(),
-  allergies: z.array(
-    z.enum([
-      "NO KNOWN ALLERGIES",
-      "FOOD ALLERGIES",
-      "DRUG ALLERGIES",
-      "ENVIRONMENTAL ALLERGIES",
-      "OTHER",
-    ]),
+    ),
   ),
   requiresMedication: yesNoSchema,
   physicalActivityLevel: rating1To5Schema,
@@ -410,9 +464,19 @@ export const tacotsOnboardingBody = z.object({
   studentCommitment: z.boolean().default(false).optional(),
   parentGuardianCommitment: z.boolean().default(false),
   programOfficerNotes: optionalTextSchema,
-  supportTypesApproved: z
-    .array(z.enum(["TUITION (SCHOOL FEES)", "SCHOOL RESOURCES", "TRANSPORTATION", "OTHER"]))
-    .optional(),
+  supportTypesApproved: z.preprocess(
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z
+      .array(z.enum(["TUITION (SCHOOL FEES)", "SCHOOL RESOURCES", "TRANSPORTATION", "OTHER"]))
+      .optional(),
+  ),
   mentorName: optionalTextSchema,
   sponsorName: optionalTextSchema,
   additionalInfo: optionalTextSchema,
@@ -566,20 +630,26 @@ export const tacotsExitBody = z.object({
   higherInstitutionCity: optionalTextSchema,
   higherInstitutionState: optionalTextSchema,
   employmentType: optionalTextSchema,
-  vocationalSkill: z
-    .enum([
-      "TAILORING / FASHION DESIGN",
-      "HAIRDRESSING / BARBING",
-      "CARPENTRY",
-      "ELECTRICAL WORK",
-      "ICT / COMPUTER TRAINING",
-      "CATERING",
-      "AUTO MECHANIC",
-      "OTHER",
-    ])
-    .optional(),
+  vocationalSkill: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z
+      .enum([
+        "TAILORING / FASHION DESIGN",
+        "HAIRDRESSING / BARBING",
+        "CARPENTRY",
+        "ELECTRICAL WORK",
+        "ICT / COMPUTER TRAINING",
+        "CATERING",
+        "AUTO MECHANIC",
+        "OTHER",
+      ])
+      .optional(),
+  ),
   newSchoolName: optionalTextSchema,
-  completedSecondaryElsewhere: z.enum(["YES", "NO", "CURRENTLY STUDYING", "NOT SURE"]).optional(),
+  completedSecondaryElsewhere: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["YES", "NO", "CURRENTLY STUDYING", "NOT SURE"]).optional(),
+  ),
   programImpactDescription: optionalTextSchema,
   programImpactRating: rating1To10Schema.optional(),
   additionalSituationInfo: optionalTextSchema,

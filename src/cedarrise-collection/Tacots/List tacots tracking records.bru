@@ -1,0 +1,54 @@
+meta {
+  name: List TACOTS tracking records
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/tacots/tracking?page=&limit=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List TACOTS Tracking Records
+
+  Returns a paginated list of TACOTS beneficiary tracking records. Results are ordered by creation date.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default | Description                     |
+  |-----------|--------|----------|---------|---------------------------------|
+  | page      | number | No       | `1`     | Page number (integer >= 1)      |
+  | limit     | number | No       | `25`    | Items per page (integer, 1-100) |
+
+  ## Response
+
+  **`200 OK`** — Returns a paginated array of TACOTS tracking records.
+
+  ## Errors
+
+  | Status                      | Description                                         |
+  |-----------------------------|-----------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. non-numeric `page`). |
+  | `401 Unauthorized`          | Missing or invalid authentication token.            |
+  | `403 Forbidden`             | User does not have `read` permission.               |
+  | `500 Internal Server Error` | Unexpected server error.                            |
+}

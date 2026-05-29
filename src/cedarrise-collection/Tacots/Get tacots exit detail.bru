@@ -1,0 +1,49 @@
+meta {
+  name: Get TACOTS exit detail
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/tacots/exit/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get TACOTS Exit Detail
+
+  Retrieves the full detail of a single TACOTS exit/completion record by its unique identifier. Returns all exit reason, post-programme outcomes, impact assessment, and status fields.
+
+  ## Authorization
+  Requires `read` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                       |
+  |-----------|--------|----------|-----------------------------------|
+  | id        | string | Yes      | UUID of the TACOTS exit record    |
+
+  ## Response
+
+  **`200 OK`** — Returns the complete TACOTS exit record.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                |
+  | `403 Forbidden`             | User does not have `read` permission.                   |
+  | `500 Internal Server Error` | Unexpected server error.                                |
+}

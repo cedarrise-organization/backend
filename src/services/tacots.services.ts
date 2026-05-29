@@ -339,39 +339,442 @@ export const getTacotsFeedback = async (id: string) => {
 
 // ONBOARDING
 export const submitOnboarding = async (req: Request, options: TacotsonboardingbodyType) => {
- 
+  const files = req.files as {
+    parentSignature: Express.Multer.File[];
+    admissionLetter: Express.Multer.File[];
+  };
+
+  const parentSignatureFile = files.parentSignature?.[0];
+  const admissionLetterFile = files.admissionLetter?.[0];
+
+  const parentSignatureUpload: UploadApiResponse | undefined | null = parentSignatureFile
+    ? await uploadToCloudinary(
+        parentSignatureFile,
+        "/Cedarrise Initiative/TACOTS-ASSETS/SIGNATURES",
+      )
+    : null;
+
+  const admissionLetterUpload: UploadApiResponse | undefined | null = admissionLetterFile
+    ? await uploadToCloudinary(
+        admissionLetterFile,
+        "/Cedarrise Initiative/TACOTS-ASSETS/ADMISSION-LETTERS",
+      )
+    : null;
+
+  const [onboarding] = await db
+    .insert(tacotsOnboarding)
+    .values({
+      id: sql`uuid_generate_v4()`,
+      studentId: options.studentId,
+      onboardingDate: sql`TO_DATE(${options.onboardingDate}, 'YYYY-MM-DD')`,
+      hasMentalHealthDiagnosis: options.hasMentalHealthDiagnosis,
+      diagnosedConditions: options.diagnosedConditions,
+      behavioralIndicators: options.behavioralIndicators,
+      focusAbilityRating: options.focusAbilityRating,
+      emotionalStabilityRating: options.emotionalStabilityRating,
+      peerInteractionRating: options.peerInteractionRating,
+      receivedCounseling: options.receivedCounseling,
+      needsSpecialSupport: options.needsSpecialSupport,
+      mentalHealthNotes: options.mentalHealthNotes,
+      generalHealthStatus: options.generalHealthStatus,
+      immunizationStatus: options.immunizationStatus,
+      hasChronicCondition: options.hasChronicCondition,
+      chronicConditions: options.chronicConditions,
+      allergies: options.allergies,
+      requiresMedication: options.requiresMedication,
+      physicalActivityLevel: options.physicalActivityLevel,
+      physicalLimitations: options.physicalLimitations,
+      additionalHealthNotes: options.additionalHealthNotes,
+      enrolledSchoolName: options.enrolledSchoolName,
+      enrolledSchoolTown: options.enrolledSchoolTown,
+      enrolledSchoolLga: options.enrolledSchoolLga,
+      enrolledSchoolState: options.enrolledSchoolState,
+      enrolledClass: options.enrolledClass,
+      termResumptionDate: sql`TO_DATE(${options.termResumptionDate}, 'YYYY-MM-DD')`,
+      schoolFeesPerTerm: options.schoolFeesPerTerm,
+      studentCommitment: options.studentCommitment,
+      parentGuardianCommitment: options.parentGuardianCommitment,
+      parentSignatureUrl: parentSignatureUpload ? parentSignatureUpload.secure_url : null,
+      parentSignaturePublicId: parentSignatureUpload ? parentSignatureUpload.public_id : null,
+      admissionLetterUrl: admissionLetterUpload ? admissionLetterUpload.secure_url : null,
+      admissionLetterPublicId: admissionLetterUpload ? admissionLetterUpload.public_id : null,
+      programOfficerNotes: options.programOfficerNotes,
+      supportTypesApproved: options.supportTypesApproved,
+      mentorName: options.mentorName,
+      sponsorName: options.sponsorName,
+      additionalInfo: options.additionalInfo,
+    })
+    .returning();
+
+  /// cache set
+  await cacheSet(`cedarrise:tacots:onboarding:${onboarding?.id}`, onboarding, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 201,
+    message: "Tacots onboarding form submitted successfully",
+    data: onboarding,
+  };
 };
+
 export const listOnboarding = async (page: number, limit: number) => {
- 
+  /// cache
+  const key = `cedarrise:tacots:onboarding:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Tacots onboarded beneficiaries found successfully",
+      data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
+    };
+  }
+  ///
+
+  const onboarded = await db
+    .select()
+    .from(tacotsOnboarding)
+    .orderBy(tacotsOnboarding.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, onboarded, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots onboarded beneficiaries found successfully",
+    data: onboarded,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
+  };
 };
+
 export const getOnboarding = async (id: string) => {
- 
+  /// cache
+  const key = `cedarrise:tacots:onboarding:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Tacots onboarding data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [onboarding] = await db.select().from(tacotsOnboarding).where(eq(tacotsOnboarding.id, id));
+
+  /// cache set
+  await cacheSet(key, onboarding, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots onboarding data found successfully",
+    data: onboarding,
+  };
 };
+
 export const deleteOnboarding = async (id: string) => {
- 
+  await db.delete(tacotsOnboarding).where(eq(tacotsOnboarding.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:tacots:onboarding:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots onboarding data deleted successfully",
+  };
 };
 
 // TRACKING
 export const submitTacotsTracking = async (req: Request, options: TacotstrackingbodyType) => {
- 
+  const files = req.files as {
+    termResult: Express.Multer.File[];
+    paymentEvidence: Express.Multer.File[];
+  };
+
+  const termResultFile = files.termResult?.[0];
+  const paymentEvidenceFile = files.paymentEvidence?.[0];
+
+  const termResultUpload: UploadApiResponse | undefined | null = termResultFile
+    ? await uploadToCloudinary(termResultFile, "/Cedarrise Initiative/TACOTS-ASSETS/TERM-RESULTS")
+    : null;
+
+  const paymentEvidenceUpload: UploadApiResponse | undefined | null = paymentEvidenceFile
+    ? await uploadToCloudinary(
+        paymentEvidenceFile,
+        "/Cedarrise Initiative/TACOTS-ASSETS/PAYMENT-EVIDENCE",
+      )
+    : null;
+
+  if (!termResultUpload) {
+    throw new Error(`Could not upload term result`);
+  }
+
+  const [tracking] = await db
+    .insert(tacotsTracking)
+    .values({
+      id: sql`uuid_generate_v4()`,
+      studentId: options.studentId,
+      schoolId: options.schoolId,
+      region: options.region,
+      academicSession: options.academicSession,
+      academicTerm: options.academicTerm,
+      assessmentPeriod: options.assessmentPeriod,
+      submissionDate: sql`TO_DATE(${options.submissionDate}, 'YYYY-MM-DD')`,
+      highestSubjectScore: options.highestSubjectScore,
+      lowestSubjectScore: options.lowestSubjectScore,
+      studentAveragePct: options.studentAveragePct,
+      studentPositionInClass: options.studentPositionInClass,
+      academicComment: options.academicComment,
+      socialBehaviorRating: options.socialBehaviorRating,
+      schoolRulesRating: options.schoolRulesRating,
+      responsibilityRating: options.responsibilityRating,
+      formationComments: options.formationComments,
+      mentorName: options.mentorName,
+      mentorshipSessionDate: sql`TO_DATE(${options.mentorshipSessionDate}, 'YYYY-MM-DD')`,
+      mentorshipMode: options.mentorshipMode,
+      mentorshipDuration: options.mentorshipDuration,
+      mentorshipNotes: options.mentorshipNotes,
+      serviceActivityType: options.serviceActivityType,
+      serviceDate: sql`TO_DATE(${options.serviceDate}, 'YYYY-MM-DD')`,
+      serviceDuration: options.serviceDuration,
+      serviceDescription: options.serviceDescription,
+      serviceSupervisor: options.serviceSupervisor,
+      tuitionFeePaid: options.tuitionFeePaid,
+      resourcesSpent: options.resourcesSpent,
+      sundriesSpent: options.sundriesSpent,
+      totalAmountSpent: options.totalAmountSpent,
+      financialNotes: options.financialNotes,
+      termResultUrl: termResultUpload ? termResultUpload.secure_url : "",
+      termResultPublicId: termResultUpload ? termResultUpload.public_id : "",
+      paymentEvidenceUrl: paymentEvidenceUpload ? paymentEvidenceUpload.secure_url : null,
+      paymentEvidencePublicId: paymentEvidenceUpload ? paymentEvidenceUpload.public_id : null,
+    })
+    .returning();
+
+  /// cache set
+  await cacheSet(`cedarrise:tacots:tracking:${tracking?.id}`, tracking, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 201,
+    message: "Tacots tracking form submitted successfully",
+    data: tracking,
+  };
 };
+
 export const listTacotsTracking = async (page: number, limit: number) => {
- 
+  /// cache
+  const key = `cedarrise:tacots:tracking:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "All Tacots tracking data found successfully",
+      data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
+    };
+  }
+  ///
+
+  const tracking = await db
+    .select()
+    .from(tacotsTracking)
+    .orderBy(tacotsTracking.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, tracking, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "All Tacots tracking data found successfully",
+    data: tracking,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
+  };
 };
+
 export const getTacotsTracking = async (id: string) => {
- 
+  /// cache
+  const key = `cedarrise:tacots:tracking:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Tacots tracking data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [tracking] = await db.select().from(tacotsTracking).where(eq(tacotsTracking.id, id));
+
+  /// cache set
+  await cacheSet(key, tracking, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots tracking data found successfully",
+    data: tracking,
+  };
 };
-export const deleteTacotsTracking = async (id: string) => {}
- 
+
+export const deleteTacotsTracking = async (id: string) => {
+  await db.delete(tacotsTracking).where(eq(tacotsTracking.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:tacots:tracking:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots tracking data deleted successfully",
+  };
+};
+
 // EXIT
-export const submitTacotsExit = async (req: Request, options: TacotsexitbodyType) => {
- 
+export const submitTacotsExit = async (options: TacotsexitbodyType) => {
+  const [exit] = await db
+    .insert(tacotsExit)
+    .values({
+      id: sql`uuid_generate_v4()`,
+      studentId: options.studentId,
+      schoolAttendedDuringProgram: options.schoolAttendedDuringProgram,
+      yearOfExit: options.yearOfExit,
+      exitReason: options.exitReason,
+      highestEducationAttained: options.highestEducationAttained,
+      currentStatus: options.currentStatus,
+      higherInstitutionName: options.higherInstitutionName,
+      higherInstitutionCity: options.higherInstitutionCity,
+      higherInstitutionState: options.higherInstitutionState,
+      employmentType: options.employmentType,
+      vocationalSkill: options.vocationalSkill,
+      newSchoolName: options.newSchoolName,
+      completedSecondaryElsewhere: options.completedSecondaryElsewhere,
+      programImpactDescription: options.programImpactDescription,
+      programImpactRating: options.programImpactRating,
+      additionalSituationInfo: options.additionalSituationInfo,
+      completedBy: options.completedBy,
+      submissionDate: sql`TO_DATE(${options.submissionDate}, 'YYYY-MM-DD')`,
+    })
+    .returning();
+
+  /// cache set
+  await cacheSet(`cedarrise:tacots:exit:${exit?.id}`, exit, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 201,
+    message: "Ash exit form submitted successfully",
+    data: exit,
+  };
 };
+
 export const listTacotsExit = async (page: number, limit: number) => {
- 
+  /// cache
+  const key = `cedarrise:tacots:exit:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "All Tacots exit data found successfully",
+      data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+        },
+      },
+    };
+  }
+  ///
+
+  const exit = await db
+    .select()
+    .from(tacotsExit)
+    .orderBy(tacotsExit.createdAt)
+    .limit(limit)
+    .offset((page - 1) * limit);
+
+  /// cache set
+  await cacheSet(key, exit, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "All Tacots exit data found successfully",
+    data: exit,
+    meta: {
+      pagination: {
+        page,
+        limit,
+      },
+    },
+  };
 };
+
 export const getTacotsExit = async (id: string) => {
- 
+  /// cache
+  const key = `cedarrise:tacots:exit:${id}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Tacots tracking data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [exit] = await db.select().from(tacotsExit).where(eq(tacotsExit.id, id));
+
+  /// cache set
+  await cacheSet(key, exit, CACHE_TTL.FORM_DATA);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots exit data found successfully",
+    data: exit,
+  };
 };
-export const deleteTacotsExit = async (id: string) => {}
- 
+
+export const deleteTacotsExit = async (id: string) => {
+  await db.delete(tacotsExit).where(eq(tacotsExit.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:tacots:exit:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots exit data deleted successfully",
+  };
+};

@@ -170,7 +170,14 @@ export const ashProgramFeedbackBody = z.object({
   ]),
   attendanceFrequency: z.enum(["EVERY WEEK", "MOST WEEKS", "SOMETIMES", "RARELY"]),
   enjoyedParts: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -204,7 +211,14 @@ export const ashProgramFeedbackBody = z.object({
     z.enum(["YES - VERY POSITIVE", "SOME IMPROVEMENT", "NO CHANGE", "NOT SURE"]).optional(),
   ),
   mostValuableAspects: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([
@@ -306,7 +320,14 @@ export const ashWeeklyAttendanceBody = z.object({
   studentsInAttendance: z.array(z.uuid("Invalid ID")).min(1),
   studentsMentored: z.array(z.uuid("Invalid ID")).min(1),
   sessionsConducted: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z.array(z.enum(["PERFORMANCE ART", "SKILLS TRAINING", "FORMATIVE TALKS"])).optional(),
   ),
   sessionDetails: optionalTextSchema,
@@ -366,7 +387,14 @@ export const ashExitBody = z.object({
   ]),
   academicImpactRating: rating1To10Schema,
   areasOfImprovement: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
     z
       .array(
         z.enum([

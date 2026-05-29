@@ -269,32 +269,105 @@ export const submitOnboardingController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const {} = req.body;
+  const {
+    studentId,
+    onboardingDate,
+    hasMentalHealthDiagnosis,
+    diagnosedConditions,
+    behavioralIndicators,
+    focusAbilityRating,
+    emotionalStabilityRating,
+    peerInteractionRating,
+    receivedCounseling,
+    needsSpecialSupport,
+    mentalHealthNotes,
+    generalHealthStatus,
+    immunizationStatus,
+    hasChronicCondition,
+    chronicConditions,
+    allergies,
+    requiresMedication,
+    physicalActivityLevel,
+    physicalLimitations,
+    additionalHealthNotes,
+    enrolledSchoolName,
+    enrolledSchoolTown,
+    enrolledSchoolLga,
+    enrolledSchoolState,
+    enrolledClass,
+    termResumptionDate,
+    schoolFeesPerTerm,
+    studentCommitment,
+    parentGuardianCommitment,
+    programOfficerNotes,
+    supportTypesApproved,
+    mentorName,
+    sponsorName,
+    additionalInfo,
+  } = req.body;
   try {
-    // const response = await submitOnboarding();
-    // return successResponse(res, response.code, response.message, response.data)
+    const response = await submitOnboarding(req, {
+      studentId,
+      onboardingDate,
+      hasMentalHealthDiagnosis,
+      diagnosedConditions,
+      behavioralIndicators,
+      focusAbilityRating,
+      emotionalStabilityRating,
+      peerInteractionRating,
+      receivedCounseling,
+      needsSpecialSupport,
+      mentalHealthNotes,
+      generalHealthStatus,
+      immunizationStatus,
+      hasChronicCondition,
+      chronicConditions,
+      allergies,
+      requiresMedication,
+      physicalActivityLevel,
+      physicalLimitations,
+      additionalHealthNotes,
+      enrolledSchoolName,
+      enrolledSchoolTown,
+      enrolledSchoolLga,
+      enrolledSchoolState,
+      enrolledClass,
+      termResumptionDate,
+      schoolFeesPerTerm,
+      studentCommitment,
+      parentGuardianCommitment,
+      programOfficerNotes,
+      supportTypesApproved,
+      mentorName,
+      sponsorName,
+      additionalInfo,
+    });
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
 };
+
 export const listOnboardingController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
-    // const response = await listOnboarding(page, limit);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    const response = await listOnboarding(page, limit);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
 };
+
 export const getOnboardingController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    // const response = await getOnboarding(id);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    const response = await getOnboarding(id);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
 };
+
 export const deleteOnboardingController = async (
   req: Request,
   res: Response,
@@ -302,8 +375,8 @@ export const deleteOnboardingController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    // const response = await deleteOnboarding(id);
-    // return successResponse(res, response.code, response.message)
+    const response = await deleteOnboarding(id);
+    return successResponse(res, response.code, response.message);
   } catch (error) {
     next(error);
   }
@@ -315,14 +388,82 @@ export const submitTacotsTrackingController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const {} = req.body;
+  const {
+    studentId,
+    schoolId,
+    region,
+    academicSession,
+    academicTerm,
+    assessmentPeriod,
+    submissionDate,
+    highestSubjectScore,
+    lowestSubjectScore,
+    studentAveragePct,
+    studentPositionInClass,
+    academicComment,
+    socialBehaviorRating,
+    schoolRulesRating,
+    responsibilityRating,
+    formationComments,
+    mentorName,
+    mentorshipSessionDate,
+    mentorshipMode,
+    mentorshipDuration,
+    mentorshipNotes,
+    serviceActivityType,
+    serviceDate,
+    serviceDuration,
+    serviceDescription,
+    serviceSupervisor,
+    tuitionFeePaid,
+    resourcesSpent,
+    sundriesSpent,
+    totalAmountSpent,
+    financialNotes,
+  } = req.body;
+
+  if (!req.files) throw new ValidationError("Please upload the file");
   try {
-    // const response = await submitTacotsTracking();
-    // return successResponse(res, response.code, response.message, response.data)
+    const response = await submitTacotsTracking(req, {
+      studentId,
+      schoolId,
+      region,
+      academicSession,
+      academicTerm,
+      assessmentPeriod,
+      submissionDate,
+      highestSubjectScore,
+      lowestSubjectScore,
+      studentAveragePct,
+      studentPositionInClass,
+      academicComment,
+      socialBehaviorRating,
+      schoolRulesRating,
+      responsibilityRating,
+      formationComments,
+      mentorName,
+      mentorshipSessionDate,
+      mentorshipMode,
+      mentorshipDuration,
+      mentorshipNotes,
+      serviceActivityType,
+      serviceDate,
+      serviceDuration,
+      serviceDescription,
+      serviceSupervisor,
+      tuitionFeePaid,
+      resourcesSpent,
+      sundriesSpent,
+      totalAmountSpent,
+      financialNotes,
+    });
+
+    return successResponse(res, response.code, response.message, response.data)
   } catch (error) {
     next(error);
   }
 };
+
 export const listTacotsTrackingController = async (
   req: Request,
   res: Response,
@@ -330,12 +471,13 @@ export const listTacotsTrackingController = async (
 ) => {
   const { page, limit } = req.qtransformed;
   try {
-    // const response = await listTacotsTracking(page, limit);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    const response = await listTacotsTracking(page, limit);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
 };
+
 export const getTacotsTrackingController = async (
   req: Request,
   res: Response,
@@ -343,12 +485,13 @@ export const getTacotsTrackingController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    // const response = await getTacotsTracking(id);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    const response = await getTacotsTracking(id);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
 };
+
 export const deleteTacotsTrackingController = async (
   req: Request,
   res: Response,
@@ -356,8 +499,8 @@ export const deleteTacotsTrackingController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    // const response = await deleteTacotsTracking(id);
-    // return successResponse(res, response.code, response.message)
+    const response = await deleteTacotsTracking(id);
+    return successResponse(res, response.code, response.message);
   } catch (error) {
     next(error);
   }
@@ -369,32 +512,73 @@ export const submitTacotsExitController = async (
   res: Response,
   next: NextFunction,
 ) => {
-   const {} = req.body;
+  const {
+    studentId,
+    schoolAttendedDuringProgram,
+    yearOfExit,
+    exitReason,
+    highestEducationAttained,
+    currentStatus,
+    higherInstitutionName,
+    higherInstitutionCity,
+    higherInstitutionState,
+    employmentType,
+    vocationalSkill,
+    newSchoolName,
+    completedSecondaryElsewhere,
+    programImpactDescription,
+    programImpactRating,
+    additionalSituationInfo,
+    completedBy,
+    submissionDate,
+  } = req.body;
   try {
-    // const response = await submitTacotsExit();
-    // return successResponse(res, response.code, response.message, response.data)
+    const response = await submitTacotsExit({
+      studentId,
+      schoolAttendedDuringProgram,
+      yearOfExit,
+      exitReason,
+      highestEducationAttained,
+      currentStatus,
+      higherInstitutionName,
+      higherInstitutionCity,
+      higherInstitutionState,
+      employmentType,
+      vocationalSkill,
+      newSchoolName,
+      completedSecondaryElsewhere,
+      programImpactDescription,
+      programImpactRating,
+      additionalSituationInfo,
+      completedBy,
+      submissionDate,
+    });
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
 };
+
 export const listTacotsExitController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
-    // const response = await listTacotsExit(page, limit);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    const response = await listTacotsExit(page, limit);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
 };
+
 export const getTacotsExitController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    // const response = await getTacotsExit(id);
-    // return successResponse(res, response.code, response.message, response.data, response.meta)
+    const response = await getTacotsExit(id);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
 };
+
 export const deleteTacotsExitController = async (
   req: Request,
   res: Response,
@@ -402,13 +586,14 @@ export const deleteTacotsExitController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    // const response = await deleteTacotsExit(id);
-    // return successResponse(res, response.code, response.message)
+    const response = await deleteTacotsExit(id);
+    return successResponse(res, response.code, response.message);
   } catch (error) {
     next(error);
   }
 };
 
+// EXAMPLE
 export const example = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // const response = await example();

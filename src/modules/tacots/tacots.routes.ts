@@ -96,6 +96,10 @@ router.get(
 // Create onboarding record post-shortlisting
 router.post(
   "/onboarding",
+    upload.fields([
+    { name: "parentSignature", maxCount: 1 },
+    { name: "admissionLetter", maxCount: 1 },
+  ]),
   authenticate(),
   authorize("create"),
   validateRequest(createTacotsOnboardingSchema),
@@ -129,6 +133,10 @@ router.delete(
 // Submit TACOTS Student Tracking (midterm/end-of-term)
 router.post(
   "/tracking",
+  upload.fields([
+    { name: "termResult", maxCount: 1 },
+    { name: "paymentEvidence", maxCount: 1 },
+  ]),
   authenticate(),
   authorize("create"),
   validateRequest(createTacotsTrackingSchema),

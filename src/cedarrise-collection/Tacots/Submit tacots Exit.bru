@@ -1,0 +1,102 @@
+meta {
+  name: Submit TACOTS Exit
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/tacots/exit
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "studentId": "31aa62bd-73d7-4df0-858f-c9d0cf8601ff",
+    "schoolAttendedDuringProgram": "Naim Academy",
+    "yearOfExit": 2025,
+    "exitReason": "COMPLETED SECONDARY EDUCATION (GRADUATED)",
+    "highestEducationAttained": "SENIOR SECONDARY",
+    "currentStatus": "ADMITTED INTO HIGHER INSTITUTION",
+    "higherInstitutionName": "University of Nigeria",
+    "higherInstitutionCity": "Nsukka",
+    "higherInstitutionState": "ENUGU",
+    "employmentType": "",
+    "vocationalSkill": "",
+    "newSchoolName": "",
+    "completedSecondaryElsewhere": "",
+    "programImpactDescription": "The programme helped me complete my education",
+    "programImpactRating": 9,
+    "additionalSituationInfo": "",
+    "completedBy": "Program Officer",
+    "submissionDate": "2025-06-01"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit TACOTS Exit
+
+  Submits an exit/completion form for a TACOTS beneficiary who is leaving or has completed the programme. The form captures the student's exit reason, current status, post-programme outcomes, and programme impact assessment.
+
+  On success, the exit record is saved to the database. The endpoint returns the newly created exit object with a `201 Created` status.
+
+  ## Authorization
+  Requires `create` permission.
+
+  ## Request Body (`application/json`)
+
+  ### Core
+
+  | Field                        | Type   | Required | Constraints / Allowed Values                                                                                                                                                |
+  |------------------------------|--------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | studentId                    | string | Yes      | UUID of the TACOTS student record                                                                                                                                           |
+  | schoolAttendedDuringProgram  | string | Yes      | Non-empty text                                                                                                                                                              |
+  | yearOfExit                   | number | Yes      | Integer (e.g. `2025`)                                                                                                                                                       |
+  | exitReason                   | string | Yes      | One of: `COMPLETED SECONDARY EDUCATION (GRADUATED)`, `DID NOT MEET PROGRAM REQUIREMENTS`, `DROPPED OUT OF SCHOOL`, `WITHDREW FROM THE PROGRAM`, `RELOCATED / MOVED AWAY`, `PERSONAL OR FAMILY REASONS`, `OTHER` |
+  | highestEducationAttained     | string | Yes      | One of: `PRIMARY`, `JUNIOR SECONDARY`, `SENIOR SECONDARY`                                                                                                                  |
+  | currentStatus                | string | Yes      | One of: `CONTINUING SECONDARY EDUCATION ELSEWHERE`, `ADMITTED INTO HIGHER INSTITUTION`, `LEARNING A TRADE / VOCATIONAL SKILL`, `EMPLOYED`, `NOT CURRENTLY STUDYING OR WORKING`, `OTHER` |
+  | completedBy                  | string | Yes      | Non-empty text                                                                                                                                                              |
+  | submissionDate               | date   | Yes      | ISO date string — `YYYY-MM-DD` format                                                                                                                                       |
+
+  ### Post-Programme Details (Optional)
+
+  | Field                        | Type   | Required | Constraints / Allowed Values                                                                                                                                |
+  |------------------------------|--------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | higherInstitutionName        | string | No       | Optional text                                                                                                                                               |
+  | higherInstitutionCity        | string | No       | Optional text                                                                                                                                               |
+  | higherInstitutionState       | string | No       | Optional text                                                                                                                                               |
+  | employmentType               | string | No       | Optional text                                                                                                                                               |
+  | vocationalSkill              | string | No       | One of: `TAILORING / FASHION DESIGN`, `HAIRDRESSING / BARBING`, `CARPENTRY`, `ELECTRICAL WORK`, `ICT / COMPUTER TRAINING`, `CATERING`, `AUTO MECHANIC`, `OTHER` (optional) |
+  | newSchoolName                | string | No       | Optional text                                                                                                                                               |
+  | completedSecondaryElsewhere  | string | No       | One of: `YES`, `NO`, `CURRENTLY STUDYING`, `NOT SURE` (optional)                                                                                           |
+
+  ### Impact Assessment (Optional)
+
+  | Field                    | Type   | Required | Constraints / Allowed Values     |
+  |--------------------------|--------|----------|----------------------------------|
+  | programImpactDescription | string | No       | Optional free text               |
+  | programImpactRating      | number | No       | Integer from `1` to `10`         |
+  | additionalSituationInfo  | string | No       | Optional free text               |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created TACOTS exit record.
+
+  ## Errors
+
+  | Status                      | Description                                                           |
+  |-----------------------------|-----------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                              |
+  | `403 Forbidden`             | User does not have `create` permission.                               |
+  | `500 Internal Server Error` | Unexpected server error.                                              |
+}

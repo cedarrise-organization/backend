@@ -1,0 +1,151 @@
+meta {
+  name: Submit TACOTS Onboarding
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/tacots/onboarding
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  studentId: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  onboardingDate: 2025-09-01
+  hasMentalHealthDiagnosis: NO
+  diagnosedConditions: NONE DIAGNOSED
+  behavioralIndicators: NONE OF THE ABOVE
+  focusAbilityRating: 4
+  emotionalStabilityRating: 4
+  peerInteractionRating: 4
+  receivedCounseling: NO
+  needsSpecialSupport: NO
+  mentalHealthNotes: 
+  generalHealthStatus: GOOD
+  immunizationStatus: FULLY IMMUNIZED
+  hasChronicCondition: NO
+  chronicConditions: 
+  allergies: NO KNOWN ALLERGIES
+  requiresMedication: NO
+  physicalActivityLevel: 4
+  physicalLimitations: NONE
+  additionalHealthNotes: 
+  enrolledSchoolName: Naim Academy
+  enrolledSchoolTown: Aba
+  enrolledSchoolLga: Aba North
+  enrolledSchoolState: ABIA
+  enrolledClass: SS1
+  termResumptionDate: 2025-09-15
+  schoolFeesPerTerm: 45000
+  studentCommitment: true
+  parentGuardianCommitment: true
+  programOfficerNotes: 
+  supportTypesApproved: TUITION (SCHOOL FEES)
+  mentorName: 
+  sponsorName: 
+  additionalInfo: 
+  parentSignature: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  admissionLetter: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit TACOTS Onboarding
+
+  Creates a new onboarding record for a TACOTS beneficiary who has been shortlisted from the recommendation stage. The form captures mental-health screening, physical-health information, enrolled school details, commitment declarations, and optional file uploads (parent signature and admission letter).
+
+  On success, the onboarding record is saved to the database. The endpoint returns the newly created TACOTS onboarding object with a `201 Created` status.
+
+  ## Authorization
+  Requires `create` permission.
+
+  ## Request Body (`multipart/form-data`)
+
+  ### Core
+
+  | Field           | Type   | Required | Constraints / Allowed Values                  |
+  |-----------------|--------|----------|-----------------------------------------------|
+  | studentId       | string | Yes      | UUID of the recommended student record        |
+  | onboardingDate  | date   | Yes      | ISO date string — `YYYY-MM-DD` format         |
+
+  ### Mental Health Screening
+
+  | Field                    | Type   | Required | Constraints / Allowed Values                                                                                                                                                                       |
+  |--------------------------|--------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | hasMentalHealthDiagnosis | string | Yes      | One of: `YES`, `NO`, `NOT SURE`                                                                                                                                                                     |
+  | diagnosedConditions      | array  | No       | Array of: `ADHD`, `AUTISM SPECTRUM`, `LEARNING DIFFICULTY`, `INTELLECTUAL DISABILITY`, `EMOTIONAL / BEHAVIORAL DISORDER`, `SPEECH OR LANGUAGE DELAY`, `ANXIETY OR DEPRESSION`, `NONE DIAGNOSED`, `OTHER` |
+  | behavioralIndicators     | array  | Yes      | Array of: `DIFFICULTY CONCENTRATING`, `EASILY DISTRACTED`, `RESTLESS / HYPERACTIVE`, `DIFFICULTY UNDERSTANDING LESSONS`, `DIFFICULTY READING OR WRITING`, `DIFFICULTY FOLLOWING INSTRUCTIONS`, `FREQUENT EMOTIONAL OUTBURSTS`, `SOCIAL WITHDRAWAL`, `AGGRESSIVE BEHAVIOR`, `NONE OF THE ABOVE`, `OTHER` |
+  | focusAbilityRating       | number | Yes      | Integer from `1` to `5`                                                                                                                                                                             |
+  | emotionalStabilityRating | number | Yes      | Integer from `1` to `5`                                                                                                                                                                             |
+  | peerInteractionRating    | number | Yes      | Integer from `1` to `5`                                                                                                                                                                             |
+  | receivedCounseling       | string | Yes      | One of: `YES`, `NO`, `NOT SURE`                                                                                                                                                                     |
+  | needsSpecialSupport      | string | Yes      | One of: `YES`, `NO`, `POSSIBLY / NEEDS ASSESSMENT`                                                                                                                                                 |
+  | mentalHealthNotes        | string | No       | Optional free text                                                                                                                                                                                  |
+
+  ### Physical Health
+
+  | Field                  | Type   | Required | Constraints / Allowed Values                                                                                                                                   |
+  |------------------------|--------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | generalHealthStatus    | string | Yes      | One of: `EXCELLENT`, `GOOD`, `FAIR`, `POOR`                                                                                                                    |
+  | immunizationStatus     | string | Yes      | One of: `FULLY IMMUNIZED`, `PARTIALLY IMMUNIZED`, `NOT IMMUNIZED`, `STATUS UNKNOWN`                                                                           |
+  | hasChronicCondition    | string | Yes      | One of: `NO`, `YES`, `NOT SURE`                                                                                                                                |
+  | chronicConditions      | array  | No       | Array of: `ASTHMA`, `DIABETES`, `EPILEPSY`, `SICKLE CELL DISEASE`, `HEART CONDITION`, `PHYSICAL DISABILITY`, `VISION IMPAIRMENT`, `HEARING IMPAIRMENT`, `OTHER` |
+  | allergies              | array  | Yes      | Array of: `NO KNOWN ALLERGIES`, `FOOD ALLERGIES`, `DRUG ALLERGIES`, `ENVIRONMENTAL ALLERGIES`, `OTHER`                                                        |
+  | requiresMedication     | string | Yes      | One of: `YES`, `NO`                                                                                                                                            |
+  | physicalActivityLevel  | number | Yes      | Integer from `1` to `5`                                                                                                                                        |
+  | physicalLimitations    | string | Yes      | One of: `NONE`, `DIFFICULTY WALKING OR RUNNING`, `DIFFICULTY SEEING`, `DIFFICULTY HEARING`, `OTHER`                                                           |
+  | additionalHealthNotes  | string | No       | Optional free text                                                                                                                                             |
+
+  ### Enrolled School Details
+
+  | Field              | Type   | Required | Constraints / Allowed Values                                                                |
+  |--------------------|--------|----------|---------------------------------------------------------------------------------------------|
+  | enrolledSchoolName | string | Yes      | Non-empty text                                                                              |
+  | enrolledSchoolTown | string | Yes      | Non-empty text                                                                              |
+  | enrolledSchoolLga  | string | Yes      | Non-empty text                                                                              |
+  | enrolledSchoolState| string | Yes      | Valid Nigerian state (e.g. `ABIA`, `LAGOS`, `FCT`)                                          |
+  | enrolledClass      | string | Yes      | One of: `PRIMARY 3`–`PRIMARY 6`, `JSS1`–`JSS3`, `SS1`–`SS3`                                |
+  | termResumptionDate | date   | Yes      | ISO date string — `YYYY-MM-DD` format                                                       |
+  | schoolFeesPerTerm  | number | No       | Optional numeric value                                                                      |
+
+  ### Commitment & Programme Assignment
+
+  | Field                     | Type    | Required | Constraints / Allowed Values                                                      |
+  |---------------------------|---------|----------|-----------------------------------------------------------------------------------|
+  | studentCommitment         | boolean | No       | Defaults to `false`                                                               |
+  | parentGuardianCommitment  | boolean | Yes      | Defaults to `false`                                                               |
+  | programOfficerNotes       | string  | No       | Optional free text                                                                |
+  | supportTypesApproved      | array   | No       | Array of: `TUITION (SCHOOL FEES)`, `SCHOOL RESOURCES`, `TRANSPORTATION`, `OTHER`  |
+  | mentorName                | string  | No       | Optional text                                                                     |
+  | sponsorName               | string  | No       | Optional text                                                                     |
+  | additionalInfo            | string  | No       | Optional free text                                                                |
+
+  ## File Uploads
+
+  | Field            | MIME Types Accepted         | Required | Notes                                                                                         |
+  |------------------|-----------------------------|----------|-----------------------------------------------------------------------------------------------|
+  | parentSignature  | `image/*` (JPEG, PNG, etc.) | No       | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/SIGNATURES` on Cloudinary                    |
+  | admissionLetter  | PDF, image                  | No       | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/ADMISSION-LETTERS` on Cloudinary             |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created TACOTS onboarding record.
+
+  ## Errors
+
+  | Status                      | Description                                                           |
+  |-----------------------------|-----------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                              |
+  | `403 Forbidden`             | User does not have `create` permission.                               |
+  | `500 Internal Server Error` | Cloudinary upload failed or unexpected server error.                  |
+}

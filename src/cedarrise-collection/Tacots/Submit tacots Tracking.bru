@@ -1,0 +1,151 @@
+meta {
+  name: Submit TACOTS Tracking
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/tacots/tracking
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  studentId: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  schoolId: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  region: ABIA
+  academicSession: 2024/2025
+  academicTerm: 1ST TERM
+  assessmentPeriod: END OF TERM
+  submissionDate: 2025-04-10
+  highestSubjectScore: Mathematics - 92
+  lowestSubjectScore: Civic Education - 55
+  studentAveragePct: 75
+  studentPositionInClass: 3rd
+  academicComment: 
+  socialBehaviorRating: 4
+  schoolRulesRating: 4
+  responsibilityRating: 4
+  formationComments: 
+  mentorName: Mr. Johnson
+  mentorshipSessionDate: 2025-03-20
+  mentorshipMode: PHYSICAL (IN-PERSON)
+  mentorshipDuration: 30 MINUTES
+  mentorshipNotes: Student is progressing well
+  serviceActivityType: ENVIRONMENTAL SANITATION
+  serviceDate: 2025-03-15
+  serviceDuration: 2 HOURS
+  serviceDescription: Community cleanup exercise
+  serviceSupervisor: Mrs. Eze
+  tuitionFeePaid: 45000
+  resourcesSpent: 10000
+  sundriesSpent: 5000
+  totalAmountSpent: 60000
+  financialNotes: 
+  termResult: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  paymentEvidence: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit TACOTS Tracking
+
+  Submits a midterm or end-of-term tracking report for a TACOTS beneficiary. The form captures academic performance, character formation ratings, mentorship session details, community service activities, financial expenditure, and required file uploads (term result and optional payment evidence).
+
+  On success, the tracking record is saved to the database. The endpoint returns the newly created tracking object with a `201 Created` status.
+
+  ## Authorization
+  Requires `create` permission.
+
+  ## Request Body (`multipart/form-data`)
+
+  ### Identification & Period
+
+  | Field            | Type   | Required | Constraints / Allowed Values                                 |
+  |------------------|--------|----------|--------------------------------------------------------------|
+  | studentId        | string | Yes      | UUID of the TACOTS student record                            |
+  | schoolId         | string | Yes      | UUID of the enrolled school record                           |
+  | region           | string | Yes      | Valid Nigerian state (e.g. `ABIA`, `LAGOS`, `FCT`)           |
+  | academicSession  | string | Yes      | Academic session format (e.g. `2024/2025`)                   |
+  | academicTerm     | string | Yes      | One of: `1ST TERM`, `2ND TERM`, `3RD TERM`                  |
+  | assessmentPeriod | string | Yes      | One of: `MIDTERM`, `END OF TERM`                             |
+  | submissionDate   | date   | Yes      | ISO date string — `YYYY-MM-DD` format                        |
+
+  ### Academic Performance
+
+  | Field                  | Type   | Required | Constraints / Allowed Values   |
+  |------------------------|--------|----------|--------------------------------|
+  | highestSubjectScore    | string | Yes      | Non-empty text                 |
+  | lowestSubjectScore     | string | Yes      | Non-empty text                 |
+  | studentAveragePct      | number | Yes      | Numeric value                  |
+  | studentPositionInClass | string | Yes      | Non-empty text                 |
+  | academicComment        | string | No       | Optional free text             |
+
+  ### Character Formation
+
+  | Field                | Type   | Required | Constraints / Allowed Values   |
+  |----------------------|--------|----------|--------------------------------|
+  | socialBehaviorRating | number | Yes      | Integer from `1` to `5`        |
+  | schoolRulesRating    | number | Yes      | Integer from `1` to `5`        |
+  | responsibilityRating | number | Yes      | Integer from `1` to `5`        |
+  | formationComments    | string | No       | Optional free text             |
+
+  ### Mentorship
+
+  | Field                | Type   | Required | Constraints / Allowed Values                                                     |
+  |----------------------|--------|----------|----------------------------------------------------------------------------------|
+  | mentorName           | string | Yes      | Non-empty text                                                                   |
+  | mentorshipSessionDate| date   | Yes      | ISO date string — `YYYY-MM-DD` format                                            |
+  | mentorshipMode       | string | Yes      | One of: `PHYSICAL (IN-PERSON)`, `VIRTUAL (ONLINE)`                               |
+  | mentorshipDuration   | string | Yes      | One of: `15 MINUTES`, `30 MINUTES`, `45 MINUTES`, `60 MINUTES`, `MORE THAN 60 MINUTES` |
+  | mentorshipNotes      | string | Yes      | Non-empty text                                                                   |
+
+  ### Community Service
+
+  | Field               | Type   | Required | Constraints / Allowed Values                                                                                                                |
+  |---------------------|--------|----------|---------------------------------------------------------------------------------------------------------------------------------------------|
+  | serviceActivityType | string | Yes      | One of: `ENVIRONMENTAL SANITATION`, `TEACHING YOUNGER CHILDREN`, `CHURCH / COMMUNITY SUPPORT`, `HELPING ELDERLY PERSONS`, `SCHOOL VOLUNTEERING`, `OTHER` |
+  | serviceDate         | date   | Yes      | ISO date string — `YYYY-MM-DD` format                                                                                                       |
+  | serviceDuration     | string | Yes      | One of: `30 MINS`, `1 HOUR`, `2 HOURS`, `3 HOURS`, `4 HOURS`, `5 HOURS`, `MORE THAN 5 HOURS`                                              |
+  | serviceDescription  | string | Yes      | Non-empty text                                                                                                                              |
+  | serviceSupervisor   | string | Yes      | Non-empty text                                                                                                                              |
+
+  ### Financial Summary
+
+  | Field            | Type   | Required | Constraints / Allowed Values   |
+  |------------------|--------|----------|--------------------------------|
+  | tuitionFeePaid   | number | Yes      | Numeric value                  |
+  | resourcesSpent   | number | Yes      | Numeric value                  |
+  | sundriesSpent    | number | Yes      | Numeric value                  |
+  | totalAmountSpent | number | Yes      | Numeric value                  |
+  | financialNotes   | string | No       | Optional free text             |
+
+  ## File Uploads
+
+  | Field           | MIME Types Accepted | Required | Notes                                                                                   |
+  |-----------------|---------------------|----------|-----------------------------------------------------------------------------------------|
+  | termResult      | PDF, image          | **Yes**  | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/TERM-RESULTS` on Cloudinary            |
+  | paymentEvidence | PDF, image          | No       | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/PAYMENT-EVIDENCE` on Cloudinary        |
+
+  ## Response
+
+  **`201 Created`** — Returns the newly created TACOTS tracking record.
+
+  ## Errors
+
+  | Status                      | Description                                                           |
+  |-----------------------------|-----------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
+  | `400 Bad Request`           | No files were attached to the request.                                |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                              |
+  | `403 Forbidden`             | User does not have `create` permission.                               |
+  | `500 Internal Server Error` | Cloudinary upload failed for `termResult`.                            |
+}
