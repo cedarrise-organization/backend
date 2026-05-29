@@ -24,9 +24,11 @@ import {
   submitRecommendationController,
   listRecommendationsController,
   getRecommendationController,
+  deleteRecommendationController,
   submitFeedbackController,
   listFeedbackController,
   getFeedbackController,
+  deleteFeedbackController,
   submitOnboardingController,
   listOnboardingController,
   getOnboardingController,
@@ -53,7 +55,6 @@ router.post(
   validateRequest(createTacotsRecommendationSchema),
   submitRecommendationController,
 );
-
 // List recommendations (filterable by admin_status)
 router.get(
   "/recommendation",
@@ -62,7 +63,6 @@ router.get(
   validateRequest(tacotsRecommendationQuerySchema),
   listRecommendationsController,
 );
-
 // Get full recommendation detail
 router.get(
   "/recommendation/:id",
@@ -71,10 +71,17 @@ router.get(
   validateRequest(tacotsRecommendationParamsSchema),
   getRecommendationController,
 );
+// Delete recommendation record
+router.delete(
+  "/recommendation/:id",
+  authenticate(),
+  authorize("delete"),
+  validateRequest(tacotsRecommendationParamsSchema),
+  deleteRecommendationController,
+);
 
 // Submit ASH TACOTS Feedback
 router.post("/feedback", validateRequest(createTacotsFeedbackSchema), submitFeedbackController);
-
 // List TACOTS feedback submissions
 router.get(
   "/feedback",
@@ -83,7 +90,6 @@ router.get(
   validateRequest(tacotsFeedbackQuerySchema),
   listFeedbackController,
 );
-
 // Get full TACOTS feedback submission
 router.get(
   "/feedback/:id",
@@ -91,6 +97,14 @@ router.get(
   authorize("read"),
   validateRequest(tacotsFeedbackParamsSchema),
   getFeedbackController,
+);
+// Delete TACOTS feedback record
+router.delete(
+  "/feedback/:id",
+  authenticate(),
+  authorize("delete"),
+  validateRequest(tacotsFeedbackParamsSchema),
+  deleteFeedbackController,
 );
 
 // Create onboarding record post-shortlisting
@@ -199,4 +213,5 @@ router.delete(
   validateRequest(tacotsExitParamsSchema),
   deleteTacotsExitController,
 );
+
 export default router;

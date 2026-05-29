@@ -1,0 +1,49 @@
+meta {
+  name: Delete volunteer feedback record
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/forms/volunteer/feedback/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete Volunteer Feedback Record
+
+  Permanently deletes a single volunteer feedback record by its unique identifier. The corresponding cache entry is also invalidated.
+
+  ## Authorization
+  Requires `delete` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                                |
+  |-----------|--------|----------|--------------------------------------------|
+  | id        | string | Yes      | UUID of the volunteer feedback record      |
+
+  ## Response
+
+  **`200 OK`** — Confirms the volunteer feedback record has been deleted.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                |
+  | `403 Forbidden`             | User does not have `delete` permission.                 |
+  | `500 Internal Server Error` | Unexpected server error.                                |
+}

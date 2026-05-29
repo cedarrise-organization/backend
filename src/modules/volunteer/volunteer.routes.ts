@@ -6,9 +6,11 @@ import {
   submitVolunteerRegistrationController,
   listVolunteersController,
   getVolunteerController,
+  deleteVolunteerController,
   submitVolunteerFeedbackController,
   listVolunteerFeedbackController,
   getVolunteerFeedbackController,
+  deleteVolunteerFeedbackController,
 } from "./volunteer.controller.js";
 import {
   createVolunteerRegistrationSchema,
@@ -47,6 +49,15 @@ router.get(
   getVolunteerController,
 );
 
+// Delete volunteer detail
+router.delete(
+  "/:id",
+  authenticate(),
+  authorize("delete"),
+  validateRequest(volunteerRegistrationParamsSchema),
+  deleteVolunteerController,
+);
+
 // Submit volunteer feedback form
 router.post(
   "/feedback",
@@ -71,4 +82,14 @@ router.get(
   validateRequest(volunteerFeedbackParamsSchema),
   getVolunteerFeedbackController,
 );
+
+// Delete volunteer detail
+router.delete(
+  "/feedback/:id",
+  authenticate(),
+  authorize("delete"),
+  validateRequest(volunteerFeedbackParamsSchema),
+  deleteVolunteerFeedbackController,
+);
+
 export default router;

@@ -6,9 +6,11 @@ import {
   submitVolunteerRegistration,
   listVolunteers,
   getVolunteer,
+  deleteVolunteer,
   submitVolunteerFeedback,
   listVolunteerFeedback,
   getVolunteerFeedback,
+  deleteVolunteerFeedback,
 } from "../../services/volunteer.services.js";
 
 export const submitVolunteerRegistrationController = async (
@@ -100,6 +102,20 @@ export const getVolunteerController = async (req: Request, res: Response, next: 
   }
 };
 
+export const deleteVolunteerController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await deleteVolunteer(id);
+    return successResponse(res, response.code, response.message)
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const submitVolunteerFeedbackController = async (
   req: Request,
   res: Response,
@@ -158,7 +174,11 @@ export const submitVolunteerFeedbackController = async (
   }
 };
 
-export const listVolunteerFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+export const listVolunteerFeedbackController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { page, limit } = req.qtransformed;
   try {
     const response = await listVolunteerFeedback(page, limit);
@@ -168,11 +188,29 @@ export const listVolunteerFeedbackController = async (req: Request, res: Respons
   }
 };
 
-export const getVolunteerFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+export const getVolunteerFeedbackController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const id = (req as any).params.id.toString();
   try {
     const response = await getVolunteerFeedback(id);
     return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteVolunteerFeedbackController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await deleteVolunteerFeedback(id);
+    return successResponse(res, response.code, response.message)
   } catch (error) {
     next(error);
   }

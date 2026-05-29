@@ -155,6 +155,19 @@ export const getVolunteer = async (id: string) => {
   };
 };
 
+export const deleteVolunteer  = async (id: string) => {
+  await db.delete(volunteerRegistration).where(eq(volunteerRegistration.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:volunteer:voluntee:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "volunteer data deleted successfully",
+  };
+};
+
 export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType) => {
   const [newVolunteerFeedback] = await db
     .insert(volunteerFeedback)
@@ -265,5 +278,18 @@ export const getVolunteerFeedback = async (id: string) => {
     code: 200,
     message: "Single volunteer feedback found successfully",
     data: feedback,
+  };
+};
+
+export const deleteVolunteerFeedback  = async (id: string) => {
+  await db.delete(volunteerFeedback).where(eq(volunteerFeedback.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:volunteer:feedback:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "volunteer feedback deleted successfully",
   };
 };

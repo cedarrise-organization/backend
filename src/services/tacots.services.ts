@@ -1,5 +1,5 @@
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/storage.util.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
-import { uploadToCloudinary } from "../utils/storage.util.js";
 import { UploadApiResponse } from "cloudinary";
 import { sql, asc, eq } from "drizzle-orm";
 import { Request } from "express";
@@ -17,6 +17,7 @@ import {
   tacotsTracking,
   tacotsExit,
 } from "../db/models/admin.js";
+import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -223,6 +224,45 @@ export const getRecommendation = async (id: string) => {
   };
 };
 
+export const deleteRecommendation = async (id: string) => {
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+  const [data] = await db
+    .select({
+      passportPhotoPublicId: tacotsRecommendation.passportPhotoPublicId,
+      lastResultPublicId: tacotsRecommendation.lastResultPublicId,
+    })
+    .from(tacotsRecommendation)
+    .where(eq(tacotsRecommendation.id, id));
+
+  if (data?.passportPhotoPublicId) {
+    try {
+      await deleteFromCloudinary(data.passportPhotoPublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete passport photo for user ${id}`);
+    }
+  }
+
+  if (data?.lastResultPublicId) {
+    try {
+      await deleteFromCloudinary(data.lastResultPublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete result for user ${id}`);
+    }
+  }
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+
+  await db.delete(tacotsRecommendation).where(eq(tacotsRecommendation.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:tacots:tacotsRecommendation:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots beneficiary data deleted successfully",
+  };
+};
+
 // FEEDBACK
 export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
   const [newTacotsFeedback] = await db
@@ -334,6 +374,19 @@ export const getTacotsFeedback = async (id: string) => {
     code: 200,
     message: "Single feedback found successfully",
     data: feedback,
+  };
+};
+
+export const deleteTacotsFeedback = async (id: string) => {
+  await db.delete(tacotsFeedback).where(eq(tacotsFeedback.id, id));
+
+  /// cache delete
+  await cacheDel(`cedarrise:tacots:feedback:${id}`);
+  ///
+
+  return {
+    code: 200,
+    message: "Tacots feedback data deleted successfully",
   };
 };
 
@@ -487,6 +540,32 @@ export const getOnboarding = async (id: string) => {
 };
 
 export const deleteOnboarding = async (id: string) => {
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+  const [data] = await db
+    .select({
+      parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
+      admissionLetterPublicId: tacotsOnboarding.admissionLetterPublicId,
+    })
+    .from(tacotsOnboarding)
+    .where(eq(tacotsOnboarding.id, id));
+
+  if (data?.parentSignaturePublicId) {
+    try {
+      await deleteFromCloudinary(data.parentSignaturePublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete parent signature for user ${id}`);
+    }
+  }
+
+  if (data?.admissionLetterPublicId) {
+    try {
+      await deleteFromCloudinary(data.admissionLetterPublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete admission letter for user ${id}`);
+    }
+  }
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+
   await db.delete(tacotsOnboarding).where(eq(tacotsOnboarding.id, id));
 
   /// cache delete
@@ -647,6 +726,32 @@ export const getTacotsTracking = async (id: string) => {
 };
 
 export const deleteTacotsTracking = async (id: string) => {
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+  const [data] = await db
+    .select({
+      termResultPublicId: tacotsTracking.termResultPublicId,
+      paymentEvidencePublicId: tacotsTracking.paymentEvidencePublicId,
+    })
+    .from(tacotsTracking)
+    .where(eq(tacotsTracking.id, id));
+
+  if (data?.termResultPublicId) {
+    try {
+      await deleteFromCloudinary(data.termResultPublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete term result for user ${id}`);
+    }
+  }
+
+  if (data?.paymentEvidencePublicId) {
+    try {
+      await deleteFromCloudinary(data.paymentEvidencePublicId, "image");
+    } catch (error) {
+      logger.error(`Could not delete payment evidence for user ${id}`);
+    }
+  }
+  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
+
   await db.delete(tacotsTracking).where(eq(tacotsTracking.id, id));
 
   /// cache delete

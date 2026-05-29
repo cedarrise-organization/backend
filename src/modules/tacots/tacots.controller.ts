@@ -6,9 +6,11 @@ import {
   submitRecommendation,
   listRecommendations,
   getRecommendation,
+  deleteRecommendation,
   submitTacotsFeedback,
   listTacotsFeedback,
   getTacotsFeedback,
+  deleteTacotsFeedback,
   submitOnboarding,
   listOnboarding,
   getOnboarding,
@@ -188,6 +190,20 @@ export const getRecommendationController = async (
   }
 };
 
+export const deleteRecommendationController= async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await deleteRecommendation(id);
+    return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // FEEDBACK
 export const submitFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -258,6 +274,20 @@ export const getFeedbackController = async (req: Request, res: Response, next: N
   try {
     const response = await getTacotsFeedback(id);
     return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteFeedbackController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await deleteTacotsFeedback(id);
+    return successResponse(res, response.code, response.message);
   } catch (error) {
     next(error);
   }
