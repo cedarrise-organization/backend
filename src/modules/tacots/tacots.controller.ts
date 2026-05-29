@@ -6,11 +6,24 @@ import {
   submitRecommendation,
   listRecommendations,
   getRecommendation,
-  submitFeedback,
-  listFeedback,
-  getFeedback,
+  submitTacotsFeedback,
+  listTacotsFeedback,
+  getTacotsFeedback,
+  submitOnboarding,
+  listOnboarding,
+  getOnboarding,
+  deleteOnboarding,
+  submitTacotsTracking,
+  listTacotsTracking,
+  getTacotsTracking,
+  deleteTacotsTracking,
+  submitTacotsExit,
+  listTacotsExit,
+  getTacotsExit,
+  deleteTacotsExit,
 } from "../../services/tacots.services.js";
 
+// RECOMMENDATION
 export const submitRecommendationController = async (
   req: Request,
   res: Response,
@@ -175,6 +188,7 @@ export const getRecommendationController = async (
   }
 };
 
+// FEEDBACK
 export const submitFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const {
     studentFirstName,
@@ -200,7 +214,7 @@ export const submitFeedbackController = async (req: Request, res: Response, next
     additionalComments,
   } = req.body;
   try {
-    const response = await submitFeedback({
+    const response = await submitTacotsFeedback({
       studentFirstName,
       studentSurname,
       currentSchool,
@@ -232,7 +246,7 @@ export const submitFeedbackController = async (req: Request, res: Response, next
 export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
-    const response = await listFeedback(page, limit);
+    const response = await listTacotsFeedback(page, limit);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -242,8 +256,154 @@ export const listFeedbackController = async (req: Request, res: Response, next: 
 export const getFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await getFeedback(id);
+    const response = await getTacotsFeedback(id);
     return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ONBOARDING
+export const submitOnboardingController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const {} = req.body;
+  try {
+    // const response = await submitOnboarding();
+    // return successResponse(res, response.code, response.message, response.data)
+  } catch (error) {
+    next(error);
+  }
+};
+export const listOnboardingController = async (req: Request, res: Response, next: NextFunction) => {
+  const { page, limit } = req.qtransformed;
+  try {
+    // const response = await listOnboarding(page, limit);
+    // return successResponse(res, response.code, response.message, response.data, response.meta)
+  } catch (error) {
+    next(error);
+  }
+};
+export const getOnboardingController = async (req: Request, res: Response, next: NextFunction) => {
+  const id = (req as any).params.id.toString();
+  try {
+    // const response = await getOnboarding(id);
+    // return successResponse(res, response.code, response.message, response.data, response.meta)
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteOnboardingController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    // const response = await deleteOnboarding(id);
+    // return successResponse(res, response.code, response.message)
+  } catch (error) {
+    next(error);
+  }
+};
+
+// TRACKING
+export const submitTacotsTrackingController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const {} = req.body;
+  try {
+    // const response = await submitTacotsTracking();
+    // return successResponse(res, response.code, response.message, response.data)
+  } catch (error) {
+    next(error);
+  }
+};
+export const listTacotsTrackingController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { page, limit } = req.qtransformed;
+  try {
+    // const response = await listTacotsTracking(page, limit);
+    // return successResponse(res, response.code, response.message, response.data, response.meta)
+  } catch (error) {
+    next(error);
+  }
+};
+export const getTacotsTrackingController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    // const response = await getTacotsTracking(id);
+    // return successResponse(res, response.code, response.message, response.data, response.meta)
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteTacotsTrackingController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    // const response = await deleteTacotsTracking(id);
+    // return successResponse(res, response.code, response.message)
+  } catch (error) {
+    next(error);
+  }
+};
+
+// EXIT
+export const submitTacotsExitController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+   const {} = req.body;
+  try {
+    // const response = await submitTacotsExit();
+    // return successResponse(res, response.code, response.message, response.data)
+  } catch (error) {
+    next(error);
+  }
+};
+export const listTacotsExitController = async (req: Request, res: Response, next: NextFunction) => {
+  const { page, limit } = req.qtransformed;
+  try {
+    // const response = await listTacotsExit(page, limit);
+    // return successResponse(res, response.code, response.message, response.data, response.meta)
+  } catch (error) {
+    next(error);
+  }
+};
+export const getTacotsExitController = async (req: Request, res: Response, next: NextFunction) => {
+  const id = (req as any).params.id.toString();
+  try {
+    // const response = await getTacotsExit(id);
+    // return successResponse(res, response.code, response.message, response.data, response.meta)
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteTacotsExitController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    // const response = await deleteTacotsExit(id);
+    // return successResponse(res, response.code, response.message)
   } catch (error) {
     next(error);
   }

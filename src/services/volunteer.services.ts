@@ -1,11 +1,11 @@
 import { volunteerRegistration, volunteerFeedback } from "../db/models/admin.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
+import { sql, asc, eq } from "drizzle-orm";
+import { Request } from "express";
 import {
   VolunteerregistrationbodyType,
   VolunteerfeedbackbodyType,
 } from "../modules/volunteer/volunteer.schema.js";
-import { Request } from "express";
-import { sql, asc, eq } from "drizzle-orm";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -19,7 +19,7 @@ const sortMap = {
   createdAt: volunteerRegistration.createdAt,
 } as const;
 
-export const submitRegistration = async (options: VolunteerregistrationbodyType) => {
+export const submitVolunteerRegistration = async (options: VolunteerregistrationbodyType) => {
   const [newVolunteerSubmission] = await db
     .insert(volunteerRegistration)
     .values({
@@ -199,7 +199,7 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
   };
 };
 
-export const listFeedback = async (page: number, limit: number) => {
+export const listVolunteerFeedback = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:volunteer:feedback:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -242,7 +242,7 @@ export const listFeedback = async (page: number, limit: number) => {
   };
 };
 
-export const getFeedback = async (id: string) => {
+export const getVolunteerFeedback = async (id: string) => {
   /// cache
   const key = `cedarrise:volunteer:feedback:${id}`;
   const cacheRes = await cacheGet<any>(key);

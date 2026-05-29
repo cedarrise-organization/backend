@@ -3,12 +3,12 @@ import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
-  submitRegistrationController,
+  submitVolunteerRegistrationController,
   listVolunteersController,
   getVolunteerController,
   submitVolunteerFeedbackController,
-  listFeedbackController,
-  getFeedbackController,
+  listVolunteerFeedbackController,
+  getVolunteerFeedbackController,
 } from "./volunteer.controller.js";
 import {
   createVolunteerRegistrationSchema,
@@ -26,7 +26,7 @@ const router = express.Router();
 router.post(
   "/register",
   validateRequest(createVolunteerRegistrationSchema),
-  submitRegistrationController,
+  submitVolunteerRegistrationController,
 );
 
 // List volunteers (default filter: status=pending)
@@ -60,7 +60,7 @@ router.get(
   authenticate(),
   authorize("read"),
   validateRequest(volunteerFeedbackQuerySchema),
-  listFeedbackController,
+  listVolunteerFeedbackController,
 );
 
 // Get single volunteer feedback submission
@@ -69,6 +69,6 @@ router.get(
   authenticate(),
   authorize("read"),
   validateRequest(volunteerFeedbackParamsSchema),
-  getFeedbackController,
+  getVolunteerFeedbackController,
 );
 export default router;

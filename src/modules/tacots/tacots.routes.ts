@@ -5,11 +5,20 @@ import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
   createTacotsRecommendationSchema,
-  createTacotsFeedbackSchema,
-  tacotsRecommendationParamsSchema,
   tacotsRecommendationQuerySchema,
+  tacotsRecommendationParamsSchema,
+  createTacotsFeedbackSchema,
   tacotsFeedbackQuerySchema,
   tacotsFeedbackParamsSchema,
+  createTacotsOnboardingSchema,
+  tacotsOnboardingQuerySchema,
+  tacotsOnboardingParamsSchema,
+  createTacotsTrackingSchema,
+  tacotsTrackingQuerySchema,
+  tacotsTrackingParamsSchema,
+  createTacotsExitSchema,
+  tacotsExitQuerySchema,
+  tacotsExitParamsSchema,
 } from "./tacots.schema.js";
 import {
   submitRecommendationController,
@@ -18,6 +27,18 @@ import {
   submitFeedbackController,
   listFeedbackController,
   getFeedbackController,
+  submitOnboardingController,
+  listOnboardingController,
+  getOnboardingController,
+  deleteOnboardingController,
+  submitTacotsTrackingController,
+  listTacotsTrackingController,
+  getTacotsTrackingController,
+  deleteTacotsTrackingController,
+  submitTacotsExitController,
+  listTacotsExitController,
+  getTacotsExitController,
+  deleteTacotsExitController,
 } from "./tacots.controller.js";
 
 const router = express.Router();
@@ -72,4 +93,102 @@ router.get(
   getFeedbackController,
 );
 
+// Create onboarding record post-shortlisting
+router.post(
+  "/onboarding",
+  authenticate(),
+  authorize("create"),
+  validateRequest(createTacotsOnboardingSchema),
+  submitOnboardingController,
+);
+// List onboarding records
+router.get(
+  "/onboarding",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsOnboardingQuerySchema),
+  listOnboardingController,
+);
+// Full onboarding detail
+router.get(
+  "/onboarding/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsOnboardingParamsSchema),
+  getOnboardingController,
+);
+// Delete onboarding record
+router.delete(
+  "/onboarding/:id",
+  authenticate(),
+  authorize("delete"),
+  validateRequest(tacotsOnboardingParamsSchema),
+  deleteOnboardingController,
+);
+
+// Submit TACOTS Student Tracking (midterm/end-of-term)
+router.post(
+  "/tracking",
+  authenticate(),
+  authorize("create"),
+  validateRequest(createTacotsTrackingSchema),
+  submitTacotsTrackingController,
+);
+// List tracking records
+router.get(
+  "/tracking",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsTrackingQuerySchema),
+  listTacotsTrackingController,
+);
+// Full tracking record detail
+router.get(
+  "/tracking/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsTrackingParamsSchema),
+  getTacotsTrackingController,
+);
+// Delete tracking record
+router.delete(
+  "/tracking/:id",
+  authenticate(),
+  authorize("delete"),
+  validateRequest(tacotsTrackingParamsSchema),
+  deleteTacotsTrackingController,
+);
+
+// Submit TACOTS Exit/Completion Form
+router.post(
+  "/exit",
+  authenticate(),
+  authorize("create"),
+  validateRequest(createTacotsExitSchema),
+  submitTacotsExitController,
+);
+// List exit records
+router.get(
+  "/exit",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsExitQuerySchema),
+  listTacotsExitController,
+);
+// Full exit record detail
+router.get(
+  "/exit/:id",
+  authenticate(),
+  authorize("read"),
+  validateRequest(tacotsExitParamsSchema),
+  getTacotsExitController,
+);
+// Delete exit record
+router.delete(
+  "/exit/:id",
+  authenticate(),
+  authorize("delete"),
+  validateRequest(tacotsExitParamsSchema),
+  deleteTacotsExitController,
+);
 export default router;

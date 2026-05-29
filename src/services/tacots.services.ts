@@ -1,13 +1,22 @@
-import { UploadApiResponse } from "cloudinary";
-import { tacotsRecommendation, tacotsFeedback } from "../db/models/admin.js";
-import { uploadToCloudinary } from "../utils/storage.util.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
+import { uploadToCloudinary } from "../utils/storage.util.js";
+import { UploadApiResponse } from "cloudinary";
+import { sql, asc, eq } from "drizzle-orm";
+import { Request } from "express";
 import {
   TacotsrecommendationbodyType,
   TacotsfeedbackbodyType,
+  TacotsonboardingbodyType,
+  TacotstrackingbodyType,
+  TacotsexitbodyType,
 } from "../modules/tacots/tacots.schema.js";
-import { Request } from "express";
-import { sql, asc, eq } from "drizzle-orm";
+import {
+  tacotsRecommendation,
+  tacotsFeedback,
+  tacotsOnboarding,
+  tacotsTracking,
+  tacotsExit,
+} from "../db/models/admin.js";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -21,6 +30,7 @@ const sortMap = {
   createdAt: tacotsRecommendation.createdAt,
 } as const;
 
+// RECOMMENDATION
 export const submitRecommendation = async (req: Request, options: TacotsrecommendationbodyType) => {
   const files = req.files as {
     passportPhoto: Express.Multer.File[];
@@ -213,7 +223,8 @@ export const getRecommendation = async (id: string) => {
   };
 };
 
-export const submitFeedback = async (options: TacotsfeedbackbodyType) => {
+// FEEDBACK
+export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
   const [newTacotsFeedback] = await db
     .insert(tacotsFeedback)
     .values({
@@ -257,7 +268,7 @@ export const submitFeedback = async (options: TacotsfeedbackbodyType) => {
   };
 };
 
-export const listFeedback = async (page: number, limit: number) => {
+export const listTacotsFeedback = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:tacots:feedback:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -300,7 +311,7 @@ export const listFeedback = async (page: number, limit: number) => {
   };
 };
 
-export const getFeedback = async (id: string) => {
+export const getTacotsFeedback = async (id: string) => {
   /// cache
   const key = `cedarrise:tacots:feedback:${id}`;
   const cacheRes = await cacheGet<any>(key);
@@ -325,3 +336,42 @@ export const getFeedback = async (id: string) => {
     data: feedback,
   };
 };
+
+// ONBOARDING
+export const submitOnboarding = async (req: Request, options: TacotsonboardingbodyType) => {
+ 
+};
+export const listOnboarding = async (page: number, limit: number) => {
+ 
+};
+export const getOnboarding = async (id: string) => {
+ 
+};
+export const deleteOnboarding = async (id: string) => {
+ 
+};
+
+// TRACKING
+export const submitTacotsTracking = async (req: Request, options: TacotstrackingbodyType) => {
+ 
+};
+export const listTacotsTracking = async (page: number, limit: number) => {
+ 
+};
+export const getTacotsTracking = async (id: string) => {
+ 
+};
+export const deleteTacotsTracking = async (id: string) => {}
+ 
+// EXIT
+export const submitTacotsExit = async (req: Request, options: TacotsexitbodyType) => {
+ 
+};
+export const listTacotsExit = async (page: number, limit: number) => {
+ 
+};
+export const getTacotsExit = async (id: string) => {
+ 
+};
+export const deleteTacotsExit = async (id: string) => {}
+ 

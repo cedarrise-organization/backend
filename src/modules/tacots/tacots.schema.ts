@@ -314,7 +314,6 @@ export const tacotsFeedbackQuerySchema = z.object({
 });
 
 // ONBOARDING
-
 export const tacotsOnboardingBody = z.object({
   studentId: z.uuid("Invalid ID"),
   onboardingDate: z.coerce.date(),
@@ -419,6 +418,8 @@ export const tacotsOnboardingBody = z.object({
   additionalInfo: optionalTextSchema,
 });
 
+export type TacotsonboardingbodyType = z.infer<typeof tacotsOnboardingBody>;
+
 export const createTacotsOnboardingSchema = z.object({
   body: tacotsOnboardingBody,
   files: z
@@ -447,6 +448,7 @@ export const tacotsOnboardingQuerySchema = z.object({
   }),
 });
 
+// TRACKING
 export const tacotsTrackingBody = z.object({
   studentId: z.uuid("Invalid ID"),
   schoolId: z.uuid("Invalid ID"),
@@ -507,6 +509,8 @@ export const tacotsTrackingBody = z.object({
   financialNotes: optionalTextSchema,
 });
 
+export type TacotstrackingbodyType = z.infer<typeof tacotsTrackingBody>;
+
 export const createTacotsTrackingSchema = z.object({
   body: tacotsTrackingBody,
   files: z.object({
@@ -535,6 +539,7 @@ export const tacotsTrackingQuerySchema = z.object({
   }),
 });
 
+// EXIT
 export const tacotsExitBody = z.object({
   studentId: z.uuid("Invalid ID"),
   schoolAttendedDuringProgram: textSchema,
@@ -581,6 +586,8 @@ export const tacotsExitBody = z.object({
   completedBy: textSchema,
   submissionDate: z.coerce.date(),
 });
+
+export type TacotsexitbodyType = z.infer<typeof tacotsExitBody>;
 
 export const createTacotsExitSchema = z.object({
   body: tacotsExitBody,

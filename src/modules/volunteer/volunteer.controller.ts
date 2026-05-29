@@ -3,15 +3,15 @@ import { Request, Response, NextFunction } from "express";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
 import {
-  submitRegistration,
+  submitVolunteerRegistration,
   listVolunteers,
   getVolunteer,
   submitVolunteerFeedback,
-  listFeedback,
-  getFeedback,
+  listVolunteerFeedback,
+  getVolunteerFeedback,
 } from "../../services/volunteer.services.js";
 
-export const submitRegistrationController = async (
+export const submitVolunteerRegistrationController = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -46,7 +46,7 @@ export const submitRegistrationController = async (
   } = req.body;
 
   try {
-    const response = await submitRegistration({
+    const response = await submitVolunteerRegistration({
       firstName,
       middleName,
       surname,
@@ -158,20 +158,20 @@ export const submitVolunteerFeedbackController = async (
   }
 };
 
-export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+export const listVolunteerFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
-    const response = await listFeedback(page, limit);
+    const response = await listVolunteerFeedback(page, limit);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
 };
 
-export const getFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
+export const getVolunteerFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await getFeedback(id);
+    const response = await getVolunteerFeedback(id);
     return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
