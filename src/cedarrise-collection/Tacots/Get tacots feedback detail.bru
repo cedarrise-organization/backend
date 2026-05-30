@@ -1,7 +1,7 @@
 meta {
   name: Get TACOTS feedback detail
   type: http
-  seq: 6
+  seq: 7
 }
 
 get {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get TACOTS Feedback Detail
-
+  
   Retrieves the full detail of a single TACOTS scholarship programme feedback submission by its unique identifier.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                        |
   |-----------|--------|----------|------------------------------------|
   | id        | string | Yes      | UUID of the feedback submission    |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete TACOTS feedback record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |

@@ -15,31 +15,32 @@ import tacotsRouter from "./modules/tacots/tacots.routes.js";
 import capacityRouter from "./modules/capacity/capacity.routes.js";
 import volunteerRouter from "./modules/volunteer/volunteer.routes.js";
 import outreachRouter from "./modules/outreaches/outreaches.routes.js";
+// import featureRouter from "./modules/feature/feature.routes.js";
 import "./events/admin.events.js";
 import "./events/donate.event.js";
 import "./events/auth.events.js";
-// import featureRouter from "./modules/feature/feature.routes.js";
-
+// import "./events/feature.event.js"
+import "./queues/workers/deleteCloudinaryAsset.worker.js"
 // import "./queues/workers/feature.worker.js"
 
 const app = express();
 
 const whitelist = [`http://localhost:3002`];
 const corsOptions = {
-	origin: function (
-		origin: string | undefined,
-		callback: (err: Error | null, allowed?: boolean) => void,
-	) {
-		if (whitelist.indexOf(origin || "") !== -1 || !origin) {
-			callback(null, true);
-		} else {
-			callback(new Error("Not allowed by CORS"));
-		}
-	},
-	methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-	credentials: true, //Allow cookies/auth headers
-	allowedHeaders: ["Content-Type", "Authorization"],
-	maxAge: 86400, // Cache preflight requests for 24 hours
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allowed?: boolean) => void,
+  ) {
+    if (whitelist.indexOf(origin || "") !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+  credentials: true, //Allow cookies/auth headers
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400, // Cache preflight requests for 24 hours
 };
 
 app.use(express.json());
@@ -48,7 +49,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 (async () => {
-	await connectRedis();
+  await connectRedis();
 })();
 
 //ROUTES
@@ -64,14 +65,16 @@ app.use("/api/v1/forms/ash", ashRouter);
 app.use("/api/v1/forms/tacots", tacotsRouter);
 app.use("/api/v1/forms/outreaches", outreachRouter);
 app.use("/api/v1/forms/capacity-building", capacityRouter);
-// app.use("/queues", bullBoardAdapter.getRouter());
+
+// BULL BOARD DASHBOARD. (ADD AUTH N' AUTH IN PRODUCTION)
+app.use("/api/v1/queues", bullBoardAdapter.getRouter());
 
 // HANDLER FOR UNKNOWN ROUTES
 app.use((req, res) => {
-	res.status(404).json({
-		success: false,
-		error: { code: "NOT_FOUND", message: `Route ${req.path} not found` },
-	});
+  res.status(404).json({
+    success: false,
+    error: { code: "NOT_FOUND", message: `Route ${req.path} not found` },
+  });
 });
 
 //GLOBAL ERROR HANDLER

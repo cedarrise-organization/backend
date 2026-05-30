@@ -1,4 +1,5 @@
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/storage.util.js";
+import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
 import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
@@ -207,7 +208,6 @@ export const getRegistration = async (id: string) => {
 };
 
 export const deleteRegistration = async (id: string) => {
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
   const [data] = await db
     .select({
       passportPhotoPublicId: ashStudent.passportPhotoPublicId,
@@ -219,28 +219,33 @@ export const deleteRegistration = async (id: string) => {
 
   if (data?.passportPhotoPublicId) {
     try {
-      await deleteFromCloudinary(data.passportPhotoPublicId, "image");
+      await addAssetToDeletionQueue(data.passportPhotoPublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete passport photo for user ${id}`);
+      logger.error(`Could not add passport photo public id to queue`, {
+        user: id,
+      });
     }
   }
 
   if (data?.parentSignaturePublicId) {
     try {
-      await deleteFromCloudinary(data.parentSignaturePublicId, "image");
+      await addAssetToDeletionQueue(data.parentSignaturePublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete parent signature for user ${id}`);
+      logger.error(`Could not add parent signature public id to queue`, {
+        user: id,
+      });
     }
   }
 
   if (data?.lastResultPublicId) {
     try {
-      await deleteFromCloudinary(data.lastResultPublicId, "image");
+      await addAssetToDeletionQueue(data.lastResultPublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete last result for user ${id}`);
+      logger.error(`Could not add last result public id to queue`, {
+        user: id,
+      });
     }
   }
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
 
   await db.delete(ashStudent).where(eq(ashStudent.id, id));
 
@@ -509,7 +514,6 @@ export const getTrack = async (id: string) => {
 };
 
 export const deleteTrack = async (id: string) => {
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
   const [data] = await db
     .select({
       termResultPublicId: ashTermlyTracking.termResultPublicId,
@@ -519,12 +523,13 @@ export const deleteTrack = async (id: string) => {
 
   if (data?.termResultPublicId) {
     try {
-      await deleteFromCloudinary(data.termResultPublicId, "image");
+      await addAssetToDeletionQueue(data.termResultPublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete term result for user ${id}`);
+      logger.error(`Could not add term result public id to queue`, {
+        user: id,
+      });
     }
   }
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
 
   // delete file from db
   await db.delete(ashTermlyTracking).where(eq(ashTermlyTracking.id, id));

@@ -1,4 +1,5 @@
 import { uploadToCloudinary, deleteFromCloudinary } from "../utils/storage.util.js";
+import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { UploadApiResponse } from "cloudinary";
 import { sql, asc, eq } from "drizzle-orm";
@@ -225,7 +226,6 @@ export const getRecommendation = async (id: string) => {
 };
 
 export const deleteRecommendation = async (id: string) => {
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
   const [data] = await db
     .select({
       passportPhotoPublicId: tacotsRecommendation.passportPhotoPublicId,
@@ -236,20 +236,23 @@ export const deleteRecommendation = async (id: string) => {
 
   if (data?.passportPhotoPublicId) {
     try {
-      await deleteFromCloudinary(data.passportPhotoPublicId, "image");
+      await addAssetToDeletionQueue(data.passportPhotoPublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete passport photo for user ${id}`);
+      logger.error(`Could not add passportphoto public id to queue`, {
+        user: id,
+      });
     }
   }
 
   if (data?.lastResultPublicId) {
     try {
-      await deleteFromCloudinary(data.lastResultPublicId, "image");
+      await addAssetToDeletionQueue(data.lastResultPublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete result for user ${id}`);
+      logger.error(`Could not add last result public id to queue`, {
+        user: id,
+      });
     }
   }
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
 
   await db.delete(tacotsRecommendation).where(eq(tacotsRecommendation.id, id));
 
@@ -540,7 +543,6 @@ export const getOnboarding = async (id: string) => {
 };
 
 export const deleteOnboarding = async (id: string) => {
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
   const [data] = await db
     .select({
       parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
@@ -550,21 +552,24 @@ export const deleteOnboarding = async (id: string) => {
     .where(eq(tacotsOnboarding.id, id));
 
   if (data?.parentSignaturePublicId) {
-    try {
-      await deleteFromCloudinary(data.parentSignaturePublicId, "image");
+     try {
+      await addAssetToDeletionQueue(data.parentSignaturePublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete parent signature for user ${id}`);
+      logger.error(`Could not add parent signature public id to queue`, {
+        user: id,
+      });
     }
   }
 
   if (data?.admissionLetterPublicId) {
     try {
-      await deleteFromCloudinary(data.admissionLetterPublicId, "image");
+      await addAssetToDeletionQueue(data.admissionLetterPublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete admission letter for user ${id}`);
+      logger.error(`Could not add admission letter public id to queue`, {
+        user: id,
+      });
     }
   }
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
 
   await db.delete(tacotsOnboarding).where(eq(tacotsOnboarding.id, id));
 
@@ -655,7 +660,7 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
     data: tracking,
   };
 };
-
+ 
 export const listTacotsTracking = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:tacots:tracking:${page}:${limit}`;
@@ -726,7 +731,6 @@ export const getTacotsTracking = async (id: string) => {
 };
 
 export const deleteTacotsTracking = async (id: string) => {
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
   const [data] = await db
     .select({
       termResultPublicId: tacotsTracking.termResultPublicId,
@@ -736,21 +740,24 @@ export const deleteTacotsTracking = async (id: string) => {
     .where(eq(tacotsTracking.id, id));
 
   if (data?.termResultPublicId) {
-    try {
-      await deleteFromCloudinary(data.termResultPublicId, "image");
+     try {
+      await addAssetToDeletionQueue(data.termResultPublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete term result for user ${id}`);
+      logger.error(`Could not add term result public id to queue`, {
+        user: id,
+      });
     }
   }
 
   if (data?.paymentEvidencePublicId) {
-    try {
-      await deleteFromCloudinary(data.paymentEvidencePublicId, "image");
+      try {
+      await addAssetToDeletionQueue(data.paymentEvidencePublicId, "image", id);
     } catch (error) {
-      logger.error(`Could not delete payment evidence for user ${id}`);
+      logger.error(`Could not add payment evidence public id to queue`, {
+        user: id,
+      });
     }
   }
-  // Eventually create and call function to add job to background jobs to delete the associated assets from cloudinary
 
   await db.delete(tacotsTracking).where(eq(tacotsTracking.id, id));
 

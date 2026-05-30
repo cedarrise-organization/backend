@@ -461,8 +461,8 @@ export const tacotsOnboardingBody = z.object({
   termResumptionDate: z.coerce.date(),
   schoolFeesPerTerm: numericSchema.optional(),
 
-  studentCommitment: z.boolean().default(false).optional(),
-  parentGuardianCommitment: z.boolean().default(false),
+  studentCommitment: z.coerce.boolean().default(false).optional(),
+  parentGuardianCommitment: z.coerce.boolean().default(false),
   programOfficerNotes: optionalTextSchema,
   supportTypesApproved: z.preprocess(
     (v) => {

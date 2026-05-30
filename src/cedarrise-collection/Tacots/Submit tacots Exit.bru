@@ -1,7 +1,7 @@
 meta {
   name: Submit TACOTS Exit
   type: http
-  seq: 15
+  seq: 17
 }
 
 post {
@@ -44,18 +44,18 @@ settings {
 
 docs {
   # Submit TACOTS Exit
-
+  
   Submits an exit/completion form for a TACOTS beneficiary who is leaving or has completed the programme. The form captures the student's exit reason, current status, post-programme outcomes, and programme impact assessment.
-
+  
   On success, the exit record is saved to the database. The endpoint returns the newly created exit object with a `201 Created` status.
-
+  
   ## Authorization
   Requires `create` permission.
-
+  
   ## Request Body (`application/json`)
-
+  
   ### Core
-
+  
   | Field                        | Type   | Required | Constraints / Allowed Values                                                                                                                                                |
   |------------------------------|--------|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
   | studentId                    | string | Yes      | UUID of the TACOTS student record                                                                                                                                           |
@@ -66,9 +66,9 @@ docs {
   | currentStatus                | string | Yes      | One of: `CONTINUING SECONDARY EDUCATION ELSEWHERE`, `ADMITTED INTO HIGHER INSTITUTION`, `LEARNING A TRADE / VOCATIONAL SKILL`, `EMPLOYED`, `NOT CURRENTLY STUDYING OR WORKING`, `OTHER` |
   | completedBy                  | string | Yes      | Non-empty text                                                                                                                                                              |
   | submissionDate               | date   | Yes      | ISO date string — `YYYY-MM-DD` format                                                                                                                                       |
-
+  
   ### Post-Programme Details (Optional)
-
+  
   | Field                        | Type   | Required | Constraints / Allowed Values                                                                                                                                |
   |------------------------------|--------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
   | higherInstitutionName        | string | No       | Optional text                                                                                                                                               |
@@ -78,21 +78,21 @@ docs {
   | vocationalSkill              | string | No       | One of: `TAILORING / FASHION DESIGN`, `HAIRDRESSING / BARBING`, `CARPENTRY`, `ELECTRICAL WORK`, `ICT / COMPUTER TRAINING`, `CATERING`, `AUTO MECHANIC`, `OTHER` (optional) |
   | newSchoolName                | string | No       | Optional text                                                                                                                                               |
   | completedSecondaryElsewhere  | string | No       | One of: `YES`, `NO`, `CURRENTLY STUDYING`, `NOT SURE` (optional)                                                                                           |
-
+  
   ### Impact Assessment (Optional)
-
+  
   | Field                    | Type   | Required | Constraints / Allowed Values     |
   |--------------------------|--------|----------|----------------------------------|
   | programImpactDescription | string | No       | Optional free text               |
   | programImpactRating      | number | No       | Integer from `1` to `10`         |
   | additionalSituationInfo  | string | No       | Optional free text               |
-
+  
   ## Response
-
+  
   **`201 Created`** — Returns the newly created TACOTS exit record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                                           |
   |-----------------------------|-----------------------------------------------------------------------|
   | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |

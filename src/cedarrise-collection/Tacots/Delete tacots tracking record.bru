@@ -1,7 +1,7 @@
 meta {
   name: Delete TACOTS tracking record
   type: http
-  seq: 14
+  seq: 16
 }
 
 delete {
@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  id: 4362b356-45cc-4c8d-93b4-ff8c72078a5d
   baseUrl: http://localhost:3000
 }
 
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Delete TACOTS Tracking Record
-
+  
   Permanently deletes a single TACOTS tracking record by its unique identifier. The corresponding cache entry is also invalidated.
-
+  
   ## Authorization
   Requires `delete` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                          |
   |-----------|--------|----------|--------------------------------------|
   | id        | string | Yes      | UUID of the TACOTS tracking record   |
-
+  
   ## Response
-
+  
   **`200 OK`** — Confirms the tracking record has been deleted.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |

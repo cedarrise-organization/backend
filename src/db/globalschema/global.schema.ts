@@ -80,6 +80,14 @@ export const resultFileSchema = z.array(
     ),
   }),
 );
+
+export const singleResultFileSchema = uploadedFileObjectSchema.extend({
+  mimetype: z.enum(
+    ["image/jpeg", "image/jpg", "image/png", "image/webp", "application/pdf"],
+    "Uploaded file should be an image or pdf",
+  ),
+});
+
 export const textSchema = z.string().transform((v) => v.trim());
 export const optionalTextSchema = z.preprocess(
   (v) => (v === "" ? undefined : v),

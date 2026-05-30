@@ -1,7 +1,7 @@
 meta {
   name: Get TACOTS exit detail
   type: http
-  seq: 17
+  seq: 19
 }
 
 get {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get TACOTS Exit Detail
-
+  
   Retrieves the full detail of a single TACOTS exit/completion record by its unique identifier. Returns all exit reason, post-programme outcomes, impact assessment, and status fields.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                       |
   |-----------|--------|----------|-----------------------------------|
   | id        | string | Yes      | UUID of the TACOTS exit record    |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete TACOTS exit record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |

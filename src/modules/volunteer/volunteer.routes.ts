@@ -49,7 +49,7 @@ router.get(
   getVolunteerController,
 );
 
-// Delete volunteer detail
+// Delete volunteer record
 router.delete(
   "/:id",
   authenticate(),

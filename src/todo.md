@@ -1,4 +1,3 @@
-> tacots delete files function
 > skip outreaches for now
-> add background jobs to ash services to delete assets
-> add background jobs to tacots services to delete assets
+> add singleResultFileSchema to upload file schemas for single result files. 
+> test all inputs and shi

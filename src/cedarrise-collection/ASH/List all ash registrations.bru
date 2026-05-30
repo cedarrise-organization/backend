@@ -1,7 +1,7 @@
 meta {
   name: List all registrations
   type: http
-  seq: 3
+  seq: 2
 }
 
 get {
@@ -30,25 +30,25 @@ settings {
 
 docs {
   # List All ASH Registrations
-
+  
   Returns a paginated list of ASH student registrations. Results can be filtered by approval status and sorted by various fields.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Query Parameters
-
+  
   | Parameter | Type   | Required | Default     | Description / Allowed Values                                                                                                      |
   |-----------|--------|----------|-------------|-----------------------------------------------------------------------------------------------------------------------------------|
   | page      | number | No       | `1`         | Page number (integer ≥ 1)                                                                                                         |
   | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                                   |
   | status    | string | No       | `pending`   | One of: `accepted`, `rejected`, `pending`                                                                                         |
   | sortBy    | string | No       | `createdAt` | One of: `firstName`, `surname`, `createdAt`, `schoolState`, `assignedMentor`, `currentClass`, `gender`                            |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns a paginated array of ASH student registration records.
-
+  
   ```json
   {
     "success": true,
@@ -60,9 +60,9 @@ docs {
     }
   }
   ```
-
+  
   ## Errors
-
+  
   | Status                      | Description                                           |
   |-----------------------------|-------------------------------------------------------|
   | `400 Bad Request`           | Invalid query parameters (e.g. unknown `sortBy` key). |

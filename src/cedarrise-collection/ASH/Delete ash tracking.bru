@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 2d5a5d06-78e7-44ea-a019-629460535794
+  id: 6baebd26-8cf9-4fa9-a4e6-6057f8c06902
   baseUrl: http://localhost:3000
 }
 
@@ -22,31 +22,31 @@ settings {
 
 docs {
   # Delete ASH Tracking Record
-
+  
   Permanently deletes a single ASH termly tracking record by its unique identifier. The corresponding cache entry is also invalidated.
-
+  
   ## Authorization
   Requires `delete` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                              |
   |-----------|--------|----------|------------------------------------------|
   | id        | string | Yes      | UUID of the termly tracking record       |
-
+  
   ## Response
-
+  
   **`200 OK`** — Confirmation that the record was deleted.
-
+  
   ```json
   {
     "success": true,
     "message": "Ash tracking data deleted successfully"
   }
   ```
-
+  
   ## Errors
-
+  
   | Status                      | Description                                        |
   |-----------------------------|----------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).        |

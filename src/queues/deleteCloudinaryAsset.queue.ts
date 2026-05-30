@@ -3,7 +3,7 @@ import { Queue } from "bullmq";
 const redis_host = process.env.REDIS_HOST! as string;
 const redis_port = Number(process.env.REDIS_PORT!);
 
-export const featureQueue = new Queue("feature-queue", {
+export const deleteAssetQueue = new Queue("asset-removal", {
 	connection: {
 		host: redis_host,
 		port: redis_port,
@@ -22,7 +22,7 @@ export const featureQueue = new Queue("feature-queue", {
 	},
 });
 
-export const addFeatureToQueue = async () => {
-	const job = await featureQueue.add("job-name", {});
+export const addAssetToDeletionQueue = async (publicId: string, resourceType: string, ownerId?: string) => {
+	const job = await deleteAssetQueue.add("delete-asset", {publicId, resourceType, ownerId});
 	return job.id;
 };

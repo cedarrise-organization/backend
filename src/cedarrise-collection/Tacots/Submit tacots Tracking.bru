@@ -1,7 +1,7 @@
 meta {
   name: Submit TACOTS Tracking
   type: http
-  seq: 11
+  seq: 13
 }
 
 post {
@@ -57,18 +57,18 @@ settings {
 
 docs {
   # Submit TACOTS Tracking
-
+  
   Submits a midterm or end-of-term tracking report for a TACOTS beneficiary. The form captures academic performance, character formation ratings, mentorship session details, community service activities, financial expenditure, and required file uploads (term result and optional payment evidence).
-
+  
   On success, the tracking record is saved to the database. The endpoint returns the newly created tracking object with a `201 Created` status.
-
+  
   ## Authorization
   Requires `create` permission.
-
+  
   ## Request Body (`multipart/form-data`)
-
+  
   ### Identification & Period
-
+  
   | Field            | Type   | Required | Constraints / Allowed Values                                 |
   |------------------|--------|----------|--------------------------------------------------------------|
   | studentId        | string | Yes      | UUID of the TACOTS student record                            |
@@ -78,9 +78,9 @@ docs {
   | academicTerm     | string | Yes      | One of: `1ST TERM`, `2ND TERM`, `3RD TERM`                  |
   | assessmentPeriod | string | Yes      | One of: `MIDTERM`, `END OF TERM`                             |
   | submissionDate   | date   | Yes      | ISO date string — `YYYY-MM-DD` format                        |
-
+  
   ### Academic Performance
-
+  
   | Field                  | Type   | Required | Constraints / Allowed Values   |
   |------------------------|--------|----------|--------------------------------|
   | highestSubjectScore    | string | Yes      | Non-empty text                 |
@@ -88,18 +88,18 @@ docs {
   | studentAveragePct      | number | Yes      | Numeric value                  |
   | studentPositionInClass | string | Yes      | Non-empty text                 |
   | academicComment        | string | No       | Optional free text             |
-
+  
   ### Character Formation
-
+  
   | Field                | Type   | Required | Constraints / Allowed Values   |
   |----------------------|--------|----------|--------------------------------|
   | socialBehaviorRating | number | Yes      | Integer from `1` to `5`        |
   | schoolRulesRating    | number | Yes      | Integer from `1` to `5`        |
   | responsibilityRating | number | Yes      | Integer from `1` to `5`        |
   | formationComments    | string | No       | Optional free text             |
-
+  
   ### Mentorship
-
+  
   | Field                | Type   | Required | Constraints / Allowed Values                                                     |
   |----------------------|--------|----------|----------------------------------------------------------------------------------|
   | mentorName           | string | Yes      | Non-empty text                                                                   |
@@ -107,9 +107,9 @@ docs {
   | mentorshipMode       | string | Yes      | One of: `PHYSICAL (IN-PERSON)`, `VIRTUAL (ONLINE)`                               |
   | mentorshipDuration   | string | Yes      | One of: `15 MINUTES`, `30 MINUTES`, `45 MINUTES`, `60 MINUTES`, `MORE THAN 60 MINUTES` |
   | mentorshipNotes      | string | Yes      | Non-empty text                                                                   |
-
+  
   ### Community Service
-
+  
   | Field               | Type   | Required | Constraints / Allowed Values                                                                                                                |
   |---------------------|--------|----------|---------------------------------------------------------------------------------------------------------------------------------------------|
   | serviceActivityType | string | Yes      | One of: `ENVIRONMENTAL SANITATION`, `TEACHING YOUNGER CHILDREN`, `CHURCH / COMMUNITY SUPPORT`, `HELPING ELDERLY PERSONS`, `SCHOOL VOLUNTEERING`, `OTHER` |
@@ -117,9 +117,9 @@ docs {
   | serviceDuration     | string | Yes      | One of: `30 MINS`, `1 HOUR`, `2 HOURS`, `3 HOURS`, `4 HOURS`, `5 HOURS`, `MORE THAN 5 HOURS`                                              |
   | serviceDescription  | string | Yes      | Non-empty text                                                                                                                              |
   | serviceSupervisor   | string | Yes      | Non-empty text                                                                                                                              |
-
+  
   ### Financial Summary
-
+  
   | Field            | Type   | Required | Constraints / Allowed Values   |
   |------------------|--------|----------|--------------------------------|
   | tuitionFeePaid   | number | Yes      | Numeric value                  |
@@ -127,20 +127,20 @@ docs {
   | sundriesSpent    | number | Yes      | Numeric value                  |
   | totalAmountSpent | number | Yes      | Numeric value                  |
   | financialNotes   | string | No       | Optional free text             |
-
+  
   ## File Uploads
-
+  
   | Field           | MIME Types Accepted | Required | Notes                                                                                   |
   |-----------------|---------------------|----------|-----------------------------------------------------------------------------------------|
   | termResult      | PDF, image          | **Yes**  | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/TERM-RESULTS` on Cloudinary            |
   | paymentEvidence | PDF, image          | No       | Uploaded to `/Cedarrise Initiative/TACOTS-ASSETS/PAYMENT-EVIDENCE` on Cloudinary        |
-
+  
   ## Response
-
+  
   **`201 Created`** — Returns the newly created TACOTS tracking record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                                           |
   |-----------------------------|-----------------------------------------------------------------------|
   | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |

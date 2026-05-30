@@ -1,7 +1,7 @@
 meta {
   name: Get TACOTS onboarding detail
   type: http
-  seq: 9
+  seq: 11
 }
 
 get {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get TACOTS Onboarding Detail
-
+  
   Retrieves the full detail of a single TACOTS onboarding record by its unique identifier. Returns all mental-health screening, physical-health, enrolled school, commitment, and file URL fields.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                            |
   |-----------|--------|----------|----------------------------------------|
   | id        | string | Yes      | UUID of the TACOTS onboarding record   |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete TACOTS onboarding record including all uploaded file URLs.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |

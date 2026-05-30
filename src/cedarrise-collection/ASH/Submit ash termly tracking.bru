@@ -11,8 +11,8 @@ post {
 }
 
 body:multipart-form {
-  studentId: 8d9d02ef-fd6d-4cc4-953c-147037e7b290
-  academicSession: 2025/2026
+  studentId: 9e23a69f-008d-4eea-8caf-03fdc7472221
+  academicSession: 2024/25
   term: TERM 1
   schoolName: Naim Academy
   schoolNumeracyScore: 75
@@ -35,7 +35,7 @@ body:multipart-form {
   challengesObserved: 
   nextTermRecommendations: 
   mentorName: Mr Ade
-  file: @file(C:\Users\Maxmillian\Documents\sample-result.pdf)
+  file: @file(C:\Users\Maxmillian\Pictures\WhatsApp Image 2026-04-24 at 9.50.21 AM.jpeg)
 }
 
 vars:pre-request {
@@ -49,89 +49,89 @@ settings {
 
 docs {
   # Submit ASH Termly Tracking
-
+  
   Submits a termly academic and behavioural tracking record for an ASH student. Accepts a multipart form that includes the student's school results, ASH pre/mid/post-test scores, behavioural ratings, and a file upload of the term result document.
-
+  
   On success, the tracking record is inserted into the database and cached. The endpoint returns the newly created record with a `201 Created` status.
-
+  
   ## Authorization
   Requires `create` permission.
-
+  
   ## Request Body (`multipart/form-data`)
-
+  
   ### Student & Session
-
+  
   | Field           | Type   | Required | Constraints / Allowed Values                          |
   |-----------------|--------|----------|-------------------------------------------------------|
   | studentId       | string | Yes      | Valid UUID referencing an existing ASH student record  |
   | academicSession | string | Yes      | Academic session format — e.g. `2025/2026`            |
   | term            | string | Yes      | One of: `TERM 1`, `TERM 2`, `TERM 3`                 |
   | schoolName      | string | Yes      | Non-empty text                                        |
-
+  
   ### School Performance
-
+  
   | Field               | Type   | Required | Constraints / Allowed Values |
   |---------------------|--------|----------|------------------------------|
   | schoolNumeracyScore | number | No       | Numeric score                |
   | schoolLiteracyScore | number | No       | Numeric score                |
   | schoolAverage       | number | No       | Numeric score                |
   | schoolPosition      | string | No       | Optional text (e.g. `3rd`)   |
-
+  
   ### Pre-test Scores
-
+  
   | Field                | Type   | Required | Constraints / Allowed Values |
   |----------------------|--------|----------|------------------------------|
   | pretestNumeracyScore | number | No       | Numeric score                |
   | pretestLiteracyScore | number | No       | Numeric score                |
   | pretestAverage       | number | No       | Numeric score                |
-
+  
   ### Mid-test Scores
-
+  
   | Field                | Type   | Required | Constraints / Allowed Values |
   |----------------------|--------|----------|------------------------------|
   | midtestNumeracyScore | number | No       | Numeric score                |
   | midtestLiteracyScore | number | No       | Numeric score                |
   | midtestAverage       | number | No       | Numeric score                |
-
+  
   ### Post-test Scores
-
+  
   | Field                 | Type   | Required | Constraints / Allowed Values |
   |-----------------------|--------|----------|------------------------------|
   | posttestNumeracyScore | number | No       | Numeric score                |
   | posttestLiteracyScore | number | No       | Numeric score                |
   | posttestAverage       | number | No       | Numeric score                |
-
+  
   ### Behavioural Ratings
-
+  
   | Field                    | Type   | Required | Constraints / Allowed Values |
   |--------------------------|--------|----------|------------------------------|
   | disciplineRating         | number | Yes      | Integer from `1` to `5`      |
   | responsibilityRating     | number | Yes      | Integer from `1` to `5`      |
   | leadershipRating         | number | Yes      | Integer from `1` to `5`      |
-
+  
   ### Observations
-
+  
   | Field                    | Type   | Required | Constraints / Allowed Values |
   |--------------------------|--------|----------|------------------------------|
   | notableAchievements      | string | No       | Optional free text           |
   | challengesObserved       | string | No       | Optional free text           |
   | nextTermRecommendations  | string | No       | Optional free text           |
   | mentorName               | string | Yes      | Non-empty text               |
-
+  
   ## File Upload
-
+  
   | Field | MIME Types Accepted | Required | Notes                                                                          |
   |-------|---------------------|----------|--------------------------------------------------------------------------------|
   | file  | PDF, image          | **Yes**  | Term result document. Uploaded to `/Cedarrise Initiative/ASH-ASSETS/TERMLY-RESULTS` on Cloudinary |
-
+  
   ## Response
-
+  
   **`201 Created`** — Returns the newly created ASH termly tracking record.
-
+  
   The created record is also cached under the key `cedarrise:ash:termlytracking:<id>` using the `FORM_DATA` TTL.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                                           |
   |-----------------------------|-----------------------------------------------------------------------|
   | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |

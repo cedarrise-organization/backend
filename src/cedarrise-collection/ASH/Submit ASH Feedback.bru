@@ -1,7 +1,7 @@
 meta {
   name: Submit ASH Feedback
   type: http
-  seq: 2
+  seq: 5
 }
 
 post {
@@ -48,18 +48,18 @@ settings {
 
 docs {
   # Submit ASH Program Feedback
-
+  
   Submits a combined student-and-parent feedback form for the ASH after-school programme. The form collects the student's self-reported experience alongside the parent/guardian's observations of the child's progress.
-
+  
   On success, the feedback record is stored in the database. The endpoint returns the newly created feedback object with a `201 Created` status.
-
+  
   ## Authorization
   No authentication is required for this endpoint (public form submission).
-
+  
   ## Request Body (`application/json`)
-
+  
   ### Student Section
-
+  
   | Field                          | Type    | Required | Constraints / Allowed Values                                                                                               |
   |--------------------------------|---------|----------|----------------------------------------------------------------------------------------------------------------------------|
   | studentFirstName               | string  | Yes      | Non-empty text                                                                                                             |
@@ -73,9 +73,9 @@ docs {
   | volunteerSupportRating         | number  | Yes      | Integer from `1` to `5`                                                                                                    |
   | studentEnjoyedMost             | string  | No       | Optional free text                                                                                                         |
   | studentImprovementSuggestions  | string  | No       | Optional free text                                                                                                         |
-
+  
   ### Parent / Guardian Section
-
+  
   | Field                        | Type    | Required | Constraints / Allowed Values                                                                                                    |
   |------------------------------|---------|----------|---------------------------------------------------------------------------------------------------------------------------------|
   | parentGuardianName           | string  | Yes      | Non-empty text                                                                                                                  |
@@ -89,13 +89,13 @@ docs {
   | programImpactOnChild         | string  | No       | Optional free text                                                                                                              |
   | parentImprovementSuggestions | string  | No       | Optional free text                                                                                                              |
   | additionalComments           | string  | No       | Optional free text                                                                                                              |
-
+  
   ## Response
-
+  
   **`201 Created`** — Returns the newly created ASH feedback record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                                           |
   |-----------------------------|-----------------------------------------------------------------------|
   | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |

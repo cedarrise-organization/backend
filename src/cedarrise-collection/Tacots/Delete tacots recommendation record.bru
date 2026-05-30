@@ -1,7 +1,7 @@
 meta {
   name: Delete TACOTS recommendation record
   type: http
-  seq: 19
+  seq: 4
 }
 
 delete {
@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 31aa62bd-73d7-4df0-858f-c9d0cf8601ff
+  id: 821bcd99-aa8a-404b-8da4-296f6d77da5f
   baseUrl: http://localhost:3000
 }
 
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Delete TACOTS Recommendation Record
-
+  
   Permanently deletes a single TACOTS recommendation record by its unique identifier. Associated Cloudinary assets (passport photo and last result) are also deleted. The corresponding cache entry is invalidated.
-
+  
   ## Authorization
   Requires `delete` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                                |
   |-----------|--------|----------|--------------------------------------------|
   | id        | string | Yes      | UUID of the TACOTS recommendation record   |
-
+  
   ## Response
-
+  
   **`200 OK`** — Confirms the recommendation record has been deleted.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |

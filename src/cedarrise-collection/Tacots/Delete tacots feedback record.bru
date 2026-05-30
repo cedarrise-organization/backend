@@ -1,7 +1,7 @@
 meta {
   name: Delete TACOTS feedback record
   type: http
-  seq: 20
+  seq: 8
 }
 
 delete {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Delete TACOTS Feedback Record
-
+  
   Permanently deletes a single TACOTS feedback record by its unique identifier. The corresponding cache entry is also invalidated.
-
+  
   ## Authorization
   Requires `delete` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                            |
   |-----------|--------|----------|----------------------------------------|
   | id        | string | Yes      | UUID of the TACOTS feedback record     |
-
+  
   ## Response
-
+  
   **`200 OK`** — Confirms the feedback record has been deleted.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |

@@ -118,7 +118,7 @@ export const volunteerRegistrationBody = z.object({
       .optional(),
   ),
   safeguardingAgreement: yesNoSchema,
-  mediaConsent: z.boolean().default(false),
+  mediaConsent: z.coerce.boolean().default(false),
   additionalInfo: optionalTextSchema,
   registrationDate: z.coerce.date(),
 });
