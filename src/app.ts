@@ -43,7 +43,8 @@ const corsOptions = {
   maxAge: 86400, // Cache preflight requests for 24 hours
 };
 
-app.use(express.json());
+app.use(express.json()); 
+// app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsOptions));

@@ -1,3 +1,4 @@
+import ejs from "ejs";
 import nodemailer from "nodemailer";
 import logger from "../configs/logger.config.js";
 
@@ -20,19 +21,19 @@ const transporter = nodemailer.createTransport({
 //   logger.info("Send Email Verification failed:", { err: err.message });
 // }
 
-export const sendEmail = async (
-  recipient: string,
-  subject: string,
-  textBody: string,
-  htmlBody?: string,
-) => {
+export const sendEmail = async (to: string, subject: string, content: string) => {
+  let html = await ejs.renderFile(
+    process.cwd()  + "/src/views/layout/template.ejs",
+    { subject, title: subject, content, logourl: process.env.LOGOURL!.toString() },
+    { async: true },
+  );
+
   try {
     const info = await transporter.sendMail({
       from: process.env.SMTP_USER_EMAIL, // sender address
-      to: recipient, // recipient address
-      subject, // subject line
-      text: textBody, // plain text body
-      html: htmlBody, // HTML body
+      to, // recipient address
+      subject,
+      html,
     });
 
     if (info.rejected.length > 0) {
@@ -48,17 +49,17 @@ export const sendEmail = async (
     switch (err.code) {
       case "ECONNECTION":
       case "ETIMEDOUT":
-        logger.error("Network error - retry later:", { err: err.message, recipient });
+        logger.error("Network error - retry later:", { err: err.message, recipient: to });
         // sendEmail(  recipient, subject, textBody, htmlBody)
         break;
       case "EAUTH":
-        logger.error("Authentication failed:", { err: err.message, recipient });
+        logger.error("Authentication failed:", { err: err.message, recipient: to });
         break;
       case "EENVELOPE":
-        logger.error("Invalid recipients:", { err: err.rejected, recipient });
+        logger.error("Invalid recipients:", { err: err.rejected, recipient: to });
         break;
       default:
-        logger.error("Error while sending mail:", { err: err.message, recipient });
+        logger.error("Error while sending mail:", { err: err.message, recipient: to });
     }
   }
 };
