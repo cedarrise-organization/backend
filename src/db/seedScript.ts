@@ -36,6 +36,7 @@ const clearTables = async () => {
     await db.delete(tacotsRecommendation);
     await db.delete(tacotsTracking);
     await db.delete(tacotsFeedback);
+    await db.execute(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
   } catch {
     console.log("Could not delete all tables");
   }
