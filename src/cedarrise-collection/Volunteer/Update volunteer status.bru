@@ -5,7 +5,7 @@ meta {
 }
 
 patch {
-  url: {{baseUrl}}/api/v1/volunteer/{{id}}/status?status=accepted
+  url: {{baseUrl}}/api/v1/forms/volunteer/{{id}}/status?status=accepted
   body: none
   auth: inherit
 }
@@ -22,4 +22,38 @@ vars:pre-request {
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  # Update Volunteer Status
+
+  Updates the review status of a volunteer registration record. Used to accept, reject, or reset a volunteer application to pending. On status change, all related cache entries (single record and paginated lists) are invalidated.
+
+  ## Authorization
+  Requires `update` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                                |
+  |-----------|--------|----------|--------------------------------------------|
+  | id        | string | Yes      | UUID of the volunteer registration record  |
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default   | Description / Allowed Values                  |
+  |-----------|--------|----------|-----------|-----------------------------------------------|
+  | status    | string | No       | `pending` | One of: `accepted`, `rejected`, `pending`     |
+
+  ## Response
+
+  **`200 OK`** — Returns the updated volunteer record with `id` and `status` fields.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format or unknown `status` value.          |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                |
+  | `403 Forbidden`             | User does not have `update` permission.                 |
+  | `500 Internal Server Error` | Unexpected server error.                                |
 }

@@ -23,3 +23,37 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # Update TACOTS Recommended Student Status
+
+  Updates the admin selection status of a TACOTS recommendation record. Used to mark a recommended student as selected, not selected, or keep in view. On status change, all related cache entries (single record and paginated lists) are invalidated.
+
+  ## Authorization
+  Requires `update` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                                |
+  |-----------|--------|----------|--------------------------------------------|
+  | id        | string | Yes      | UUID of the TACOTS recommendation record   |
+
+  ## Query Parameters
+
+  | Parameter | Type   | Required | Default        | Description / Allowed Values                          |
+  |-----------|--------|----------|----------------|-------------------------------------------------------|
+  | status    | string | No       | `KEEP IN VIEW` | One of: `NOT SELECTED`, `KEEP IN VIEW`, `SELECTED`    |
+
+  ## Response
+
+  **`200 OK`** — Returns the updated recommendation record with `id` and `adminStatus` fields.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format or unknown `status` value.          |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                |
+  | `403 Forbidden`             | User does not have `update` permission.                 |
+  | `500 Internal Server Error` | Unexpected server error.                                |
+}

@@ -5,13 +5,15 @@ meta {
 }
 
 patch {
-  url: {{baseUrl}}/api/v1/forms/ash/registration/{{id}}/status?status=pending
-  body: none
+  url: {{baseUrl}}/api/v1/forms/ash/registration/{{id}}/assign-mentor
+  body: json
   auth: inherit
 }
 
-params:query {
-  status: pending
+body:json {
+  {
+    "mentor": "Mr. Johnson"
+  }
 }
 
 vars:pre-request {
@@ -22,4 +24,38 @@ vars:pre-request {
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  # Assign Mentor to ASH Student
+
+  Assigns a mentor to an ASH student record. On success, all related cache entries (single record and paginated lists) are invalidated.
+
+  ## Authorization
+  Requires `update` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type   | Required | Description                          |
+  |-----------|--------|----------|--------------------------------------|
+  | id        | string | Yes      | UUID of the ASH student record       |
+
+  ## Request Body (`application/json`)
+
+  | Field  | Type   | Required | Constraints / Allowed Values        |
+  |--------|--------|----------|-------------------------------------|
+  | mentor | string | Yes      | Mentor's name (minimum 3 characters)|
+
+  ## Response
+
+  **`200 OK`** — Returns the updated student record with `id`, `status`, and `assignedMentor` fields.
+
+  ## Errors
+
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format or `mentor` too short.              |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                |
+  | `403 Forbidden`             | User does not have `update` permission.                 |
+  | `500 Internal Server Error` | Unexpected server error.                                |
 }
