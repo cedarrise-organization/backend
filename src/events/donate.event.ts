@@ -1,8 +1,11 @@
-import logger from "../configs/logger.config.js";
-import { appEvents } from "../lib/events.js";
+import { sendEmail } from "../utils/sendEmail.util.js";
 import { donors } from "../db/models/donors.js";
-import db from "../db/db.js";
+import { appEvents } from "../lib/events.js";
 import { sql } from "drizzle-orm";
+import logger from "../configs/logger.config.js";
+import db from "../db/db.js";
+import ejs from "ejs";
+
 
 // DEFINE EVENT NAMES AS CONSTANTS
 export const DONATE_EVENTS = {
@@ -10,6 +13,7 @@ export const DONATE_EVENTS = {
   DONATION_FAILED: "donation:failed",
 } as const;
 
+// CREATE NEW DONOR
 appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
   try {
     await db.insert(donors).values({
@@ -24,10 +28,34 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       email: data.email,
       // correlationId
     });
-
-    //could send email thanking them for their donation
   } catch (err) {
     logger.info("Failed to create Donation record", {
+      email: data.email,
+      // correlationId
+    });
+  }
+});
+
+// SEND THANK YOU EMAIL TO DONOR
+appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
+  let content = await ejs.renderFile(
+    process.cwd() + "/src/views/emails/donation.ejs",
+    { donorName: data.name },
+    { async: true },
+  );
+  try {
+    const info = await sendEmail(data.email, "Thank You For Your Donation", content);
+
+    if (!info) {
+      throw new Error
+    }
+
+    logger.info("Thank you email sent successully", {
+      info: info.accepted,
+      // correlationId
+    });
+  } catch (error) {
+    logger.info("Failed to send Donation email", {
       email: data.email,
       // correlationId
     });

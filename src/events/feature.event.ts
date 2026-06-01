@@ -1,4 +1,6 @@
 import logger from "../configs/logger.config.js";
+import ejs from "ejs";
+import { sendEmail } from "../utils/sendEmail.util.js";
 import { appEvents } from "../lib/events.js";
 
 // DEFINE EVENT NAMES AS CONSTANTS
@@ -6,15 +8,39 @@ export const FEATURE_EVENTS = {
   FEATURE_ACTION: "feature:action",
   /**
    * ..other event names
-  */
+   */
 } as const;
-
-
 
 appEvents.on(FEATURE_EVENTS.FEATURE_ACTION, async (data) => {
   try {
     logger.info("success", { data });
   } catch (err) {
     logger.error("failure", { data });
+  }
+});
+
+// SEND EMAIL
+appEvents.on(FEATURE_EVENTS.FEATURE_ACTION, async (data) => {
+  let content = await ejs.renderFile(
+    process.cwd() + "/src/views/emails/----.ejs",
+    { },
+    { async: true },
+  );
+  try {
+    const info = await sendEmail(data.email, "", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("email sent successully", {
+      info: info.accepted,
+      // correlationId
+    });
+  } catch (error) {
+    logger.info("Failed to send email", {
+      email: data.email,
+      // correlationId
+    });
   }
 });

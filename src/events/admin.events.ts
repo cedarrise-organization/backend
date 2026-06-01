@@ -1,12 +1,17 @@
 import logger from "../configs/logger.config.js";
+import db from "../db/db.js";
+import ejs from "ejs";
+import { sendEmail } from "../utils/sendEmail.util.js";
 import { appEvents } from "../lib/events.js";
+import { users } from "../db/models/auth.js";
 import { cacheDel } from "../lib/cache.js";
+import { eq } from "drizzle-orm";
 
 export const ADMIN_EVENTS = {
   ASSIGN_ROLE: "admin:role-assigned",
   REVOKE_ROLE: "admin:role-revoked",
   CREATE_USER: "admin:create-user",
-  DELETE_USER: "admin:delete-user"
+  DELETE_USER: "admin:delete-user",
 } as const;
 
 // LOG ASSIGNED ROLE
@@ -32,6 +37,41 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
       err,
       user: data.userId,
       // correlationId: data.correlationId
+    });
+  }
+});
+
+// INFORM USER OF NEW ROLE ASSIGNED
+appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
+  const [user] = await db
+    .select({ name: users.name, email: users.email })
+    .from(users)
+    .where(eq(users.id, data.userId));
+
+  if (!user) {
+    throw new Error();
+  }
+
+  let content = await ejs.renderFile(
+    process.cwd() + "/src/views/emails/rolechange.ejs",
+    { name: user.name, role: data.role, email: user.email },
+    { async: true },
+  );
+  try {
+    const info = await sendEmail(user.email, "You've been assigned a new Role!", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("Role assignment email sent successully", {
+      info: info.accepted,
+      // correlationId
+    });
+  } catch (error) {
+    logger.info("Failed to send Role assignment email", {
+      email: data.email,
+      // correlationId
     });
   }
 });
@@ -70,6 +110,38 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
     userId: data.userId,
     // correlationId: data.correlationId
   });
+});
+
+// SEND CREDENTIALS TO NEW USER
+appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
+  let content = await ejs.renderFile(
+    process.cwd() + "/src/views/emails/welcome.ejs",
+    {
+      name: data.name,
+      role: data.role,
+      email: data.email,
+      password: data.password,
+      department: data.department,
+    },
+    { async: true },
+  );
+  try {
+    const info = await sendEmail(data.email, "Welcome to the Cedarrise Team", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("Welcome email sent successully", {
+      info: info.accepted,
+      // correlationId
+    });
+  } catch (error) {
+    logger.info("Failed to send welcome email", {
+      email: data.email,
+      // correlationId
+    });
+  }
 });
 
 // LOG DELETED USER

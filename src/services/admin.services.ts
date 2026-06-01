@@ -69,7 +69,9 @@ export const roleAction = async (userId: string, options: any) => {
       userId: userId,
       roleId: role_.id,
     })
-    .returning();
+    .returning()
+    .onConflictDoNothing();
+
 
   appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, userId });
 
@@ -113,7 +115,14 @@ export const createUser = async (options: {
     throw new Error("User could not be created");
   }
 
-  appEvents.emit(ADMIN_EVENTS.CREATE_USER, { userId: newUser.id, name: newUser.name });
+  appEvents.emit(ADMIN_EVENTS.CREATE_USER, {
+    userId: newUser.id,
+    name: newUser.name,
+    role: "volunteer",
+    department,
+    email: newUser.email,
+    password,
+  });
 
   const [role_] = await db.select({ id: roles.id }).from(roles).where(eq(roles.isDefault, true));
 
@@ -129,7 +138,7 @@ export const createUser = async (options: {
     })
     .returning();
 
-  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: "volunteer", user: newUser.id });
+  // appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: "volunteer", user: newUser.id });
 
   return {
     code: 200,
@@ -139,7 +148,9 @@ export const createUser = async (options: {
 };
 
 export const listAllUsers = async () => {
-  const allUsers = await db.select({ id: users.id, name: users.name, email: users.email }).from(users);
+  const allUsers = await db
+    .select({ id: users.id, name: users.name, email: users.email })
+    .from(users);
 
   return {
     code: 200,
@@ -150,15 +161,15 @@ export const listAllUsers = async () => {
 
 export const deleteUser = async (userId: string) => {
   const [oldUser] = await db.delete(users).where(eq(users.id, userId)).returning();
-   
-  if(!oldUser){
-    throw new Error("Could not delete user")
+
+  if (!oldUser) {
+    throw new Error("Could not delete user");
   }
-  
+
   appEvents.emit(ADMIN_EVENTS.DELETE_USER, {
-    deletedUser: oldUser.id
-  })
-  
+    deletedUser: oldUser.id,
+  });
+
   return {
     code: 200,
     message: "User deleted",
