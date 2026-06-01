@@ -236,7 +236,31 @@ export const updateAshStudentStatus = async (id: string, status: string) => {
     data: updatedStudent,
   };
 };
-export const assignAshMentor = async (page: number, limit: number, id: string) => {};
+export const assignAshMentor = async (id: string , mentor: string) => {
+   // update
+  const [updatedStudent] = await db
+    .update(ashStudent)
+    .set({
+      assignedMentor: mentor,
+    })
+    .where(eq(ashStudent.id, id))
+    .returning({
+      id: ashStudent.id,
+      status: ashStudent.status,
+      assignedMentor: ashStudent.assignedMentor
+    });
+
+  // delete all related cache
+  await invalidateCache(`cedarrise:ash:ashStudent:${id}`, `cedarrise:ash:ashStudents:*`);
+
+  // emitter to send email on notifying mentor and mentee
+
+  return {
+    code: 200,
+    message: "Mentor assigned to Ash student successfully",
+    data: updatedStudent,
+  };
+};
 export const deleteRegistration = async (id: string) => {
   const [data] = await db
     .select({

@@ -117,7 +117,6 @@ export const submitRegistrationController = async (
     next(err);
   }
 };
-
 export const listRegistrationsController = async (
   req: Request,
   res: Response,
@@ -131,7 +130,6 @@ export const listRegistrationsController = async (
     next(error);
   }
 };
-
 export const getRegistrationController = async (
   req: Request,
   res: Response,
@@ -164,9 +162,11 @@ export const assignAshMentorController = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const id = (req as any).params.id.toString();
+  const { mentor } = req.body;
   try {
-    // const response = await example();
-    // return successResponse(res, response.code, response.message, response.data)
+    const response = await assignAshMentor(id, mentor);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }

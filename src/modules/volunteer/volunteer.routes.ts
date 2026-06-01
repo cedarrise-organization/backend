@@ -49,9 +49,13 @@ router.get(
   getVolunteerController,
 );
 // Accept/reject volunteer
-router.patch("/:id/status", authenticate(), authorize("update"), validateRequest(updateVolunteerStatusSchema), updateVolunteerStatusController);
-// Assign student(s) to volunteer
-router.patch("/:id/assign", authenticate(), authorize("update"));
+router.patch(
+  "/:id/status",
+  authenticate(),
+  authorize("update"),
+  validateRequest(updateVolunteerStatusSchema),
+  updateVolunteerStatusController,
+);
 // Delete volunteer record
 router.delete(
   "/:id",

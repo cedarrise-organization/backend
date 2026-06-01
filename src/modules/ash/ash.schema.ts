@@ -159,6 +159,15 @@ export const updateAshStudentStatusSchema = z.object({
     id: z.uuid("Invalid ID"),
   }),
 });
+
+export const updateAshStudentMentorSchema = z.object({
+  body: z.object({
+    mentor: z.string("Must include a mentor's name").min(3),
+  }),
+  params: z.object({
+    id: z.uuid("Invalid ID"),
+  }),
+});
 //
 
 // ASH FEEDBACK

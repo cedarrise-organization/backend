@@ -8,6 +8,7 @@ import {
   ashStudentQuerySchema,
   ashStudentParamsSchema,
   updateAshStudentStatusSchema,
+  updateAshStudentMentorSchema,
   createAshProgramFeedbackSchema,
   ashProgramFeedbackQuerySchema,
   ashProgramFeedbackParamsSchema,
@@ -88,6 +89,7 @@ router.patch(
   "/registration/:id/assign-mentor",
   authenticate(),
   authorize("update"),
+  validateRequest(updateAshStudentMentorSchema),
   assignAshMentorController,
 );
 // Delete registration record

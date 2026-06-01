@@ -5,13 +5,13 @@ meta {
 }
 
 patch {
-  url: {{baseUrl}}/api/v1/forms/tacots/recommendation/{{id}}/status?status=pending
+  url: {{baseUrl}}/api/v1/forms/tacots/recommendation/{{id}}/status?status=NOT SELECTED
   body: none
   auth: inherit
 }
 
 params:query {
-  status: pending
+  status: NOT SELECTED
 }
 
 vars:pre-request {
