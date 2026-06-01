@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import { sendEmail } from "../../../utils/sendEmail.util.js";
-import logger from "../../../configs/logger.config.js";
 import { successResponse } from "../../../utils/responseHandler.js";
+import { sendEmail } from "../../../utils/sendEmail.util.js";
+import { Request, Response, NextFunction } from "express";
+import logger from "../../../configs/logger.config.js";
+import ejs from "ejs";
 
 export const sendFeedbackMailController = async (
   req: Request,
@@ -9,12 +10,17 @@ export const sendFeedbackMailController = async (
   next: NextFunction,
 ) => {
   const { email, feedback } = req.body;
+  let content = await ejs.renderFile(
+    process.cwd() + "/src/views/emails/feedback.ejs",
+    { feedback },
+    { async: true },
+  );
 
   try {
     const info = await sendEmail(
       process.env.SMTP_USER_EMAIL!,
       `Feedback submitted by ${email}`,
-      feedback,
+      content,
     );
 
     if (!info) {
@@ -29,7 +35,7 @@ export const sendFeedbackMailController = async (
 
     logger.info("Feedback email sent successully", {
       sender: email,
-      info,
+      info: info.accepted,
       // correlationId
     });
 
