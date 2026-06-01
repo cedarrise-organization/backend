@@ -1,7 +1,7 @@
 meta {
   name: Submit Volunteer Feedback
   type: http
-  seq: 2
+  seq: 6
 }
 
 post {
@@ -47,57 +47,57 @@ settings {
 
 docs {
   # Submit Volunteer Feedback
-
+  
   Submits an end-of-cycle feedback form from a volunteer. The form collects the volunteer's overall experience rating, programme impact assessment, activities participated in, skills gained, and suggestions for improvement.
-
+  
   On success, the feedback record is stored in the database and the endpoint returns the newly created object with a `201 Created` status.
-
+  
   ## Authorization
   No authentication is required for this endpoint (public form submission).
-
+  
   ## Request Body (`application/json`)
-
+  
   ### Volunteer Identity
-
+  
   | Field     | Type   | Required | Constraints / Allowed Values |
   |-----------|--------|----------|------------------------------|
   | firstName | string | Yes      | Non-empty text               |
   | surname   | string | Yes      | Non-empty text               |
-
+  
   ### Programme Details
-
+  
   | Field                   | Type   | Required | Constraints / Allowed Values                                                                                  |
   |-------------------------|--------|----------|---------------------------------------------------------------------------------------------------------------|
   | programVolunteered      | string | Yes      | One of: `ASH`, `TACOTS SCHOLARSHIP`, `CAPACITY BUILDING`, `CEDAR OUTREACHES`                                 |
   | specificProgramDetails  | string | No       | Optional free text                                                                                            |
   | volunteerDuration       | string | No       | One of: `< 3 MONTHS`, `3-6 MONTHS`, `6 MONTHS-1 YEAR`, `> 1 YEAR` (optional)                                |
-
+  
   ### Experience Ratings
-
+  
   | Field                    | Type   | Required | Constraints / Allowed Values  |
   |--------------------------|--------|----------|-------------------------------|
   | overallExperienceRating  | number | Yes      | Integer from `1` to `5`       |
   | roleClarityRating        | number | Yes      | Integer from `1` to `5`       |
   | teamSupportRating        | number | Yes      | Integer from `1` to `5`       |
   | organizationRating       | number | Yes      | Integer from `1` to `5`       |
-
+  
   ### Programme Impact
-
+  
   | Field               | Type   | Required | Constraints / Allowed Values                                                                                               |
   |---------------------|--------|----------|----------------------------------------------------------------------------------------------------------------------------|
   | programMadeImpact   | string | No       | One of: `YES - VERY STRONG`, `YES - SOME`, `NOT SURE`, `NO` (optional)                                                    |
   | waysProgramHelped   | array  | No       | Array of: `IMPROVED ACADEMIC SUPPORT`, `STUDENT CONFIDENCE`, `MENTORSHIP`, `SKILLS DEVELOPMENT`, `UNDERSERVED COMMUNITIES` (optional) |
   | activitiesInvolvedIn | array | No       | Array of: `TEACHING / TUTORING`, `MENTORING`, `EXTRACURRICULAR`, `COMMUNITY OUTREACH`, `EVENT SUPPORT`, `COORDINATION`, `TRAINING`, `OTHER` (optional) |
-
+  
   ### Skills & Personal Growth
-
+  
   | Field           | Type   | Required | Constraints / Allowed Values                                                                                                   |
   |-----------------|--------|----------|--------------------------------------------------------------------------------------------------------------------------------|
   | skillsDeveloped | string | No       | One of: `YES`, `SOMEWHAT`, `NO` (optional)                                                                                     |
   | skillsGained    | array  | No       | Array of: `TEACHING`, `COMMUNICATION`, `LEADERSHIP`, `MENTORSHIP`, `TEAMWORK`, `COMMUNITY ENGAGEMENT`, `FACILITATION` (optional) |
-
+  
   ### Open Feedback
-
+  
   | Field                     | Type   | Required | Constraints / Allowed Values         |
   |---------------------------|--------|----------|--------------------------------------|
   | enjoyedMost               | string | No       | Optional free text                   |
@@ -107,13 +107,13 @@ docs {
   | wouldRecommend            | string | No       | One of: `YES`, `MAYBE`, `NO` (optional) |
   | additionalComments        | string | No       | Optional free text                   |
   | submissionDate            | date   | Yes      | ISO date string — `YYYY-MM-DD` format |
-
+  
   ## Response
-
+  
   **`201 Created`** — Returns the newly created volunteer feedback record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                                         |
   |-----------------------------|---------------------------------------------------------------------|
   | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values. |

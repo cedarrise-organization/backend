@@ -7,6 +7,7 @@ import {
   createTacotsRecommendationSchema,
   tacotsRecommendationQuerySchema,
   tacotsRecommendationParamsSchema,
+  updateTacotsRecommendationStatusSchema,
   createTacotsFeedbackSchema,
   tacotsFeedbackQuerySchema,
   tacotsFeedbackParamsSchema,
@@ -24,6 +25,7 @@ import {
   submitRecommendationController,
   listRecommendationsController,
   getRecommendationController,
+  updateRecommendedStudentStatusController,
   deleteRecommendationController,
   submitFeedbackController,
   listFeedbackController,
@@ -71,6 +73,14 @@ router.get(
   validateRequest(tacotsRecommendationParamsSchema),
   getRecommendationController,
 );
+// Update status (KEEP IN VIEW/SELECTED/NOT SELECTED)
+router.patch(
+  "/recommendation/:id/status",
+  authenticate(),
+  authorize("update"),
+  validateRequest(updateTacotsRecommendationStatusSchema),
+  updateRecommendedStudentStatusController,
+);
 // Delete recommendation record
 router.delete(
   "/recommendation/:id",
@@ -110,7 +120,7 @@ router.delete(
 // Create onboarding record post-shortlisting
 router.post(
   "/onboarding",
-    upload.fields([
+  upload.fields([
     { name: "parentSignature", maxCount: 1 },
     { name: "admissionLetter", maxCount: 1 },
   ]),

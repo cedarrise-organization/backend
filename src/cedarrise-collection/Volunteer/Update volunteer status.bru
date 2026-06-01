@@ -1,0 +1,25 @@
+meta {
+  name: Update volunteer status
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/volunteer/{{id}}/status?status=accepted
+  body: none
+  auth: inherit
+}
+
+params:query {
+  status: accepted
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  id: ba98f36a-7258-47aa-a128-fa7f781b074e
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

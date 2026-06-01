@@ -1,7 +1,7 @@
 meta {
   name: List ASH exit records
   type: http
-  seq: 18
+  seq: 19
 }
 
 get {
@@ -26,23 +26,23 @@ settings {
 
 docs {
   # List ASH Exit Records
-
+  
   Returns a paginated list of ASH exit records, ordered by creation date.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Query Parameters
-
+  
   | Parameter | Type   | Required | Default | Description                     |
   |-----------|--------|----------|---------|---------------------------------|
   | page      | number | No       | `1`     | Page number (integer ≥ 1)       |
   | limit     | number | No       | `25`    | Items per page (integer, 1–100) |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns a paginated array of ASH exit records.
-
+  
   ```json
   {
     "success": true,
@@ -55,9 +55,9 @@ docs {
     }
   }
   ```
-
+  
   ## Errors
-
+  
   | Status                      | Description                                         |
   |-----------------------------|-----------------------------------------------------|
   | `400 Bad Request`           | Invalid query parameters (e.g. non-numeric `page`). |

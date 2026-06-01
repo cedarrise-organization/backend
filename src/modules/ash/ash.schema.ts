@@ -16,7 +16,7 @@ import {
   academicSessionSchema,
   rating1To10Schema,
   rating1To5Schema,
-  singleResultFileSchema
+  singleResultFileSchema,
 } from "../../db/globalschema/global.schema.js";
 
 export const ashTermSchema = z.enum(["TERM 1", "TERM 2", "TERM 3"]);
@@ -148,6 +148,15 @@ export const ashStudentQuerySchema = z.object({
         ])
         .default("createdAt"),
     ),
+  }),
+});
+
+export const updateAshStudentStatusSchema = z.object({
+  query: z.object({
+    status: statusSchema,
+  }),
+  params: z.object({
+    id: z.uuid("Invalid ID"),
   }),
 });
 //
@@ -296,7 +305,7 @@ export type AshtermlytrackingbodyType = z.infer<typeof ashTermlyTrackingBody>;
 
 export const createAshTermlyTrackingSchema = z.object({
   body: ashTermlyTrackingBody,
-  file:  singleResultFileSchema,
+  file: singleResultFileSchema,
 });
 
 export const updateAshTermlyTrackingSchema = z.object({

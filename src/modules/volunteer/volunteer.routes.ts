@@ -6,6 +6,7 @@ import {
   submitVolunteerRegistrationController,
   listVolunteersController,
   getVolunteerController,
+  updateVolunteerStatusController,
   deleteVolunteerController,
   submitVolunteerFeedbackController,
   listVolunteerFeedbackController,
@@ -16,6 +17,7 @@ import {
   createVolunteerRegistrationSchema,
   volunteerRegistrationQuerySchema,
   volunteerRegistrationParamsSchema,
+  updateVolunteerStatusSchema,
   createVolunteerFeedbackSchema,
   volunteerFeedbackParamsSchema,
   volunteerFeedbackQuerySchema,
@@ -30,7 +32,6 @@ router.post(
   validateRequest(createVolunteerRegistrationSchema),
   submitVolunteerRegistrationController,
 );
-
 // List volunteers (default filter: status=pending)
 router.get(
   "/",
@@ -39,7 +40,6 @@ router.get(
   validateRequest(volunteerRegistrationQuerySchema),
   listVolunteersController,
 );
-
 // Get Full volunteer detail
 router.get(
   "/:id",
@@ -48,7 +48,10 @@ router.get(
   validateRequest(volunteerRegistrationParamsSchema),
   getVolunteerController,
 );
-
+// Accept/reject volunteer
+router.patch("/:id/status", authenticate(), authorize("update"), validateRequest(updateVolunteerStatusSchema), updateVolunteerStatusController);
+// Assign student(s) to volunteer
+router.patch("/:id/assign", authenticate(), authorize("update"));
 // Delete volunteer record
 router.delete(
   "/:id",
@@ -64,7 +67,6 @@ router.post(
   validateRequest(createVolunteerFeedbackSchema),
   submitVolunteerFeedbackController,
 );
-
 // List volunteer feedback submissions
 router.get(
   "/all/feedback",
@@ -73,7 +75,6 @@ router.get(
   validateRequest(volunteerFeedbackQuerySchema),
   listVolunteerFeedbackController,
 );
-
 // Get single volunteer feedback submission
 router.get(
   "/feedback/:id",
@@ -82,7 +83,6 @@ router.get(
   validateRequest(volunteerFeedbackParamsSchema),
   getVolunteerFeedbackController,
 );
-
 // Delete volunteer detail
 router.delete(
   "/feedback/:id",

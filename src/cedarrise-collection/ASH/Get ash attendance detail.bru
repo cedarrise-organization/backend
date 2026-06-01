@@ -1,7 +1,7 @@
 meta {
   name: Get ASH attendance detail
   type: http
-  seq: 15
+  seq: 16
 }
 
 get {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get ASH Attendance Detail
-
+  
   Retrieves the full detail of a single ASH weekly attendance record by its unique identifier.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                              |
   |-----------|--------|----------|------------------------------------------|
   | id        | string | Yes      | UUID of the weekly attendance record     |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete ASH weekly attendance record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                        |
   |-----------------------------|----------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).        |

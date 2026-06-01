@@ -1,4 +1,5 @@
-import { uploadToCloudinary, deleteFromCloudinary } from "../utils/storage.util.js";
+import { invalidateCache } from "../utils/cache.util.js";
+import { uploadToCloudinary } from "../utils/storage.util.js";
 import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
 import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { UploadApiResponse } from "cloudinary";
@@ -122,7 +123,6 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
     data: newAshStudent,
   };
 };
-
 export const listRegistrations = async (
   page: number,
   limit: number,
@@ -180,7 +180,6 @@ export const listRegistrations = async (
     },
   };
 };
-
 export const getRegistration = async (id: string) => {
   /// cache
   const key = `cedarrise:ash:ashStudent:${id}`;
@@ -206,7 +205,38 @@ export const getRegistration = async (id: string) => {
     data: ashstudent,
   };
 };
+export const updateAshStudentStatus = async (id: string, status: string) => {
+  // update
+  const [updatedStudent] = await db
+    .update(ashStudent)
+    .set({
+      status,
+    })
+    .where(eq(ashStudent.id, id))
+    .returning({
+      id: ashStudent.id,
+      status: ashStudent.status,
+    });
 
+  // delete all related cache
+  await invalidateCache(`cedarrise:ash:ashStudent:${id}`, `cedarrise:ash:ashStudents:*`);
+
+  // emitter to send email on accept or reject
+  if (status === "accepted") {
+    // emitter
+    console.log("accepted");
+  } else if (status === "rejected") {
+    // emitter
+    console.log("rejected");
+  }
+
+  return {
+    code: 200,
+    message: "Ash student status updated successfully",
+    data: updatedStudent,
+  };
+};
+export const assignAshMentor = async (page: number, limit: number, id: string) => {};
 export const deleteRegistration = async (id: string) => {
   const [data] = await db
     .select({
@@ -780,3 +810,5 @@ export const deleteExit = async (id: string) => {
     message: "Ash exit data deleted successfully",
   };
 };
+
+export const example = async (page: number, limit: number, id: string) => {};

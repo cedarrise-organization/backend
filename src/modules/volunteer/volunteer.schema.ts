@@ -157,6 +157,15 @@ export const volunteerRegistrationQuerySchema = z.object({
   }),
 });
 
+export const updateVolunteerStatusSchema = z.object({
+  query: z.object({
+    status: statusSchema,
+  }),
+  params: z.object({
+    id: z.uuid("Invalid ID"),
+  }),
+});
+
 // FEEDBACK
 export const volunteerFeedbackBody = z.object({
   firstName: textSchema,

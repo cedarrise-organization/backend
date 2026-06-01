@@ -1,0 +1,25 @@
+meta {
+  name: Update ASH student status
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/forms/ash/registration/{{id}}/status?status=pending
+  body: none
+  auth: inherit
+}
+
+params:query {
+  status: pending
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  id: 9e23a69f-008d-4eea-8caf-03fdc7472221
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

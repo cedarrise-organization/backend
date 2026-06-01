@@ -197,6 +197,14 @@ export const updateTacotsRecommendationSchema = z.object({
     .optional(),
 });
 
+export const updateTacotsRecommendationStatusSchema = z.object({
+  query: z.object({
+    status: adminStatusSchema,
+  }),
+  params: z.object({
+    id: z.uuid("Invalid ID"),
+  }),
+});
 export const tacotsRecommendationParamsSchema = idSchema;
 
 export const tacotsRecommendationQuerySchema = z.object({

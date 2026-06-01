@@ -6,6 +6,7 @@ import {
   submitRecommendation,
   listRecommendations,
   getRecommendation,
+  updateRecommendedStudentStatus,
   deleteRecommendation,
   submitTacotsFeedback,
   listTacotsFeedback,
@@ -184,6 +185,22 @@ export const getRecommendationController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await getRecommendation(id);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateRecommendedStudentStatusController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  const { status } = req.qtransformed;
+
+  try {
+    const response = await updateRecommendedStudentStatus(id, status);
     return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);

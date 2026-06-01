@@ -1,7 +1,6 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
 import { successResponse } from "../../utils/responseHandler.js";
-import { ValidationError } from "../../lib/error.js";
 import {
   submitVolunteerRegistration,
   listVolunteers,
@@ -11,6 +10,7 @@ import {
   listVolunteerFeedback,
   getVolunteerFeedback,
   deleteVolunteerFeedback,
+  updateVolunteerStatus,
 } from "../../services/volunteer.services.js";
 
 export const submitVolunteerRegistrationController = async (
@@ -102,6 +102,22 @@ export const getVolunteerController = async (req: Request, res: Response, next: 
   }
 };
 
+export const updateVolunteerStatusController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  const { status } = req.qtransformed;
+
+  try {
+    const response = await updateVolunteerStatus(id, status);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteVolunteerController = async (
   req: Request,
   res: Response,
@@ -110,7 +126,7 @@ export const deleteVolunteerController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteVolunteer(id);
-    return successResponse(res, response.code, response.message)
+    return successResponse(res, response.code, response.message);
   } catch (error) {
     next(error);
   }
@@ -210,7 +226,7 @@ export const deleteVolunteerFeedbackController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteVolunteerFeedback(id);
-    return successResponse(res, response.code, response.message)
+    return successResponse(res, response.code, response.message);
   } catch (error) {
     next(error);
   }

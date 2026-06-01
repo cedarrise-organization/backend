@@ -1,0 +1,25 @@
+meta {
+  name: Update TACOTS recommended student status
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/forms/tacots/recommendation/{{id}}/status?status=pending
+  body: none
+  auth: inherit
+}
+
+params:query {
+  status: pending
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  id: 8725ba3f-680f-42c6-b2d6-f1bf0021e823
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

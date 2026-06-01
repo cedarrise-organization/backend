@@ -1,7 +1,7 @@
 meta {
   name: Get ASH exit detail
   type: http
-  seq: 19
+  seq: 20
 }
 
 get {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get ASH Exit Detail
-
+  
   Retrieves the full detail of a single ASH exit record by its unique identifier.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                |
   |-----------|--------|----------|----------------------------|
   | id        | string | Yes      | UUID of the exit record    |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete ASH exit record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                 |
   |-----------------------------|---------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID). |

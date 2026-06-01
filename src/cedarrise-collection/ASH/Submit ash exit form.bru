@@ -1,7 +1,7 @@
 meta {
   name: Submit ASH exit form
   type: http
-  seq: 17
+  seq: 18
 }
 
 post {
@@ -45,18 +45,18 @@ settings {
 
 docs {
   # Submit ASH Exit Form
-
+  
   Records a student's exit from the ASH programme. Captures the reason for leaving, academic impact assessment, mentorship evaluation, post-ASH plans, and overall programme feedback.
-
+  
   On success, the exit record is inserted into the database and cached. Returns a `201 Created` status.
-
+  
   ## Authorization
   Requires `create` permission.
-
+  
   ## Request Body (`application/json`)
-
+  
   ### Student & Exit Details
-
+  
   | Field              | Type   | Required | Constraints / Allowed Values                                                                                                                      |
   |--------------------|--------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------|
   | studentId          | string | Yes      | Valid UUID referencing an existing ASH student record                                                                                              |
@@ -66,47 +66,47 @@ docs {
   | durationInProgram  | string | Yes      | One of: `LESS THAN 6 MONTHS`, `6 MONTHS-1 YEAR`, `1 YEAR`–`12 YEARS`                                                                            |
   | exitReason         | string | Yes      | One of: `COMPLETED`, `GRADUATED`, `MOVED`, `PERSONAL / FAMILY`, `COULD NOT ATTEND`, `DROPPED OUT`, `OTHER`                                      |
   | exitDate           | date   | Yes      | ISO date string — format `YYYY-MM-DD`                                                                                                             |
-
+  
   ### Academic Impact
-
+  
   | Field                | Type   | Required | Constraints / Allowed Values                                                                          |
   |----------------------|--------|----------|-------------------------------------------------------------------------------------------------------|
   | academicImpactRating | number | Yes      | Integer from `1` to `10`                                                                              |
   | areasOfImprovement   | array  | No       | Array of: `LITERACY`, `NUMERACY`, `VOCATIONAL`, `DIGITAL LITERACY`, `SOFT SKILLS`, `CHARACTER`, `OTHER` |
-
+  
   ### Mentorship
-
+  
   | Field                  | Type   | Required | Constraints / Allowed Values                                       |
   |------------------------|--------|----------|--------------------------------------------------------------------|
   | mentorshipReceived     | string | Yes      | One of: `REGULARLY`, `OFTEN`, `OCCASIONALLY`, `RARELY`, `NEVER`    |
   | mentorshipImpactRating | number | No       | Integer from `1` to `10` (optional)                                |
-
+  
   ### Post-ASH Status
-
+  
   | Field           | Type   | Required | Constraints / Allowed Values                                                                  |
   |-----------------|--------|----------|-----------------------------------------------------------------------------------------------|
   | postAshStatus   | string | Yes      | One of: `CONTINUING SCHOOL`, `COMPLETED SCHOOL`, `UNIVERSITY`, `VOCATIONAL`, `EMPLOYED`, `NOT IN TRAINING` |
   | institutionName | string | No       | Optional text                                                                                 |
   | courseOfStudy   | string | No       | Optional text                                                                                 |
   | vocationalSkill | string | No       | Optional text                                                                                 |
-
+  
   ### Programme Feedback
-
+  
   | Field                   | Type   | Required | Constraints / Allowed Values |
   |-------------------------|--------|----------|------------------------------|
   | enjoyedMost             | string | No       | Optional free text           |
   | programImpact           | string | No       | Optional free text           |
   | improvementSuggestions  | string | No       | Optional free text           |
   | facilitatorName         | string | Yes      | Non-empty text               |
-
+  
   ## Response
-
+  
   **`201 Created`** — Returns the newly created ASH exit record.
-
+  
   The created record is also cached under the key `cedarrise:ash:exit:<id>` using the `FORM_DATA` TTL.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                                         |
   |-----------------------------|---------------------------------------------------------------------|
   | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values. |

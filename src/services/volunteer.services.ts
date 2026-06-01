@@ -1,7 +1,7 @@
 import { volunteerRegistration, volunteerFeedback } from "../db/models/admin.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
+import { invalidateCache } from "../utils/cache.util.js";
 import { sql, asc, eq } from "drizzle-orm";
-import { Request } from "express";
 import {
   VolunteerregistrationbodyType,
   VolunteerfeedbackbodyType,
@@ -152,6 +152,38 @@ export const getVolunteer = async (id: string) => {
     code: 200,
     message: "Volunteer found successfully",
     data: volunteer,
+  };
+};
+
+export const updateVolunteerStatus = async (id: string, status: string) => {
+  // update
+  const [updatedVolunteer] = await db
+    .update(volunteerRegistration)
+    .set({
+      status,
+    })
+    .where(eq(volunteerRegistration.id, id))
+    .returning({
+      id: volunteerRegistration.id, 
+      status: volunteerRegistration.status
+    });
+
+  // delete all related cache
+  await invalidateCache(`cedarrise:volunteer:voluntee:${id}`, `cedarrise:volunteer:volunteers:*`);
+
+  // emitter to send email on accept or reject
+  if (status === "accepted") {
+    // emitter
+    console.log("accepted");
+  } else if (status === "rejected") {
+    // emitter
+    console.log("rejected");
+  }
+
+  return {
+    code: 200,
+    message: "Volunteer status updated successfully",
+    data: updatedVolunteer,
   };
 };
 

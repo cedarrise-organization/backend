@@ -1,6 +1,7 @@
-import { uploadToCloudinary, deleteFromCloudinary } from "../utils/storage.util.js";
 import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
+import { uploadToCloudinary } from "../utils/storage.util.js";
+import { invalidateCache } from "../utils/cache.util.js";
 import { UploadApiResponse } from "cloudinary";
 import { sql, asc, eq } from "drizzle-orm";
 import { Request } from "express";
@@ -222,6 +223,41 @@ export const getRecommendation = async (id: string) => {
     code: 200,
     message: "Tacots beneficiary found successfully",
     data: tacotBeneficiary,
+  };
+};
+
+export const updateRecommendedStudentStatus = async (id: string, status: string) => {
+  // update
+  const [updatedStudent] = await db
+    .update(tacotsRecommendation)
+    .set({
+      adminStatus: status,
+    })
+    .where(eq(tacotsRecommendation.id, id))
+    .returning({
+      id: tacotsRecommendation.id,
+      adminStatus: tacotsRecommendation.adminStatus
+    });
+
+  // delete all related cache
+  await invalidateCache(
+    `cedarrise:tacots:tacotsRecommendation:${id}`,
+    `cedarrise:tacots:tacotsRecommendations:*`,
+  );
+
+  // emitter to send email on SELECTED or NOT SELECTED
+  if (status === "SELECTED") {
+    // emitter
+    console.log("SELECTED");
+  } else if (status === "NOT SELECTED") {
+    // emitter
+    console.log("NOT SELECTED");
+  }
+
+  return {
+    code: 200,
+    message: "Recommended TACOTS' student's status updated successfully",
+    data: updatedStudent,
   };
 };
 
@@ -552,7 +588,7 @@ export const deleteOnboarding = async (id: string) => {
     .where(eq(tacotsOnboarding.id, id));
 
   if (data?.parentSignaturePublicId) {
-     try {
+    try {
       await addAssetToDeletionQueue(data.parentSignaturePublicId, "image", id);
     } catch (error) {
       logger.error(`Could not add parent signature public id to queue`, {
@@ -660,7 +696,7 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
     data: tracking,
   };
 };
- 
+
 export const listTacotsTracking = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:tacots:tracking:${page}:${limit}`;
@@ -740,7 +776,7 @@ export const deleteTacotsTracking = async (id: string) => {
     .where(eq(tacotsTracking.id, id));
 
   if (data?.termResultPublicId) {
-     try {
+    try {
       await addAssetToDeletionQueue(data.termResultPublicId, "image", id);
     } catch (error) {
       logger.error(`Could not add term result public id to queue`, {
@@ -750,7 +786,7 @@ export const deleteTacotsTracking = async (id: string) => {
   }
 
   if (data?.paymentEvidencePublicId) {
-      try {
+    try {
       await addAssetToDeletionQueue(data.paymentEvidencePublicId, "image", id);
     } catch (error) {
       logger.error(`Could not add payment evidence public id to queue`, {

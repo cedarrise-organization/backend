@@ -1,7 +1,7 @@
 meta {
   name: Get ASH tracking detail
   type: http
-  seq: 11
+  seq: 12
 }
 
 get {
@@ -22,24 +22,24 @@ settings {
 
 docs {
   # Get ASH Tracking Detail
-
+  
   Retrieves the full detail of a single ASH termly tracking record by its unique identifier.
-
+  
   ## Authorization
   Requires `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                              |
   |-----------|--------|----------|------------------------------------------|
   | id        | string | Yes      | UUID of the termly tracking record       |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete ASH termly tracking record.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                        |
   |-----------------------------|----------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).        |
