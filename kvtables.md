@@ -26,6 +26,8 @@
 | BLOGS       | 3600s (1 hr)    | `lib/cache.ts` |
 | GALLERY     | 43200s (12 hrs) | `lib/cache.ts` |
 | FORM_DATA   | 1800 (30 mins)  | `lib/cache.ts` |
+| LISTS       | 600 (10 mins)   | `lib/cache.ts` |
+
 
 ---
 
@@ -67,6 +69,10 @@
 | `cedarrise:volunteer:feedback:{page}:{limit}`                             | Cached paginated volunteer feedback list. Set on read.                                        | `services/volunteer.services.ts`            |
 | `cedarrise:capacity:evaluation:{id}`                                      | Cached single capacity building evaluation record. Set on create and read, deleted on delete. | `services/capacity.services.ts`             |
 | `cedarrise:capacity:evaluation:{page}:{limit}`                            | Cached paginated capacity building evaluation list. Set on read.                              | `services/capacity.services.ts`             |
+| `cedarrise:lookup:ash`                                                    | Cached lightweight list of accepted ASH students (id + name) for dropdown population. Set on read. | `services/lookup.services.ts`               |
+| `cedarrise:lookup:recommended`                                            | Cached lightweight list of SELECTED TACOTS recommendations (id + name) for dropdown. Set on read.  | `services/lookup.services.ts`               |
+| `cedarrise:lookup:onboarded`                                              | Cached lightweight list of TACOTS onboarded students (id + name) for dropdown. Set on read.        | `services/lookup.services.ts`               |
+| `cedarrise:lookup:volunteers`                                             | Cached lightweight list of accepted volunteers (id + name) for dropdown. Set on read.              | `services/lookup.services.ts`               |
 
 ---
 

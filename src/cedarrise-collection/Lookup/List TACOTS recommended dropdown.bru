@@ -1,0 +1,52 @@
+meta {
+  name: List TACOTS recommended dropdown
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/lookup/tacots-recommended
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List TACOTS Recommended Students Dropdown
+
+  Returns a lightweight list of TACOTS recommendation records with `SELECTED` admin status for use in onboarding dropdown/select components. Each entry contains only the student `id` and `name` (first name).
+
+  ## Authorization
+  No authentication required. This is a public lookup endpoint.
+
+  ## Response
+
+  **`200 OK`** — Returns an array of `{ id, name }` objects for selected TACOTS recommendations.
+
+  ```json
+  {
+    "success": true,
+    "message": "students found successfully",
+    "data": [
+      { "id": "uuid", "name": "Jane" }
+    ]
+  }
+  ```
+
+  ## Caching
+  Response is cached under `cedarrise:lookup:recommended` with `LISTS` TTL (10 mins).
+
+  ## Errors
+
+  | Status                      | Description              |
+  |-----------------------------|--------------------------|
+  | `500 Internal Server Error` | Unexpected server error. |
+}

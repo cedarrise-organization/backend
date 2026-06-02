@@ -6,6 +6,7 @@ export const CACHE_TTL = {
   BLOGS: 3600, // 1 hr
   GALLERY: 43200, // 12hrs
   FORM_DATA: 1800, // 30 mins
+  LISTS: 600, // 10 mins
   /*
     ...other TTLs
     */

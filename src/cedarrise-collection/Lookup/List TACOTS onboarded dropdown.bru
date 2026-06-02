@@ -1,0 +1,52 @@
+meta {
+  name: List TACOTS onboarded dropdown
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/lookup/tacots-onboarded
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List TACOTS Onboarded Students Dropdown
+
+  Returns a lightweight list of TACOTS onboarded students for use in tracking and exit form dropdown/select components. Joins `tacots_onboarding` with `tacots_recommendation` to resolve student names. Each entry contains only the student `id` and `name` (first name).
+
+  ## Authorization
+  No authentication required. This is a public lookup endpoint.
+
+  ## Response
+
+  **`200 OK`** — Returns an array of `{ id, name }` objects for onboarded TACOTS students.
+
+  ```json
+  {
+    "success": true,
+    "message": "students found successfully",
+    "data": [
+      { "id": "uuid", "name": "Alice" }
+    ]
+  }
+  ```
+
+  ## Caching
+  Response is cached under `cedarrise:lookup:onboarded` with `LISTS` TTL (10 mins).
+
+  ## Errors
+
+  | Status                      | Description              |
+  |-----------------------------|--------------------------|
+  | `500 Internal Server Error` | Unexpected server error. |
+}

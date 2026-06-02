@@ -1,0 +1,52 @@
+meta {
+  name: List volunteers dropdown
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/lookup/volunteers
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List Volunteers Dropdown
+
+  Returns a lightweight list of accepted volunteer registrations for use in mentorship assignment dropdown/select components. Each entry contains only the volunteer `id` and `name` (first name).
+
+  ## Authorization
+  No authentication required. This is a public lookup endpoint.
+
+  ## Response
+
+  **`200 OK`** — Returns an array of `{ id, name }` objects for accepted volunteers.
+
+  ```json
+  {
+    "success": true,
+    "message": "students found successfully",
+    "data": [
+      { "id": "uuid", "name": "Bob" }
+    ]
+  }
+  ```
+
+  ## Caching
+  Response is cached under `cedarrise:lookup:volunteers` with `LISTS` TTL (10 mins).
+
+  ## Errors
+
+  | Status                      | Description              |
+  |-----------------------------|--------------------------|
+  | `500 Internal Server Error` | Unexpected server error. |
+}

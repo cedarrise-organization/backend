@@ -12,6 +12,7 @@ import adminRouter from "./modules/admin/admin.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
 import ashRouter from "./modules/ash/ash.routes.js";
 import tacotsRouter from "./modules/tacots/tacots.routes.js";
+import lookupRouter from "./modules/lookup/lookup.routes.js";
 import capacityRouter from "./modules/capacity/capacity.routes.js";
 import volunteerRouter from "./modules/volunteer/volunteer.routes.js";
 import outreachRouter from "./modules/outreaches/outreaches.routes.js";
@@ -20,7 +21,7 @@ import "./events/admin.events.js";
 import "./events/donate.event.js";
 import "./events/auth.events.js";
 // import "./events/feature.event.js"
-import "./queues/workers/deleteCloudinaryAsset.worker.js"
+import "./queues/workers/deleteCloudinaryAsset.worker.js";
 // import "./queues/workers/feature.worker.js"
 
 const app = express();
@@ -43,7 +44,7 @@ const corsOptions = {
   maxAge: 86400, // Cache preflight requests for 24 hours
 };
 
-app.use(express.json()); 
+app.use(express.json());
 // app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -62,6 +63,7 @@ app.use("/api/v1/donate", donateRouter);
 app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/carousels", carouselRouter);
 app.use("/api/v1/volunteer", volunteerRouter);
+app.use("/api/v1/lookup", lookupRouter);
 app.use("/api/v1/forms/ash", ashRouter);
 app.use("/api/v1/forms/tacots", tacotsRouter);
 app.use("/api/v1/forms/outreaches", outreachRouter);
