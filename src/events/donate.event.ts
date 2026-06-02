@@ -6,7 +6,6 @@ import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
 import ejs from "ejs";
 
-
 // DEFINE EVENT NAMES AS CONSTANTS
 export const DONATE_EVENTS = {
   DONATION_MADE: "donation:success",
@@ -28,9 +27,10 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       email: data.email,
       // correlationId
     });
-  } catch (err) {
+  } catch (error: any) {
     logger.info("Failed to create Donation record", {
       email: data.email,
+      message: error.message,
       // correlationId
     });
   }
@@ -38,25 +38,27 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
 
 // SEND THANK YOU EMAIL TO DONOR
 appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
-  let content = await ejs.renderFile(
-    process.cwd() + "/src/views/emails/donation.ejs",
-    { donorName: data.name },
-    { async: true },
-  );
   try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/donation.ejs",
+      { donorName: data.name },
+      { async: true },
+    );
+
     const info = await sendEmail(data.email, "Thank You For Your Donation", content);
 
     if (!info) {
-      throw new Error
+      throw new Error();
     }
 
     logger.info("Thank you email sent successully", {
       info: info.accepted,
       // correlationId
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.info("Failed to send Donation email", {
       email: data.email,
+      message: error.message,
       // correlationId
     });
   }

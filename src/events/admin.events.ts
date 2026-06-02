@@ -32,32 +32,34 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
       user: data.userId,
       // correlationId: data.correlationId
     });
-  } catch (err) {
+  } catch (error: any) {
     logger.error("Could not remove permissions cache", {
-      err,
+      // error,
       user: data.userId,
+      message: error.message,
       // correlationId: data.correlationId
     });
   }
 });
 
-// INFORM USER OF NEW ROLE ASSIGNED
+// INFORM USER OF NEW ROLE ASSIGNED VIA EMAIL
 appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
-  const [user] = await db
-    .select({ name: users.name, email: users.email })
-    .from(users)
-    .where(eq(users.id, data.userId));
-
-  if (!user) {
-    throw new Error();
-  }
-
-  let content = await ejs.renderFile(
-    process.cwd() + "/src/views/emails/rolechange.ejs",
-    { name: user.name, role: data.role, email: user.email },
-    { async: true },
-  );
   try {
+    const [user] = await db
+      .select({ name: users.name, email: users.email })
+      .from(users)
+      .where(eq(users.id, data.userId));
+
+    if (!user) {
+      throw new Error();
+    }
+
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/rolechange.ejs",
+      { name: user.name, role: data.role, email: user.email },
+      { async: true },
+    );
+
     const info = await sendEmail(user.email, "You've been assigned a new Role!", content);
 
     if (!info) {
@@ -68,9 +70,10 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
       info: info.accepted,
       // correlationId
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.info("Failed to send Role assignment email", {
       email: data.email,
+      message: error.message,
       // correlationId
     });
   }
@@ -94,9 +97,9 @@ appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
       user: data.userId,
       // correlationId: data.correlationId
     });
-  } catch (err) {
+  } catch (error: any) {
     logger.error("Could not remove permissions cache", {
-      err,
+      message: error.message,
       user: data.userId,
       // correlationId: data.correlationId
     });
@@ -112,20 +115,21 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
   });
 });
 
-// SEND CREDENTIALS TO NEW USER
+// SEND CREDENTIALS TO NEW USER VIA EMAIL
 appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
-  let content = await ejs.renderFile(
-    process.cwd() + "/src/views/emails/welcome.ejs",
-    {
-      name: data.name,
-      role: data.role,
-      email: data.email,
-      password: data.password,
-      department: data.department,
-    },
-    { async: true },
-  );
   try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/welcome.ejs",
+      {
+        name: data.name,
+        role: data.role,
+        email: data.email,
+        password: data.password,
+        department: data.department,
+      },
+      { async: true },
+    );
+
     const info = await sendEmail(data.email, "Welcome to the Cedarrise Team", content);
 
     if (!info) {
@@ -136,9 +140,10 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
       info: info.accepted,
       // correlationId
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.info("Failed to send welcome email", {
       email: data.email,
+      message: error.message,
       // correlationId
     });
   }

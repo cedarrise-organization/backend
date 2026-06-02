@@ -21,12 +21,13 @@ appEvents.on(FEATURE_EVENTS.FEATURE_ACTION, async (data) => {
 
 // SEND EMAIL
 appEvents.on(FEATURE_EVENTS.FEATURE_ACTION, async (data) => {
-  let content = await ejs.renderFile(
-    process.cwd() + "/src/views/emails/----.ejs",
-    { },
-    { async: true },
-  );
   try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/----.ejs",
+      {},
+      { async: true },
+    );
+
     const info = await sendEmail(data.email, "", content);
 
     if (!info) {
@@ -37,9 +38,10 @@ appEvents.on(FEATURE_EVENTS.FEATURE_ACTION, async (data) => {
       info: info.accepted,
       // correlationId
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.info("Failed to send email", {
       email: data.email,
+      message: error.message
       // correlationId
     });
   }
