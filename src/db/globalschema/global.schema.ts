@@ -88,7 +88,7 @@ export const singleResultFileSchema = uploadedFileObjectSchema.extend({
   ),
 });
 
-export const textSchema = z.string().transform((v) => v.trim());
+export const textSchema = z.string().transform((v) => v.toLowerCase().trim());
 export const optionalTextSchema = z.preprocess(
   (v) => (v === "" ? undefined : v),
   textSchema.optional(),
