@@ -18,8 +18,10 @@ import volunteerRouter from "./modules/volunteer/volunteer.routes.js";
 import outreachRouter from "./modules/outreaches/outreaches.routes.js";
 // import featureRouter from "./modules/feature/feature.routes.js";
 import "./events/admin.events.js";
-import "./events/donate.event.js";
 import "./events/auth.events.js";
+import "./events/donate.events.js";
+import "./events/tacots.events.js";
+import "./events/ash.events.js";
 // import "./events/feature.event.js"
 import "./queues/workers/deleteCloudinaryAsset.worker.js";
 // import "./queues/workers/feature.worker.js"
@@ -71,6 +73,14 @@ app.use("/api/v1/forms/capacity-building", capacityRouter);
 
 // BULL BOARD DASHBOARD. (ADD AUTH N' AUTH IN PRODUCTION)
 app.use("/api/v1/queues", bullBoardAdapter.getRouter());
+
+// INTRO ROUTE HANDLER
+app.get("/api/v1", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Welcome to the cedarrise api",
+  });
+});
 
 // HANDLER FOR UNKNOWN ROUTES
 app.use((req, res) => {

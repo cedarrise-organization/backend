@@ -1,0 +1,105 @@
+import logger from "../configs/logger.config.js";
+import ejs from "ejs";
+import { sendEmail } from "../utils/sendEmail.util.js";
+import { appEvents } from "../lib/events.js";
+
+export const ASH_EVENTS = {
+  STUDENT_ACCEPTED: "student:accepted",
+  STUDENT_REJECTED: "student:rejected",
+} as const;
+
+// INFORM STUDENT VIA EMAIL ON ACCEPTANCE
+appEvents.on(ASH_EVENTS.STUDENT_ACCEPTED, async (data) => {
+  try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/welcometoash.ejs",
+      { studentName: data.name },
+      { async: true },
+    );
+
+    const info = await sendEmail(data.email, "Welcome to ASH", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("ASH welcome email sent successully", {
+      message: "new student accepted into ASH",
+      info: info.accepted,
+      studentId: data.userId,
+      // correlationId
+    });
+  } catch (error: any) {
+    logger.info("Failed to send ash welcome email", {
+      email: data.email,
+      message: error.message,
+      // correlationId
+    });
+  }
+});
+
+// INFORM STUDENT VIA EMAIL ON REJECTED
+appEvents.on(ASH_EVENTS.STUDENT_REJECTED, async (data) => {
+  try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/----.ejs",
+      { studentName: data.name },
+      { async: true },
+    );
+
+    const info = await sendEmail(data.email, "We are sorry to inform you", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("ASH rejection email sent successully", {
+      message: "new student rejected from ASH",
+      info: info.accepted,
+      studentId: data.userId,
+      // correlationId
+    });
+  } catch (error: any) {
+    logger.info("Failed to send ash rejection email", {
+      email: data.email,
+      message: error.message,
+      // correlationId
+    });
+  }
+});
+
+// appEvents.on(ASH_EVENTS.FEATURE_ACTION, async (data) => {
+//   try {
+//     logger.info("success", { data });
+//   } catch (err) {
+//     logger.error("failure", { data });
+//   }
+// });
+
+// /* SEND EMAIL */
+// appEvents.on(ASH_EVENTS.FEATURE_ACTION, async (data) => {
+//   try {
+//     let content = await ejs.renderFile(
+//       process.cwd() + "/src/views/emails/----.ejs",
+//       {},
+//       { async: true },
+//     );
+
+//     const info = await sendEmail(data.email, "", content);
+
+//     if (!info) {
+//       throw new Error();
+//     }
+
+//     logger.info("email sent successully", {
+//       info: info.accepted,
+//       // correlationId
+//     });
+//   } catch (error: any) {
+//     logger.info("Failed to send email", {
+//       email: data.email,
+//       message: error.message
+//       // correlationId
+//     });
+//   }
+// });

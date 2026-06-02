@@ -4,9 +4,9 @@ import { appEvents } from "../lib/events.js";
 // DEFINE EVENT NAMES AS CONSTANTS
 export const AUTH_EVENTS = {
   AUTH_LOGIN: "auth:login",
-  AUTH_LOGIN_FAIL: "auth:login:fail",
+  AUTH_LOGIN_FAIL: "auth:login-fail",
   AUTH_REFRESH: "auth:refresh",
-  AUTH_REFRESH_FAIL: "auth:refresh:fail",
+  AUTH_REFRESH_FAIL: "auth:refresh-fail",
 } as const;
 
 // LOG USER LOGIN

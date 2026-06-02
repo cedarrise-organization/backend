@@ -2,6 +2,7 @@ import { invalidateCache } from "../utils/cache.util.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
 import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
+import { ASH_EVENTS } from "../events/ash.events.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
 import { sql, asc, eq } from "drizzle-orm";
@@ -216,19 +217,18 @@ export const updateAshStudentStatus = async (id: string, status: string) => {
     .returning({
       id: ashStudent.id,
       status: ashStudent.status,
+      name: ashStudent.firstName,
     });
 
   // delete all related cache
   await invalidateCache(`cedarrise:ash:ashStudent:${id}`, `cedarrise:ash:ashStudents:*`);
 
   // emitter to send email on accept or reject
-  if (status === "accepted") {
-    // emitter
-    console.log("accepted");
-  } else if (status === "rejected") {
-    // emitter
-    console.log("rejected");
-  }
+  // if (status === "accepted") {
+  //   appEvents.emit(ASH_EVENTS.STUDENT_ACCEPTED, {name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/});
+  // } else if (status === "rejected") {
+  //   appEvents.emit(ASH_EVENTS.STUDENT_ACCEPTED, {name: updatedStudent?.name, userId: updatedStudent?.id, /*email: updatedStudent.email*/});
+  // }
 
   return {
     code: 200,
@@ -236,8 +236,8 @@ export const updateAshStudentStatus = async (id: string, status: string) => {
     data: updatedStudent,
   };
 };
-export const assignAshMentor = async (id: string , mentor: string) => {
-   // update
+export const assignAshMentor = async (id: string, mentor: string) => {
+  // update
   const [updatedStudent] = await db
     .update(ashStudent)
     .set({
@@ -247,7 +247,7 @@ export const assignAshMentor = async (id: string , mentor: string) => {
     .returning({
       id: ashStudent.id,
       status: ashStudent.status,
-      assignedMentor: ashStudent.assignedMentor
+      assignedMentor: ashStudent.assignedMentor,
     });
 
   // delete all related cache
@@ -357,7 +357,6 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
     data: newAshProgramFeedback,
   };
 };
-
 export const listFeedback = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:ash:feedback:${page}:${limit}`;
@@ -400,7 +399,6 @@ export const listFeedback = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getFeedback = async (id: string) => {
   /// cache
   const key = `cedarrise:ash:feedback:${id}`;
@@ -429,7 +427,6 @@ export const getFeedback = async (id: string) => {
     data: feedback,
   };
 };
-
 export const deleteFeedback = async (id: string) => {
   await db.delete(ashProgramFeedback).where(eq(ashProgramFeedback.id, id));
 
@@ -497,7 +494,6 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
     data: tracker,
   };
 };
-
 export const listTracking = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:ash:termlytracking:${page}:${limit}`;
@@ -540,7 +536,6 @@ export const listTracking = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getTrack = async (id: string) => {
   /// cache
   const key = `cedarrise:ash:termlytracking:${id}`;
@@ -566,7 +561,6 @@ export const getTrack = async (id: string) => {
     data: track,
   };
 };
-
 export const deleteTrack = async (id: string) => {
   const [data] = await db
     .select({
@@ -628,7 +622,6 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
     data: attendance,
   };
 };
-
 export const listAttendance = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:ash:weeklyattendance:${page}:${limit}`;
@@ -671,7 +664,6 @@ export const listAttendance = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getAttendance = async (id: string) => {
   /// cache
   const key = `cedarrise:ash:weeklyattendance:${id}`;
@@ -700,7 +692,6 @@ export const getAttendance = async (id: string) => {
     data: attendance,
   };
 };
-
 export const deleteAttendance = async (id: string) => {
   await db.delete(ashWeeklyAttendance).where(eq(ashWeeklyAttendance.id, id));
 
@@ -752,7 +743,6 @@ export const submitExit = async (options: AshexitbodyType) => {
     data: exit,
   };
 };
-
 export const listExit = async (page: number, limit: number) => {
   /// cache
   const key = `cedarrise:ash:exit:${page}:${limit}`;
@@ -795,7 +785,6 @@ export const listExit = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getExit = async (id: string) => {
   /// cache
   const key = `cedarrise:ash:exit:${id}`;
@@ -821,7 +810,6 @@ export const getExit = async (id: string) => {
     data: exit,
   };
 };
-
 export const deleteExit = async (id: string) => {
   await db.delete(ashExit).where(eq(ashExit.id, id));
 
@@ -834,5 +822,4 @@ export const deleteExit = async (id: string) => {
     message: "Ash exit data deleted successfully",
   };
 };
-
 export const example = async (page: number, limit: number, id: string) => {};

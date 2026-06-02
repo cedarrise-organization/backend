@@ -1,8 +1,10 @@
 import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
+import { TACOTS_EVENTS } from "../events/tacots.events.js";
 import { invalidateCache } from "../utils/cache.util.js";
 import { UploadApiResponse } from "cloudinary";
+import { appEvents } from "../lib/events.js";
 import { sql, asc, eq } from "drizzle-orm";
 import { Request } from "express";
 import {
@@ -236,7 +238,8 @@ export const updateRecommendedStudentStatus = async (id: string, status: string)
     .where(eq(tacotsRecommendation.id, id))
     .returning({
       id: tacotsRecommendation.id,
-      adminStatus: tacotsRecommendation.adminStatus
+      adminStatus: tacotsRecommendation.adminStatus,
+      name: tacotsRecommendation.firstName,
     });
 
   // delete all related cache
@@ -246,13 +249,15 @@ export const updateRecommendedStudentStatus = async (id: string, status: string)
   );
 
   // emitter to send email on SELECTED or NOT SELECTED
-  if (status === "SELECTED") {
-    // emitter
-    console.log("SELECTED");
-  } else if (status === "NOT SELECTED") {
-    // emitter
-    console.log("NOT SELECTED");
-  }
+  // if (status === "SELECTED") {
+  //   appEvents.emit(TACOTS_EVENTS.APPLICANT_ACCEPTED, {
+  //     name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/,
+  //   });
+  // } else if (status === "NOT SELECTED") {
+  //   appEvents.emit(TACOTS_EVENTS.APPLICANT_REJECTED, {
+  //     name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/,
+  //   });
+  // }
 
   return {
     code: 200,

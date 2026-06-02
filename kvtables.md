@@ -28,47 +28,46 @@
 | FORM_DATA   | 1800 (30 mins)  | `lib/cache.ts` |
 | LISTS       | 600 (10 mins)   | `lib/cache.ts` |
 
-
 ---
 
 # Cache Key Patterns
 
-| Key Pattern                                                               | Description                                                                                   | Source                                      |
-| :------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------- | :------------------------------------------ |
-| `cedarrise:permissions:{userId}`                                          | Stores a user's resolved permission names                                                     | `utils/rbac.util.ts`                        |
-| `cedarrise:lock:{key}`                                                    | Distributed lock for cache-aside stampede prevention (5s expiry)                              | `lib/cache.ts`                              |
-| `cedarrise:blogs:list:{page}:{limit}`                                     | Cached paginated blog list. Set on read.                                                      | `services/clientside/blog.services.ts`      |
-| `cedarrise:blogs:single:{id}`                                             | Cached single blog post. Set on read/create, deleted on update/delete.                        | `services/clientside/blog.services.ts`      |
-| `cedarrise:gallery:ash`                                                   | Cached ASH program photo URLs (public_id + secure_url). Set on read.                          | `services/clientside/carousels.services.ts` |
-| `cedarrise:gallery:tacots`                                                | Cached TACOTS program photo URLs (public_id + secure_url). Set on read.                       | `services/clientside/carousels.services.ts` |
-| `cedarrise:gallery:outreaches`                                            | Cached Outreaches program photo URLs (public_id + secure_url). Set on read.                   | `services/clientside/carousels.services.ts` |
-| `cedarrise:gallery:capacity`                                              | Cached Capacity Building program photo URLs (public_id + secure_url). Set on read.            | `services/clientside/carousels.services.ts` |
-| `cedarrise:ash:ashStudent:{id}`                                           | Cached single ASH student record. Set on create and read.                                     | `services/ash.services.ts`                  |
-| `cedarrise:ash:ashStudents:{page}:{limit}:{status}:{sortBy}`              | Cached paginated ASH student list, sorted and filtered by status. Set on read.                | `services/ash.services.ts`                  |
-| `cedarrise:ash:feedback:{id}`                                             | Cached single ASH programme feedback record. Set on create and read.                          | `services/ash.services.ts`                  |
-| `cedarrise:ash:feedback:{page}:{limit}`                                   | Cached paginated ASH programme feedback list. Set on read.                                    | `services/ash.services.ts`                  |
-| `cedarrise:ash:termlytracking:{id}`                                       | Cached single ASH termly tracking record. Set on create and read, deleted on delete.          | `services/ash.services.ts`                  |
-| `cedarrise:ash:termlytracking:{page}:{limit}`                             | Cached paginated ASH termly tracking list. Set on read.                                       | `services/ash.services.ts`                  |
-| `cedarrise:ash:weeklyattendance:{id}`                                     | Cached single ASH weekly attendance record. Set on create and read, deleted on delete.        | `services/ash.services.ts`                  |
-| `cedarrise:ash:weeklyattendance:{page}:{limit}`                           | Cached paginated ASH weekly attendance list. Set on read.                                     | `services/ash.services.ts`                  |
-| `cedarrise:ash:exit:{id}`                                                 | Cached single ASH exit record. Set on create and read, deleted on delete.                     | `services/ash.services.ts`                  |
-| `cedarrise:ash:exit:{page}:{limit}`                                       | Cached paginated ASH exit record list. Set on read.                                           | `services/ash.services.ts`                  |
-| `cedarrise:tacots:tacotsRecommendation:{id}`                              | Cached single TACOTS recommendation record. Set on create and read.                           | `services/tacots.services.ts`               |
-| `cedarrise:tacots:tacotsRecommendations:{page}:{limit}:{status}:{sortBy}` | Cached paginated TACOTS recommendation list, sorted and filtered by status. Set on read.      | `services/tacots.services.ts`               |
-| `cedarrise:tacots:feedback:{id}`                                          | Cached single TACOTS feedback record. Set on create and read.                                 | `services/tacots.services.ts`               |
-| `cedarrise:tacots:feedback:{page}:{limit}`                                | Cached paginated TACOTS feedback list. Set on read.                                           | `services/tacots.services.ts`               |
-| `cedarrise:tacots:onboarding:{id}`                                        | Cached single TACOTS onboarding record. Set on create and read, deleted on delete.            | `services/tacots.services.ts`               |
-| `cedarrise:tacots:onboarding:{page}:{limit}`                              | Cached paginated TACOTS onboarding list. Set on read.                                         | `services/tacots.services.ts`               |
-| `cedarrise:tacots:tracking:{id}`                                          | Cached single TACOTS tracking record. Set on create and read, deleted on delete.              | `services/tacots.services.ts`               |
-| `cedarrise:tacots:tracking:{page}:{limit}`                                | Cached paginated TACOTS tracking list. Set on read.                                           | `services/tacots.services.ts`               |
-| `cedarrise:tacots:exit:{id}`                                              | Cached single TACOTS exit record. Set on read, deleted on delete.                             | `services/tacots.services.ts`               |
-| `cedarrise:tacots:exit:{page}:{limit}`                                    | Cached paginated TACOTS exit list. Set on read.                                               | `services/tacots.services.ts`               |
-| `cedarrise:volunteer:voluntee:{id}`                                       | Cached single volunteer registration record. Set on create and read.                          | `services/volunteer.services.ts`            |
-| `cedarrise:volunteer:volunteers:{page}:{limit}:{status}:{sortBy}`         | Cached paginated volunteer list, sorted and filtered by status. Set on read.                  | `services/volunteer.services.ts`            |
-| `cedarrise:volunteer:feedback:{id}`                                       | Cached single volunteer feedback record. Set on create and read.                              | `services/volunteer.services.ts`            |
-| `cedarrise:volunteer:feedback:{page}:{limit}`                             | Cached paginated volunteer feedback list. Set on read.                                        | `services/volunteer.services.ts`            |
-| `cedarrise:capacity:evaluation:{id}`                                      | Cached single capacity building evaluation record. Set on create and read, deleted on delete. | `services/capacity.services.ts`             |
-| `cedarrise:capacity:evaluation:{page}:{limit}`                            | Cached paginated capacity building evaluation list. Set on read.                              | `services/capacity.services.ts`             |
+| Key Pattern                                                               | Description                                                                                        | Source                                      |
+| :------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- | :------------------------------------------ |
+| `cedarrise:permissions:{userId}`                                          | Stores a user's resolved permission names                                                          | `utils/rbac.util.ts`                        |
+| `cedarrise:lock:{key}`                                                    | Distributed lock for cache-aside stampede prevention (5s expiry)                                   | `lib/cache.ts`                              |
+| `cedarrise:blogs:list:{page}:{limit}`                                     | Cached paginated blog list. Set on read.                                                           | `services/clientside/blog.services.ts`      |
+| `cedarrise:blogs:single:{id}`                                             | Cached single blog post. Set on read/create, deleted on update/delete.                             | `services/clientside/blog.services.ts`      |
+| `cedarrise:gallery:ash`                                                   | Cached ASH program photo URLs (public_id + secure_url). Set on read.                               | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:tacots`                                                | Cached TACOTS program photo URLs (public_id + secure_url). Set on read.                            | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:outreaches`                                            | Cached Outreaches program photo URLs (public_id + secure_url). Set on read.                        | `services/clientside/carousels.services.ts` |
+| `cedarrise:gallery:capacity`                                              | Cached Capacity Building program photo URLs (public_id + secure_url). Set on read.                 | `services/clientside/carousels.services.ts` |
+| `cedarrise:ash:ashStudent:{id}`                                           | Cached single ASH student record. Set on create and read.                                          | `services/ash.services.ts`                  |
+| `cedarrise:ash:ashStudents:{page}:{limit}:{status}:{sortBy}`              | Cached paginated ASH student list, sorted and filtered by status. Set on read.                     | `services/ash.services.ts`                  |
+| `cedarrise:ash:feedback:{id}`                                             | Cached single ASH programme feedback record. Set on create and read.                               | `services/ash.services.ts`                  |
+| `cedarrise:ash:feedback:{page}:{limit}`                                   | Cached paginated ASH programme feedback list. Set on read.                                         | `services/ash.services.ts`                  |
+| `cedarrise:ash:termlytracking:{id}`                                       | Cached single ASH termly tracking record. Set on create and read, deleted on delete.               | `services/ash.services.ts`                  |
+| `cedarrise:ash:termlytracking:{page}:{limit}`                             | Cached paginated ASH termly tracking list. Set on read.                                            | `services/ash.services.ts`                  |
+| `cedarrise:ash:weeklyattendance:{id}`                                     | Cached single ASH weekly attendance record. Set on create and read, deleted on delete.             | `services/ash.services.ts`                  |
+| `cedarrise:ash:weeklyattendance:{page}:{limit}`                           | Cached paginated ASH weekly attendance list. Set on read.                                          | `services/ash.services.ts`                  |
+| `cedarrise:ash:exit:{id}`                                                 | Cached single ASH exit record. Set on create and read, deleted on delete.                          | `services/ash.services.ts`                  |
+| `cedarrise:ash:exit:{page}:{limit}`                                       | Cached paginated ASH exit record list. Set on read.                                                | `services/ash.services.ts`                  |
+| `cedarrise:tacots:tacotsRecommendation:{id}`                              | Cached single TACOTS recommendation record. Set on create and read.                                | `services/tacots.services.ts`               |
+| `cedarrise:tacots:tacotsRecommendations:{page}:{limit}:{status}:{sortBy}` | Cached paginated TACOTS recommendation list, sorted and filtered by status. Set on read.           | `services/tacots.services.ts`               |
+| `cedarrise:tacots:feedback:{id}`                                          | Cached single TACOTS feedback record. Set on create and read.                                      | `services/tacots.services.ts`               |
+| `cedarrise:tacots:feedback:{page}:{limit}`                                | Cached paginated TACOTS feedback list. Set on read.                                                | `services/tacots.services.ts`               |
+| `cedarrise:tacots:onboarding:{id}`                                        | Cached single TACOTS onboarding record. Set on create and read, deleted on delete.                 | `services/tacots.services.ts`               |
+| `cedarrise:tacots:onboarding:{page}:{limit}`                              | Cached paginated TACOTS onboarding list. Set on read.                                              | `services/tacots.services.ts`               |
+| `cedarrise:tacots:tracking:{id}`                                          | Cached single TACOTS tracking record. Set on create and read, deleted on delete.                   | `services/tacots.services.ts`               |
+| `cedarrise:tacots:tracking:{page}:{limit}`                                | Cached paginated TACOTS tracking list. Set on read.                                                | `services/tacots.services.ts`               |
+| `cedarrise:tacots:exit:{id}`                                              | Cached single TACOTS exit record. Set on read, deleted on delete.                                  | `services/tacots.services.ts`               |
+| `cedarrise:tacots:exit:{page}:{limit}`                                    | Cached paginated TACOTS exit list. Set on read.                                                    | `services/tacots.services.ts`               |
+| `cedarrise:volunteer:voluntee:{id}`                                       | Cached single volunteer registration record. Set on create and read.                               | `services/volunteer.services.ts`            |
+| `cedarrise:volunteer:volunteers:{page}:{limit}:{status}:{sortBy}`         | Cached paginated volunteer list, sorted and filtered by status. Set on read.                       | `services/volunteer.services.ts`            |
+| `cedarrise:volunteer:feedback:{id}`                                       | Cached single volunteer feedback record. Set on create and read.                                   | `services/volunteer.services.ts`            |
+| `cedarrise:volunteer:feedback:{page}:{limit}`                             | Cached paginated volunteer feedback list. Set on read.                                             | `services/volunteer.services.ts`            |
+| `cedarrise:capacity:evaluation:{id}`                                      | Cached single capacity building evaluation record. Set on create and read, deleted on delete.      | `services/capacity.services.ts`             |
+| `cedarrise:capacity:evaluation:{page}:{limit}`                            | Cached paginated capacity building evaluation list. Set on read.                                   | `services/capacity.services.ts`             |
 | `cedarrise:lookup:ash`                                                    | Cached lightweight list of accepted ASH students (id + name) for dropdown population. Set on read. | `services/lookup.services.ts`               |
 | `cedarrise:lookup:recommended`                                            | Cached lightweight list of SELECTED TACOTS recommendations (id + name) for dropdown. Set on read.  | `services/lookup.services.ts`               |
 | `cedarrise:lookup:onboarded`                                              | Cached lightweight list of TACOTS onboarded students (id + name) for dropdown. Set on read.        | `services/lookup.services.ts`               |
@@ -90,9 +89,9 @@
 | Constant            | Event String        | Emitted When                                |
 | :------------------ | :------------------ | :------------------------------------------ |
 | `AUTH_LOGIN`        | `auth:login`        | User logs in successfully                   |
-| `AUTH_LOGIN_FAIL`   | `auth:login:fail`   | Login attempt fails (bad email or password) |
+| `AUTH_LOGIN_FAIL`   | `auth:login-fail`   | Login attempt fails (bad email or password) |
 | `AUTH_REFRESH`      | `auth:refresh`      | Refresh token is rotated successfully       |
-| `AUTH_REFRESH_FAIL` | `auth:refresh:fail` | Refresh token rotation fails                |
+| `AUTH_REFRESH_FAIL` | `auth:refresh-fail` | Refresh token rotation fails                |
 
 ---
 
@@ -107,7 +106,7 @@
 
 ---
 
-# DONATION Events (`FEATURE_EVENTS`)
+# DONATION Events (`DONATE_EVENTS`)
 
 | Constant          | Event String       | Emitted When                     |
 | :---------------- | :----------------- | :------------------------------- |
@@ -116,11 +115,31 @@
 
 ---
 
+# ASH Events (`ASH_EVENTS`)
+
+| Constant           | Event String       | Emitted When                 |
+| :----------------- | :----------------- | :--------------------------- |
+| `STUDENT_ACCEPTED` | `student:accepted` | Student is accepted into ash |
+| `STUDENT_REJECTED` | `student:rejected` | Student is rejected from ash |
+
+---
+
+# TACOTS Events (`TACOTS_EVENTS`)
+
+| Constant             | Event String         | Emitted When                    |
+| :------------------- | :------------------- | :------------------------------ |
+| `APPLICANT_ACCEPTED` | `applicant:accepted` | Student is accepted into tacots |
+| `APPLICANT_REJECTED` | `applicant:rejected` | Student is rejected from tacots |
+
+---
+
 # Feature Events (`FEATURE_EVENTS`)
 
 | Constant         | Event String     | Emitted When                 |
 | :--------------- | :--------------- | :--------------------------- |
 | `FEATURE_ACTION` | `feature:action` | Template / placeholder event |
+
+---
 
 # BullMQ Queues
 
