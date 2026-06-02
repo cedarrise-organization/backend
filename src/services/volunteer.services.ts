@@ -14,7 +14,6 @@ const sortMap = {
   emailAddress: volunteerRegistration.emailAddress,
   phoneNumber: volunteerRegistration.phoneNumber,
   state: volunteerRegistration.state,
-  registrationDate: volunteerRegistration.registrationDate,
   volunteerAreas: volunteerRegistration.volunteerAreas,
   createdAt: volunteerRegistration.createdAt,
 } as const;
@@ -42,14 +41,12 @@ export const submitVolunteerRegistration = async (options: Volunteerregistration
       skillsToContribute: options.skillsToContribute,
       availability: options.availability,
       commitmentDuration: options.commitmentDuration,
-      ashInterest: options.ashInterest,
       ashSaturdayAvailability: options.ashSaturdayAvailability,
       ashAcademicArea: options.ashAcademicArea,
       ashExtracurricular: options.ashExtracurricular,
       safeguardingAgreement: options.safeguardingAgreement,
       mediaConsent: options.mediaConsent,
       additionalInfo: options.additionalInfo,
-      registrationDate: sql`TO_DATE(${options.registrationDate}, 'YYYY-MM-DD')`,
     })
     .returning();
 

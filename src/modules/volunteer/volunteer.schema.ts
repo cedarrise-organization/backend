@@ -82,7 +82,6 @@ export const volunteerRegistrationBody = z.object({
     (v) => (v === "" ? undefined : v),
     z.enum(["3 MONTHS", "6 MONTHS", "1 YEAR", "MORE THAN 1 YEAR"]).optional(),
   ),
-  ashInterest: yesNoSchema.optional(),
   ashSaturdayAvailability: z.preprocess(
     (v) => (v === "" ? undefined : v),
     z
@@ -120,7 +119,6 @@ export const volunteerRegistrationBody = z.object({
   safeguardingAgreement: yesNoSchema,
   mediaConsent: z.coerce.boolean().default(false),
   additionalInfo: optionalTextSchema,
-  registrationDate: z.coerce.date(),
 });
 
 export type VolunteerregistrationbodyType = z.infer<typeof volunteerRegistrationBody>;

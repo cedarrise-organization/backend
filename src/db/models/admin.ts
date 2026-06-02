@@ -663,7 +663,6 @@ export const volunteerRegistration = p.pgTable(
     availability: p.text().array().notNull(),
     commitmentDuration: p.text("commitment_duration"),
 
-    ashInterest: p.text("ash_interest"),
     ashSaturdayAvailability: p.text("ash_saturday_availability"),
     ashAcademicArea: p.text("ash_academic_area"),
     ashExtracurricular: p.text("ash_extracurricular").array(),
@@ -671,7 +670,6 @@ export const volunteerRegistration = p.pgTable(
     safeguardingAgreement: p.text("safeguarding_agreement").notNull(),
     mediaConsent: p.boolean("media_consent").default(false).notNull(),
     additionalInfo: p.text("additional_info"),
-    registrationDate: p.date("registration_date").notNull(),
 
     status: p.text().default("pending").notNull(),
 
@@ -683,7 +681,6 @@ export const volunteerRegistration = p.pgTable(
     index("volunteer_registration_phone_idx").on(table.phoneNumber),
     index("volunteer_registration_state_idx").on(table.state),
     index("volunteer_registration_status_idx").on(table.status),
-    index("volunteer_registration_date_idx").on(table.registrationDate),
     index("volunteer_registration_created_at_idx").on(table.createdAt),
     index("volunteer_registration_areas_idx").using("gin", table.volunteerAreas),
     index("volunteer_registration_skills_idx").using(
