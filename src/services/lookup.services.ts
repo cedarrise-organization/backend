@@ -23,7 +23,7 @@ export const ashDropdown = async () => {
   ///
 
   const students = await db
-    .select({ id: ashStudent.id, name: ashStudent.firstName })
+    .select({ id: ashStudent.id, name: ashStudent.firstName, status: ashStudent.status })
     .from(ashStudent)
     .where(eq(ashStudent.status, "accepted"));
 
@@ -52,7 +52,11 @@ export const recommendedDropdown = async () => {
   ///
 
   const students = await db
-    .select({ id: tacotsRecommendation.id, name: tacotsRecommendation.firstName })
+    .select({
+      id: tacotsRecommendation.id,
+      name: tacotsRecommendation.firstName,
+      status: tacotsRecommendation.adminStatus,
+    })
     .from(tacotsRecommendation)
     .where(eq(tacotsRecommendation.adminStatus, "SELECTED"));
 
@@ -115,7 +119,11 @@ export const volunteerDropdown = async () => {
   ///
 
   const students = await db
-    .select({ id: volunteerRegistration.id, name: volunteerRegistration.firstName })
+    .select({
+      id: volunteerRegistration.id,
+      name: volunteerRegistration.firstName,
+      status: volunteerRegistration.status,
+    })
     .from(volunteerRegistration)
     .where(eq(volunteerRegistration.status, "accepted"));
 
