@@ -72,7 +72,6 @@ export const roleAction = async (userId: string, options: any) => {
     .returning()
     .onConflictDoNothing();
 
-
   appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, userId });
 
   return {
@@ -103,7 +102,6 @@ export const createUser = async (options: {
   const [newUser] = await db
     .insert(users)
     .values({
-      id: sql`uuid_generate_v4()`,
       name,
       email,
       password: passwordHash,

@@ -25,7 +25,6 @@ export const createOutreach = async (req: Request, options: OutreachtrackerbodyT
   const [outreach] = await db
     .insert(outreachTracker)
     .values({
-      id: sql`uuid_generate_v4()`,
       outreachStartDate: sql`TO_DATE(${options.outreachStartDate}, 'YYYY-MM-DD')`,
       outreachEndDate: sql`TO_DATE(${options.outreachEndDate}, 'YYYY-MM-DD')`,
       outreachState: options.outreachState,
@@ -127,7 +126,7 @@ export const getOneOutreach = async (id: string) => {
 };
 
 export const deleteOutreach = async (id: string) => {
-  const [search] = await db.select().from(outreachTracker).where(eq(outreachTracker.id, id))
+  const [search] = await db.select().from(outreachTracker).where(eq(outreachTracker.id, id));
 
   const deleteResponse = await deleteFromCloudinary(search!.documentationPublicId!, "image");
 

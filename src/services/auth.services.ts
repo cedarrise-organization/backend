@@ -50,7 +50,6 @@ export const login = async (email: string, password: string) => {
 
   const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
   await db.insert(refreshtoken).values({
-    id: sql`uuid_generate_v4()`,
     userId: user.id,
     token: tokenHash,
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7days
@@ -109,7 +108,6 @@ export const refresh = async (rawRefreshToken: string) => {
 
   //save to refreshtoken db
   await db.insert(refreshtoken).values({
-    id: sql`uuid_generate_v4()`,
     userId: payload.sub,
     token: newHash,
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7days

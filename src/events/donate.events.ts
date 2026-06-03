@@ -16,7 +16,6 @@ export const DONATE_EVENTS = {
 appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
   try {
     await db.insert(donors).values({
-      id: sql`uuid_generate_v4()`,
       amount: data.amount,
       name: data.name,
       email: data.email,

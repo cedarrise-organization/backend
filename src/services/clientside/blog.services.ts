@@ -79,7 +79,6 @@ export const createBlog = async (req: Request, title: string, description: strin
   const [newBlog] = await db
     .insert(blogs)
     .values({
-      id: sql`uuid_generate_v4()`,
       title,
       description,
       documentUrl: response.secure_url,
@@ -143,7 +142,7 @@ export const updateBlog = async (
     }
 
     const deleteResponse = await deleteFromCloudinary(blog.publicId, "image");
-    
+
     if (deleteResponse.result !== "ok") {
       logger.error("Blog pdf was not deleted from s3", {
         publicId: blogs.publicId,
@@ -151,7 +150,7 @@ export const updateBlog = async (
       });
     }
 
-    const uploadResponse = await uploadToCloudinary(req.file, "/Cedarrise Initiative/BLOG")
+    const uploadResponse = await uploadToCloudinary(req.file, "/Cedarrise Initiative/BLOG");
 
     if (!uploadResponse) {
       throw new Error("Could not upload pdf");
@@ -167,7 +166,7 @@ export const updateBlog = async (
   if (title === undefined && description === undefined) {
     return {
       code: 200,
-      message: "Update submission should include at least one field"
+      message: "Update submission should include at least one field",
     };
   }
 

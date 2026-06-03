@@ -60,7 +60,6 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
   const [newTacotsRecommendation] = await db
     .insert(tacotsRecommendation)
     .values({
-      id: sql`uuid_generate_v4()`,
       firstName: options.firstName,
       middleName: options.middleName,
       surname: options.surname,
@@ -312,7 +311,6 @@ export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
   const [newTacotsFeedback] = await db
     .insert(tacotsFeedback)
     .values({
-      id: sql`uuid_generate_v4()`,
       studentFirstName: options.studentFirstName,
       studentSurname: options.studentSurname,
       currentSchool: options.currentSchool,
@@ -461,7 +459,6 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
   const [onboarding] = await db
     .insert(tacotsOnboarding)
     .values({
-      id: sql`uuid_generate_v4()`,
       studentId: options.studentId,
       onboardingDate: sql`TO_DATE(${options.onboardingDate}, 'YYYY-MM-DD')`,
       hasMentalHealthDiagnosis: options.hasMentalHealthDiagnosis,
@@ -652,7 +649,6 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
   const [tracking] = await db
     .insert(tacotsTracking)
     .values({
-      id: sql`uuid_generate_v4()`,
       studentId: options.studentId,
       schoolId: options.schoolId,
       region: options.region,
@@ -817,7 +813,6 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
   const [exit] = await db
     .insert(tacotsExit)
     .values({
-      id: sql`uuid_generate_v4()`,
       studentId: options.studentId,
       schoolAttendedDuringProgram: options.schoolAttendedDuringProgram,
       yearOfExit: options.yearOfExit,

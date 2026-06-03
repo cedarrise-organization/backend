@@ -11,7 +11,6 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
   const [evaluation] = await db
     .insert(capacityBuildingEvaluation)
     .values({
-      id: sql`uuid_generate_v4()`,
       programName: options.programName,
       programType: options.programType,
       programDate: sql`TO_DATE(${options.programDate}, 'YYYY-MM-DD')`,

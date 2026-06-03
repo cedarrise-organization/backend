@@ -65,7 +65,6 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
   const [newAshStudent] = await db
     .insert(ashStudent)
     .values({
-      id: sql`uuid_generate_v4()`,
       programType: options.programType,
       firstName: options.firstName,
       middleName: options.middleName,
@@ -317,7 +316,6 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
   const [newAshProgramFeedback] = await db
     .insert(ashProgramFeedback)
     .values({
-      id: sql`uuid_generate_v4()`,
       studentFirstName: options.studentFirstName,
       studentSurname: options.studentSurname,
       schoolName: options.schoolName,
@@ -454,7 +452,6 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
   const [tracker] = await db
     .insert(ashTermlyTracking)
     .values({
-      id: sql`uuid_generate_v4()`,
       studentId: options.studentId,
       academicSession: options.academicSession,
       term: options.term,
@@ -597,7 +594,6 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
   const [attendance] = await db
     .insert(ashWeeklyAttendance)
     .values({
-      id: sql`uuid_generate_v4()`,
       sessionDate: sql`TO_DATE(${options.sessionDate}, 'YYYY-MM-DD')`,
       studentsInAttendance: options.studentsInAttendance,
       studentsMentored: options.studentsMentored,
@@ -710,7 +706,6 @@ export const submitExit = async (options: AshexitbodyType) => {
   const [exit] = await db
     .insert(ashExit)
     .values({
-      id: sql`uuid_generate_v4()`,
       studentId: options.studentId,
       ageAtExit: options.ageAtExit,
       schoolName: options.schoolName,

@@ -11,7 +11,7 @@ const timestamps = {
 export const ashStudent = p.pgTable(
   "ash_student",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     programType: p.text("program_type").notNull(),
     firstName: p.text("first_name").notNull(),
@@ -87,7 +87,7 @@ export const ashStudent = p.pgTable(
 export const ashTermlyTracking = p.pgTable(
   "ash_termly_tracking",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -183,7 +183,7 @@ export const ashTermlyTracking = p.pgTable(
 export const ashWeeklyAttendance = p.pgTable(
   "ash_weekly_attendance",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     sessionDate: p.date("session_date").notNull(),
     studentsInAttendance: p.uuid("students_in_attendance").array().notNull(),
@@ -213,7 +213,7 @@ export const ashWeeklyAttendance = p.pgTable(
 export const ashExit = p.pgTable(
   "ash_exit",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -274,7 +274,7 @@ export const ashExit = p.pgTable(
 export const capacityBuildingEvaluation = p.pgTable(
   "capacity_building_evaluation",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     programName: p.text("program_name").notNull(),
     programType: p.text("program_type").notNull(),
@@ -378,7 +378,7 @@ export const capacityBuildingEvaluation = p.pgTable(
 export const tacotsFeedback = p.pgTable(
   "tacots_feedback",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     studentFirstName: p.text("student_first_name").notNull(),
     studentSurname: p.text("student_surname").notNull(),
@@ -444,7 +444,7 @@ export const tacotsFeedback = p.pgTable(
 export const ashProgramFeedback = p.pgTable(
   "ash_program_feedback",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     studentFirstName: p.text("student_first_name").notNull(),
     studentSurname: p.text("student_surname").notNull(),
@@ -516,7 +516,7 @@ export const ashProgramFeedback = p.pgTable(
 export const volunteerFeedback = p.pgTable(
   "volunteer_feedback",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     firstName: p.text("first_name").notNull(),
     surname: p.text().notNull(),
@@ -587,7 +587,7 @@ export const volunteerFeedback = p.pgTable(
 export const outreachTracker = p.pgTable(
   "outreach_tracker",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     outreachStartDate: p.date("outreach_start_date").notNull(),
     outreachEndDate: p.date("outreach_end_date").notNull(),
@@ -640,7 +640,7 @@ export const outreachTracker = p.pgTable(
 export const volunteerRegistration = p.pgTable(
   "volunteer_registration",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     firstName: p.text("first_name").notNull(),
     middleName: p.text("middle_name"),
@@ -702,7 +702,7 @@ export const volunteerRegistration = p.pgTable(
 export const tacotsRecommendation = p.pgTable(
   "tacots_recommendation",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     firstName: p.text("first_name").notNull(),
     middleName: p.text("middle_name"),
@@ -829,7 +829,7 @@ export const tacotsRecommendation = p.pgTable(
 export const tacotsOnboarding = p.pgTable(
   "tacots_onboarding",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -939,7 +939,7 @@ export const tacotsOnboarding = p.pgTable(
 export const tacotsTracking = p.pgTable(
   "tacots_tracking",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -1042,7 +1042,7 @@ export const tacotsTracking = p.pgTable(
 export const tacotsExit = p.pgTable(
   "tacots_exit",
   {
-    id: p.uuid().primaryKey().notNull(),
+    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
 
     studentId: p
       .uuid("student_id")
