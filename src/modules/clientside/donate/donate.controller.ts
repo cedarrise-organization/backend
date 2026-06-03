@@ -39,10 +39,11 @@ export const verifyViaCallbackController = async (
     const response = await verifyTransaction(reference);
 
     if (response.data.data.status !== "success") {
-      return trackTransactionStatus(res, response.data.data.status); 
+      return trackTransactionStatus(res, response.data.data.status);
     }
 
-    return successResponse(res, response.code, response.message, response.data);
+    // return successResponse(res, response.code, response.message, response.data);
+    return res.redirect("http://localhost:3002/donate?message=Donation+made+successfully");
   } catch (error) {
     next(error);
   }
