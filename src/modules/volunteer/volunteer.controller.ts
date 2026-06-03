@@ -37,14 +37,12 @@ export const submitVolunteerRegistrationController = async (
     skillsToContribute,
     availability,
     commitmentDuration,
-    ashInterest,
     ashSaturdayAvailability,
     ashAcademicArea,
     ashExtracurricular,
     safeguardingAgreement,
     mediaConsent,
     additionalInfo,
-    registrationDate,
   } = req.body;
 
   try {
@@ -67,14 +65,12 @@ export const submitVolunteerRegistrationController = async (
       skillsToContribute,
       availability,
       commitmentDuration,
-      ashInterest,
       ashSaturdayAvailability,
       ashAcademicArea,
       ashExtracurricular,
       safeguardingAgreement,
       mediaConsent,
       additionalInfo,
-      registrationDate,
     });
     return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
