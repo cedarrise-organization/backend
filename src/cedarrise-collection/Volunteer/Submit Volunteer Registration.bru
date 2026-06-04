@@ -30,14 +30,12 @@ body:json {
     "skillsToContribute": ["TEACHING", "MENTORING"],
     "availability": ["WEEKENDS"],
     "commitmentDuration": "6 MONTHS",
-    "ashInterest": "YES",
     "ashSaturdayAvailability": "EVERY SATURDAY",
     "ashAcademicArea": "BOTH",
     "ashExtracurricular": ["DRAMA / THEATRE"],
     "safeguardingAgreement": "YES",
     "mediaConsent": true,
     "additionalInfo": "",
-    "registrationDate": "2026-05-20"
   }
 }
 
@@ -94,7 +92,6 @@ docs {
 
   | Field                    | Type   | Required | Constraints / Allowed Values                                                                                  |
   |--------------------------|--------|----------|---------------------------------------------------------------------------------------------------------------|
-  | ashInterest              | string | No       | One of: `YES`, `NO` (optional)                                                                                |
   | ashSaturdayAvailability  | string | No       | One of: `EVERY SATURDAY`, `TWO SATURDAYS A MONTH`, `ONE SATURDAY A MONTH`, `OCCASIONALLY` (optional)         |
   | ashAcademicArea          | string | No       | One of: `LITERACY (READING & WRITING)`, `NUMERACY (MATHEMATICS)`, `BOTH` (optional)                          |
   | ashExtracurricular       | array  | No       | Array of: `DRAMA / THEATRE`, `MUSIC / SINGING`, `DANCE`, `PUBLIC SPEAKING`, `CREATIVE WRITING`, `SPORTS / GAMES`, `DIGITAL SKILLS`, `ARTS AND CRAFTS` (optional) |
@@ -106,7 +103,6 @@ docs {
   | safeguardingAgreement | string  | Yes      | One of: `YES`, `NO`                    |
   | mediaConsent          | boolean | Yes      | `true` or `false`. Defaults to `false` |
   | additionalInfo        | string  | No       | Optional free text                     |
-  | registrationDate      | date    | Yes      | ISO date string — `YYYY-MM-DD` format  |
 
   ## Response
 
