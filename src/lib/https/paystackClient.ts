@@ -9,19 +9,31 @@ export const callPaystackApi = createFetchClient({
   dedupeStrategy: "cancel",
   // credentials: "same-origin",
   auth: process.env.PAYSTACK_API_KEY,
-  onRequest: (ctx) => {
-    logger.info("Request to Paystack has been made", { date: new Date(Date.now()), context: ctx });
+  onRequest: (ctx: any) => {
+    logger.info("Request to Paystack has been made", {
+      date: new Date(Date.now()),
+      context: ctx.data,
+    });
   },
-  onResponse: (ctx) => {
-    logger.info("Response from Paystack has been received", { date: new Date(Date.now()), context: ctx });
+  onResponse: (ctx: any) => {
+    logger.info("Response from Paystack has been received", {
+      date: new Date(Date.now()),
+      context: ctx.data,
+    });
   },
-  onError: (ctx) => {
-    logger.error("Paystack Api returned an error", { date: new Date(Date.now()), context: ctx });
+  onError: (ctx: any) => {
+    logger.error("Paystack Api returned an error", {
+      date: new Date(Date.now()),
+      context: ctx.data,
+    });
   },
-  onSuccess: (ctx) => {
-    logger.info("Request to Paystack was successfuly", { date: new Date(Date.now()), context: ctx });
+  onSuccess: (ctx: any) => {
+    logger.info("Request to Paystack was successfuly", {
+      date: new Date(Date.now()),
+      context: ctx.data,
+    });
   },
-  onRetry: (ctx) => {
-    logger.info("Request failed. Retrying...", { date: new Date(Date.now()), context: ctx });
+  onRetry: (ctx: any) => {
+    logger.info("Request failed. Retrying...", { date: new Date(Date.now()), context: ctx.data });
   },
 });

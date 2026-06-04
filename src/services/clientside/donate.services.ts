@@ -32,13 +32,18 @@ export const verifyTransaction = async (reference: string) => {
       email: data.data.customer.email,
       name: data.data.metadata.name,
       comment: data.data.metadata.comment,
+      metaData: {
+        code: 200,
+        message: "Transaction verified successfully",
+        data,
+      },
       // correlationId
     });
   }
 
   return {
     code: 200,
-    message: "Transaction verified successfully",
+    message: "Donation+made+successfully",
     data,
   };
 };

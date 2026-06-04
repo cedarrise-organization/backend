@@ -11,6 +11,7 @@ export const donors = p.pgTable(
     name: p.text().notNull(),
     email: p.text().notNull(),
     comment: p.text(),
+    metaData: p.text("meta_data"),
     date: p.timestamp().defaultNow().notNull(),
   },
   (table) => [index("donor_idx").on(table.date)],

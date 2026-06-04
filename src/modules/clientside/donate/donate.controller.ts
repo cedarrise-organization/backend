@@ -22,7 +22,8 @@ export const initializeController = async (req: Request, res: Response, next: Ne
   }
 };
 
-export const verifyController = async (req: Request, res: Response, next: NextFunction) => {
+// NOT COMPLETE
+export const verifyViaWebhookController = async (req: Request, res: Response, next: NextFunction) => {
   const event = req.body;
   console.log("\n WEBOOK ROUTE GOT HIT \n");
   console.log(event);
@@ -35,15 +36,14 @@ export const verifyViaCallbackController = async (
   next: NextFunction,
 ) => {
   const { reference } = req.qtransformed;
+  const redirect_url = process.env.PAYSTACK_POST_DONATION_REDIRECT_URL!.toString();
   try {
     const response = await verifyTransaction(reference);
 
     if (response.data.data.status !== "success") {
-      return trackTransactionStatus(res, response.data.data.status);
+      return trackTransactionStatus(res, response.data.data.status, redirect_url);
     }
-
-    // return successResponse(res, response.code, response.message, response.data);
-    return res.redirect("http://localhost:3002/donate?message=Donation+made+successfully");
+    return res.redirect(`${redirect_url}?message=${response.message}`);
   } catch (error) {
     next(error);
   }

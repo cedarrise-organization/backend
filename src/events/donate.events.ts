@@ -20,6 +20,7 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       name: data.name,
       email: data.email,
       comment: data.comment,
+      metaData: JSON.stringify(data.metaData)
     });
 
     logger.info("Donotion record created!", {
