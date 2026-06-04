@@ -28,7 +28,7 @@ import "./queues/workers/deleteCloudinaryAsset.worker.js";
 
 const app = express();
 
-const whitelist = [`http://localhost:3002`, `https://cederrise.vercel.app/`];
+const whitelist = [`http://localhost:3002`, `https://cederrise.vercel.app`];
 const corsOptions = {
   origin: function (
     origin: string | undefined,
