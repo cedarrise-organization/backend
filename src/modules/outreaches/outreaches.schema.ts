@@ -6,7 +6,6 @@ import {
   nigerianStateSchema,
   idSchema,
   baseQueryBody,
-  uploadedFileSchema,
 } from "../../db/globalschema/global.schema.js";
 
 export const outreachTrackerBody = z.object({
@@ -31,12 +30,10 @@ export type OutreachtrackerbodyType = z.infer<typeof outreachTrackerBody>;
 
 export const createOutreachTrackerSchema = z.object({
   body: outreachTrackerBody,
-  file: uploadedFileSchema.optional(),
 });
 
 export const updateOutreachTrackerSchema = z.object({
   body: outreachTrackerBody.partial(),
-  file: uploadedFileSchema.optional(),
 });
 
 export const outreachTrackerParamsSchema = idSchema;

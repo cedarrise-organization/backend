@@ -5,3 +5,5 @@
 > test all inputs and shi. 
 > delete cache on submit
 > cache dels should be pushed to events for api speed
+
+> shift redirect base url for paystack to dotenv

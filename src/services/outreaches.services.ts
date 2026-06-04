@@ -12,16 +12,7 @@ import { sql, asc, eq } from "drizzle-orm";
 import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
 
-export const createOutreach = async (req: Request, options: OutreachtrackerbodyType) => {
-  const documentUpload: UploadApiResponse | undefined = await uploadToCloudinary(
-    (req as any).file,
-    "./",
-  );
-
-  if (!documentUpload) {
-    throw new Error(`Could not upload document`);
-  }
-
+export const createOutreach = async (options: OutreachtrackerbodyType) => {
   const [outreach] = await db
     .insert(outreachTracker)
     .values({
@@ -40,8 +31,6 @@ export const createOutreach = async (req: Request, options: OutreachtrackerbodyT
       recommendations: options.recommendations,
       submittedBy: options.submittedBy,
       submissionDate: sql`TO_DATE(${options.submissionDate}, 'YYYY-MM-DD')`,
-      documentationUrl: documentUpload.secure_url,
-      documentationPublicId: documentUpload.public_id,
     })
     .returning();
 
@@ -127,15 +116,6 @@ export const getOneOutreach = async (id: string) => {
 
 export const deleteOutreach = async (id: string) => {
   const [search] = await db.select().from(outreachTracker).where(eq(outreachTracker.id, id));
-
-  const deleteResponse = await deleteFromCloudinary(search!.documentationPublicId!, "image");
-
-  if (deleteResponse.result !== "ok") {
-    logger.error("Document was not deleted from s3", {
-      publicId: search?.documentationPublicId,
-      event: "delete_doc",
-    });
-  }
 
   await db.delete(outreachTracker).where(eq(outreachTracker.id, id));
 

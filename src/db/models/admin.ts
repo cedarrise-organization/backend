@@ -604,8 +604,6 @@ export const outreachTracker = p.pgTable(
     impactStories: p.text("impact_stories"),
     challengesEncountered: p.text("challenges_encountered"),
     recommendations: p.text(),
-    documentationUrl: p.text("documentation_url"),
-    documentationPublicId: p.text("documentation_public_id"),
 
     submittedBy: p.text("submitted_by").notNull(),
     submissionDate: p.date("submission_date").notNull(),
