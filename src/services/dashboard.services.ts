@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { cacheGet, CACHE_TTL, cacheSet, cacheDel } from "../lib/cache.js";
 import {
   eq,
   gt,
@@ -36,6 +37,18 @@ import {
 import db from "../db/db.js";
 
 export const getCards = async () => {
+  /// cache
+  const key = `cedarrise:dashboard:cards`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Cards data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
   let [volunteerApplied] = await db
     .select({ value: count(volunteerRegistration.id) })
     .from(volunteerRegistration); // Count ids because it has an index
@@ -59,7 +72,7 @@ export const getCards = async () => {
     .from(capacityBuildingEvaluation);
   let [capacityOrganizationsPartneredWith] = await db
     .select({
-      value: countDistinct(sql`lower(${capacityBuildingEvaluation.partnerOrganizations})`),
+      value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
     })
     .from(capacityBuildingEvaluation); // transform values to lowercase to avoid counting similar records twice
   let [capacityVolunteersEngaged] = await db
@@ -76,7 +89,7 @@ export const getCards = async () => {
   };
 
   let [outreachesCommunitiesEngaged] = await db
-    .select({ value: countDistinct(sql`lower(${outreachTracker.outreachCommunity})`) })
+    .select({ value: countDistinct(sql`lower(trim(${outreachTracker.outreachCommunity}))`) })
     .from(outreachTracker); // count distinct outreach communities, transform values to lowercase to avoid counting similar records twice
   let [outreachesBeneficiariesReached] = await db
     .select({ value: sum(outreachTracker.numBeneficiaries) })
@@ -110,7 +123,7 @@ export const getCards = async () => {
       ),
     );
   let [ashCommunitiesEngaged] = await db
-    .select({ value: countDistinct(sql`${ashStudent.schoolLga}`) })
+    .select({ value: countDistinct(sql`lower(trim(${ashStudent.schoolLga}))`) })
     .from(ashStudent)
     .where(eq(ashStudent.status, "accepted"));
   let [ashImprovedGrades] = await db
@@ -149,15 +162,55 @@ export const getCards = async () => {
     dropOuts: ashDropOuts!.value,
   };
 
+  let [tacotsEnrolled] = await db
+    .select({ value: count(tacotsOnboarding.id) })
+    .from(tacotsOnboarding);
+  let [tacotsCurrentlyInSchools] = await db
+    .select({ value: countDistinct(tacotsOnboarding.id) })
+    .from(tacotsOnboarding)
+    .leftJoin(tacotsExit, eq(tacotsExit.studentId, tacotsOnboarding.id))
+    .where(isNull(tacotsExit.studentId));
+  let [tacotsPartnerSchools] = await db
+    .select({
+      value: countDistinct(sql`lower(trim(${tacotsOnboarding.enrolledSchoolName}))`),
+    })
+    .from(tacotsOnboarding);
+  let [tacotsBenefactors] = await db
+    .select({ value: count(tacotsRecommendation.id) })
+    .from(tacotsRecommendation)
+    .where(eq(tacotsRecommendation.adminStatus, "SELECTED"));
+  let [tacotsSponsors] = await db
+    .select({ value: countDistinct(sql`lower(trim(${tacotsOnboarding.sponsorName}))`) })
+    .from(tacotsOnboarding);
+  let tacotsPartners: number = 10;
+  let [tacotsGraduated] = await db
+    .select({ value: countDistinct(tacotsExit.studentId) })
+    .from(tacotsExit)
+    .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"]));
+
   const tacots = {
-    enrolled: 10,
-    currentlyInSchools: 10,
-    partnerSchools: 10,
-    benefactors: 10,
-    sponsors: 10,
-    partners: 10,
-    graduated: 10,
+    enrolled: tacotsEnrolled!.value,
+    currentlyInSchools: tacotsCurrentlyInSchools!.value,
+    partnerSchools: tacotsPartnerSchools!.value,
+    benefactors: tacotsBenefactors!.value,
+    sponsors: tacotsSponsors!.value,
+    partners: tacotsPartners, // NOT-SUPPORTED-IN-TABLES
+    graduated: tacotsGraduated!.value,
   };
+
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      volunteer,
+      capacityBuilding,
+      outreaches,
+      ash,
+      tacots,
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+  ///
 
   return {
     code: 200,

@@ -1,5 +1,6 @@
 import redisClient from "../configs/cache.config.js";
 import crypto from "crypto";
+import logger from "../configs/logger.config.js";
 
 export const CACHE_TTL = {
   PERMISSIONS: 600, // 10 mins
@@ -7,6 +8,7 @@ export const CACHE_TTL = {
   GALLERY: 43200, // 12hrs
   FORM_DATA: 1800, // 30 mins
   LISTS: 600, // 10 mins
+  DASHBOARD_CARDS: 3600, // 1 hr
   /*
     ...other TTLs
     */
@@ -16,6 +18,7 @@ export const cacheGet = async <T>(key: string): Promise<T | null> => {
   const raw = await redisClient.get(key);
   if (!raw) return null;
   try {
+    logger.debug(`cache hit @${new Date(Date.now())}`)
     return JSON.parse(raw) as T;
   } catch {
     return null;
@@ -23,14 +26,17 @@ export const cacheGet = async <T>(key: string): Promise<T | null> => {
 };
 
 export const cacheSet = async (key: string, value: any, ttlseconds: number): Promise<void> => {
+  logger.debug(`cache set @${new Date(Date.now())}`)
   await redisClient.setEx(key, ttlseconds, JSON.stringify(value));
 };
 
 export const cacheDel = async (key: string) => {
+  logger.debug(`cache key deleted @${new Date(Date.now())}`)
   await redisClient.del(key);
 };
 
 export const cacheDelPattern = async (pattern: string): Promise<void> => {
+  logger.debug(`cache keys deleted @${new Date(Date.now())}`)
   for await (const key of redisClient.scanIterator({ MATCH: pattern, COUNT: 100 })) {
     await redisClient.del(key);
   }

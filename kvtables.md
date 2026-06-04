@@ -25,8 +25,9 @@
 | PERMISSIONS | 600s (10 mins)  | `lib/cache.ts` |
 | BLOGS       | 3600s (1 hr)    | `lib/cache.ts` |
 | GALLERY     | 43200s (12 hrs) | `lib/cache.ts` |
-| FORM_DATA   | 1800 (30 mins)  | `lib/cache.ts` |
-| LISTS       | 600 (10 mins)   | `lib/cache.ts` |
+| FORM_DATA        | 1800 (30 mins)  | `lib/cache.ts` |
+| LISTS            | 600 (10 mins)   | `lib/cache.ts` |
+| DASHBOARD_CARDS  | 3600s (1 hr)    | `lib/cache.ts` |
 
 ---
 
@@ -72,6 +73,7 @@
 | `cedarrise:lookup:recommended`                                            | Cached lightweight list of SELECTED TACOTS recommendations (id + name) for dropdown. Set on read.  | `services/lookup.services.ts`               |
 | `cedarrise:lookup:onboarded`                                              | Cached lightweight list of TACOTS onboarded students (id + name) for dropdown. Set on read.        | `services/lookup.services.ts`               |
 | `cedarrise:lookup:volunteers`                                             | Cached lightweight list of accepted volunteers (id + name) for dropdown. Set on read.              | `services/lookup.services.ts`               |
+| `cedarrise:dashboard:cards`                                               | Cached aggregate dashboard card metrics (volunteer, capacity, outreach, ASH, TACOTS). Set on read. | `services/dashboard.services.ts`            |
 
 ---
 

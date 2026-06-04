@@ -5,8 +5,8 @@ import { successResponse } from "../../utils/responseHandler.js";
 
 export const getCardsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const response = await getCards()
-    successResponse(res, response.code, response.message, response.data)
+    const response = await getCards();
+    successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }

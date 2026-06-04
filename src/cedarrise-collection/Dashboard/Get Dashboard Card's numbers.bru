@@ -18,3 +18,155 @@ settings {
   encodeUrl: true
   timeout: 0
 }
+
+docs {
+  # Get Dashboard Card Numbers
+  
+  Returns aggregate metrics for the admin dashboard, grouped into five programme cards: **Volunteer**, **Capacity Building**, **Outreaches**, **ASH**, and **TACOTS**. Results are cached for 1 hour (`DASHBOARD_CARDS` TTL).
+  
+  ## Authorization
+  Authentication and authorization are currently **disabled** on this route (commented out in `dashboard.routes.ts`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response
+  
+  **`200 OK`** — Returns an object with five programme sections.
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "volunteer": { 
+        "applied": number,
+        "accepted": number,
+        "Partners": number,
+        "currentVolunteers": number,
+        "sponsors": number
+       },
+      "capacityBuilding": { 
+        "participantsImpacted": number,
+        "organizationsPartneredWith": number,
+        "volunteersEngaged": number,
+        "workshopsConducted": number
+      },
+      "outreaches": { 
+        "communitiesEngaged": number,
+        "beneficiariesReached": number,
+        "partners": number,
+        "volunteers": number,
+        "outreachEvents": number
+      },
+      "ash": { 
+        "studentsEnrolled": number,
+        "volunteers": number,
+        "communitiesEngaged": number,
+        "improvedGrades": number,
+        "currentBeneficiaries": number,
+        "graduated": number,
+        "dropOuts": number
+       },
+      "tacots": { 
+        "enrolled": number,
+        "currentlyInSchools": number,
+        "partnerSchools": number,
+        "benefactors": number,
+        "sponsors": number,
+        "partners": number,
+        "graduated": number
+      }
+    }
+  }
+  ```
+  
+  ---
+  
+  ### `volunteer`
+  
+  | Field              | Type   | Calculation                                                                                                                   |
+  |--------------------|--------|-------------------------------------------------------------------------------------------------------------------------------|
+  | applied            | number | `COUNT(volunteerRegistration.id)` — total volunteer registration rows.                                                        |
+  | accepted           | number | `COUNT(volunteerRegistration.id) WHERE status = 'accepted'`.                                                                  |
+  | Partners           | number | **⚠️ Hardcoded to `10`** — no partners table exists in the database.                                                          |
+  | currentVolunteers  | number | Same query as `accepted` — reuses the accepted count.                                                                         |
+  | sponsors           | number | **⚠️ Hardcoded to `10`** — no sponsors table exists in the database.                                                          |
+  
+  ---
+  
+  ### `capacityBuilding`
+  
+  | Field                    | Type   | Calculation                                                                                                                               |
+  |--------------------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------|
+  | participantsImpacted     | number | `SUM(capacityBuildingEvaluation.numberOfParticipants)` — total participants across all evaluations.                                        |
+  | organizationsPartneredWith | number | `COUNT(DISTINCT lower(trim(capacityBuildingEvaluation.partnerOrganizations)))` — unique partner orgs (case-insensitive, trimmed).       |
+  | volunteersEngaged        | number | `MAX(capacityBuildingEvaluation.numberOfVolunteers)` — highest volunteer count from any single evaluation.                                |
+  | workshopsConducted       | number | `COUNT(capacityBuildingEvaluation.id)` — total evaluation rows (each row represents one workshop).                                        |
+  
+  ---
+  
+  ### `outreaches`
+  
+  | Field               | Type   | Calculation                                                                                                                      |
+  |---------------------|--------|----------------------------------------------------------------------------------------------------------------------------------|
+  | communitiesEngaged  | number | `COUNT(DISTINCT lower(trim(outreachTracker.outreachCommunity)))` — unique communities (case-insensitive, trimmed).                |
+  | beneficiariesReached | number | `SUM(outreachTracker.numBeneficiaries)` — total beneficiaries across all outreach events.                                        |
+  | partners            | number | **⚠️ Hardcoded to `10`** — no outreach partners table exists in the database.                                                    |
+  | volunteers          | number | `MAX(outreachTracker.numVolunteers)` — highest volunteer count from any single outreach event.                                    |
+  | outreachEvents      | number | `COUNT(outreachTracker.id)` — total outreach tracker rows (each row represents one event).                                       |
+  
+  ---
+  
+  ### `ash` (After-School Hub)
+  
+  | Field                | Type   | Calculation                                                                                                                                                     |
+  |----------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | studentsEnrolled     | number | `COUNT(ashStudent.id) WHERE status = 'accepted'` — total accepted ASH students.                                                                                 |
+  | volunteers           | number | `COUNT(volunteerRegistration.id) WHERE status = 'accepted' AND volunteerAreas @> ['ASH']` — accepted volunteers whose areas include "ASH".                      |
+  | communitiesEngaged   | number | `COUNT(DISTINCT lower(trim(ashStudent.schoolLga))) WHERE status = 'accepted'` — unique LGAs among accepted students (case-insensitive, trimmed).                |
+  | improvedGrades       | number | Percentage: `(studentsWithImprovement / studentsEnrolled) * 100`. Students with improvement are `COUNT(DISTINCT ashTermlyTracking.studentId)` where the student is accepted AND `posttestAverage > pretestAverage`. Returns `0` if no students are enrolled. |
+  | currentBeneficiaries | number | `COUNT(DISTINCT ashStudent.id) WHERE status = 'accepted' AND ashExit.studentId IS NULL` — accepted students who have **not** exited the programme (LEFT JOIN with ashExit). |
+  | graduated            | number | `COUNT(DISTINCT ashExit.studentId) WHERE exitReason IN ('COMPLETED', 'GRADUATED')`.                                                                            |
+  | dropOuts             | number | `COUNT(DISTINCT ashExit.studentId) WHERE exitReason = 'DROPPED OUT'`.                                                                                           |
+  
+  ---
+  
+  ### `tacots`
+  
+  | Field              | Type   | Calculation                                                                                                                                    |
+  |--------------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------|
+  | enrolled           | number | `COUNT(tacotsOnboarding.id)` — total TACOTS onboarding rows.                                                                                   |
+  | currentlyInSchools | number | `COUNT(DISTINCT tacotsOnboarding.id) WHERE tacotsExit.studentId IS NULL` — onboarded students who have **not** exited (LEFT JOIN with tacotsExit). |
+  | partnerSchools     | number | `COUNT(DISTINCT lower(trim(tacotsOnboarding.enrolledSchoolName)))` — unique schools (case-insensitive, trimmed).                                |
+  | benefactors        | number | `COUNT(tacotsRecommendation.id) WHERE adminStatus = 'SELECTED'` — recommendations marked as selected.                                          |
+  | sponsors           | number | `COUNT(DISTINCT lower(trim(tacotsOnboarding.sponsorName)))` — unique sponsor names (case-insensitive, trimmed).                                 |
+  | partners           | number | **⚠️ Hardcoded to `10`** — no TACOTS partners table exists in the database.                                                                     |
+  | graduated          | number | `COUNT(DISTINCT tacotsExit.studentId) WHERE exitReason IN ('COMPLETED SECONDARY EDUCATION (GRADUATED)')`.                                       |
+  
+  ---
+  
+  ### Hardcoded Values Summary
+  
+  The following fields are set to a **hardcoded value of `10`** because no corresponding table exists in the database to derive them:
+  
+  | Section    | Field    | Variable in Service          |
+  |------------|----------|------------------------------|
+  | volunteer  | Partners | `volunteerPartners`          |
+  | volunteer  | sponsors | `volunteersponsors`          |
+  | outreaches | partners | `outreachesPartners`         |
+  | tacots     | partners | `tacotsPartners`             |
+  
+  All four are annotated with `// NOT-SUPPORTED-IN-TABLES` in `dashboard.services.ts`.
+  
+  ## Caching
+  
+  - **Key:** `cedarrise:dashboard:cards`
+  - **TTL:** `CACHE_TTL.DASHBOARD_CARDS` (3600s / 1 hour)
+  - Set after the first successful database fetch; subsequent requests within the TTL window return cached data.
+  
+  ## Errors
+  
+  | Status                      | Description              |
+  |-----------------------------|--------------------------|
+  | `500 Internal Server Error` | Unexpected server error. |
+}
