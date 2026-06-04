@@ -24,11 +24,11 @@ import "./events/tacots.events.js";
 import "./events/ash.events.js";
 // import "./events/feature.event.js"
 import "./queues/workers/deleteCloudinaryAsset.worker.js";
-// import "./queues/workers/feature.worker.js"
+// import "./queues/workers/feature.worker.js" 
 
 const app = express();
 
-const whitelist = [`http://localhost:3002`];
+const whitelist = [`http://localhost:3002`, `https://cederrise.vercel.app/`];
 const corsOptions = {
   origin: function (
     origin: string | undefined,
