@@ -16,6 +16,7 @@ import lookupRouter from "./modules/lookup/lookup.routes.js";
 import capacityRouter from "./modules/capacity/capacity.routes.js";
 import volunteerRouter from "./modules/volunteer/volunteer.routes.js";
 import outreachRouter from "./modules/outreaches/outreaches.routes.js";
+import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
 // import featureRouter from "./modules/feature/feature.routes.js";
 import "./events/admin.events.js";
 import "./events/auth.events.js";
@@ -24,7 +25,7 @@ import "./events/tacots.events.js";
 import "./events/ash.events.js";
 // import "./events/feature.event.js"
 import "./queues/workers/deleteCloudinaryAsset.worker.js";
-// import "./queues/workers/feature.worker.js" 
+// import "./queues/workers/feature.worker.js"
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/donate", donateRouter);
 app.use("/api/v1/feedback", feedbackRouter);
 app.use("/api/v1/carousels", carouselRouter);
+app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/volunteer", volunteerRouter);
 app.use("/api/v1/lookup", lookupRouter);
 app.use("/api/v1/forms/ash", ashRouter);
