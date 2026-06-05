@@ -3,7 +3,7 @@ import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { capacityBuildingEvaluation } from "../db/models/admin.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { UploadApiResponse } from "cloudinary";
-import { sql, eq, asc } from "drizzle-orm";
+import { sql, eq, asc, count } from "drizzle-orm";
 import { Request } from "express";
 import db from "../db/db.js";
 
@@ -77,26 +77,32 @@ export const listAllEvaluation = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "All evaluation found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
-
-  const evaluation = await db
-    .select()
-    .from(capacityBuildingEvaluation)
-    .orderBy(asc(capacityBuildingEvaluation.createdAt))
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [evaluation, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(capacityBuildingEvaluation)
+      .orderBy(asc(capacityBuildingEvaluation.createdAt))
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db
+      .select({ value: count(capacityBuildingEvaluation.id) })
+      .from(capacityBuildingEvaluation),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, evaluation, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: evaluation, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -107,6 +113,7 @@ export const listAllEvaluation = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };

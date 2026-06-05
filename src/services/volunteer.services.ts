@@ -1,7 +1,7 @@
 import { volunteerRegistration, volunteerFeedback } from "../db/models/admin.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { invalidateCache } from "../utils/cache.util.js";
-import { sql, asc, eq } from "drizzle-orm";
+import { sql, asc, eq, count } from "drizzle-orm";
 import {
   VolunteerregistrationbodyType,
   VolunteerfeedbackbodyType,
@@ -78,11 +78,12 @@ export const listVolunteers = async (
     return {
       code: 200,
       message: "Volunteers found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
@@ -90,24 +91,27 @@ export const listVolunteers = async (
   ///
 
   const sortColumn = sortMap[sortBy] ?? volunteerRegistration.createdAt;
-
-  const volunteers = await db
-    .select()
-    .from(volunteerRegistration)
-    .orderBy(
-      sql`
+  const [volunteers, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(volunteerRegistration)
+      .orderBy(
+        sql`
         CASE
           WHEN ${volunteerRegistration.status} = ${status} THEN 0
           ELSE 1
         END
       `,
-      asc(sortColumn),
-    )
-    .limit(limit)
-    .offset((page - 1) * limit);
+        asc(sortColumn),
+      )
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, volunteers, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: volunteers, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -118,6 +122,7 @@ export const listVolunteers = async (
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -161,8 +166,8 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
     })
     .where(eq(volunteerRegistration.id, id))
     .returning({
-      id: volunteerRegistration.id, 
-      status: volunteerRegistration.status
+      id: volunteerRegistration.id,
+      status: volunteerRegistration.status,
     });
 
   // delete all related cache
@@ -184,7 +189,7 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
   };
 };
 
-export const deleteVolunteer  = async (id: string) => {
+export const deleteVolunteer = async (id: string) => {
   await db.delete(volunteerRegistration).where(eq(volunteerRegistration.id, id));
 
   /// cache delete
@@ -249,26 +254,31 @@ export const listVolunteerFeedback = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Volunteer feedback successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const feedback = await db
-    .select()
-    .from(volunteerFeedback)
-    .orderBy(volunteerFeedback.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [feedback, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(volunteerFeedback)
+      .orderBy(volunteerFeedback.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(volunteerFeedback.id) }).from(volunteerFeedback),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: feedback, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -279,6 +289,7 @@ export const listVolunteerFeedback = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages, 
       },
     },
   };
@@ -310,7 +321,7 @@ export const getVolunteerFeedback = async (id: string) => {
   };
 };
 
-export const deleteVolunteerFeedback  = async (id: string) => {
+export const deleteVolunteerFeedback = async (id: string) => {
   await db.delete(volunteerFeedback).where(eq(volunteerFeedback.id, id));
 
   /// cache delete
