@@ -5,7 +5,7 @@ import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { ASH_EVENTS } from "../events/ash.events.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
-import { sql, asc, eq } from "drizzle-orm";
+import { sql, asc, eq, count } from "drizzle-orm";
 import { Request } from "express";
 import {
   AshstudentbodyType,
@@ -136,11 +136,12 @@ export const listRegistrations = async (
     return {
       code: 200,
       message: "Ash students found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
@@ -148,24 +149,27 @@ export const listRegistrations = async (
   ///
 
   const sortColumn = sortMap[sortBy] ?? ashStudent.createdAt;
-
-  const ashStudents = await db
-    .select()
-    .from(ashStudent)
-    .orderBy(
-      sql`
+  const [ashStudents, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(ashStudent)
+      .orderBy(
+        sql`
         CASE
           WHEN ${ashStudent.status} = ${status} THEN 0
           ELSE 1
         END
       `,
-      asc(sortColumn),
-    )
-    .limit(limit)
-    .offset((page - 1) * limit);
+        asc(sortColumn),
+      )
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(ashStudent.id) }).from(ashStudent),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, ashStudents, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: ashStudents, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -176,6 +180,7 @@ export const listRegistrations = async (
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -363,26 +368,31 @@ export const listFeedback = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Ash program feedback found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const allProgramFeedback = await db
-    .select()
-    .from(ashProgramFeedback)
-    .orderBy(ashProgramFeedback.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [allProgramFeedback, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(ashProgramFeedback)
+      .orderBy(ashProgramFeedback.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(ashProgramFeedback.id) }).from(ashProgramFeedback),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, allProgramFeedback, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: allProgramFeedback, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -393,6 +403,7 @@ export const listFeedback = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -499,26 +510,32 @@ export const listTracking = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Tracking data found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const tracking = await db
-    .select()
-    .from(ashTermlyTracking)
-    .orderBy(ashTermlyTracking.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [tracking, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(ashTermlyTracking)
+      .orderBy(ashTermlyTracking.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+
+    await db.select({ value: count(ashTermlyTracking.id) }).from(ashTermlyTracking),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, tracking, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: tracking, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -529,6 +546,7 @@ export const listTracking = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -626,26 +644,32 @@ export const listAttendance = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Attendance data found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const attendance = await db
-    .select()
-    .from(ashWeeklyAttendance)
-    .orderBy(ashWeeklyAttendance.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [attendance, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(ashWeeklyAttendance)
+      .orderBy(ashWeeklyAttendance.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+
+    await db.select({ value: count(ashWeeklyAttendance.id) }).from(ashWeeklyAttendance),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, attendance, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: attendance, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -656,6 +680,7 @@ export const listAttendance = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -746,26 +771,30 @@ export const listExit = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Exit data found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
-
-  const exit = await db
-    .select()
-    .from(ashExit)
-    .orderBy(ashExit.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [exit, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(ashExit)
+      .orderBy(ashExit.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(ashExit.id) }).from(ashExit),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, exit, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: exit, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -776,6 +805,7 @@ export const listExit = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };

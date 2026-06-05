@@ -6,9 +6,9 @@ import {
   deleteFromCloudinary,
 } from "../utils/storage.util.js";
 import { outreachTracker } from "../db/models/admin.js";
+import { sql, asc, eq, count } from "drizzle-orm";
 import { UploadApiResponse } from "cloudinary";
 import { Request } from "express";
-import { sql, asc, eq } from "drizzle-orm";
 import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
 
@@ -53,26 +53,31 @@ export const listOutreaches = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Outreaches found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const outreaches = await db
-    .select()
-    .from(outreachTracker)
-    .orderBy(asc(outreachTracker.createdAt))
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [outreaches, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(outreachTracker)
+      .orderBy(asc(outreachTracker.createdAt))
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(outreachTracker.id) }).from(outreachTracker),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, outreaches, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: outreaches, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -83,6 +88,7 @@ export const listOutreaches = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };

@@ -42,6 +42,20 @@ docs {
   ## Response
   
   **`200 OK`** — Returns a paginated array of TACOTS exit records.
+
+  ```json
+  {
+    "success": true,
+    "data": [ ... ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 1
+      }
+    }
+  }
+  ```
   
   ## Errors
   
