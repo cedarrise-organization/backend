@@ -49,14 +49,16 @@ docs {
   
   **`200 OK`** — Returns a paginated array of TACOTS recommendation records.
   
-  ```json
+ ```json
   {
     "success": true,
     "data": [ ... ],
-    "meta": "pagination": {
-      "page": 1,
-      "limit": 25,
-      "total": 42
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 1
+      }
     }
   }
   ```

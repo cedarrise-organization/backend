@@ -5,9 +5,14 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/volunteer/all/feedback
+  url: {{baseUrl}}/api/v1/volunteer/all/feedback?page=&limit=
   body: none
   auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
 }
 
 vars:pre-request {
@@ -45,7 +50,7 @@ docs {
     "meta": "pagination": {
       "page": 1,
       "limit": 25,
-      "total": 42
+      "totalPages": 2
     }
   }
   ```

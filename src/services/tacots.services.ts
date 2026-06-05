@@ -3,9 +3,9 @@ import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { TACOTS_EVENTS } from "../events/tacots.events.js";
 import { invalidateCache } from "../utils/cache.util.js";
+import { sql, asc, eq, count } from "drizzle-orm";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
-import { sql, asc, eq } from "drizzle-orm";
 import { Request } from "express";
 import {
   TacotsrecommendationbodyType,
@@ -153,11 +153,12 @@ export const listRecommendations = async (
     return {
       code: 200,
       message: "Tacots beneficiaries found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
@@ -165,24 +166,27 @@ export const listRecommendations = async (
   ///
 
   const sortColumn = sortMap[sortBy] ?? tacotsRecommendation.createdAt;
-
-  const tacotsBeneficiaries = await db
-    .select()
-    .from(tacotsRecommendation)
-    .orderBy(
-      sql`
+  const [tacotsBeneficiaries, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(tacotsRecommendation)
+      .orderBy(
+        sql`
           CASE
             WHEN ${tacotsRecommendation.adminStatus} = ${status} THEN 0
             ELSE 1
           END
         `,
-      asc(sortColumn),
-    )
-    .limit(limit)
-    .offset((page - 1) * limit);
+        asc(sortColumn),
+      )
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(tacotsRecommendation.id) }).from(tacotsRecommendation),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, tacotsBeneficiaries, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: tacotsBeneficiaries, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -193,6 +197,7 @@ export const listRecommendations = async (
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -358,26 +363,31 @@ export const listTacotsFeedback = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Tacots feedback found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const feedback = await db
-    .select()
-    .from(tacotsFeedback)
-    .orderBy(tacotsFeedback.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [feedback, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(tacotsFeedback)
+      .orderBy(tacotsFeedback.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(tacotsFeedback.id) }).from(tacotsFeedback),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, feedback, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: feedback, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -388,6 +398,7 @@ export const listTacotsFeedback = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -519,26 +530,31 @@ export const listOnboarding = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Tacots onboarded beneficiaries found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const onboarded = await db
-    .select()
-    .from(tacotsOnboarding)
-    .orderBy(tacotsOnboarding.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [onboarded, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(tacotsOnboarding)
+      .orderBy(tacotsOnboarding.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, onboarded, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: onboarded, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -549,6 +565,7 @@ export const listOnboarding = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -706,26 +723,31 @@ export const listTacotsTracking = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "All Tacots tracking data found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const tracking = await db
-    .select()
-    .from(tacotsTracking)
-    .orderBy(tacotsTracking.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
+  const [tracking, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(tacotsTracking)
+      .orderBy(tacotsTracking.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(tacotsTracking.id) }).from(tacotsTracking),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, tracking, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: tracking, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -736,6 +758,7 @@ export const listTacotsTracking = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
@@ -853,26 +876,30 @@ export const listTacotsExit = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "All Tacots exit data found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,
           limit,
+          totalPages: cacheRes.totalPages,
         },
       },
     };
   }
   ///
 
-  const exit = await db
-    .select()
-    .from(tacotsExit)
-    .orderBy(tacotsExit.createdAt)
-    .limit(limit)
-    .offset((page - 1) * limit);
-
+  const [exit, [totalDocuments]] = await Promise.all([
+    await db
+      .select()
+      .from(tacotsExit)
+      .orderBy(tacotsExit.createdAt)
+      .limit(limit)
+      .offset((page - 1) * limit),
+    await db.select({ value: count(tacotsExit.id) }).from(tacotsExit),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
   /// cache set
-  await cacheSet(key, exit, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: exit, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -883,6 +910,7 @@ export const listTacotsExit = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
+        totalPages,
       },
     },
   };
