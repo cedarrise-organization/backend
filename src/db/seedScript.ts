@@ -19,6 +19,7 @@ import {
   volunteerRegistration,
   volunteerFeedback,
   outreachTracker,
+  projects,
 } from "./models/admin.js";
 
 // CLEAR TABLES
@@ -44,6 +45,7 @@ const clearTables = async () => {
     await db.delete(tacotsFeedback);
     await db.delete(outreachTracker);
     await db.delete(capacityBuildingEvaluation);
+    await db.delete(projects);
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -324,7 +326,7 @@ async function seedAshStudent() {
 
     logger.info(`Inserted ${rows.length} rows into ashstudent`);
   } catch (error) {
-    logger.error("Could not seed ashstudent tables", {error});
+    logger.error("Could not seed ashstudent tables", { error });
   }
 }
 async function seedAshTermlyTracking() {
@@ -343,7 +345,7 @@ async function seedAshTermlyTracking() {
 
     logger.info(`Inserted ${rows.length} rows into ashTermlyTracking`);
   } catch (error) {
-    logger.error("could not seed ashtermlytracking table", {error});
+    logger.error("could not seed ashtermlytracking table", { error });
   }
 }
 async function seedAshWeeklyAttendance() {
@@ -371,7 +373,7 @@ async function seedAshWeeklyAttendance() {
 
     logger.info(`Inserted ${rows.length} rows into ashWeeklyAttendance`);
   } catch (error) {
-    logger.error("could not seed ashWeeklyAttendance table", {error});
+    logger.error("could not seed ashWeeklyAttendance table", { error });
   }
 }
 async function seedAshExit() {
@@ -396,7 +398,7 @@ async function seedAshExit() {
 
     logger.info(`Inserted ${rows.length} rows into ashExit`);
   } catch (error) {
-    logger.error("could not seed ashExit table", {error});
+    logger.error("could not seed ashExit table", { error });
   }
 }
 async function seedAshProgramFeedback() {
@@ -423,7 +425,7 @@ async function seedAshProgramFeedback() {
 
     logger.info(`Inserted ${rows.length} rows into ashProgramFeedback`);
   } catch (error) {
-    logger.error("could not seed ashProgramFeedback table", {error});
+    logger.error("could not seed ashProgramFeedback table", { error });
   }
 }
 
@@ -453,7 +455,7 @@ async function seedVolunteerRegistration() {
 
     logger.info(`Inserted ${rows.length} rows into volunteerRegistration`);
   } catch (error) {
-    logger.error("could not seed volunteerRegistration table", {error});
+    logger.error("could not seed volunteerRegistration table", { error });
   }
 }
 async function seedVolunteerFeedback() {
@@ -481,7 +483,7 @@ async function seedVolunteerFeedback() {
 
     logger.info(`Inserted ${rows.length} rows into volunteerFeedback`);
   } catch (error) {
-    logger.error("could not seed volunteerFeedback table", {error});
+    logger.error("could not seed volunteerFeedback table", { error });
   }
 }
 
@@ -511,7 +513,7 @@ async function seedTacotsRecommendation() {
 
     logger.info(`Inserted ${rows.length} rows into tacotsRecommendation`);
   } catch (error) {
-    logger.error("could not seed tacotsRecommendation table", {error});
+    logger.error("could not seed tacotsRecommendation table", { error });
   }
 }
 async function seedTacotsOnboarding() {
@@ -540,7 +542,7 @@ async function seedTacotsOnboarding() {
 
     logger.info(`Inserted ${rows.length} rows into tacotsOnboarding`);
   } catch (error) {
-    logger.error("could not seed tacotsOnboarding table", {error});
+    logger.error("could not seed tacotsOnboarding table", { error });
   }
 }
 async function seedTacotsTracking() {
@@ -570,7 +572,7 @@ async function seedTacotsTracking() {
 
     logger.info(`Inserted ${rows.length} rows into tacotsTracking`);
   } catch (error) {
-    logger.error("could not seed tacotsTracking table", {error});
+    logger.error("could not seed tacotsTracking table", { error });
   }
 }
 async function seedTacotsExit() {
@@ -595,7 +597,7 @@ async function seedTacotsExit() {
 
     logger.info(`Inserted ${rows.length} rows into tacotsExit`);
   } catch (error) {
-    logger.error("could not seed tacotsExit table", {error});
+    logger.error("could not seed tacotsExit table", { error });
   }
 }
 async function seedTacotsFeedback() {
@@ -622,7 +624,7 @@ async function seedTacotsFeedback() {
 
     logger.info(`Inserted ${rows.length} rows into tacotsFeedback`);
   } catch (error) {
-    logger.error("could not seed tacotsFeedback table", {error});
+    logger.error("could not seed tacotsFeedback table", { error });
   }
 }
 
@@ -654,7 +656,7 @@ async function seedOutreachTracker() {
 
     logger.info(`Inserted ${rows.length} rows into outreachTracker`);
   } catch (error) {
-    logger.error("could not seed outreachTracker table", {error});
+    logger.error("could not seed outreachTracker table", { error });
   }
 }
 
@@ -685,7 +687,25 @@ async function seedCapacityBuildingEvaluation() {
 
     logger.info(`Inserted ${rows.length} rows into capacityBuildingEvaluation`);
   } catch (error) {
-    logger.error("could not seed capacityBuildingEvaluation table", {error});
+    logger.error("could not seed capacityBuildingEvaluation table", { error });
+  }
+}
+
+// PROJECTS
+async function seedProjects() {
+  try {
+    const file = await fs.readFile(`${process.cwd()}/src/db/seeddata/projects.jsonl`, "utf-8");
+
+    const rows = file
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line) => JSON.parse(line));
+
+    await db.insert(projects).values(rows);
+
+    logger.info(`Inserted ${rows.length} rows into projects`);
+  } catch (error) {
+    logger.error("could not seed projects table", { error });
   }
 }
 
@@ -707,3 +727,4 @@ await seedTacotsExit();
 await seedTacotsFeedback();
 await seedOutreachTracker();
 await seedCapacityBuildingEvaluation();
+await seedProjects();

@@ -16,8 +16,5 @@ router.get(
 // router.get("/");
 // router.get("/");
 // router.get("/");
-// router.get("/");
-// router.get("/");
-// router.get("/");
 
 export default router;

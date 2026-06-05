@@ -1,0 +1,87 @@
+meta {
+  name: Update project status
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/general/projects/:id?status=ongoing
+  body: none
+  auth: inherit
+}
+
+params:query {
+  status: ongoing
+}
+
+params:path {
+  id: 0bec2607-0d07-4c73-bce8-911621090412
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Update Project Status
+  
+  Updates the status of an existing project. Invalidates the projects cache on success.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Required | Description                     |
+  |-----------|------|----------|---------------------------------|
+  | `id`      | uuid | ✅       | The ID of the project to update.|
+  
+  ### Query Parameters
+  
+  | Parameter | Type   | Required | Validation                          |
+  |-----------|--------|----------|-------------------------------------|
+  | `status`  | string | ✅       | Must be `"ongoing"` or `"completed"`. Empty strings are rejected. |
+  
+  ## Response
+  
+  **`200 OK`** — Returns the updated project record.
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "title": "Project Title",
+      "description": "Project description text",
+      "imageUrl": "https://res.cloudinary.com/...",
+      "imagePublicId": "public_id_string",
+      "status": "completed",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-05T00:00:00.000Z"
+    }
+  }
+  ```
+  
+  ## Cache Invalidation
+  
+  - **Deleted Key:** `cedarrise:dashboard:projects`
+  - The projects list cache is cleared after a successful status update.
+  
+  ## Errors
+  
+  | Status                      | Description                                          |
+  |-----------------------------|------------------------------------------------------|
+  | `400 Bad Request`           | Invalid ID format or invalid status value.           |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                     |
+  | `403 Forbidden`             | Insufficient permissions.                            |
+  | `500 Internal Server Error` | Unexpected server error.                             |
+}

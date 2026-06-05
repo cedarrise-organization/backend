@@ -1,0 +1,70 @@
+meta {
+  name: Delete a project
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/general/projects/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 6ea62383-3bc8-44a2-87db-f79dfc252c00
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete a Project
+  
+  Deletes a project record by ID. If the request includes a file context, the associated Cloudinary image is also deleted. Invalidates the projects cache on success.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Required | Description                      |
+  |-----------|------|----------|----------------------------------|
+  | `id`      | uuid | ✅       | The ID of the project to delete. |
+  
+  No request body or query parameters.
+  
+  ## Response
+  
+  **`200 OK`** — Confirms deletion.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Project status deleted successfully"
+  }
+  ```
+  
+  ## Side Effects
+  
+  - If the project has an associated Cloudinary image, it is deleted from Cloudinary. A failed Cloudinary deletion is logged but does not block the database deletion.
+  - **Deleted Cache Key:** `cedarrise:dashboard:projects`
+  
+  ## Errors
+  
+  | Status                      | Description                              |
+  |-----------------------------|------------------------------------------|
+  | `400 Bad Request`           | Invalid ID format.                       |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.         |
+  | `403 Forbidden`             | Insufficient permissions.                |
+  | `500 Internal Server Error` | Unexpected server error.                 |
+}

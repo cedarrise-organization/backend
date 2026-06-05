@@ -11,7 +11,7 @@ import { successResponse } from "../../utils/responseHandler.js";
 export const ashDropdownController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const response = await ashDropdown();
-    successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }
@@ -24,7 +24,7 @@ export const recommendedDropdownController = async (
 ) => {
   try {
     const response = await recommendedDropdown();
-    successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }
@@ -37,7 +37,7 @@ export const onboardedDropdownController = async (
 ) => {
   try {
     const response = await onboardedDropdown();
-    successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }
@@ -50,7 +50,7 @@ export const volunteerDropdownController = async (
 ) => {
   try {
     const response = await volunteerDropdown();
-    successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }
