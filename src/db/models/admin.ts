@@ -1090,3 +1090,13 @@ export const tacotsExit = p.pgTable(
     ),
   ],
 );
+
+export const projects = p.pgTable("projects", {
+   id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+   title: p.text().notNull(),
+   description: p.text(),
+   imageUrl: p.text().default("https://res.cloudinary.com/dhdfwtjs5/image/upload/v1780649959/ongoing_project_result_raix7r.webp"), 
+   imagePublicId: p.text().default("ongoing_project_result_raix7r"), 
+   status: p.text().default("ongoing"), 
+   ...timestamps,
+}) 

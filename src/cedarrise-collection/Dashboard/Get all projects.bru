@@ -1,0 +1,71 @@
+meta {
+  name: Get all projects
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/general/projects
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get All Projects
+  
+  Returns a list of all projects, ordered by most recently created. Results are cached using the `DASHBOARD_CARDS` TTL.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  
+  No path parameters, query parameters, or request body.
+  
+  ## Response
+  
+  **`200 OK`** — Returns an array of project records.
+  
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "uuid",
+        "title": "Project Title",
+        "description": "Project description text",
+        "imageUrl": "https://res.cloudinary.com/...",
+        "imagePublicId": "public_id_string",
+        "status": "ongoing",
+        "createdAt": "2026-06-01T00:00:00.000Z",
+        "updatedAt": "2026-06-01T00:00:00.000Z"
+      }
+    ]
+  }
+  ```
+  
+  ## Caching
+  
+  - **Key:** `cedarrise:dashboard:projects`
+  - **TTL:** `CACHE_TTL.DASHBOARD_CARDS`
+  - Cache is populated on the first successful database fetch; subsequent requests within the TTL window return cached data.
+  
+  ## Errors
+  
+  | Status                      | Description                         |
+  |-----------------------------|-------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid Bearer token.    |
+  | `403 Forbidden`             | Insufficient permissions.           |
+  | `500 Internal Server Error` | Unexpected server error.            |
+}

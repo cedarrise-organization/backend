@@ -1,0 +1,83 @@
+meta {
+  name: Create a project
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/general/projects
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  title: Example Project Title
+  description: An optional project description
+  file: @file(/path/to/image.jpg)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Create a Project
+  
+  Creates a new project record. Optionally uploads a project image to Cloudinary under `/Cedarrise Initiative/DASHBOARD-ASSETS/PROJECTS`. Invalidates the projects cache on success.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  
+  **Content-Type:** `multipart/form-data`
+  
+  ### Body Fields
+  
+  | Field         | Type   | Required | Validation                                            |
+  |---------------|--------|----------|-------------------------------------------------------|
+  | `title`       | string | ✅       | Min 3 characters, max 150 characters.                 |
+  | `description` | string | ❌       | Optional text description.                            |
+  | `file`        | file   | ❌       | Image file (jpeg, jpg, png, webp). Max 20 MB.         |
+  
+  ## Response
+  
+  **`200 OK`** — Returns the newly created project record.
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "title": "Example Project Title",
+      "description": "An optional project description",
+      "imageUrl": "https://res.cloudinary.com/...",
+      "imagePublicId": "public_id_string",
+      "status": "ongoing",
+      "createdAt": "2026-06-01T00:00:00.000Z",
+      "updatedAt": "2026-06-01T00:00:00.000Z"
+    }
+  }
+  ```
+  
+  ## Cache Invalidation
+  
+  - **Deleted Key:** `cedarrise:dashboard:projects`
+  - The projects list cache is cleared after a successful creation.
+  
+  ## Errors
+  
+  | Status                      | Description                                     |
+  |-----------------------------|-------------------------------------------------|
+  | `400 Bad Request`           | Validation failed (title too short, invalid file type, etc.). |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                |
+  | `403 Forbidden`             | Insufficient permissions.                       |
+  | `500 Internal Server Error` | Unexpected server error or Cloudinary upload failure. |
+}
