@@ -74,6 +74,7 @@
 | `cedarrise:lookup:onboarded`                                              | Cached lightweight list of TACOTS onboarded students (id + name) for dropdown. Set on read.        | `services/lookup.services.ts`               |
 | `cedarrise:lookup:volunteers`                                             | Cached lightweight list of accepted volunteers (id + name) for dropdown. Set on read.              | `services/lookup.services.ts`               |
 | `cedarrise:dashboard:cards`                                               | Cached aggregate dashboard card metrics (volunteer, capacity, outreach, ASH, TACOTS). Set on read. | `services/dashboard.services.ts`            |
+| `cedarrise:dashboard:student-performance`                                 | Cached student performance chart data (graduation rate, attendance, test scores, dropout trend, risk). Set on read. | `services/dashboard.services.ts`            |
 
 ---
 

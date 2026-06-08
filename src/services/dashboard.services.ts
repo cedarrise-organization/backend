@@ -262,7 +262,18 @@ export const getCards = async () => {
 };
 
 export const getStudentPerformance = async () => {
-  /*** */
+/// cache
+  const key = `cedarrise:dashboard:student-performance`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Student Performance data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
   const academicYear = sql<string>`
   CASE
     WHEN EXTRACT(MONTH FROM ${ashExit.exitDate}) >= 9
@@ -278,92 +289,195 @@ export const getStudentPerformance = async () => {
     )
   END
 `;
+  const currentYear = new Date().getFullYear();
+  const sessionLabels = ["2025/2026", "2026/2027", "2027/2028", "2028/2029", "2029/2030"];
+  const termLabels = ["Term 1", "Term 2", "Term 3"];
+  const normalizedTerm = sql<string>`lower(trim(${ashTermlyTracking.term}))`;
 
-  const ashGraduated = await db
-    .select({
-      value: countDistinct(ashExit.studentId),
-      academicYear,
-    })
-    .from(ashExit)
-    .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"]))
-    .groupBy(academicYear);
-  const ashDropOuts = await db
-    .select({
-      value: countDistinct(ashExit.studentId),
-      academicYear,
-    })
-    .from(ashExit)
-    .where(eq(ashExit.exitReason, "DROPPED OUT"))
-    .groupBy(academicYear);
+  const [ashGraduated, ashDropOuts, attendance, testScores, dropouts, [risk]] = await Promise.all([
+    // ashGraduated
+    await db
+      .select({
+        value: countDistinct(ashExit.studentId),
+        academicYear,
+      })
+      .from(ashExit)
+      .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"]))
+      .groupBy(academicYear),
+    // ashDropOuts
+    await db
+      .select({
+        value: countDistinct(ashExit.studentId),
+        academicYear,
+      })
+      .from(ashExit)
+      .where(eq(ashExit.exitReason, "DROPPED OUT"))
+      .groupBy(academicYear),
+    // attendance
+    await db
+      .select({
+        value: sql<number>`COALESCE(SUM(cardinality(${ashWeeklyAttendance.studentsInAttendance})), 0)`,
+        month: sql<string>`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`,
+      })
+      .from(ashWeeklyAttendance)
+      .where(sql`EXTRACT(YEAR FROM ${ashWeeklyAttendance.sessionDate}) = ${currentYear}`)
+      .groupBy(sql`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`),
+    // testScores
+    await db
+      .select({
+        term: normalizedTerm,
+        pretestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.pretestAverage}), 0)`,
+        midtestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.midtestAverage}), 0)`,
+        posttestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.posttestAverage}), 0)`,
+      })
+      .from(ashTermlyTracking)
+      .where(sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`)
+      .groupBy(normalizedTerm),
+    // dropouts
+    await db
+      .select({
+        value: countDistinct(ashExit.studentId),
+        month: sql<string>`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`,
+      })
+      .from(ashExit)
+      .where(
+        and(
+          eq(ashExit.exitReason, "DROPPED OUT"),
+          sql`EXTRACT(YEAR FROM ${ashExit.exitDate}) = ${currentYear}`,
+        ),
+      )
+      .groupBy(sql`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`),
+    // risk
+    await db
+      .select({
+        lowRisk: sql<number>`
+        COUNT(DISTINCT ${ashTermlyTracking.studentId})
+        FILTER (
+          WHERE ${ashTermlyTracking.posttestAverage} >= 50
+        )
+      `,
+        atRisk: sql<number>`
+        COUNT(DISTINCT ${ashTermlyTracking.studentId})
+        FILTER (
+          WHERE ${ashTermlyTracking.posttestAverage} < 50
+        )
+      `,
+      })
+      .from(ashTermlyTracking)
+      .where(sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`),
+  ]);
 
-  const labels = ["2025/2026", "2026/2027", "2027/2028", "2028/2029", "2029/2030"];
+  ////
+  /* ashGraduated, ashDropOuts */
   const graduatedMap = new Map(ashGraduated.map((row) => [row.academicYear, Number(row.value)]));
   const dropOutMap = new Map(ashDropOuts.map((row) => [row.academicYear, Number(row.value)]));
-
   const c_graduationRate: Dataset = {
     type: "bar",
-    labels: labels.map((label) => label.replace("20", "").replace("/20", "-")),
+    labels: sessionLabels.map((label) => label.replace("20", "").replace("/20", "-")),
     datasets: [
       {
         label: "Graduated",
-        data: labels.map((year) => graduatedMap.get(year) ?? 0),
+        data: sessionLabels.map((year) => graduatedMap.get(year) ?? 0),
       },
       {
         label: "Dropped out",
-        data: labels.map((year) => dropOutMap.get(year) ?? 0),
+        data: sessionLabels.map((year) => dropOutMap.get(year) ?? 0),
       },
     ],
   };
-  /*** */
+  ////
 
-  /*** */
-  const currentYear = new Date().getFullYear();
-
-  const attendance = await db
-    .select({
-      value: sql<number>`COALESCE(SUM(cardinality(${ashWeeklyAttendance.studentsInAttendance})), 0)`,
-      month: sql<string>`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`,
-    })
-    .from(ashWeeklyAttendance)
-    .where(sql`EXTRACT(YEAR FROM ${ashWeeklyAttendance.sessionDate}) = ${currentYear}`)
-    .groupBy(sql`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`);
-
+  ////
+  /* attendance */
   const monthKeys = Array.from({ length: 12 }, (_, index) => {
     const month = String(index + 1).padStart(2, "0");
     return `${currentYear}-${month}`;
   });
-
   const attendanceMap = new Map(attendance.map((row) => [row.month, Number(row.value)]));
   const c_attendanceTrend: Dataset = {
     type: "line",
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
-      { label: "Avg attendance", data: monthKeys.map((month) => attendanceMap.get(month) ?? 0) },
+      { label: "Total attendance", data: monthKeys.map((month) => attendanceMap.get(month) ?? 0) },
     ],
   };
-  /*** */
+  ////
 
+  ////
+  /* testScores */
+  const termKeys = termLabels.map((term) => term.toLowerCase());
+  const testScoresMap = new Map(
+    testScores.map((row) => [
+      row.term,
+      {
+        pretestAverage: Number(row.pretestAverage),
+        midtestAverage: Number(row.midtestAverage),
+        posttestAverage: Number(row.posttestAverage),
+      },
+    ]),
+  );
   const c_testScores: Dataset = {
     type: "line",
-    labels: ["Term 1", "Term 2", "Term 3"],
+    labels: termLabels,
     datasets: [
-      { label: "Pre-test", data: [52, 55, 57] },
-      { label: "Mid-test", data: [61, 65, 68] },
-      { label: "Post-test", data: [72, 76, 79] },
+      {
+        label: "Pre-test",
+        data: termKeys.map((term) => testScoresMap.get(term)?.pretestAverage ?? 0),
+      },
+      {
+        label: "Mid-test",
+        data: termKeys.map((term) => testScoresMap.get(term)?.midtestAverage ?? 0),
+      },
+      {
+        label: "Post-test",
+        data: termKeys.map((term) => testScoresMap.get(term)?.posttestAverage ?? 0),
+      },
     ],
   };
+  ////
+
+  ////
+  /* dropouts */
+  const dropoutsMap = new Map(dropouts.map((row) => [row.month, Number(row.value)]));
   const c_dropoutTrend: Dataset = {
     type: "bar",
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    datasets: [{ label: "Dropouts", data: [1, 0, 2, 3, 1, 2, 0, 1, 3, 1, 0, 0] }],
+    datasets: [
+      {
+        label: "Dropouts",
+        data: monthKeys.map((month) => dropoutsMap.get(month) ?? 0),
+      },
+    ],
   };
+  ////
+
+  ////
+  /* risk */
   const c_risk: Dataset = {
     type: "doughnut",
     labels: ["Low-risk", "At-risk"],
-    datasets: [{ data: [170, 48] }],
+    datasets: [
+      {
+        data: [Number(risk?.lowRisk ?? 0), Number(risk?.atRisk ?? 0)],
+      },
+    ],
   };
+  ////
 
-  // console.log();
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      c_graduationRate,
+      c_attendanceTrend,
+      c_testScores,
+      c_dropoutTrend,
+      c_risk,
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+  ///
+
   return {
     code: 200,
     message: "Student Performance data found successfully",
@@ -454,7 +568,7 @@ export const getInstEffectiveness = async () => {
     { title: "2028/2029", amount: 200 },
     { title: "2029/2030", amount: 400 },
   ];
-  
+
   return {
     code: 200,
     message: "Institutional Effectiveness data found successfully",
