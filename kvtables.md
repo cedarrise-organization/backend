@@ -145,6 +145,14 @@
 
 # BullMQ Queues
 
+| Queue Name      | Default Attempts | Backoff               | Concurrency | Source                                  |
+| :-------------- | :--------------- | :-------------------- | :---------- | :-------------------------------------- |
+| `asset-removal` | 3                | Exponential, 3s delay | 3           | `queues/deleteCloudinaryAsset.queue.ts` |
+
+---
+
+# BullMQ Queues
+
 | Queue Name      | Default Attempts | Backoff               | Concurrency | Source                    |
 | :-------------- | :--------------- | :-------------------- | :---------- | :------------------------ |
 | `feature-queue` | 3                | Exponential, 3s delay | 3           | `queues/feature.queue.ts` |
