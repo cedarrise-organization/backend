@@ -45,8 +45,16 @@ export const login = async (email: string, password: string) => {
   });
 
   // create tokens
-  const accessToken = generateAccessToken({ id: user.id });
-  const refreshToken = generateRefreshToken({ id: user.id });
+  const accessToken = generateAccessToken({
+    id: user.id,
+    name: user.name,
+    department: user.department,
+  });
+  const refreshToken = generateRefreshToken({
+    id: user.id,
+    name: user.name,
+    department: user.department,
+  });
 
   const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
   await db.insert(refreshtoken).values({
@@ -102,8 +110,16 @@ export const refresh = async (rawRefreshToken: string) => {
 
   await db.delete(refreshtoken).where(eq(refreshtoken.token, tokenHash));
 
-  const newAccessToken = generateAccessToken({ id: user.id });
-  const newRefreshToken = generateRefreshToken({ id: user.id });
+  const newAccessToken = generateAccessToken({
+    id: user.id,
+    name: user.name,
+    department: user.department,
+  });
+  const newRefreshToken = generateRefreshToken({
+    id: user.id,
+    name: user.name,
+    department: user.department,
+  });
   const newHash = crypto.createHash("sha256").update(newRefreshToken).digest("hex");
 
   //save to refreshtoken db
@@ -115,6 +131,8 @@ export const refresh = async (rawRefreshToken: string) => {
 
   appEvents.emit(AUTH_EVENTS.AUTH_REFRESH, {
     userId: payload.sub,
+    name: payload.name,
+    department: payload.department,
   });
 
   return {
@@ -124,6 +142,8 @@ export const refresh = async (rawRefreshToken: string) => {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
       sub: payload.sub,
+      name: payload.name,
+      department: payload.department,
     },
   };
 };

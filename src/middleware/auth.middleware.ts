@@ -15,19 +15,23 @@ export const authenticate = () => async (req: Request, res: Response, next: Next
 
     if (payload.type !== "access") throw new UnauthorizedError("Invalid token type");
 
-    req.user = { id: payload.sub };
+    req.user = { id: payload.sub, name: payload.name, department: payload.department };
 
     next();
   } catch (error: any) {
     if (error instanceof jwt.TokenExpiredError || error instanceof jwt.JsonWebTokenError) {
       const refreshToken = req.cookies["cedarrefresh"];
       if (!refreshToken) throw new UnauthorizedError("No refresh token provided");
-      
+
       const authResponse = await refresh(refreshToken);
       res.cookie("cedaraccess", authResponse.meta.accessToken, { httpOnly: true });
       res.cookie("cedarrefresh", authResponse.meta.refreshToken, { httpOnly: true });
 
-      req.user = { id: authResponse.meta.sub };
+      req.user = {
+        id: authResponse.meta.sub,
+        name: authResponse.meta.name,
+        department: authResponse.meta.department,
+      };
 
       return next();
     }

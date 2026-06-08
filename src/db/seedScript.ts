@@ -21,11 +21,13 @@ import {
   outreachTracker,
   projects,
 } from "./models/admin.js";
+import { refreshtoken } from "./models/auth.js";
 
 // CLEAR TABLES
 const clearTables = async () => {
   try {
     logger.info("Clearing tables...");
+    await db.delete(refreshtoken);
     await db.delete(users);
     await db.delete(roles);
     await db.delete(permissions);

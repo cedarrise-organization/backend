@@ -32,6 +32,8 @@ appEvents.on(AUTH_EVENTS.AUTH_LOGIN_FAIL, async (data) => {
 appEvents.on(AUTH_EVENTS.AUTH_REFRESH, async (data) => {
   logger.info("user got refresh token", {
     userId: data.userId,
+    userName: data.name,
+    userDepartment: data.department,
     // deviceInfo: data.deviceInfo,
     // correlationId: data.correlationId
   });

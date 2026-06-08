@@ -1,0 +1,60 @@
+meta {
+  name: Session
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/auth/session
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Session
+  
+  Verifies the current user's session by validating the `cedaraccess` cookie. If the access token has expired but a valid `cedarrefresh` cookie is present, the middleware silently refreshes both tokens and sets updated `cedaraccess` and `cedarrefresh` HTTP-only cookies on the response before returning the user data.
+  
+  ## Authorization
+  Requires a valid `cedaraccess` HTTP-only cookie (set during login). No role or permission checks.
+  
+  ## Request Body
+  None.
+  
+  ## Success Response — `200 OK`
+  
+  ```json
+  {
+    "success": true,
+    "message": "User session verified",
+    "data": {
+      "id": "string — the user's ID (from the JWT `sub` claim)",
+      "name": "string — the user's display name",
+      "department": "string — the user's department"
+    }
+  }
+  ```
+  
+  ## Error Responses
+  
+  ### `401 Unauthorized`
+  
+  Returned in any of the following scenarios:
+  
+  | Scenario | Message |
+  |----------|---------|
+  | No `cedaraccess` cookie present in the request. | No token provided |
+  | The `cedaraccess` token's `type` claim is not `"access"`. | Invalid token type |
+  | The `cedaraccess` token is expired **and** no `cedarrefresh` cookie is present. | No refresh token provided |
+  | The `cedaraccess` token is expired **and** the refresh token is invalid or revoked (the `refresh` service throws). | Dependent on refresh service error |
+  | The access token is malformed or otherwise invalid and does not match a known JWT error class. | Invalid access token |
+}
