@@ -1,0 +1,124 @@
+meta {
+  name: Get Student performance metrics
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/dashboard/student-performance
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Student Performance Metrics
+  
+  Returns chart-ready metrics for the Student Performance dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `LineData` (key-value list), ready for direct consumption by the frontend charting library.
+  
+  > **⚠️ WIP:** `c_testScores`, `c_dropoutTrend`, and `c_risk` currently return hardcoded placeholder data. `c_graduationRate` and `c_attendanceTrend` are live from the database.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response Types
+  
+  Every chart field conforms to one of two types defined in `types/dashboard.d.ts`:
+  
+  ### `Dataset`
+  ```typescript
+  {
+    type: "bar" | "line" | "doughnut" | "pie",
+    labels: object,       // array of axis labels (string[])
+    datasets: object      // array of { label?: string, data: number[] }
+  }
+  ```
+  
+  ### `LineData`
+  ```typescript
+  Array<{ title: string, amount: number }>
+  ```
+  
+  ---
+  
+  ## Success Response — `200 OK`
+  
+  ```json
+  {
+    "success": true,
+    "message": "Student Performance data found successfully",
+    "data": {
+      "c_graduationRate": Dataset,
+      "c_attendanceTrend": Dataset,
+      "c_testScores": Dataset,
+      "c_dropoutTrend": Dataset,
+      "c_risk": Dataset
+    }
+  }
+  ```
+  
+  ---
+  
+  ### `c_graduationRate` — `Dataset` (bar)
+  
+  Graduation vs dropout counts per academic year, queried from `ashExit`.
+  
+  | Field    | Value                                                             |
+  |----------|-------------------------------------------------------------------|
+  | type     | `"bar"`                                                           |
+  | labels   | Shortened academic years, e.g. `["25/26", "26/27", ...]`         |
+  | datasets | Two series: `"Graduated"` (COMPLETED/GRADUATED) and `"Dropped out"` (DROPPED OUT). Values are `countDistinct(ashExit.studentId)` grouped by computed academic year. |
+  
+  ### `c_attendanceTrend` — `Dataset` (line)
+  
+  Monthly total attendance for the current calendar year, queried from `ashWeeklyAttendance`.
+  
+  | Field    | Value                                                                         |
+  |----------|-------------------------------------------------------------------------------|
+  | type     | `"line"`                                                                      |
+  | labels   | `["Jan", "Feb", ..., "Dec"]`                                                  |
+  | datasets | Single series `"Avg attendance"` — `SUM(cardinality(studentsInAttendance))` per month. Months with no sessions default to `0`. |
+  
+  ### `c_testScores` — `Dataset` (line) ⚠️ Hardcoded
+  
+  | Field    | Value                                                      |
+  |----------|--------------------------------------------------------------|
+  | type     | `"line"`                                                     |
+  | labels   | `["Term 1", "Term 2", "Term 3"]`                             |
+  | datasets | Three series: `"Pre-test"`, `"Mid-test"`, `"Post-test"`.     |
+  
+  ### `c_dropoutTrend` — `Dataset` (bar) ⚠️ Hardcoded
+  
+  | Field    | Value                                           |
+  |----------|-------------------------------------------------|
+  | type     | `"bar"`                                          |
+  | labels   | `["Jan", "Feb", ..., "Dec"]`                     |
+  | datasets | Single series `"Dropouts"` — monthly counts.     |
+  
+  ### `c_risk` — `Dataset` (doughnut) ⚠️ Hardcoded
+  
+  | Field    | Value                                                  |
+  |----------|--------------------------------------------------------|
+  | type     | `"doughnut"`                                            |
+  | labels   | `["Low-risk", "At-risk"]`                               |
+  | datasets | Single unlabelled series with two numeric values.       |
+  
+  ## Error Responses
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

@@ -1,0 +1,137 @@
+meta {
+  name: Get Enrollment metrics
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/dashboard/enrollment
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Enrollment & Recruitment Metrics
+  
+  Returns chart-ready metrics for the Enrollment & Recruitment dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `LineData` (key-value list), ready for direct consumption by the frontend charting library.
+  
+  > **⚠️ WIP:** All fields currently return hardcoded placeholder data. Database queries have not been implemented yet.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response Types
+  
+  Every field conforms to one of two types defined in `types/dashboard.d.ts`:
+  
+  ### `Dataset`
+  ```typescript
+  {
+    type: "bar" | "line" | "doughnut" | "pie",
+    labels: object,       // array of axis labels (string[])
+    datasets: object      // array of { label?: string, data: number[] }
+  }
+  ```
+  
+  ### `LineData`
+  ```typescript
+  Array<{ title: string, amount: number }>
+  ```
+  
+  ---
+  
+  ## Success Response — `200 OK`
+  
+  ```json
+  {
+    "success": true,
+    "message": "Enrollment and Recruitment data found successfully",
+    "data": {
+      "c_applicationNumbers": Dataset,
+      "c_genderDiversity": Dataset,
+      "c_classAgeDistribution": Dataset,
+      "c_acceptanceRate": LineData,
+      "c_geographicalDistribution": LineData
+    }
+  }
+  ```
+  
+  ---
+  
+  ### `c_applicationNumbers` — `Dataset` (line) ⚠️ Hardcoded
+  
+  Monthly application counts per programme.
+  
+  | Field    | Value                                                           |
+  |----------|-----------------------------------------------------------------|
+  | type     | `"line"`                                                        |
+  | labels   | `["Jan", "Feb", ..., "Dec"]`                                    |
+  | datasets | Two series: `"ASH"` and `"TACOTS"` — monthly application counts.|
+  
+  ### `c_genderDiversity` — `Dataset` (pie) ⚠️ Hardcoded
+  
+  Gender split across enrolled students.
+  
+  | Field    | Value                                    |
+  |----------|------------------------------------------|
+  | type     | `"pie"`                                   |
+  | labels   | `["Female", "Male"]`                      |
+  | datasets | Single unlabelled series with two values. |
+  
+  ### `c_classAgeDistribution` — `Dataset` (bar) ⚠️ Hardcoded
+  
+  Student count by class/education level.
+  
+  | Field    | Value                                                                     |
+  |----------|---------------------------------------------------------------------------|
+  | type     | `"bar"`                                                                    |
+  | labels   | `["Primary", "JSS1", "JSS2", "JSS3", "SS1", "SS2", "SS3"]`               |
+  | datasets | Single series `"Students"` — count per class level.                        |
+  
+  ### `c_acceptanceRate` — `LineData` ⚠️ Hardcoded
+  
+  Acceptance rate percentage per programme.
+  
+  ```json
+  [
+    { "title": "ASH", "amount": 74 },
+    { "title": "TACOTS", "amount": 74 },
+    { "title": "Volunteer", "amount": 74 }
+  ]
+  ```
+  
+  ### `c_geographicalDistribution` — `LineData` ⚠️ Hardcoded
+  
+  Student count by state/region.
+  
+  ```json
+  [
+    { "title": "Enugu", "amount": 70 },
+    { "title": "Ebonyi", "amount": 60 },
+    { "title": "Anambra", "amount": 50 },
+    { "title": "Abia", "amount": 40 },
+    { "title": "Imo", "amount": 30 },
+    { "title": "others", "amount": 20 }
+  ]
+  ```
+  
+  ## Error Responses
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

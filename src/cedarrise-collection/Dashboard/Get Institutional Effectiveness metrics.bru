@@ -1,0 +1,134 @@
+meta {
+  name: Get Institutional Effectiveness metrics
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/dashboard/institutional-effectiveness
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Institutional Effectiveness Metrics
+  
+  Returns chart-ready metrics for the Institutional Effectiveness dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `LineData` (key-value list), ready for direct consumption by the frontend charting library.
+  
+  > **⚠️ WIP:** All fields currently return hardcoded placeholder data. Database queries have not been implemented yet.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response Types
+  
+  Every field conforms to one of two types defined in `types/dashboard.d.ts`:
+  
+  ### `Dataset`
+  ```typescript
+  {
+    type: "bar" | "line" | "doughnut" | "pie",
+    labels: object,       // array of axis labels (string[])
+    datasets: object      // array of { label?: string, data: number[] }
+  }
+  ```
+  
+  ### `LineData`
+  ```typescript
+  Array<{ title: string, amount: number }>
+  ```
+  
+  ---
+  
+  ## Success Response — `200 OK`
+  
+  ```json
+  {
+    "success": true,
+    "message": "Institutional Effectiveness data found successfully",
+    "data": {
+      "c_communityServiceHours": Dataset,
+      "c_averageMentorshipHours": Dataset,
+      "c_studentBenchMark": Dataset,
+      "c_spendPerstudent": Dataset,
+      "c_totalAccHours": LineData
+    }
+  }
+  ```
+  
+  ---
+  
+  ### `c_communityServiceHours` — `Dataset` (bar) ⚠️ Hardcoded
+  
+  Community service hours by academic year — total and per-student average.
+  
+  | Field    | Value                                                                          |
+  |----------|--------------------------------------------------------------------------------|
+  | type     | `"bar"`                                                                        |
+  | labels   | `["20-21", "21-22", "22-23", "23-24", "24-25"]`                               |
+  | datasets | Two series: `"Total hrs"` (aggregate hours) and `"Avg/student"` (per-student). |
+  
+  ### `c_averageMentorshipHours` — `Dataset` (line) ⚠️ Hardcoded
+  
+  Average mentorship hours tracked at term mid-points and end-points.
+  
+  | Field    | Value                                                                   |
+  |----------|-------------------------------------------------------------------------|
+  | type     | `"line"`                                                                |
+  | labels   | `["T1 Mid", "T1 End", "T2 Mid", "T2 End", "T3 Mid", "T3 End"]`        |
+  | datasets | Single series `"Avg hrs"` — average mentorship hours at each checkpoint.|
+  
+  ### `c_studentBenchMark` — `Dataset` (bar) ⚠️ Hardcoded
+  
+  Percentage of students meeting academic benchmarks per term.
+  
+  | Field    | Value                                                          |
+  |----------|----------------------------------------------------------------|
+  | type     | `"bar"`                                                        |
+  | labels   | `["Term 1", "Term 2", "Term 3"]`                               |
+  | datasets | Single series `"Meeting benchmark"` — percentage values.        |
+  
+  ### `c_spendPerstudent` — `Dataset` (bar) ⚠️ Hardcoded
+  
+  Average spend per student broken down by category.
+  
+  | Field    | Value                                                    |
+  |----------|----------------------------------------------------------|
+  | type     | `"bar"`                                                  |
+  | labels   | `["Tuition", "Resources", "Sundries"]`                   |
+  | datasets | Single series `"Avg spend"` — amounts in Naira (₦).      |
+  
+  ### `c_totalAccHours` — `LineData` ⚠️ Hardcoded
+  
+  Total accumulated programme hours by academic year.
+  
+  ```json
+  [
+    { "title": "2025/2026", "amount": 500 },
+    { "title": "2026/2027", "amount": 400 },
+    { "title": "2027/2028", "amount": 300 },
+    { "title": "2028/2029", "amount": 200 },
+    { "title": "2029/2030", "amount": 400 }
+  ]
+  ```
+  
+  ## Error Responses
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}
