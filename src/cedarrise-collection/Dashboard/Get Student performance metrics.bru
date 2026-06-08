@@ -22,9 +22,7 @@ settings {
 docs {
   # Get Student Performance Metrics
   
-  Returns chart-ready metrics for the Student Performance dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `LineData` (key-value list), ready for direct consumption by the frontend charting library.
-  
-  > **⚠️ WIP:** `c_testScores`, `c_dropoutTrend`, and `c_risk` currently return hardcoded placeholder data. `c_graduationRate` and `c_attendanceTrend` are live from the database.
+  Returns chart-ready metrics for the Student Performance dashboard tab. All six queries are executed in parallel via `Promise.all`. Results are cached for 1 hour (`DASHBOARD_CARDS` TTL). Each field in the response is a `Dataset`, ready for direct consumption by the frontend charting library.
   
   ## Authorization
   Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
@@ -34,20 +32,15 @@ docs {
   
   ## Response Types
   
-  Every chart field conforms to one of two types defined in `types/dashboard.d.ts`:
+  Every chart field conforms to the `Dataset` type defined in `types/dashboard.d.ts`:
   
   ### `Dataset`
   ```typescript
   {
-    type: "bar" | "line" | "doughnut" | "pie",
-    labels: object,       // array of axis labels (string[])
-    datasets: object      // array of { label?: string, data: number[] }
+    type: "bar" | "line" | "doughnut" | "pie";
+    labels: string[];
+    datasets: { label?: string; data: number[] }[];
   }
-  ```
-  
-  ### `LineData`
-  ```typescript
-  Array<{ title: string, amount: number }>
   ```
   
   ---
@@ -72,47 +65,95 @@ docs {
   
   ### `c_graduationRate` — `Dataset` (bar)
   
-  Graduation vs dropout counts per academic year, queried from `ashExit`.
+  Graduation vs dropout counts per academic year.
   
-  | Field    | Value                                                             |
-  |----------|-------------------------------------------------------------------|
-  | type     | `"bar"`                                                           |
-  | labels   | Shortened academic years, e.g. `["25/26", "26/27", ...]`         |
-  | datasets | Two series: `"Graduated"` (COMPLETED/GRADUATED) and `"Dropped out"` (DROPPED OUT). Values are `countDistinct(ashExit.studentId)` grouped by computed academic year. |
+  | Field    | Value |
+  |----------|-------|
+  | type     | `"bar"` |
+  | labels   | Shortened academic years: `["25/26", "26/27", "27/28", "28/29", "29/30"]` |
+  | datasets | Two series: `"Graduated"` and `"Dropped out"` |
+  
+  **Computation:**
+  - Academic year is derived from `ashExit.exitDate` using a SQL `CASE`: if the exit month is ≥ September, the year maps to `YYYY/(YYYY+1)`; otherwise to `(YYYY-1)/YYYY`.
+  - **Graduated:** `COUNT(DISTINCT ashExit.studentId) WHERE exitReason IN ('COMPLETED', 'GRADUATED')`, grouped by computed academic year.
+  - **Dropped out:** `COUNT(DISTINCT ashExit.studentId) WHERE exitReason = 'DROPPED OUT'`, grouped by computed academic year.
+  - Results are mapped against a fixed label set `["2025/2026", ..., "2029/2030"]`. Years with no exits default to `0`.
+  - Labels are shortened by stripping the `"20"` prefix (e.g. `"2025/2026"` → `"25/26"`).
+  
+  ---
   
   ### `c_attendanceTrend` — `Dataset` (line)
   
-  Monthly total attendance for the current calendar year, queried from `ashWeeklyAttendance`.
+  Monthly total attendance for the current calendar year.
   
-  | Field    | Value                                                                         |
-  |----------|-------------------------------------------------------------------------------|
-  | type     | `"line"`                                                                      |
-  | labels   | `["Jan", "Feb", ..., "Dec"]`                                                  |
-  | datasets | Single series `"Avg attendance"` — `SUM(cardinality(studentsInAttendance))` per month. Months with no sessions default to `0`. |
+  | Field    | Value |
+  |----------|-------|
+  | type     | `"line"` |
+  | labels   | `["Jan", "Feb", ..., "Dec"]` |
+  | datasets | Single series: `"Total attendance"` |
   
-  ### `c_testScores` — `Dataset` (line) ⚠️ Hardcoded
+  **Computation:**
+  - Queries `ashWeeklyAttendance` filtered to `EXTRACT(YEAR FROM sessionDate) = currentYear`.
+  - Per month: `COALESCE(SUM(cardinality(studentsInAttendance)), 0)`, grouped by `TO_CHAR(sessionDate, 'YYYY-MM')`.
+  - Results are mapped to all 12 months (`YYYY-01` through `YYYY-12`). Months with no sessions default to `0`.
   
-  | Field    | Value                                                      |
-  |----------|--------------------------------------------------------------|
-  | type     | `"line"`                                                     |
-  | labels   | `["Term 1", "Term 2", "Term 3"]`                             |
-  | datasets | Three series: `"Pre-test"`, `"Mid-test"`, `"Post-test"`.     |
+  ---
   
-  ### `c_dropoutTrend` — `Dataset` (bar) ⚠️ Hardcoded
+  ### `c_testScores` — `Dataset` (line)
   
-  | Field    | Value                                           |
-  |----------|-------------------------------------------------|
-  | type     | `"bar"`                                          |
-  | labels   | `["Jan", "Feb", ..., "Dec"]`                     |
-  | datasets | Single series `"Dropouts"` — monthly counts.     |
+  Average pre/mid/post-test scores per term for the current calendar year.
   
-  ### `c_risk` — `Dataset` (doughnut) ⚠️ Hardcoded
+  | Field    | Value |
+  |----------|-------|
+  | type     | `"line"` |
+  | labels   | `["Term 1", "Term 2", "Term 3"]` |
+  | datasets | Three series: `"Pre-test"`, `"Mid-test"`, `"Post-test"` |
   
-  | Field    | Value                                                  |
-  |----------|--------------------------------------------------------|
-  | type     | `"doughnut"`                                            |
-  | labels   | `["Low-risk", "At-risk"]`                               |
-  | datasets | Single unlabelled series with two numeric values.       |
+  **Computation:**
+  - Queries `ashTermlyTracking` filtered to `EXTRACT(YEAR FROM createdAt) = currentYear`.
+  - Grouped by `lower(trim(term))` (normalized term name).
+  - Each series is `COALESCE(AVG(pretestAverage), 0)`, `COALESCE(AVG(midtestAverage), 0)`, and `COALESCE(AVG(posttestAverage), 0)` respectively.
+  - Terms with no tracking records default to `0`.
+  
+  ---
+  
+  ### `c_dropoutTrend` — `Dataset` (bar)
+  
+  Monthly dropout counts for the current calendar year.
+  
+  | Field    | Value |
+  |----------|-------|
+  | type     | `"bar"` |
+  | labels   | `["Jan", "Feb", ..., "Dec"]` |
+  | datasets | Single series: `"Dropouts"` |
+  
+  **Computation:**
+  - Queries `ashExit` filtered to `exitReason = 'DROPPED OUT' AND EXTRACT(YEAR FROM exitDate) = currentYear`.
+  - Per month: `COUNT(DISTINCT ashExit.studentId)`, grouped by `TO_CHAR(exitDate, 'YYYY-MM')`.
+  - Months with no dropouts default to `0`.
+  
+  ---
+  
+  ### `c_risk` — `Dataset` (doughnut)
+  
+  Student risk distribution for the current calendar year.
+  
+  | Field    | Value |
+  |----------|-------|
+  | type     | `"doughnut"` |
+  | labels   | `["Low-risk", "At-risk"]` |
+  | datasets | Single unlabelled series with two values |
+  
+  **Computation:**
+  - Queries `ashTermlyTracking` filtered to `EXTRACT(YEAR FROM createdAt) = currentYear`.
+  - **Low-risk:** `COUNT(DISTINCT studentId) FILTER (WHERE posttestAverage >= 50)`.
+  - **At-risk:** `COUNT(DISTINCT studentId) FILTER (WHERE posttestAverage < 50)`.
+  
+  ## Caching
+  
+  - **Key:** `cedarrise:dashboard:student-performance`
+  - **TTL:** `CACHE_TTL.DASHBOARD_CARDS` (3600s / 1 hour)
+  - Set after the first successful database fetch; subsequent requests within the TTL window return cached data.
   
   ## Error Responses
   
