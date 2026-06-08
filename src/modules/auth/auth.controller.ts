@@ -23,3 +23,11 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
 
   return successResponse(res, 200, "Logged out successfully");
 };
+
+export const sessionController = async (req: Request, res: Response, next: NextFunction) => {
+  return successResponse(res, 200, "User session verified", {
+    id: (req as any).user.id,
+    name: (req as any).user.name,
+    department: (req as any).user.department,
+  });
+};
