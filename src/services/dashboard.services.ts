@@ -794,7 +794,7 @@ export const getEnrollment = async () => {
     CACHE_TTL.DASHBOARD_CARDS,
   );
   ///
-  
+
   return {
     code: 200,
     message: "Enrollment and Recruitment data found successfully",
@@ -809,36 +809,272 @@ export const getEnrollment = async () => {
 };
 
 export const getInstEffectiveness = async () => {
+  /// cache
+  const key = `cedarrise:dashboard:institutional-effectiveness`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Institutional Effectiveness data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const sessionLabels = ["2025/26", "2026/27", "2027/28", "2028/29", "2029/30"];
+  const serviceHours = sql<number>`
+    CASE ${tacotsTracking.serviceDuration}
+      WHEN '30 MINS' THEN 0.5
+      WHEN '1 HOUR' THEN 1
+      WHEN '2 HOURS' THEN 2
+      WHEN '3 HOURS' THEN 3
+      WHEN '4 HOURS' THEN 4
+      WHEN '5 HOURS' THEN 5
+      WHEN 'MORE THAN 5 HOURS' THEN 6
+      ELSE 0
+    END
+  `;
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentAcademicSession =
+    currentMonth >= 9
+      ? `${currentYear}/${String(currentYear + 1).slice(2)}`
+      : `${currentYear - 1}/${String(currentYear).slice(2)}`;
+  const mentorshipHours = sql<number>`
+    CASE ${tacotsTracking.mentorshipDuration}
+      WHEN '15 MINUTES' THEN 0.25
+      WHEN '30 MINUTES' THEN 0.5
+      WHEN '45 MINUTES' THEN 0.75
+      WHEN '60 MINUTES' THEN 1
+      WHEN 'MORE THAN 60 MINUTES' THEN 1.5
+      ELSE 0
+    END
+  `;
+  const normalizedAshTerm = sql<string>`upper(trim(${ashTermlyTracking.term}))`;
+
+  const [
+    communityServiceHours,
+    mentorshipData,
+    [spendPerStudent],
+    totalAccHours,
+    studentBenchmark,
+  ] = await Promise.all([
+    // communityServiceHours
+    await db
+      .select({
+        academicSession: tacotsTracking.academicSession,
+        totalHours: sql<number>`
+        COALESCE(SUM(${serviceHours}), 0)
+      `,
+        avgPerStudent: sql<number>`
+        CASE
+          WHEN COUNT(DISTINCT ${tacotsTracking.studentId}) = 0 THEN 0
+          ELSE COALESCE(SUM(${serviceHours}), 0) / COUNT(DISTINCT ${tacotsTracking.studentId})
+        END
+      `,
+      })
+      .from(tacotsTracking)
+      .groupBy(tacotsTracking.academicSession),
+    // mentorshipData
+    await db
+      .select({
+        academicTerm: tacotsTracking.academicTerm,
+        assessmentPeriod: tacotsTracking.assessmentPeriod,
+        avgHours: sql<number>`COALESCE(AVG(${mentorshipHours}), 0)`,
+      })
+      .from(tacotsTracking)
+      .where(eq(tacotsTracking.academicSession, currentAcademicSession))
+      .groupBy(tacotsTracking.academicTerm, tacotsTracking.assessmentPeriod),
+    // spendPerStudent
+    await db
+      .select({
+        avgTuition: sql<number>`
+        COALESCE(
+          SUM(${tacotsTracking.tuitionFeePaid}) / NULLIF(COUNT(DISTINCT ${tacotsTracking.studentId}), 0),
+          0
+        )
+      `,
+        avgResources: sql<number>`
+        COALESCE(
+          SUM(${tacotsTracking.resourcesSpent}) / NULLIF(COUNT(DISTINCT ${tacotsTracking.studentId}), 0),
+          0
+        )
+      `,
+        avgSundries: sql<number>`
+        COALESCE(
+          SUM(${tacotsTracking.sundriesSpent}) / NULLIF(COUNT(DISTINCT ${tacotsTracking.studentId}), 0),
+          0
+        )
+      `,
+        avgTotal: sql<number>`
+        COALESCE(
+          SUM(${tacotsTracking.totalAmountSpent}) / NULLIF(COUNT(DISTINCT ${tacotsTracking.studentId}), 0),
+          0
+        )
+      `,
+      })
+      .from(tacotsTracking)
+      .where(eq(tacotsTracking.academicSession, currentAcademicSession)),
+    // totalAccHours
+    await db
+      .select({
+        academicSession: tacotsTracking.academicSession,
+        value: sql<number>`
+        COALESCE(SUM(${mentorshipHours}), 0)
+      `,
+      })
+      .from(tacotsTracking)
+      .groupBy(tacotsTracking.academicSession),
+    // studentBenchmark
+    await db
+      .select({
+        term: normalizedAshTerm,
+        value: countDistinct(ashTermlyTracking.studentId),
+      })
+      .from(ashTermlyTracking)
+      .where(
+        and(
+          eq(ashTermlyTracking.academicSession, currentAcademicSession),
+          gt(ashTermlyTracking.posttestAverage, 50),
+        ),
+      )
+      .groupBy(normalizedAshTerm),
+  ]);
+
+  ////
+  /* communityServiceHours */
+  const communityServiceMap = new Map(
+    communityServiceHours.map((row) => [
+      row.academicSession,
+      {
+        totalHours: Number(row.totalHours),
+        avgPerStudent: Number(Number(row.avgPerStudent).toFixed(2)),
+      },
+    ]),
+  );
+  // Avg/student = total community service hours in that academic session / unique students tracked in that academic session
   const c_communityServiceHours: Dataset = {
     type: "bar",
-    labels: ["20-21", "21-22", "22-23", "23-24", "24-25"],
+    labels: sessionLabels.map((session) => session.replace("20", "").replace("/", "-")),
     datasets: [
-      { label: "Total hrs", data: [310, 440, 580, 720, 890] },
-      { label: "Avg/student", data: [8.2, 10.5, 12.4, 14.8, 18.1] },
+      {
+        label: "Total hrs",
+        data: sessionLabels.map((session) => communityServiceMap.get(session)?.totalHours ?? 0),
+      },
+      {
+        label: "Avg/student",
+        data: sessionLabels.map((session) => communityServiceMap.get(session)?.avgPerStudent ?? 0),
+      },
     ],
   };
+  ////
+
+  ////
+  /* mentorshipData */
+  const mentorshipMap = new Map(
+    mentorshipData.map((row) => [
+      `${row.academicTerm}-${row.assessmentPeriod}`,
+      Number(Number(row.avgHours).toFixed(2)),
+    ]),
+  );
+  const mentorshipKeys = [
+    { label: "T1 Mid", term: "1ST TERM", period: "MIDTERM" },
+    { label: "T1 End", term: "1ST TERM", period: "END OF TERM" },
+    { label: "T2 Mid", term: "2ND TERM", period: "MIDTERM" },
+    { label: "T2 End", term: "2ND TERM", period: "END OF TERM" },
+    { label: "T3 Mid", term: "3RD TERM", period: "MIDTERM" },
+    { label: "T3 End", term: "3RD TERM", period: "END OF TERM" },
+  ];
+  // Avg hrs = average mentorship duration for that term + assessment period in the current academic session
+  // T1 Mid = average mentorship hours where:
+  // academicSession = currentAcademicSession
+  // academicTerm = "1ST TERM"
+  // assessmentPeriod = "MIDTERM"
   const c_averageMentorshipHours: Dataset = {
     type: "line",
-    labels: ["T1 Mid", "T1 End", "T2 Mid", "T2 End", "T3 Mid", "T3 End"],
-    datasets: [{ label: "Avg hrs", data: [14.2, 15.2, 16.8, 18.4, 19.9, 22.1] }],
+    labels: mentorshipKeys.map((item) => item.label),
+    datasets: [
+      {
+        label: "Avg hrs",
+        data: mentorshipKeys.map((item) => {
+          const key = `${item.term}-${item.period}`;
+          return mentorshipMap.get(key) ?? 0;
+        }),
+      },
+    ],
   };
-  const c_studentBenchMark: Dataset = {
-    type: "bar",
-    labels: ["Term 1", "Term 2", "Term 3"],
-    datasets: [{ label: "Meeting benchmark", data: [58, 65, 71] }],
-  };
+  ////
+
+  ////
+  /* spendPerStudent */
+  const formatMoneyValue = (value: number | string | null | undefined) =>
+    Number(Number(value ?? 0).toFixed(2));
+  // Avg spend per student = total amount for that category / unique students in current academic session
   const c_spendPerstudent: Dataset = {
     type: "bar",
-    labels: ["Tuition", "Resources", "Sundries"],
-    datasets: [{ label: "Avg spend", data: [180200, 57500, 27300] }],
+    labels: ["Tuition", "Resources", "Sundries", "Total"],
+    datasets: [
+      {
+        label: "Avg spend",
+        data: [
+          formatMoneyValue(spendPerStudent?.avgTuition),
+          formatMoneyValue(spendPerStudent?.avgResources),
+          formatMoneyValue(spendPerStudent?.avgSundries),
+          formatMoneyValue(spendPerStudent?.avgTotal),
+        ],
+      },
+    ],
   };
-  const c_totalAccHours: LineData = [
-    { title: "2025/2026", amount: 500 },
-    { title: "2026/2027", amount: 400 },
-    { title: "2027/2028", amount: 300 },
-    { title: "2028/2029", amount: 200 },
-    { title: "2029/2030", amount: 400 },
+  ////
+
+  ////
+  /* totalAccHours */
+  const totalAccHoursMap = new Map(
+    totalAccHours.map((row) => [row.academicSession, Number(row.value)]),
+  );
+  const c_totalAccHours: LineData = sessionLabels.map((session) => {
+    const [startYear, endYear] = session.split("/");
+    return {
+      title: `${startYear}/20${endYear}`,
+      amount: totalAccHoursMap.get(session) ?? 0,
+    };
+  });
+  ////
+
+  ////
+  /* studentBenchmark */
+  const studentBenchmarkMap = new Map(studentBenchmark.map((row) => [row.term, Number(row.value)]));
+  const benchmarkTermKeys = [
+    { label: "TERM 1", value: "1ST TERM" },
+    { label: "TERM 2", value: "2ND TERM" },
+    { label: "TERM 3", value: "3RD TERM" },
   ];
+  const c_studentBenchMark: Dataset = {
+    type: "bar",
+    labels: benchmarkTermKeys.map((term) => term.label),
+    datasets: [
+      {
+        label: "Meeting benchmark",
+        data: benchmarkTermKeys.map((term) => studentBenchmarkMap.get(term.label) ?? 0),
+      },
+    ],
+  };
+  ////
+
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      c_communityServiceHours,
+      c_averageMentorshipHours,
+      c_spendPerstudent,
+      c_totalAccHours,
+      c_studentBenchMark,
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+  ///
 
   return {
     code: 200,
@@ -846,9 +1082,9 @@ export const getInstEffectiveness = async () => {
     data: {
       c_communityServiceHours,
       c_averageMentorshipHours,
-      c_studentBenchMark,
       c_spendPerstudent,
       c_totalAccHours,
+      c_studentBenchMark,
     },
   };
 };

@@ -24,7 +24,7 @@ docs {
   
   Returns chart-ready metrics for the Institutional Effectiveness dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `LineData` (key-value list), ready for direct consumption by the frontend charting library.
   
-  > **⚠️ WIP:** All fields currently return hardcoded placeholder data. Database queries have not been implemented yet.
+  All metrics are fully database-driven. Most are sourced from the `tacots_tracking` table, with `c_studentBenchMark` sourced from `ash_termly_tracking`. Several metrics are **scoped to the current academic session**, which is derived at runtime: if the current month is September or later, the session is `<currentYear>/<nextYear>`; otherwise it is `<previousYear>/<currentYear>` (e.g. in June 2026 → `2025/26`, in October 2026 → `2026/27`). Results are cached under the key `cedarrise:dashboard:institutional-effectiveness` with the `DASHBOARD_CARDS` TTL.
   
   ## Authorization
   Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
@@ -61,28 +61,49 @@ docs {
     "data": {
       "c_communityServiceHours": Dataset,
       "c_averageMentorshipHours": Dataset,
-      "c_studentBenchMark": Dataset,
       "c_spendPerstudent": Dataset,
-      "c_totalAccHours": LineData
+      "c_totalAccHours": LineData,
+      "c_studentBenchMark": Dataset
     }
   }
   ```
   
   ---
   
-  ### `c_communityServiceHours` — `Dataset` (bar) ⚠️ Hardcoded
+  ### `c_communityServiceHours` — `Dataset` (bar)
   
-  Community service hours by academic year — total and per-student average.
+  Community service hours by academic session — total and per-student average.
+  
+  **Calculation:**
+  - Queries the `tacots_tracking` table, grouped by `academic_session`.
+  - **`Total hrs` series:** `SUM` of a `CASE` expression that maps the `service_duration` text column to numeric hours:
+    - `'30 MINS'` → `0.5`, `'1 HOUR'` → `1`, `'2 HOURS'` → `2`, `'3 HOURS'` → `3`, `'4 HOURS'` → `4`, `'5 HOURS'` → `5`, `'MORE THAN 5 HOURS'` → `6`, else `0`.
+  - **`Avg/student` series:** The same `SUM` of service hours divided by `COUNT(DISTINCT student_id)` within each academic session. If no students exist, returns `0`. Values are rounded to 2 decimal places.
+  - Results are mapped onto a fixed 5-session axis: `["2025/26", "2026/27", "2027/28", "2028/29", "2029/30"]`. Any session with no data defaults to `0`.
+  - Labels are shortened by stripping the `20` prefix and replacing `/` with `-` (e.g. `"2025/26"` → `"25-26"`).
   
   | Field    | Value                                                                          |
   |----------|--------------------------------------------------------------------------------|
   | type     | `"bar"`                                                                        |
-  | labels   | `["20-21", "21-22", "22-23", "23-24", "24-25"]`                               |
+  | labels   | `["25-26", "26-27", "27-28", "28-29", "29-30"]`                               |
   | datasets | Two series: `"Total hrs"` (aggregate hours) and `"Avg/student"` (per-student). |
   
-  ### `c_averageMentorshipHours` — `Dataset` (line) ⚠️ Hardcoded
+  ### `c_averageMentorshipHours` — `Dataset` (line)
   
-  Average mentorship hours tracked at term mid-points and end-points.
+  Average mentorship hours tracked at term mid-points and end-points for the current academic session.
+  
+  **Calculation:**
+  - Queries `tacots_tracking` filtered to `academic_session = <currentAcademicSession>`, grouped by `academic_term` and `assessment_period`.
+  - Each data point is `AVG` of a `CASE` expression that maps the `mentorship_duration` text column to numeric hours:
+    - `'15 MINUTES'` → `0.25`, `'30 MINUTES'` → `0.5`, `'45 MINUTES'` → `0.75`, `'60 MINUTES'` → `1`, `'MORE THAN 60 MINUTES'` → `1.5`, else `0`.
+  - Results are mapped onto 6 fixed checkpoints, keyed by `{academicTerm}-{assessmentPeriod}`:
+    - `T1 Mid` → `1ST TERM` + `MIDTERM`
+    - `T1 End` → `1ST TERM` + `END OF TERM`
+    - `T2 Mid` → `2ND TERM` + `MIDTERM`
+    - `T2 End` → `2ND TERM` + `END OF TERM`
+    - `T3 Mid` → `3RD TERM` + `MIDTERM`
+    - `T3 End` → `3RD TERM` + `END OF TERM`
+  - Values are rounded to 2 decimal places. Any checkpoint with no data defaults to `0`.
   
   | Field    | Value                                                                   |
   |----------|-------------------------------------------------------------------------|
@@ -90,39 +111,57 @@ docs {
   | labels   | `["T1 Mid", "T1 End", "T2 Mid", "T2 End", "T3 Mid", "T3 End"]`        |
   | datasets | Single series `"Avg hrs"` — average mentorship hours at each checkpoint.|
   
-  ### `c_studentBenchMark` — `Dataset` (bar) ⚠️ Hardcoded
+  ### `c_spendPerstudent` — `Dataset` (bar)
   
-  Percentage of students meeting academic benchmarks per term.
+  Average spend per student broken down by category for the current academic session.
   
-  | Field    | Value                                                          |
-  |----------|----------------------------------------------------------------|
-  | type     | `"bar"`                                                        |
-  | labels   | `["Term 1", "Term 2", "Term 3"]`                               |
-  | datasets | Single series `"Meeting benchmark"` — percentage values.        |
+  **Calculation:**
+  - Queries `tacots_tracking` filtered to `academic_session = <currentAcademicSession>`.
+  - For each category, the value is `SUM(<column>) / COUNT(DISTINCT student_id)`, with `NULLIF(..., 0)` to prevent division by zero (returns `0` when no students exist). Values are rounded to 2 decimal places.
+    - **Tuition:** `SUM(tuition_fee_paid) / NULLIF(COUNT(DISTINCT student_id), 0)`
+    - **Resources:** `SUM(resources_spent) / NULLIF(COUNT(DISTINCT student_id), 0)`
+    - **Sundries:** `SUM(sundries_spent) / NULLIF(COUNT(DISTINCT student_id), 0)`
+    - **Total:** `SUM(total_amount_spent) / NULLIF(COUNT(DISTINCT student_id), 0)`
   
-  ### `c_spendPerstudent` — `Dataset` (bar) ⚠️ Hardcoded
+  | Field    | Value                                                         |
+  |----------|---------------------------------------------------------------|
+  | type     | `"bar"`                                                       |
+  | labels   | `["Tuition", "Resources", "Sundries", "Total"]`               |
+  | datasets | Single series `"Avg spend"` — amounts in Naira (₦).           |
   
-  Average spend per student broken down by category.
+  ### `c_totalAccHours` — `LineData`
   
-  | Field    | Value                                                    |
-  |----------|----------------------------------------------------------|
-  | type     | `"bar"`                                                  |
-  | labels   | `["Tuition", "Resources", "Sundries"]`                   |
-  | datasets | Single series `"Avg spend"` — amounts in Naira (₦).      |
+  Total accumulated mentorship hours by academic session.
   
-  ### `c_totalAccHours` — `LineData` ⚠️ Hardcoded
-  
-  Total accumulated programme hours by academic year.
+  **Calculation:**
+  - Queries `tacots_tracking`, grouped by `academic_session`.
+  - Each value is `SUM` of the same `mentorship_duration` → numeric hours `CASE` expression used in `c_averageMentorshipHours`.
+  - Results are mapped onto the fixed 5-session axis. Session labels are expanded to full format (e.g. `"2025/26"` → `"2025/2026"`). Any session with no data defaults to `0`.
   
   ```json
   [
-    { "title": "2025/2026", "amount": 500 },
-    { "title": "2026/2027", "amount": 400 },
-    { "title": "2027/2028", "amount": 300 },
-    { "title": "2028/2029", "amount": 200 },
-    { "title": "2029/2030", "amount": 400 }
+    { "title": "2025/2026", "amount": <hours> },
+    { "title": "2026/2027", "amount": <hours> },
+    { "title": "2027/2028", "amount": <hours> },
+    { "title": "2028/2029", "amount": <hours> },
+    { "title": "2029/2030", "amount": <hours> }
   ]
   ```
+  
+  ### `c_studentBenchMark` — `Dataset` (bar)
+  
+  Count of distinct ASH students meeting the academic benchmark per term in the current academic session.
+  
+  **Calculation:**
+  - Queries the `ash_termly_tracking` table filtered to `academic_session = <currentAcademicSession>` **and** `posttest_average > 50` (the benchmark threshold).
+  - Groups by `upper(trim(term))` and counts `COUNT(DISTINCT student_id)` — the number of unique students who scored above 50 on their post-test.
+  - Results are mapped onto 3 fixed term buckets. The map keys come from the normalized term column, and the chart labels are `"TERM 1"`, `"TERM 2"`, `"TERM 3"`. Any term with no qualifying students defaults to `0`.
+  
+  | Field    | Value                                                           |
+  |----------|-----------------------------------------------------------------|
+  | type     | `"bar"`                                                         |
+  | labels   | `["TERM 1", "TERM 2", "TERM 3"]`                                |
+  | datasets | Single series `"Meeting benchmark"` — distinct student counts.  |
   
   ## Error Responses
   

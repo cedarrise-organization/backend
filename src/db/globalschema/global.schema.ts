@@ -111,7 +111,6 @@ export const adminStatusSchema = z.preprocess(
 );
 
 export const academicSessionSchema = z.enum([
-  "2024/25",
   "2025/26",
   "2026/27",
   "2027/28",
