@@ -24,7 +24,7 @@ docs {
   
   Returns chart-ready metrics for the Enrollment & Recruitment dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `LineData` (key-value list), ready for direct consumption by the frontend charting library.
   
-  > **⚠️ WIP:** All fields currently return hardcoded placeholder data. Database queries have not been implemented yet.
+  All metrics are fully database-driven and **scoped to the current calendar year** (`EXTRACT(YEAR FROM ...) = <currentYear>`). Results are cached under the key `cedarrise:dashboard:enrollment` with the `DASHBOARD_CARDS` TTL.
   
   ## Authorization
   Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
@@ -61,7 +61,7 @@ docs {
     "data": {
       "c_applicationNumbers": Dataset,
       "c_genderDiversity": Dataset,
-      "c_classAgeDistribution": Dataset,
+      "c_classDistribution": Dataset,
       "c_acceptanceRate": LineData,
       "c_geographicalDistribution": LineData
     }
@@ -70,60 +70,85 @@ docs {
   
   ---
   
-  ### `c_applicationNumbers` — `Dataset` (line) ⚠️ Hardcoded
+  ### `c_applicationNumbers` — `Dataset` (line)
   
-  Monthly application counts per programme.
+  Monthly application counts per programme for the current year.
   
-  | Field    | Value                                                           |
-  |----------|-----------------------------------------------------------------|
-  | type     | `"line"`                                                        |
-  | labels   | `["Jan", "Feb", ..., "Dec"]`                                    |
-  | datasets | Two series: `"ASH"` and `"TACOTS"` — monthly application counts.|
+  **Calculation:**
+  - **ASH series:** Queries the `ash_student` table, counting rows (`COUNT(id)`) grouped by month (`TO_CHAR(created_at, 'YYYY-MM')`), filtered to the current year. Each month without data defaults to `0`.
+  - **TACOTS series:** Queries the `tacots_recommendation` table using the same approach — `COUNT(id)` grouped by month, filtered to the current year.
+  - Results from both queries are mapped onto a fixed 12-month axis (Jan–Dec). Any month with no applications resolves to `0`.
   
-  ### `c_genderDiversity` — `Dataset` (pie) ⚠️ Hardcoded
+  | Field    | Value                                                                   |
+  |----------|-------------------------------------------------------------------------|
+  | type     | `"line"`                                                                |
+  | labels   | `["Jan", "Feb", ..., "Dec"]`                                            |
+  | datasets | Two series: `"ASH"` (from `ash_student`) and `"TACOTS"` (from `tacots_recommendation`) — monthly application counts. |
   
-  Gender split across enrolled students.
+  ### `c_genderDiversity` — `Dataset` (pie)
   
-  | Field    | Value                                    |
-  |----------|------------------------------------------|
-  | type     | `"pie"`                                   |
-  | labels   | `["Female", "Male"]`                      |
-  | datasets | Single unlabelled series with two values. |
+  Aggregated gender split across all ASH and TACOTS applicants for the current year.
   
-  ### `c_classAgeDistribution` — `Dataset` (bar) ⚠️ Hardcoded
+  **Calculation:**
+  - **ASH gender counts:** Queries `ash_student`, grouping by `lower(trim(gender))` and counting rows (`COUNT(id)`), filtered to the current year. This counts *all* applicants, not just accepted students.
+  - **TACOTS gender counts:** Queries `tacots_recommendation` using the same approach — `COUNT(id)` grouped by `lower(trim(gender))`, filtered to the current year. This counts *all* recommended students, not just selected ones.
+  - The two result sets are merged into a single `Map<gender, count>` by summing counts for matching gender keys. The final dataset extracts `"female"` and `"male"` totals from this map.
   
-  Student count by class/education level.
+  | Field    | Value                                                         |
+  |----------|---------------------------------------------------------------|
+  | type     | `"pie"`                                                       |
+  | labels   | `["Female", "Male"]`                                          |
+  | datasets | Single unlabelled series: `[<femaleTotal>, <maleTotal>]`.     |
+  
+  ### `c_classDistribution` — `Dataset` (bar)
+  
+  Accepted ASH student count by class/education level for the current year.
+  
+  **Calculation:**
+  - Queries the `ash_student` table, counting rows (`COUNT(id)`) grouped by `upper(trim(current_class))`, filtered to the current year **and** `status = 'accepted'` (only accepted students are included).
+  - Results are mapped onto a fixed 7-bucket axis. The `"Primary"` bucket is an aggregate — it sums the counts for `"PRIMARY 1"` through `"PRIMARY 6"`. All other buckets (`JSS1`–`SS3`) map one-to-one to their class name. Any class with no matching records resolves to `0`.
   
   | Field    | Value                                                                     |
   |----------|---------------------------------------------------------------------------|
-  | type     | `"bar"`                                                                    |
+  | type     | `"bar"`                                                                   |
   | labels   | `["Primary", "JSS1", "JSS2", "JSS3", "SS1", "SS2", "SS3"]`               |
-  | datasets | Single series `"Students"` — count per class level.                        |
+  | datasets | Single series `"Students"` — count per class level.                       |
   
-  ### `c_acceptanceRate` — `LineData` ⚠️ Hardcoded
+  ### `c_acceptanceRate` — `LineData`
   
-  Acceptance rate percentage per programme.
+  Acceptance rate percentage per programme for the current year.
+  
+  **Calculation:**
+  Each programme's rate is computed as `(accepted / total) * 100`, rounded to 2 decimal places. If `total` is `0`, the rate returns `0` to avoid division by zero.
+  
+  - **ASH:** Queries `ash_student` filtered to the current year. `total` = `COUNT(id)` of all rows; `accepted` = `COUNT(id) FILTER (WHERE status = 'accepted')`. Rate = `(accepted / total) * 100`.
+  - **TACOTS:** Queries `tacots_recommendation` filtered to the current year. `total` = `COUNT(id)` of all rows; `accepted` = `COUNT(id) FILTER (WHERE admin_status = 'SELECTED')`. Rate = `(accepted / total) * 100`.
+  - **Volunteer:** Queries `volunteer_registration` filtered to the current year. `total` = `COUNT(id)` of all rows; `accepted` = `COUNT(id) FILTER (WHERE status = 'accepted')`. Rate = `(accepted / total) * 100`.
   
   ```json
   [
-    { "title": "ASH", "amount": 74 },
-    { "title": "TACOTS", "amount": 74 },
-    { "title": "Volunteer", "amount": 74 }
+    { "title": "ASH", "amount": <percentage> },
+    { "title": "TACOTS", "amount": <percentage> },
+    { "title": "Volunteer", "amount": <percentage> }
   ]
   ```
   
-  ### `c_geographicalDistribution` — `LineData` ⚠️ Hardcoded
+  ### `c_geographicalDistribution` — `LineData`
   
-  Student count by state/region.
+  ASH applicant count by state for the current year.
+  
+  **Calculation:**
+  - Queries the `ash_student` table, counting rows (`COUNT(id)`) grouped by `upper(trim(school_state))`, filtered to the current year. This includes *all* applicants regardless of status.
+  - Five featured states are shown individually: `ENUGU`, `EBONYI`, `ANAMBRA`, `ABIA`, `IMO`. All remaining states are aggregated into an `"OTHERS"` bucket by summing their counts.
   
   ```json
   [
-    { "title": "Enugu", "amount": 70 },
-    { "title": "Ebonyi", "amount": 60 },
-    { "title": "Anambra", "amount": 50 },
-    { "title": "Abia", "amount": 40 },
-    { "title": "Imo", "amount": 30 },
-    { "title": "others", "amount": 20 }
+    { "title": "ENUGU", "amount": <count> },
+    { "title": "EBONYI", "amount": <count> },
+    { "title": "ANAMBRA", "amount": <count> },
+    { "title": "ABIA", "amount": <count> },
+    { "title": "IMO", "amount": <count> },
+    { "title": "OTHERS", "amount": <count> }
   ]
   ```
   

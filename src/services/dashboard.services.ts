@@ -262,7 +262,7 @@ export const getCards = async () => {
 };
 
 export const getStudentPerformance = async () => {
-/// cache
+  /// cache
   const key = `cedarrise:dashboard:student-performance`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
@@ -492,45 +492,316 @@ export const getStudentPerformance = async () => {
 };
 
 export const getEnrollment = async () => {
+  /// cache
+  const key = `cedarrise:dashboard:enrollment`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Enrollment and Recruitment data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const currentYear = new Date().getFullYear();
+  const normalizedAshGender = sql<string>`lower(trim(${ashStudent.gender}))`;
+  const normalizedTacotsGender = sql<string>`lower(trim(${tacotsRecommendation.gender}))`;
+  const normalizedAshClass = sql<string>`upper(trim(${ashStudent.currentClass}))`;
+  const getPercentage = (accepted: number, total: number) =>
+    total === 0 ? 0 : Number(((accepted / total) * 100).toFixed(2));
+  const normalizedAshSchoolState = sql<string>`upper(trim(${ashStudent.schoolState}))`;
+
+  const [
+    ashApplications,
+    tacotsApplications,
+    ashGenderCounts,
+    tacotsGenderCounts,
+    ashClassCounts,
+    [ashAcceptance],
+    [tacotsAcceptance],
+    [volunteerAcceptance],
+    ashStateCounts,
+  ] = await Promise.all([
+    // ashApplications
+    await db
+      .select({
+        value: count(ashStudent.id),
+        month: sql<string>`TO_CHAR(${ashStudent.createdAt}, 'YYYY-MM')`,
+      })
+      .from(ashStudent)
+      .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`)
+      .groupBy(sql`TO_CHAR(${ashStudent.createdAt}, 'YYYY-MM')`),
+    // tacotsApplications
+    await db
+      .select({
+        value: count(tacotsRecommendation.id),
+        month: sql<string>`TO_CHAR(${tacotsRecommendation.createdAt}, 'YYYY-MM')`,
+      })
+      .from(tacotsRecommendation)
+      .where(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`)
+      .groupBy(sql`TO_CHAR(${tacotsRecommendation.createdAt}, 'YYYY-MM')`),
+    // ashGenderCounts
+    // if query is based on accepted students: .where(and(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`, eq(ashStudent.status, "accepted")))
+    await db
+      .select({
+        gender: normalizedAshGender,
+        value: count(ashStudent.id),
+      })
+      .from(ashStudent)
+      .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`)
+      .groupBy(normalizedAshGender),
+    // tacotsGenderCounts
+    // if query is based on accepted students: .where(and(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`, eq(tacotsRecommendation.adminStatus, "SELECTED")))
+    await db
+      .select({
+        gender: normalizedTacotsGender,
+        value: count(tacotsRecommendation.id),
+      })
+      .from(tacotsRecommendation)
+      .where(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`)
+      .groupBy(normalizedTacotsGender),
+    // ashClassCounts
+    await db
+      .select({
+        currentClass: normalizedAshClass,
+        value: count(ashStudent.id),
+      })
+      .from(ashStudent)
+      .where(
+        and(
+          sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`,
+          eq(ashStudent.status, "accepted"),
+        ),
+      )
+      .groupBy(normalizedAshClass),
+    // ashAcceptance
+    await db
+      .select({
+        total: count(ashStudent.id),
+        accepted: sql<number>`
+        COUNT(${ashStudent.id})
+        FILTER (
+          WHERE ${ashStudent.status} = 'accepted'
+        )
+      `,
+      })
+      .from(ashStudent)
+      .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`),
+    // tacotsAcceptance
+    await db
+      .select({
+        total: count(tacotsRecommendation.id),
+        accepted: sql<number>`
+        COUNT(${tacotsRecommendation.id})
+        FILTER (
+          WHERE ${tacotsRecommendation.adminStatus} = 'SELECTED'
+        )
+      `,
+      })
+      .from(tacotsRecommendation)
+      .where(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`),
+    // volunteerAcceptance
+    await db
+      .select({
+        total: count(volunteerRegistration.id),
+        accepted: sql<number>`
+        COUNT(${volunteerRegistration.id})
+        FILTER (
+          WHERE ${volunteerRegistration.status} = 'accepted'
+        )
+      `,
+      })
+      .from(volunteerRegistration)
+      .where(sql`EXTRACT(YEAR FROM ${volunteerRegistration.createdAt}) = ${currentYear}`),
+    // ashStateCounts
+    await db
+      .select({
+        state: normalizedAshSchoolState,
+        value: count(ashStudent.id),
+      })
+      .from(ashStudent)
+      .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`)
+      .groupBy(normalizedAshSchoolState),
+  ]);
+
+  ////
+  /* ashApplications, tacotsApplications */
+  const monthLabels = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const monthKeys = Array.from({ length: 12 }, (_, index) => {
+    const month = String(index + 1).padStart(2, "0");
+    return `${currentYear}-${month}`;
+  });
+  const ashApplicationsMap = new Map(ashApplications.map((row) => [row.month, Number(row.value)]));
+  const tacotsApplicationsMap = new Map(
+    tacotsApplications.map((row) => [row.month, Number(row.value)]),
+  );
   const c_applicationNumbers: Dataset = {
     type: "line",
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: monthLabels,
     datasets: [
-      { label: "ASH", data: [14, 12, 18, 22, 19, 16, 8, 24, 21, 17, 15, 12] },
-      { label: "TACOTS", data: [6, 5, 9, 10, 8, 7, 4, 11, 9, 8, 6, 5] },
+      {
+        label: "ASH",
+        data: monthKeys.map((month) => ashApplicationsMap.get(month) ?? 0),
+      },
+      {
+        label: "TACOTS",
+        data: monthKeys.map((month) => tacotsApplicationsMap.get(month) ?? 0),
+      },
     ],
   };
+  ////
+
+  ////
+  /* ashGenderCounts, tacotsGenderCounts */
+  const genderTotals = new Map<string, number>();
+  const addGenderCounts = (rows: { gender: string; value: number | string }[]) => {
+    for (const row of rows) {
+      genderTotals.set(row.gender, (genderTotals.get(row.gender) ?? 0) + Number(row.value));
+    }
+  };
+  addGenderCounts(ashGenderCounts);
+  addGenderCounts(tacotsGenderCounts);
   const c_genderDiversity: Dataset = {
     type: "pie",
     labels: ["Female", "Male"],
-    datasets: [{ data: [54, 46] }],
+    datasets: [
+      {
+        data: [genderTotals.get("female") ?? 0, genderTotals.get("male") ?? 0],
+      },
+    ],
   };
-  const c_classAgeDistribution: Dataset = {
+  ////
+
+  ////
+  /* ashClassCounts */
+  const classCountMap = new Map(ashClassCounts.map((row) => [row.currentClass, Number(row.value)]));
+  const primaryClasses = [
+    "PRIMARY 1",
+    "PRIMARY 2",
+    "PRIMARY 3",
+    "PRIMARY 4",
+    "PRIMARY 5",
+    "PRIMARY 6",
+  ];
+  const getClassCount = (className: string) => classCountMap.get(className) ?? 0;
+  const c_classDistribution: Dataset = {
     type: "bar",
     labels: ["Primary", "JSS1", "JSS2", "JSS3", "SS1", "SS2", "SS3"],
-    datasets: [{ label: "Students", data: [18, 28, 34, 31, 42, 38, 27] }],
+    datasets: [
+      {
+        label: "Students",
+        data: [
+          primaryClasses.reduce((total, className) => total + getClassCount(className), 0),
+          getClassCount("JSS1"),
+          getClassCount("JSS2"),
+          getClassCount("JSS3"),
+          getClassCount("SS1"),
+          getClassCount("SS2"),
+          getClassCount("SS3"),
+        ],
+      },
+    ],
   };
-  const c_acceptanceRate: LineData = [
-    { title: "ASH", amount: 74 },
-    { title: "TACOTS", amount: 74 },
-    { title: "Volunteer", amount: 74 },
-  ];
-  const c_geographicalDistribution: LineData = [
-    { title: "Enugu", amount: 70 },
-    { title: "Ebonyi", amount: 60 },
-    { title: "Anambra", amount: 50 },
-    { title: "Abia", amount: 40 },
-    { title: "Imo", amount: 30 },
-    { title: "others", amount: 20 },
-  ];
+  ////
 
+  ////
+  /* ashAcceptance, tacotsAcceptance, volunteerAcceptance */
+  const c_acceptanceRate: LineData = [
+    {
+      title: "ASH",
+      amount: getPercentage(
+        Number(ashAcceptance?.accepted ?? 0),
+        Number(ashAcceptance?.total ?? 0),
+      ),
+    },
+    {
+      title: "TACOTS",
+      amount: getPercentage(
+        Number(tacotsAcceptance?.accepted ?? 0),
+        Number(tacotsAcceptance?.total ?? 0),
+      ),
+    },
+    {
+      title: "Volunteer",
+      amount: getPercentage(
+        Number(volunteerAcceptance?.accepted ?? 0),
+        Number(volunteerAcceptance?.total ?? 0),
+      ),
+    },
+  ];
+  ////
+
+  ////
+  /* ashStateCounts */
+  const ashStateCountMap = new Map(ashStateCounts.map((row) => [row.state, Number(row.value)]));
+  const featuredStates = ["ENUGU", "EBONYI", "ANAMBRA", "ABIA", "IMO"];
+  const othersCount = ashStateCounts.reduce((total, row) => {
+    if (featuredStates.includes(row.state)) return total;
+    return total + Number(row.value);
+  }, 0);
+  const c_geographicalDistribution: LineData = [
+    {
+      title: "ENUGU",
+      amount: ashStateCountMap.get("ENUGU") ?? 0,
+    },
+    {
+      title: "EBONYI",
+      amount: ashStateCountMap.get("EBONYI") ?? 0,
+    },
+    {
+      title: "ANAMBRA",
+      amount: ashStateCountMap.get("ANAMBRA") ?? 0,
+    },
+    {
+      title: "ABIA",
+      amount: ashStateCountMap.get("ABIA") ?? 0,
+    },
+    {
+      title: "IMO",
+      amount: ashStateCountMap.get("IMO") ?? 0,
+    },
+    {
+      title: "OTHERS",
+      amount: othersCount,
+    },
+  ];
+  ////
+
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      c_applicationNumbers,
+      c_genderDiversity,
+      c_classDistribution,
+      c_acceptanceRate,
+      c_geographicalDistribution,
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+  ///
+  
   return {
     code: 200,
     message: "Enrollment and Recruitment data found successfully",
     data: {
       c_applicationNumbers,
       c_genderDiversity,
-      c_classAgeDistribution,
+      c_classDistribution,
       c_acceptanceRate,
       c_geographicalDistribution,
     },
