@@ -75,6 +75,8 @@
 | `cedarrise:lookup:volunteers`                                             | Cached lightweight list of accepted volunteers (id + name) for dropdown. Set on read.              | `services/lookup.services.ts`               |
 | `cedarrise:dashboard:cards`                                               | Cached aggregate dashboard card metrics (volunteer, capacity, outreach, ASH, TACOTS). Set on read. | `services/dashboard.services.ts`            |
 | `cedarrise:dashboard:student-performance`                                 | Cached student performance chart data (graduation rate, attendance, test scores, dropout trend, risk). Set on read. | `services/dashboard.services.ts`            |
+| `cedarrise:dashboard:enrollment`                                          | Cached enrollment & recruitment chart data (application numbers, gender diversity, class distribution, acceptance rate, geographical distribution). Set on read. | `services/dashboard.services.ts`            |
+| `cedarrise:dashboard:institutional-effectiveness`                         | Cached institutional effectiveness chart data (community service hours, mentorship hours, spend per student, total accumulated hours, student benchmark). Set on read. | `services/dashboard.services.ts`            |
 
 ---
 
