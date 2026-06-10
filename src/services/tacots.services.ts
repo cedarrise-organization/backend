@@ -310,6 +310,10 @@ export const deleteRecommendation = async (id: string) => {
     message: "Tacots beneficiary data deleted successfully",
   };
 };
+export const exportTacotsRecommendationTableToCSV = async () => {
+  const data = await db.select().from(tacotsRecommendation);
+  return data;
+};
 
 // FEEDBACK
 export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
@@ -441,6 +445,10 @@ export const deleteTacotsFeedback = async (id: string) => {
     code: 200,
     message: "Tacots feedback data deleted successfully",
   };
+};
+export const exportTacotsFeedbackTableToCSV = async () => {
+  const data = await db.select().from(tacotsFeedback);
+  return data;
 };
 
 // ONBOARDING
@@ -637,6 +645,10 @@ export const deleteOnboarding = async (id: string) => {
     message: "Tacots onboarding data deleted successfully",
   };
 };
+export const exportTacotsOnboardingTableToCSV = async () => {
+  const data = await db.select().from(tacotsOnboarding);
+  return data;
+};
 
 // TRACKING
 export const submitTacotsTracking = async (req: Request, options: TacotstrackingbodyType) => {
@@ -830,6 +842,10 @@ export const deleteTacotsTracking = async (id: string) => {
     message: "Tacots tracking data deleted successfully",
   };
 };
+export const exportTacotsTrackingTableToCSV = async () => {
+  const data = await db.select().from(tacotsTracking);
+  return data;
+};
 
 // EXIT
 export const submitTacotsExit = async (options: TacotsexitbodyType) => {
@@ -953,4 +969,8 @@ export const deleteTacotsExit = async (id: string) => {
     code: 200,
     message: "Tacots exit data deleted successfully",
   };
+};
+export const exportTacotsExitTableToCSV = async () => {
+  const data = await db.select().from(tacotsExit);
+  return data;
 };

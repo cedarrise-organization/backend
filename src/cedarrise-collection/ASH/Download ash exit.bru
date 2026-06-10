@@ -1,0 +1,73 @@
+meta {
+  name: Download ASH exit
+  type: http
+  seq: 27
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/download/ashexit
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download ASH Exit Records (CSV Export)
+  
+  Exports the entire `ash_exit` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="ash_exit.csv"`
+  
+  The CSV contains one row per exit record with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `studentId` | UUID foreign key referencing the ASH student |
+  | `ageAtExit` | Student's age at the time of exiting the programme |
+  | `schoolName` | Name of school attended at exit |
+  | `classAtExit` | Student's class level at exit |
+  | `durationInProgram` | How long the student was in the programme |
+  | `exitReason` | Reason for exit (e.g. `"COMPLETED"`, `"GRADUATED"`, `"DROPPED OUT"`) |
+  | `academicImpactRating` | Rating of the programme's academic impact |
+  | `areasOfImprovement` | Areas where the student showed improvement |
+  | `mentorshipReceived` | Whether the student received mentorship |
+  | `mentorshipImpactRating` | Rating of mentorship impact |
+  | `postAshStatus` | Student's status after leaving ASH |
+  | `institutionName` | Name of institution (if continuing education) |
+  | `courseOfStudy` | Course of study (if continuing education) |
+  | `vocationalSkill` | Vocational skill (if applicable) |
+  | `enjoyedMost` | What the student enjoyed most about the programme |
+  | `programImpact` | Student's assessment of programme impact |
+  | `improvementSuggestions` | Student's suggestions for improvement |
+  | `facilitatorName` | Name of the facilitator who recorded the exit |
+  | `exitDate` | Date the student exited the programme |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

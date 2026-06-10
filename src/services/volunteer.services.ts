@@ -201,6 +201,10 @@ export const deleteVolunteer = async (id: string) => {
     message: "volunteer data deleted successfully",
   };
 };
+export const exportVolunteerRegistrationTableToCSV = async () => {
+  const data = await db.select().from(volunteerRegistration);
+  return data;
+};
 
 export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType) => {
   const [newVolunteerFeedback] = await db
@@ -332,4 +336,8 @@ export const deleteVolunteerFeedback = async (id: string) => {
     code: 200,
     message: "volunteer feedback deleted successfully",
   };
+};
+export const exportVolunteerFeedbackTableToCSV = async () => {
+  const data = await db.select().from(volunteerFeedback);
+  return data;
 };

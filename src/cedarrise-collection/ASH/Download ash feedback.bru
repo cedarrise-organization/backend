@@ -1,0 +1,76 @@
+meta {
+  name: Download ASH feedback
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/download/ashfeedback
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download ASH Program Feedback (CSV Export)
+  
+  Exports the entire `ash_program_feedback` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="ash_program_feedback.csv"`
+  
+  The CSV contains one row per feedback submission with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `studentFirstName` | Student's first name |
+  | `studentSurname` | Student's surname |
+  | `schoolName` | Name of school attended |
+  | `currentClass` | Student's current class level |
+  | `attendanceFrequency` | How frequently the student attended sessions |
+  | `enjoyedParts` | Parts of the programme the student enjoyed |
+  | `learningImprovementRating` | Student's rating of learning improvement |
+  | `confidenceRating` | Student's confidence rating |
+  | `volunteerSupportRating` | Student's rating of volunteer support |
+  | `studentEnjoyedMost` | What the student enjoyed most |
+  | `studentImprovementSuggestions` | Student's suggestions for improvement |
+  | `parentGuardianName` | Parent/guardian full name |
+  | `parentGuardianRelationship` | Parent/guardian relationship to student |
+  | `parentPhone` | Parent/guardian phone number |
+  | `childBenefited` | Whether the parent believes the child benefited |
+  | `academicImprovementNoticed` | Whether the parent noticed academic improvement |
+  | `confidenceBehaviorChange` | Whether the parent noticed confidence/behavior changes |
+  | `mostValuableAspects` | Most valuable aspects according to the parent |
+  | `parentSatisfactionRating` | Parent's overall satisfaction rating |
+  | `programImpactOnChild` | Parent's assessment of programme impact on child |
+  | `parentImprovementSuggestions` | Parent's suggestions for improvement |
+  | `additionalComments` | Any additional comments |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

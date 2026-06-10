@@ -1,5 +1,6 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
+import { Parser } from "json2csv";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
 import {
@@ -8,23 +9,28 @@ import {
   getRegistration,
   updateAshStudentStatus,
   assignAshMentor,
+  exportAshStudentTableToCSV,
   deleteRegistration,
   submitFeedback,
   listFeedback,
   getFeedback,
   deleteFeedback,
+  exportAshFeedbackTableToCSV,
   submitTracking,
   listTracking,
   getTrack,
   deleteTrack,
+  exportAshTermlyTrackingTableToCSV,
   submitAttendance,
   listAttendance,
   getAttendance,
   deleteAttendance,
+  exportAshAttendanceTableToCSV,
   submitExit,
   listExit,
   getExit,
   deleteExit,
+  exportAshExitTableToCSV,
 } from "../../services/ash.services.js";
 
 // ASH REGISTRATION
@@ -171,7 +177,6 @@ export const assignAshMentorController = async (
     next(error);
   }
 };
-
 export const deleteRegistrationController = async (
   req: Request,
   res: Response,
@@ -181,6 +186,74 @@ export const deleteRegistrationController = async (
   try {
     const response = await deleteRegistration(id);
     return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+export const exportAshStudentController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const response = await exportAshStudentTableToCSV();
+
+    const fields = [
+      "id",
+      "programType",
+      "firstName",
+      "middleName",
+      "surname",
+      "gender",
+      "age",
+      "dob",
+      "primaryLanguage",
+      "homeAddress",
+      "studentPhone",
+      "passportPhotoUrl",
+      "passportPhotoPublicId",
+      "schoolName",
+      "schoolTown",
+      "schoolLga",
+      "schoolState",
+      "currentClass",
+      "classPositionLastTerm",
+      "lastResultUrl",
+      "lastResultPublicId",
+      "prevAfterschoolProgram",
+      "reasonForJoining",
+      "fathersName",
+      "fathersPhone",
+      "fathersOccupation",
+      "mothersName",
+      "mothersPhone",
+      "mothersOccupation",
+      "guardianName",
+      "guardianRelationship",
+      "guardianPhone",
+      "guardianOccupation",
+      "householdIncomeRange",
+      "hasLearningCondition",
+      "learningConditions",
+      "parentConsent",
+      "declarationConfirmed",
+      "parentSignatureUrl",
+      "parentSignaturePublicId",
+      "assignedMentor",
+      "pretestScore",
+      "status",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="ash_students.csv"');
+
+    return res.status(200).send(csv);
   } catch (error) {
     next(error);
   }
@@ -244,7 +317,6 @@ export const submitFeedbackController = async (req: Request, res: Response, next
     next(error);
   }
 };
-
 export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
@@ -254,7 +326,6 @@ export const listFeedbackController = async (req: Request, res: Response, next: 
     next(error);
   }
 };
-
 export const getFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
@@ -264,12 +335,59 @@ export const getFeedbackController = async (req: Request, res: Response, next: N
     next(error);
   }
 };
-
 export const deleteFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteFeedback(id);
     return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+export const exportAshFeedbackController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const response = await exportAshFeedbackTableToCSV();
+
+    const fields = [
+      "id",
+      "studentFirstName",
+      "studentSurname",
+      "schoolName",
+      "currentClass",
+      "attendanceFrequency",
+      "enjoyedParts",
+      "learningImprovementRating",
+      "confidenceRating",
+      "volunteerSupportRating",
+      "studentEnjoyedMost",
+      "studentImprovementSuggestions",
+      "parentGuardianName",
+      "parentGuardianRelationship",
+      "parentPhone",
+      "childBenefited",
+      "academicImprovementNoticed",
+      "confidenceBehaviorChange",
+      "mostValuableAspects",
+      "parentSatisfactionRating",
+      "programImpactOnChild",
+      "parentImprovementSuggestions",
+      "additionalComments",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="ash_program_feedback.csv"');
+
+    return res.status(200).send(csv);
   } catch (error) {
     next(error);
   }
@@ -338,7 +456,6 @@ export const submitTrackingController = async (req: Request, res: Response, next
     next(error);
   }
 };
-
 export const listTrackingController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
@@ -348,7 +465,6 @@ export const listTrackingController = async (req: Request, res: Response, next: 
     next(error);
   }
 };
-
 export const getTrackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
@@ -358,12 +474,63 @@ export const getTrackController = async (req: Request, res: Response, next: Next
     next(error);
   }
 };
-
 export const deleteTrackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteTrack(id);
     return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+export const exportAshTermlyTrackingController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const response = await exportAshTermlyTrackingTableToCSV();
+
+    const fields = [
+      "id",
+      "studentId",
+      "academicSession",
+      "term",
+      "schoolName",
+      "schoolNumeracyScore",
+      "schoolLiteracyScore",
+      "schoolAverage",
+      "schoolPosition",
+      "pretestNumeracyScore",
+      "pretestLiteracyScore",
+      "pretestAverage",
+      "midtestNumeracyScore",
+      "midtestLiteracyScore",
+      "midtestAverage",
+      "posttestNumeracyScore",
+      "posttestLiteracyScore",
+      "posttestAverage",
+      "termResultUrl",
+      "termResultPublicId",
+      "disciplineRating",
+      "responsibilityRating",
+      "leadershipRating",
+      "notableAchievements",
+      "challengesObserved",
+      "nextTermRecommendations",
+      "mentorName",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="ash_termly_tracking.csv"');
+
+    return res.status(200).send(csv);
   } catch (error) {
     next(error);
   }
@@ -399,7 +566,6 @@ export const submitAttendanceController = async (
     next(error);
   }
 };
-
 export const listAttendanceController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
@@ -409,7 +575,6 @@ export const listAttendanceController = async (req: Request, res: Response, next
     next(error);
   }
 };
-
 export const getAttendanceController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
@@ -419,7 +584,6 @@ export const getAttendanceController = async (req: Request, res: Response, next:
     next(error);
   }
 };
-
 export const deleteAttendanceController = async (
   req: Request,
   res: Response,
@@ -429,6 +593,39 @@ export const deleteAttendanceController = async (
   try {
     const response = await deleteAttendance(id);
     return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+export const exportAshAttendanceController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const response = await exportAshAttendanceTableToCSV();
+
+    const fields = [
+      "id",
+      "sessionDate",
+      "studentsInAttendance",
+      "studentsMentored",
+      "sessionsConducted",
+      "sessionDetails",
+      "volunteersInAttendance",
+      "programReview",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="ash_weekly_attendance.csv"');
+
+    return res.status(200).send(csv);
   } catch (error) {
     next(error);
   }
@@ -484,7 +681,6 @@ export const submitExitController = async (req: Request, res: Response, next: Ne
     next(error);
   }
 };
-
 export const listExitController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit } = req.qtransformed;
   try {
@@ -494,7 +690,6 @@ export const listExitController = async (req: Request, res: Response, next: Next
     next(error);
   }
 };
-
 export const getExitController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
@@ -504,12 +699,52 @@ export const getExitController = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
-
 export const deleteExitController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
     const response = await deleteExit(id);
     return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+export const exportAshExitController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await exportAshExitTableToCSV();
+
+    const fields = [
+      "id",
+      "studentId",
+      "ageAtExit",
+      "schoolName",
+      "classAtExit",
+      "durationInProgram",
+      "exitReason",
+      "academicImpactRating",
+      "areasOfImprovement",
+      "mentorshipReceived",
+      "mentorshipImpactRating",
+      "postAshStatus",
+      "institutionName",
+      "courseOfStudy",
+      "vocationalSkill",
+      "enjoyedMost",
+      "programImpact",
+      "improvementSuggestions",
+      "facilitatorName",
+      "exitDate",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="ash_exit.csv"');
+
+    return res.status(200).send(csv);
   } catch (error) {
     next(error);
   }

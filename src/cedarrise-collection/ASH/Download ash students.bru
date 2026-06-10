@@ -1,0 +1,96 @@
+meta {
+  name: Download ASH students
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/download/ashstudent
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download ASH Students (CSV Export)
+  
+  Exports the entire `ash_student` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="ash_students.csv"`
+  
+  The CSV contains one row per ASH student record with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `programType` | Programme the student applied for |
+  | `firstName` | Student's first name |
+  | `middleName` | Student's middle name |
+  | `surname` | Student's surname |
+  | `gender` | Student's gender |
+  | `age` | Student's age at registration |
+  | `dob` | Date of birth |
+  | `primaryLanguage` | Student's primary language |
+  | `homeAddress` | Home address |
+  | `studentPhone` | Student phone number |
+  | `passportPhotoUrl` | Cloudinary URL for passport photo |
+  | `passportPhotoPublicId` | Cloudinary public ID for passport photo |
+  | `schoolName` | Name of school attended |
+  | `schoolTown` | Town where the school is located |
+  | `schoolLga` | LGA where the school is located |
+  | `schoolState` | State where the school is located |
+  | `currentClass` | Student's current class level |
+  | `classPositionLastTerm` | Position in class last term |
+  | `lastResultUrl` | Cloudinary URL for last result document |
+  | `lastResultPublicId` | Cloudinary public ID for last result |
+  | `prevAfterschoolProgram` | Whether student attended a previous afterschool programme |
+  | `reasonForJoining` | Reason for joining ASH |
+  | `fathersName` | Father's full name |
+  | `fathersPhone` | Father's phone number |
+  | `fathersOccupation` | Father's occupation |
+  | `mothersName` | Mother's full name |
+  | `mothersPhone` | Mother's phone number |
+  | `mothersOccupation` | Mother's occupation |
+  | `guardianName` | Guardian's full name |
+  | `guardianRelationship` | Guardian's relationship to student |
+  | `guardianPhone` | Guardian's phone number |
+  | `guardianOccupation` | Guardian's occupation |
+  | `householdIncomeRange` | Household income range |
+  | `hasLearningCondition` | Whether the student has a learning condition |
+  | `learningConditions` | Description of learning conditions (if any) |
+  | `parentConsent` | Whether parent consent was given |
+  | `declarationConfirmed` | Whether the declaration was confirmed |
+  | `parentSignatureUrl` | Cloudinary URL for parent signature |
+  | `parentSignaturePublicId` | Cloudinary public ID for parent signature |
+  | `assignedMentor` | Name of the assigned mentor |
+  | `pretestScore` | Pre-test score at registration |
+  | `status` | Application status (`pending`, `accepted`, `rejected`) |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

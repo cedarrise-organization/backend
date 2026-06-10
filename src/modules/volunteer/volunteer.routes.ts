@@ -8,10 +8,12 @@ import {
   getVolunteerController,
   updateVolunteerStatusController,
   deleteVolunteerController,
+  exportVolunteerRegistrationController,
   submitVolunteerFeedbackController,
   listVolunteerFeedbackController,
   getVolunteerFeedbackController,
   deleteVolunteerFeedbackController,
+  exportVolunteerFeedbackController,
 } from "./volunteer.controller.js";
 import {
   createVolunteerRegistrationSchema,
@@ -64,6 +66,8 @@ router.delete(
   validateRequest(volunteerRegistrationParamsSchema),
   deleteVolunteerController,
 );
+// Download volunteerRegistration table
+router.get("/download/volunteerregistration", authenticate(), authorize("read"), exportVolunteerRegistrationController);
 
 // Submit volunteer feedback form
 router.post(
@@ -95,5 +99,7 @@ router.delete(
   validateRequest(volunteerFeedbackParamsSchema),
   deleteVolunteerFeedbackController,
 );
+// Download volunteerFeedback table
+router.get("/download/volunteerfeedback", authenticate(), authorize("read"), exportVolunteerFeedbackController);
 
 export default router;

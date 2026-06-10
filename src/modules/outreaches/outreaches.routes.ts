@@ -8,6 +8,7 @@ import {
   getOneOutreachController,
   listAllOutreachController,
   deleteOutreachController,
+  exportOutreachTrackerController
 } from "./outreaches.controller.js";
 import {
   createOutreachTrackerSchema,
@@ -26,7 +27,6 @@ router.post(
   validateRequest(createOutreachTrackerSchema),
   createOutreachController,
 );
-
 // List outreach records (filterable by state, date)
 router.get(
   "/",
@@ -34,7 +34,6 @@ router.get(
   validateRequest(outreachTrackerQuerySchema),
   listAllOutreachController,
 );
-
 // Get full outreach record detail
 router.get(
   "/:id",
@@ -42,7 +41,6 @@ router.get(
   validateRequest(outreachTrackerParamsSchema),
   getOneOutreachController,
 );
-
 // Delete outreach record
 router.delete(
   "/:id",
@@ -50,5 +48,7 @@ router.delete(
   validateRequest(outreachTrackerParamsSchema),
   deleteOutreachController,
 );
+// Download outreachTracker table
+router.get("/download/outreachtracker", authenticate(), authorize("read"), exportOutreachTrackerController);
 
 export default router;
