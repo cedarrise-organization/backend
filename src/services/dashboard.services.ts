@@ -55,6 +55,7 @@ export const getCards = async () => {
   let volunteersponsors: number = 10;
   let outreachesPartners: number = 10;
   let tacotsPartners: number = 10;
+  // If these values are going to be a yearly thing, just add a where clause to check createdat for current year
   const [
     [volunteersApplied],
     [volunteersAccepted],
@@ -841,6 +842,7 @@ export const getInstEffectiveness = async () => {
     currentMonth >= 9
       ? `${currentYear}/${String(currentYear + 1).slice(2)}`
       : `${currentYear - 1}/${String(currentYear).slice(2)}`;
+      console.log(currentAcademicSession)
   const mentorshipHours = sql<number>`
     CASE ${tacotsTracking.mentorshipDuration}
       WHEN '15 MINUTES' THEN 0.25
