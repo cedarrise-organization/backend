@@ -1,11 +1,10 @@
-import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/storage.util.js";
+import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { projects } from "../db/models/admin.js";
 import { UploadApiResponse } from "cloudinary";
+import { eq, desc } from "drizzle-orm";
 import { Request } from "express";
-import { sql, eq, desc, asc } from "drizzle-orm";
 import db from "../db/db.js";
-import { cache } from "ejs";
 import logger from "../configs/logger.config.js";
 
 export const getProjects = async () => {
@@ -21,7 +20,10 @@ export const getProjects = async () => {
   }
   ///
 
-  const allProjects = await db.select().from(projects).orderBy(desc(projects.createdAt));
+  const allProjects = await db
+    .select()
+    .from(projects)
+    .orderBy(desc(projects.createdAt), desc(projects.status));
 
   ///
   await cacheSet("cedarrise:dashboard:projects", allProjects, CACHE_TTL.DASHBOARD_CARDS);
