@@ -3,6 +3,7 @@ import { refresh } from "../services/auth.services.js";
 import { Request, Response, NextFunction } from "express";
 import { getUserPermissions } from "../utils/rbac.util.js";
 import { verifyAccessToken } from "../utils/token.util.js";
+import { authCookieOptions } from "../lib/cookie.js";
 import { ForbiddentError, UnauthorizedError } from "../lib/error.js";
 
 export const authenticate = () => async (req: Request, res: Response, next: NextFunction) => {
@@ -24,8 +25,8 @@ export const authenticate = () => async (req: Request, res: Response, next: Next
       if (!refreshToken) throw new UnauthorizedError("No refresh token provided");
 
       const authResponse = await refresh(refreshToken);
-      res.cookie("cedaraccess", authResponse.meta.accessToken, { httpOnly: true });
-      res.cookie("cedarrefresh", authResponse.meta.refreshToken, { httpOnly: true });
+      res.cookie("cedaraccess", authResponse.meta.accessToken, authCookieOptions);
+      res.cookie("cedarrefresh", authResponse.meta.refreshToken, authCookieOptions);
 
       req.user = {
         id: authResponse.meta.sub,

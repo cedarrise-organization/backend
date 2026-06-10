@@ -6,7 +6,7 @@ import { successResponse } from "../../utils/responseHandler.js";
 export const getProjectsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const response = await getProjects();
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }

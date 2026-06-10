@@ -22,7 +22,7 @@ settings {
 docs {
   # Get All Projects
   
-  Returns a list of all projects, ordered by most recently created and status "ongoing". Results are cached using the `DASHBOARD_CARDS` TTL.
+  Returns a list of all projects, ordered by most recently created and status "ongoing". It also returns the nuber of ongoing projects in the meta object. Results are cached using the `DASHBOARD_CARDS` TTL.
   
   ## Authorization
   
@@ -35,7 +35,7 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns an array of project records.
+  **`200 OK`** — Returns an array of project records along with useful metadata like the number of ongoing projects.
   
   ```json
   {
@@ -50,7 +50,10 @@ docs {
         "status": "ongoing",
         "createdAt": "2026-06-01T00:00:00.000Z",
         "updatedAt": "2026-06-01T00:00:00.000Z"
-      }
+      },
+      "meta": {
+        "ongoingProjectCount": 4,
+    },
     ]
   }
   ```
