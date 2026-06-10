@@ -44,7 +44,7 @@ const corsOptions = {
   },
   methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   credentials: true, //Allow cookies/auth headers
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "Content-Disposition"],
   maxAge: 86400, // Cache preflight requests for 24 hours
 };
 

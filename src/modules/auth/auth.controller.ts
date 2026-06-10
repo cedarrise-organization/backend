@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { authCookieOptions } from "../../lib/cookie.js";
 import { login, logout } from "../../services/auth.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 
@@ -7,8 +8,8 @@ export const loginController = async (req: Request, res: Response, next: NextFun
   try {
     const response = await login(email, password);
 
-    res.cookie("cedaraccess", response.meta.accessToken, { httpOnly: true });
-    res.cookie("cedarrefresh", response.meta.refreshToken, { httpOnly: true });
+    res.cookie("cedaraccess", response.meta.accessToken, authCookieOptions);
+    res.cookie("cedarrefresh", response.meta.refreshToken, authCookieOptions);
 
     return successResponse(res, response.code, response.message, response.data);
   } catch (err) {

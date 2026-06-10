@@ -2,7 +2,7 @@ import { deleteFromCloudinary, uploadToCloudinary } from "../utils/storage.util.
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { projects } from "../db/models/admin.js";
 import { UploadApiResponse } from "cloudinary";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, count } from "drizzle-orm";
 import { Request } from "express";
 import db from "../db/db.js";
 import logger from "../configs/logger.config.js";
@@ -15,24 +15,37 @@ export const getProjects = async () => {
     return {
       code: 200,
       message: "Found all projects successfully",
-      data: cacheRes,
+      data: cacheRes.data,
+      meta: {
+        ongoingProjectCount: cacheRes.ongoingProjectCount,
+      },
     };
   }
   ///
 
-  const allProjects = await db
-    .select()
-    .from(projects)
-    .orderBy(desc(projects.createdAt), desc(projects.status));
+  const [allProjects, [projectsCount]] = await Promise.all([
+    await db.select().from(projects).orderBy(desc(projects.createdAt), desc(projects.status)),
+    await db
+      .select({ value: count(projects.id) })
+      .from(projects)
+      .where(eq(projects.status, "ongoing")),
+  ]);
 
   ///
-  await cacheSet("cedarrise:dashboard:projects", allProjects, CACHE_TTL.DASHBOARD_CARDS);
+  await cacheSet(
+    "cedarrise:dashboard:projects",
+    { data: allProjects, ongoingProjectCount: projectsCount!.value },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
   ///
 
   return {
     code: 200,
     message: "Found all projects successfully",
     data: allProjects,
+    meta: {
+      ongoingProjectCount: projectsCount!.value,
+    },
   };
 };
 
