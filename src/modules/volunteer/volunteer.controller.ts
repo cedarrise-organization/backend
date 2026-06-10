@@ -1,16 +1,19 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
+import { Parser } from "json2csv";
 import { successResponse } from "../../utils/responseHandler.js";
 import {
   submitVolunteerRegistration,
   listVolunteers,
   getVolunteer,
   deleteVolunteer,
+  updateVolunteerStatus,
+  exportVolunteerRegistrationTableToCSV,
   submitVolunteerFeedback,
   listVolunteerFeedback,
   getVolunteerFeedback,
   deleteVolunteerFeedback,
-  updateVolunteerStatus,
+  exportVolunteerFeedbackTableToCSV,
 } from "../../services/volunteer.services.js";
 
 export const submitVolunteerRegistrationController = async (
@@ -77,7 +80,6 @@ export const submitVolunteerRegistrationController = async (
     next(err);
   }
 };
-
 export const listVolunteersController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, status, sortBy } = req.qtransformed;
   try {
@@ -87,7 +89,6 @@ export const listVolunteersController = async (req: Request, res: Response, next
     next(error);
   }
 };
-
 export const getVolunteerController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
@@ -97,7 +98,6 @@ export const getVolunteerController = async (req: Request, res: Response, next: 
     next(error);
   }
 };
-
 export const updateVolunteerStatusController = async (
   req: Request,
   res: Response,
@@ -113,7 +113,6 @@ export const updateVolunteerStatusController = async (
     next(error);
   }
 };
-
 export const deleteVolunteerController = async (
   req: Request,
   res: Response,
@@ -123,6 +122,56 @@ export const deleteVolunteerController = async (
   try {
     const response = await deleteVolunteer(id);
     return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+export const exportVolunteerRegistrationController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const response = await exportVolunteerRegistrationTableToCSV();
+
+    const fields = [
+      "id",
+      "firstName",
+      "middleName",
+      "surname",
+      "gender",
+      "dob",
+      "age",
+      "phoneNumber",
+      "emailAddress",
+      "homeAddress",
+      "city",
+      "state",
+      "occupation",
+      "highestEducation",
+      "reasonForVolunteering",
+      "volunteerAreas",
+      "skillsToContribute",
+      "availability",
+      "commitmentDuration",
+      "ashSaturdayAvailability",
+      "ashAcademicArea",
+      "ashExtracurricular",
+      "safeguardingAgreement",
+      "mediaConsent",
+      "additionalInfo",
+      "status",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="volunteer_registration.csv"');
+
+    return res.status(200).send(csv);
   } catch (error) {
     next(error);
   }
@@ -185,7 +234,6 @@ export const submitVolunteerFeedbackController = async (
     next(error);
   }
 };
-
 export const listVolunteerFeedbackController = async (
   req: Request,
   res: Response,
@@ -199,7 +247,6 @@ export const listVolunteerFeedbackController = async (
     next(error);
   }
 };
-
 export const getVolunteerFeedbackController = async (
   req: Request,
   res: Response,
@@ -213,7 +260,6 @@ export const getVolunteerFeedbackController = async (
     next(error);
   }
 };
-
 export const deleteVolunteerFeedbackController = async (
   req: Request,
   res: Response,
@@ -223,6 +269,52 @@ export const deleteVolunteerFeedbackController = async (
   try {
     const response = await deleteVolunteerFeedback(id);
     return successResponse(res, response.code, response.message);
+  } catch (error) {
+    next(error);
+  }
+};
+export const exportVolunteerFeedbackController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const response = await exportVolunteerFeedbackTableToCSV();
+
+    const fields = [
+      "id",
+      "firstName",
+      "surname",
+      "programVolunteered",
+      "specificProgramDetails",
+      "volunteerDuration",
+      "overallExperienceRating",
+      "roleClarityRating",
+      "teamSupportRating",
+      "organizationRating",
+      "programMadeImpact",
+      "waysProgramHelped",
+      "activitiesInvolvedIn",
+      "skillsDeveloped",
+      "skillsGained",
+      "enjoyedMost",
+      "challengesExperienced",
+      "improvementSuggestions",
+      "continueVolunteering",
+      "wouldRecommend",
+      "additionalComments",
+      "submissionDate",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="volunteer_feedback.csv"');
+
+    return res.status(200).send(csv);
   } catch (error) {
     next(error);
   }

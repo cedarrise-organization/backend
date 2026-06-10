@@ -7,6 +7,7 @@ import {
   listAllEvaluationController,
   getEvaluationController,
   deleteEvaluationController,
+  exportCapacityEvaluationController
 } from "./capacity.controller.js";
 import { upload } from "../../configs/multer.config.js";
 import {
@@ -49,5 +50,8 @@ router.delete(
   validateRequest(capacityBuildingEvaluationParamsSchema),
   deleteEvaluationController,
 );
+
+// Download capacityBuildingEvaluation table
+router.get("/download/capacityevaluation", authenticate(), authorize("read"), exportCapacityEvaluationController);
 
 export default router;

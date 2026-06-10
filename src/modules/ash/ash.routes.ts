@@ -29,6 +29,7 @@ import {
   updateAshStudentStatusController,
   assignAshMentorController,
   deleteRegistrationController,
+  exportAshStudentController,
   submitFeedbackController,
   listFeedbackController,
   getFeedbackController,
@@ -45,6 +46,10 @@ import {
   listExitController,
   getExitController,
   deleteExitController,
+  exportAshExitController,
+  exportAshAttendanceController,
+  exportAshTermlyTrackingController,
+  exportAshFeedbackController,
 } from "./ash.controller.js";
 
 const router = express.Router();
@@ -100,6 +105,8 @@ router.delete(
   validateRequest(ashStudentParamsSchema),
   deleteRegistrationController,
 );
+// Download ashStudent table
+router.get("/download/ashstudent", authenticate(), authorize("read"), exportAshStudentController);
 
 // Submit ASH Program Feedback
 router.post("/feedback", validateRequest(createAshProgramFeedbackSchema), submitFeedbackController);
@@ -127,6 +134,8 @@ router.delete(
   validateRequest(ashProgramFeedbackParamsSchema),
   deleteFeedbackController,
 );
+// Download ashProgramFeedback table
+router.get("/download/ashfeedback", authenticate(), authorize("read"), exportAshFeedbackController);
 
 // Submit ASH Termly Tracking record
 router.post(
@@ -161,6 +170,13 @@ router.delete(
   validateRequest(ashTermlyTrackingParamsSchema),
   deleteTrackController,
 );
+// Download ashTermlyTracking table
+router.get(
+  "/download/ashtracking",
+  authenticate(),
+  authorize("read"),
+  exportAshTermlyTrackingController,
+);
 
 // Submit ASH Weekly Attendance
 router.post(
@@ -193,6 +209,13 @@ router.delete(
   authorize("delete"),
   validateRequest(ashWeeklyAttendanceParamsSchema),
   deleteAttendanceController,
+);
+// Download ashWeeklyAttendancetable
+router.get(
+  "/download/ashattendance",
+  authenticate(),
+  authorize("read"),
+  exportAshAttendanceController,
 );
 
 // Submit ASH Exit Form
@@ -227,5 +250,7 @@ router.delete(
   validateRequest(ashExitParamsSchema),
   deleteExitController,
 );
+// Download ashExit table
+router.get("/download/ashexit", authenticate(), authorize("read"), exportAshExitController);
 
 export default router;

@@ -1,0 +1,94 @@
+meta {
+  name: Download capacity evaluation
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/capacity-building/download/capacityevaluation
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download Capacity Building Evaluation (CSV Export)
+  
+  Exports the entire `capacity_building_evaluation` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="capacity_building_evaluation.csv"`
+  
+  The CSV contains one row per evaluation record with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `programName` | Name of the capacity building programme |
+  | `programType` | Type/category of the programme |
+  | `programDate` | Date the programme was held |
+  | `location` | Venue/location of the programme |
+  | `programCoordinator` | Name of the programme coordinator |
+  | `numberOfSponsors` | Number of sponsors involved |
+  | `listOfSponsors` | Names of sponsors |
+  | `sponsorshipType` | Type of sponsorship received |
+  | `partnerOrganizations` | Partner organisations involved |
+  | `partnershipLevel` | Level of partnership |
+  | `numberOfParticipants` | Total number of participants |
+  | `targetAudience` | Intended target audience |
+  | `numberOfFacilitators` | Number of facilitators |
+  | `numberOfVolunteers` | Number of volunteers involved |
+  | `participantEngagementLevel` | Level of participant engagement |
+  | `programObjectives` | Stated programme objectives |
+  | `objectiveAchievement` | Whether objectives were achieved |
+  | `programOutcome` | Summary of programme outcomes |
+  | `programImpact` | Assessment of programme impact |
+  | `majorActivities` | Major activities conducted |
+  | `effectiveActivities` | Most effective activities |
+  | `venueSuitability` | Suitability rating of the venue |
+  | `timeManagement` | Time management assessment |
+  | `resourceAvailability` | Availability of resources |
+  | `communicationAndCoordination` | Communication and coordination quality |
+  | `teamworkAmongOrganizers` | Teamwork among organisers |
+  | `challengesEncountered` | Challenges encountered during the programme |
+  | `challengesAddressed` | How challenges were addressed |
+  | `lessonsLearned` | Key lessons learned |
+  | `budgetAllocated` | Budget allocated for the programme |
+  | `budgetUtilized` | Actual budget utilised |
+  | `wereResourcesAdequate` | Whether resources were adequate |
+  | `inadequateResourcesExplanation` | Explanation if resources were inadequate |
+  | `overallSuccess` | Overall success rating |
+  | `recommendTheProgram` | Whether evaluator recommends the programme |
+  | `improvementSuggestions` | Suggestions for improvement |
+  | `recommendFuturePrograms` | Recommended future programmes |
+  | `name` | Name of the evaluator/submitter |
+  | `role` | Role of the evaluator/submitter |
+  | `dateSubmitted` | Date the evaluation was submitted |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

@@ -134,3 +134,7 @@ export const deleteOutreach = async (id: string) => {
     message: "Outreach deleted successfully",
   };
 };
+export const exportOutreachTrackerTableToCSV = async () => {
+  const data = await db.select().from(outreachTracker);
+  return data;
+};

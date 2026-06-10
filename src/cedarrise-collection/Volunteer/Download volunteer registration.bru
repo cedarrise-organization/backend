@@ -1,0 +1,79 @@
+meta {
+  name: Download volunteer registration
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/volunteer/download/volunteerregistration
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download Volunteer Registration (CSV Export)
+  
+  Exports the entire `volunteer_registration` table as a CSV file download. Selects all rows (no filters, no pagination) and converts to CSV via `json2csv`. The response is a `text/csv` attachment — **not** JSON.
+  
+  ## Authorization
+  Requires `authenticate()` and `authorize("read")`.
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="volunteer_registration.csv"`
+  
+  The CSV contains one row per volunteer record with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `firstName` | Volunteer's first name |
+  | `middleName` | Volunteer's middle name |
+  | `surname` | Volunteer's surname |
+  | `gender` | Volunteer's gender |
+  | `dob` | Date of birth |
+  | `age` | Volunteer's age |
+  | `phoneNumber` | Phone number |
+  | `emailAddress` | Email address |
+  | `homeAddress` | Home address |
+  | `city` | City of residence |
+  | `state` | State of residence |
+  | `occupation` | Occupation |
+  | `highestEducation` | Highest level of education |
+  | `reasonForVolunteering` | Reason for volunteering |
+  | `volunteerAreas` | Areas the volunteer is interested in |
+  | `skillsToContribute` | Skills the volunteer can contribute |
+  | `availability` | Availability schedule |
+  | `commitmentDuration` | How long the volunteer can commit |
+  | `ashSaturdayAvailability` | Availability for ASH Saturday sessions |
+  | `ashAcademicArea` | Preferred ASH academic area |
+  | `ashExtracurricular` | Preferred ASH extracurricular activity |
+  | `safeguardingAgreement` | Whether the safeguarding agreement was accepted |
+  | `mediaConsent` | Whether media consent was given |
+  | `additionalInfo` | Any additional information |
+  | `status` | Application status (`pending`, `accepted`, `rejected`) |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

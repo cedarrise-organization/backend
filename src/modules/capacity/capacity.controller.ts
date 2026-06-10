@@ -1,10 +1,12 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
+import { Parser } from "json2csv";
 import {
   createEvaluation,
   listAllEvaluation,
   getEvaluation,
   deleteEvaluation,
+  exportCapacityEvaluationTableToCSV,
 } from "../../services/capacity.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 
@@ -103,7 +105,6 @@ export const createEvaluationController = async (
     next(err);
   }
 };
-
 export const listAllEvaluationController = async (
   req: Request,
   res: Response,
@@ -117,7 +118,6 @@ export const listAllEvaluationController = async (
     next(err);
   }
 };
-
 export const getEvaluationController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id;
   try {
@@ -127,7 +127,6 @@ export const getEvaluationController = async (req: Request, res: Response, next:
     next(err);
   }
 };
-
 export const deleteEvaluationController = async (
   req: Request,
   res: Response,
@@ -139,5 +138,71 @@ export const deleteEvaluationController = async (
     return successResponse(res, response.code, response.message);
   } catch (err) {
     next(err);
+  }
+};
+export const exportCapacityEvaluationController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const response = await exportCapacityEvaluationTableToCSV();
+
+    const fields = [
+      "id",
+      "programName",
+      "programType",
+      "programDate",
+      "location",
+      "programCoordinator",
+      "numberOfSponsors",
+      "listOfSponsors",
+      "sponsorshipType",
+      "partnerOrganizations",
+      "partnershipLevel",
+      "numberOfParticipants",
+      "targetAudience",
+      "numberOfFacilitators",
+      "numberOfVolunteers",
+      "participantEngagementLevel",
+      "programObjectives",
+      "objectiveAchievement",
+      "programOutcome",
+      "programImpact",
+      "majorActivities",
+      "effectiveActivities",
+      "venueSuitability",
+      "timeManagement",
+      "resourceAvailability",
+      "communicationAndCoordination",
+      "teamworkAmongOrganizers",
+      "challengesEncountered",
+      "challengesAddressed",
+      "lessonsLearned",
+      "budgetAllocated",
+      "budgetUtilized",
+      "wereResourcesAdequate",
+      "inadequateResourcesExplanation",
+      "overallSuccess",
+      "recommendTheProgram",
+      "improvementSuggestions",
+      "recommendFuturePrograms",
+      "name",
+      "role",
+      "dateSubmitted",
+      "updatedAt",
+      "createdAt",
+      "deletedAt",
+    ];
+
+    const json2csvParser = new Parser({ fields });
+    const csv = json2csvParser.parse(response);
+
+    res.header("Content-Type", "text/csv");
+    res.header("Content-Disposition", 'attachment; filename="capacity_building_evaluation.csv"');
+
+    return res.status(200).send(csv);
+  } catch (error) {
+    next(error);
   }
 };

@@ -1,0 +1,92 @@
+meta {
+  name: Download TACOTS onboarding
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/tacots/download/tacotsonboarding
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download TACOTS Onboarding (CSV Export)
+  
+  Exports the entire `tacots_onboarding` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="tacots_onboarding.csv"`
+  
+  The CSV contains one row per onboarding record with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `studentId` | UUID foreign key referencing the TACOTS recommendation |
+  | `onboardingDate` | Date the student was onboarded |
+  | `hasMentalHealthDiagnosis` | Whether the student has a mental health diagnosis |
+  | `diagnosedConditions` | Diagnosed mental health conditions (if any) |
+  | `behavioralIndicators` | Observed behavioral indicators |
+  | `focusAbilityRating` | Rating of the student's ability to focus |
+  | `emotionalStabilityRating` | Rating of emotional stability |
+  | `peerInteractionRating` | Rating of peer interaction skills |
+  | `receivedCounseling` | Whether the student has received counselling |
+  | `needsSpecialSupport` | Whether the student needs special support |
+  | `mentalHealthNotes` | Additional mental health notes |
+  | `generalHealthStatus` | General health status |
+  | `immunizationStatus` | Immunisation status |
+  | `hasChronicCondition` | Whether the student has a chronic condition |
+  | `chronicConditions` | Chronic conditions (if any) |
+  | `allergies` | Known allergies |
+  | `requiresMedication` | Whether the student requires medication |
+  | `physicalActivityLevel` | Level of physical activity |
+  | `physicalLimitations` | Physical limitations (if any) |
+  | `additionalHealthNotes` | Additional health notes |
+  | `enrolledSchoolName` | Name of the enrolled school |
+  | `enrolledSchoolTown` | Town of the enrolled school |
+  | `enrolledSchoolLga` | LGA of the enrolled school |
+  | `enrolledSchoolState` | State of the enrolled school |
+  | `enrolledClass` | Class the student was enrolled into |
+  | `termResumptionDate` | Date of term resumption |
+  | `schoolFeesPerTerm` | School fees per term |
+  | `studentCommitment` | Student's commitment declaration |
+  | `parentGuardianCommitment` | Parent/guardian commitment declaration |
+  | `parentSignatureUrl` | Cloudinary URL for parent signature |
+  | `parentSignaturePublicId` | Cloudinary public ID for parent signature |
+  | `admissionLetterUrl` | Cloudinary URL for admission letter |
+  | `admissionLetterPublicId` | Cloudinary public ID for admission letter |
+  | `programOfficerNotes` | Notes from the programme officer |
+  | `supportTypesApproved` | Types of support approved |
+  | `mentorName` | Name of assigned mentor |
+  | `sponsorName` | Name of assigned sponsor |
+  | `additionalInfo` | Any additional information |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

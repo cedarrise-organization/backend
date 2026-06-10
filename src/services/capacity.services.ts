@@ -163,3 +163,7 @@ export const deleteEvaluation = async (id: string) => {
     message: "Outreach deleted successfully",
   };
 };
+export const exportCapacityEvaluationTableToCSV = async () => {
+  const data = await db.select().from(capacityBuildingEvaluation);
+  return data;
+};

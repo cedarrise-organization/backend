@@ -315,6 +315,10 @@ export const deleteRegistration = async (id: string) => {
     message: "Ash student data deleted successfully",
   };
 };
+export const exportAshStudentTableToCSV = async () => {
+  const data = await db.select().from(ashStudent);
+  return data
+};
 
 // ASH FEEDBACK
 export const submitFeedback = async (options: AshprogramfeedbackType) => {
@@ -448,6 +452,11 @@ export const deleteFeedback = async (id: string) => {
     message: "Ash feedback data deleted successfully",
   };
 };
+export const exportAshFeedbackTableToCSV = async () => {
+  const data = await db.select().from(ashProgramFeedback);
+  return data
+};
+
 
 // ASH TRACKING
 export const submitTracking = async (req: Request, options: AshtermlytrackingbodyType) => {
@@ -606,6 +615,11 @@ export const deleteTrack = async (id: string) => {
     message: "Ash tracking data deleted successfully",
   };
 };
+export const exportAshTermlyTrackingTableToCSV = async () => {
+  const data = await db.select().from(ashTermlyTracking);
+  return data
+};
+
 
 // ASH ATTENDANCE
 export const submitAttendance = async (options: AshweeklyattendancebodyType) => {
@@ -725,6 +739,11 @@ export const deleteAttendance = async (id: string) => {
     message: "Ash attendance data deleted successfully",
   };
 };
+export const exportAshAttendanceTableToCSV = async () => {
+  const data = await db.select().from(ashWeeklyAttendance);
+  return data
+};
+
 
 // ASH EXIT
 export const submitExit = async (options: AshexitbodyType) => {
@@ -847,4 +866,9 @@ export const deleteExit = async (id: string) => {
     message: "Ash exit data deleted successfully",
   };
 };
+export const exportAshExitTableToCSV = async () => {
+  const data = await db.select().from(ashExit);
+  return data
+};
+
 export const example = async (page: number, limit: number, id: string) => {};

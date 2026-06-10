@@ -1,0 +1,75 @@
+meta {
+  name: Download volunteer feedback
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/v1/volunteer/download/volunteerfeedback
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download Volunteer Feedback (CSV Export)
+  
+  Exports the entire `volunteer_feedback` table as a CSV file download. Selects all rows (no filters, no pagination) and converts to CSV via `json2csv`. The response is a `text/csv` attachment — **not** JSON.
+  
+  ## Authorization
+  Requires `authenticate()` and `authorize("read")`.
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="volunteer_feedback.csv"`
+  
+  The CSV contains one row per feedback submission with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `firstName` | Volunteer's first name |
+  | `surname` | Volunteer's surname |
+  | `programVolunteered` | Programme the volunteer participated in |
+  | `specificProgramDetails` | Specific details about the programme |
+  | `volunteerDuration` | Duration of volunteer service |
+  | `overallExperienceRating` | Overall experience rating |
+  | `roleClarityRating` | Rating of role clarity |
+  | `teamSupportRating` | Rating of team support |
+  | `organizationRating` | Rating of programme organisation |
+  | `programMadeImpact` | Whether the volunteer felt the programme made an impact |
+  | `waysProgramHelped` | Ways the programme helped |
+  | `activitiesInvolvedIn` | Activities the volunteer was involved in |
+  | `skillsDeveloped` | Skills developed during volunteering |
+  | `skillsGained` | Skills gained through the experience |
+  | `enjoyedMost` | What the volunteer enjoyed most |
+  | `challengesExperienced` | Challenges experienced |
+  | `improvementSuggestions` | Suggestions for improvement |
+  | `continueVolunteering` | Whether the volunteer would continue |
+  | `wouldRecommend` | Whether the volunteer would recommend the programme |
+  | `additionalComments` | Any additional comments |
+  | `submissionDate` | Date the feedback was submitted |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

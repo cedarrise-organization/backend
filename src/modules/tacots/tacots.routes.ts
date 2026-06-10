@@ -27,22 +27,27 @@ import {
   getRecommendationController,
   updateRecommendedStudentStatusController,
   deleteRecommendationController,
+  exportTacotsRecommendationController,
   submitFeedbackController,
   listFeedbackController,
   getFeedbackController,
   deleteFeedbackController,
+  exportTacotsFeedbackController,
   submitOnboardingController,
   listOnboardingController,
   getOnboardingController,
   deleteOnboardingController,
+  exportTacotsOnboardingController,
   submitTacotsTrackingController,
   listTacotsTrackingController,
   getTacotsTrackingController,
   deleteTacotsTrackingController,
+  exportTacotsTrackingController,
   submitTacotsExitController,
   listTacotsExitController,
   getTacotsExitController,
   deleteTacotsExitController,
+  exportTacotsExitController,
 } from "./tacots.controller.js";
 
 const router = express.Router();
@@ -89,6 +94,13 @@ router.delete(
   validateRequest(tacotsRecommendationParamsSchema),
   deleteRecommendationController,
 );
+// Download tacotsRecommendation table
+router.get(
+  "/download/tacotsrecommendation",
+  authenticate(),
+  authorize("read"),
+  exportTacotsRecommendationController,
+);
 
 // Submit ASH TACOTS Feedback
 router.post("/feedback", validateRequest(createTacotsFeedbackSchema), submitFeedbackController);
@@ -115,6 +127,13 @@ router.delete(
   authorize("delete"),
   validateRequest(tacotsFeedbackParamsSchema),
   deleteFeedbackController,
+);
+// Download tacotsFeedback table
+router.get(
+  "/download/tacotsfeedback",
+  authenticate(),
+  authorize("read"),
+  exportTacotsFeedbackController,
 );
 
 // Create onboarding record post-shortlisting
@@ -153,6 +172,13 @@ router.delete(
   validateRequest(tacotsOnboardingParamsSchema),
   deleteOnboardingController,
 );
+// Download tacotsOnboarding table
+router.get(
+  "/download/tacotsonboarding",
+  authenticate(),
+  authorize("read"),
+  exportTacotsOnboardingController,
+);
 
 // Submit TACOTS Student Tracking (midterm/end-of-term)
 router.post(
@@ -190,6 +216,13 @@ router.delete(
   validateRequest(tacotsTrackingParamsSchema),
   deleteTacotsTrackingController,
 );
+// Download tacotsTracking table
+router.get(
+  "/download/tacotstracking",
+  authenticate(),
+  authorize("read"),
+  exportTacotsTrackingController,
+);
 
 // Submit TACOTS Exit/Completion Form
 router.post(
@@ -223,5 +256,7 @@ router.delete(
   validateRequest(tacotsExitParamsSchema),
   deleteTacotsExitController,
 );
+// Download TacotsExit table
+router.get("/download/tacotsexit", authenticate(), authorize("read"), exportTacotsExitController);
 
 export default router;

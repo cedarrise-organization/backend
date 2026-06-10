@@ -1,0 +1,72 @@
+meta {
+  name: Download TACOTS exit
+  type: http
+  seq: 26
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/tacots/download/tacotsexit
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download TACOTS Exit Records (CSV Export)
+  
+  Exports the entire `tacots_exit` table as a CSV file download. Selects all rows (no filters, no pagination) and converts to CSV via `json2csv`. The response is a `text/csv` attachment — **not** JSON.
+  
+  ## Authorization
+  Requires `authenticate()` and `authorize("read")`.
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="tacots_exit.csv"`
+  
+  The CSV contains one row per exit record with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `studentId` | UUID foreign key referencing the TACOTS recommendation |
+  | `schoolAttendedDuringProgram` | School attended while in the programme |
+  | `yearOfExit` | Year the student exited |
+  | `exitReason` | Reason for exit |
+  | `highestEducationAttained` | Highest level of education attained |
+  | `currentStatus` | Student's current status post-programme |
+  | `higherInstitutionName` | Name of higher institution (if applicable) |
+  | `higherInstitutionCity` | City of higher institution |
+  | `higherInstitutionState` | State of higher institution |
+  | `employmentType` | Type of employment (if applicable) |
+  | `vocationalSkill` | Vocational skill acquired (if applicable) |
+  | `newSchoolName` | New school name (if transferred) |
+  | `completedSecondaryElsewhere` | Whether secondary was completed elsewhere |
+  | `programImpactDescription` | Description of programme impact |
+  | `programImpactRating` | Rating of programme impact |
+  | `additionalSituationInfo` | Additional situational information |
+  | `completedBy` | Name of person who completed the form |
+  | `submissionDate` | Date of submission |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}

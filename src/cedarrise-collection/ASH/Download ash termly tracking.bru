@@ -1,0 +1,80 @@
+meta {
+  name: Download ASH termly tracking
+  type: http
+  seq: 16
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash/download/ashtracking
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download ASH Termly Tracking (CSV Export)
+  
+  Exports the entire `ash_termly_tracking` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="ash_termly_tracking.csv"`
+  
+  The CSV contains one row per termly tracking record with the following columns (in order):
+  
+  | Column | Description |
+  |--------|-------------|
+  | `id` | UUID primary key |
+  | `studentId` | UUID foreign key referencing the ASH student |
+  | `academicSession` | Academic session (e.g. `"2025/26"`) |
+  | `term` | Term name (e.g. `"TERM 1"`, `"TERM 2"`, `"TERM 3"`) |
+  | `schoolName` | Name of school attended during this term |
+  | `schoolNumeracyScore` | School-reported numeracy score |
+  | `schoolLiteracyScore` | School-reported literacy score |
+  | `schoolAverage` | School-reported average of numeracy + literacy |
+  | `schoolPosition` | Student's position in class (e.g. `"7th"`) |
+  | `pretestNumeracyScore` | ASH pre-test numeracy score |
+  | `pretestLiteracyScore` | ASH pre-test literacy score |
+  | `pretestAverage` | Average of pre-test numeracy + literacy |
+  | `midtestNumeracyScore` | ASH mid-test numeracy score |
+  | `midtestLiteracyScore` | ASH mid-test literacy score |
+  | `midtestAverage` | Average of mid-test numeracy + literacy |
+  | `posttestNumeracyScore` | ASH post-test numeracy score |
+  | `posttestLiteracyScore` | ASH post-test literacy score |
+  | `posttestAverage` | Average of post-test numeracy + literacy |
+  | `termResultUrl` | Cloudinary URL for term result document |
+  | `termResultPublicId` | Cloudinary public ID for term result |
+  | `disciplineRating` | Discipline rating (1–5) |
+  | `responsibilityRating` | Responsibility rating (1–5) |
+  | `leadershipRating` | Leadership rating (1–5) |
+  | `notableAchievements` | Notable achievements observed during the term |
+  | `challengesObserved` | Challenges observed during the term |
+  | `nextTermRecommendations` | Recommendations for the next term |
+  | `mentorName` | Name of the student's mentor |
+  | `updatedAt` | Last update timestamp |
+  | `createdAt` | Creation timestamp |
+  | `deletedAt` | Soft-delete timestamp (null if active) |
+  
+  ## Errors
+  
+  | Status | Description |
+  |--------|-------------|
+  | `401 Unauthorized` | Missing or invalid access token / refresh token. |
+  | `403 Forbidden` | User lacks the `"read"` permission. |
+  | `500 Internal Server Error` | Unexpected server error. |
+}
