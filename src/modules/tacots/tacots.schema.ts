@@ -517,6 +517,21 @@ export const tacotsOnboardingParamsSchema = idSchema;
 export const tacotsOnboardingQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "onboardingDate",
+          "generalHealthStatus",
+          "enrolledSchoolName",
+          "enrolledSchoolState",
+          "enrolledClass",
+          "mentorName",
+          "sponsorName",
+          "createdAt",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });
 
@@ -606,8 +621,19 @@ export const tacotsTrackingParamsSchema = idSchema;
 export const tacotsTrackingQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
-    academicSession: academicSessionSchema.optional(),
-    term: tacotsAcademicTermSchema.optional(),
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "academicSession",
+          "academicTerm",
+          "assessmentPeriod",
+          "submissionDate",
+          "mentorName",
+          "createdAt",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });
 
@@ -680,5 +706,16 @@ export const tacotsExitParamsSchema = idSchema;
 export const tacotsExitQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "schoolAttendedDuringProgram",
+          "yearOfExit",
+          "exitReason",
+          "createdAt",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });

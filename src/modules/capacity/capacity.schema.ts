@@ -84,7 +84,7 @@ export const capacityBuildingEvaluationBody = z.object({
   dateSubmitted: z.coerce.date(),
 });
 
-export type CapacitybuildingevaluationbodyType = z.infer<typeof capacityBuildingEvaluationBody>
+export type CapacitybuildingevaluationbodyType = z.infer<typeof capacityBuildingEvaluationBody>;
 
 export const createCapacityBuildingEvaluationSchema = z.object({
   body: capacityBuildingEvaluationBody,
@@ -99,5 +99,18 @@ export const capacityBuildingEvaluationParamsSchema = idSchema;
 export const capacityBuildingEvaluationQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "programName",
+          "programType",
+          "programDate",
+          "location",
+          "programCoordinator",
+          "createdAt",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });

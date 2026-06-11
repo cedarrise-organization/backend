@@ -4,6 +4,15 @@ import { capacityBuildingEvaluation } from "../db/models/admin.js";
 import { sql, eq, asc, count } from "drizzle-orm";
 import db from "../db/db.js";
 
+const sortMap = {
+  programName: capacityBuildingEvaluation.programName,
+  programType: capacityBuildingEvaluation.programType,
+  programDate: capacityBuildingEvaluation.programDate,
+  location: capacityBuildingEvaluation.location,
+  programCoordinator: capacityBuildingEvaluation.programCoordinator,
+  createdAt: capacityBuildingEvaluation.createdAt,
+} as const;
+
 export const createEvaluation = async (options: CapacitybuildingevaluationbodyType) => {
   const [evaluation] = await db
     .insert(capacityBuildingEvaluation)
@@ -66,7 +75,7 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
   };
 };
 
-export const listAllEvaluation = async (page: number, limit: number, search: string) => {
+export const listAllEvaluation = async (page: number, limit: number, search: string, sortBy: keyof typeof sortMap ) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -124,11 +133,13 @@ export const listAllEvaluation = async (page: number, limit: number, search: str
     };
   }
   ///
+
+  const sortColumn = sortMap[sortBy] ?? capacityBuildingEvaluation.createdAt;
   const [evaluation, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(capacityBuildingEvaluation)
-      .orderBy(asc(capacityBuildingEvaluation.createdAt))
+      .orderBy(asc(sortColumn))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation),

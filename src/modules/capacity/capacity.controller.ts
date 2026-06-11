@@ -110,9 +110,9 @@ export const listAllEvaluationController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit, search } = req.qtransformed;
+  const { page, limit, search, sortBy } = req.qtransformed;
   try {
-    const response = await listAllEvaluation(page, limit, search);
+    const response = await listAllEvaluation(page, limit, search, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);

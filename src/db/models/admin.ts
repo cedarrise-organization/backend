@@ -703,6 +703,7 @@ export const outreachTracker = p.pgTable(
       table.outreachLga,
       table.outreachCity,
     ),
+    index("outreach_tracker_outreach_type_idx").on(table.outreachType),
     index("outreach_tracker_submitted_by_idx").on(table.submittedBy),
     index("outreach_tracker_submission_date_idx").on(table.submissionDate),
     index("outreach_tracker_created_at_idx").on(table.createdAt),

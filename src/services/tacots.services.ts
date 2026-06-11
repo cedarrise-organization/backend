@@ -35,6 +35,30 @@ const sortMap = {
   createdAt: tacotsRecommendation.createdAt,
 } as const;
 
+const trackingSortMap = {
+  academicSession: tacotsTracking.academicSession,
+  academicTerm: tacotsTracking.academicTerm,
+  assessmentPeriod: tacotsTracking.assessmentPeriod,
+  mentorName: tacotsTracking.mentorName,
+  createdAt: tacotsTracking.createdAt,
+} as const;
+const onboardingSortMap = {
+  onboardingDate: tacotsOnboarding.onboardingDate,
+  generalHealthStatus: tacotsOnboarding.generalHealthStatus,
+  enrolledSchoolName: tacotsOnboarding.enrolledSchoolName,
+  enrolledSchoolState: tacotsOnboarding.enrolledSchoolState,
+  enrolledClass: tacotsOnboarding.enrolledClass,
+  mentorName: tacotsOnboarding.mentorName,
+  sponsorName: tacotsOnboarding.sponsorName,
+  createdAt: tacotsOnboarding.createdAt,
+} as const;
+const exitSortMap = {
+  schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,
+  yearOfExit: tacotsExit.yearOfExit,
+  exitReason: tacotsExit.exitReason,
+  createdAt: tacotsExit.createdAt,
+} as const;
+
 // RECOMMENDATION
 export const submitRecommendation = async (req: Request, options: TacotsrecommendationbodyType) => {
   const files = req.files as {
@@ -611,7 +635,12 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
     data: onboarding,
   };
 };
-export const listOnboarding = async (page: number, limit: number, search: string) => {
+export const listOnboarding = async (
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: keyof typeof onboardingSortMap,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -678,11 +707,12 @@ export const listOnboarding = async (page: number, limit: number, search: string
   }
   ///
 
+  const sortColumn = onboardingSortMap[sortBy] ?? tacotsOnboarding.createdAt;
   const [onboarded, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(tacotsOnboarding)
-      .orderBy(tacotsOnboarding.createdAt)
+      .orderBy(asc(sortColumn))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
@@ -852,7 +882,12 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
     data: tracking,
   };
 };
-export const listTacotsTracking = async (page: number, limit: number, search: string) => {
+export const listTacotsTracking = async (
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: keyof typeof trackingSortMap,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -911,11 +946,12 @@ export const listTacotsTracking = async (page: number, limit: number, search: st
   }
   ///
 
+  const sortColumn = trackingSortMap[sortBy] ?? tacotsTracking.createdAt;
   const [tracking, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(tacotsTracking)
-      .orderBy(tacotsTracking.createdAt)
+      .orderBy(asc(sortColumn))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsTracking.id) }).from(tacotsTracking),
@@ -1045,7 +1081,12 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
     data: exit,
   };
 };
-export const listTacotsExit = async (page: number, limit: number, search: string) => {
+export const listTacotsExit = async (
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: keyof typeof exitSortMap,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -1101,13 +1142,14 @@ export const listTacotsExit = async (page: number, limit: number, search: string
       },
     };
   }
-  ///
 
+  ///
+  const sortColumn = exitSortMap[sortBy] ?? tacotsExit.createdAt;
   const [exit, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(tacotsExit)
-      .orderBy(tacotsExit.createdAt)
+      .orderBy(asc(sortColumn))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsExit.id) }).from(tacotsExit),

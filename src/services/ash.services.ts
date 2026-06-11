@@ -25,6 +25,7 @@ import db from "../db/db.js";
 import logger from "../configs/logger.config.js";
 
 const sortMap = {
+  // ashStudent
   firstName: ashStudent.firstName,
   surname: ashStudent.surname,
   gender: ashStudent.gender,
@@ -32,6 +33,23 @@ const sortMap = {
   currentClass: ashStudent.currentClass,
   assignedMentor: ashStudent.assignedMentor,
   createdAt: ashStudent.createdAt,
+} as const;
+
+const termlySortMap = {
+  // ashTermlyTracking
+  academicSession: ashTermlyTracking.academicSession,
+  term: ashTermlyTracking.term,
+  schoolName: ashTermlyTracking.schoolName,
+  mentorName: ashTermlyTracking.mentorName,
+  createdAt: ashTermlyTracking.createdAt,
+} as const;
+
+const exitSortMap = {
+  // ashExit
+  schoolName: ashExit.schoolName,
+  classAtExit: ashExit.classAtExit,
+  exitDate: ashExit.exitDate,
+  createdAt: ashExit.createdAt,
 } as const;
 
 // ASH REGISTRATION
@@ -598,7 +616,12 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
     data: tracker,
   };
 };
-export const listTracking = async (page: number, limit: number, search: string) => {
+export const listTracking = async (
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: keyof typeof termlySortMap,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -658,11 +681,12 @@ export const listTracking = async (page: number, limit: number, search: string) 
   }
   ///
 
+  const sortColumn = termlySortMap[sortBy] ?? ashTermlyTracking.createdAt;
   const [tracking, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(ashTermlyTracking)
-      .orderBy(ashTermlyTracking.createdAt)
+      .orderBy(asc(sortColumn))
       .limit(limit)
       .offset((page - 1) * limit),
 
@@ -945,7 +969,12 @@ export const submitExit = async (options: AshexitbodyType) => {
     data: exit,
   };
 };
-export const listExit = async (page: number, limit: number, search: string) => {
+export const listExit = async (
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: keyof typeof exitSortMap,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -1004,11 +1033,12 @@ export const listExit = async (page: number, limit: number, search: string) => {
     };
   }
   ///
+  const sortColumn = exitSortMap[sortBy] ?? ashExit.createdAt;
   const [exit, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(ashExit)
-      .orderBy(ashExit.createdAt)
+      .orderBy(asc(sortColumn))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(ashExit.id) }).from(ashExit),

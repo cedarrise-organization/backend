@@ -41,5 +41,17 @@ export const outreachTrackerParamsSchema = idSchema;
 export const outreachTrackerQuerySchema = z.object({
   query: z.object({
     ...baseQueryBody,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z
+        .enum([
+          "outreachStartDate",
+          "outreachEndDate",
+          "outreachState",
+          "outreachType",
+          "createdAt",
+        ])
+        .default("createdAt"),
+    ),
   }),
 });

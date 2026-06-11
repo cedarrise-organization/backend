@@ -4,6 +4,14 @@ import { outreachTracker } from "../db/models/admin.js";
 import { sql, asc, eq, count } from "drizzle-orm";
 import db from "../db/db.js";
 
+const sortMap = {
+  outreachStartDate: outreachTracker.outreachStartDate,
+  outreachEndDate: outreachTracker.outreachEndDate,
+  outreachState: outreachTracker.outreachState,
+  outreachType: outreachTracker.outreachType,
+  createdAt: outreachTracker.createdAt,
+} as const;
+
 export const createOutreach = async (options: OutreachtrackerbodyType) => {
   const [outreach] = await db
     .insert(outreachTracker)
@@ -36,7 +44,12 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
     data: outreach,
   };
 };
-export const listOutreaches = async (page: number, limit: number, search: string) => {
+export const listOutreaches = async (
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: keyof typeof sortMap,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -97,11 +110,12 @@ export const listOutreaches = async (page: number, limit: number, search: string
   }
   ///
 
+  const sortColumn = sortMap[sortBy] ?? outreachTracker.createdAt;
   const [outreaches, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(outreachTracker)
-      .orderBy(asc(outreachTracker.createdAt))
+      .orderBy(asc(sortColumn))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(outreachTracker.id) }).from(outreachTracker),

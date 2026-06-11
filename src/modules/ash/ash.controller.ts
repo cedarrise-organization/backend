@@ -457,9 +457,9 @@ export const submitTrackingController = async (req: Request, res: Response, next
   }
 };
 export const listTrackingController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit, search } = req.qtransformed;
+  const { page, limit, search, sortBy } = req.qtransformed;
   try {
-    const response = await listTracking(page, limit, search);
+    const response = await listTracking(page, limit, search, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -682,9 +682,9 @@ export const submitExitController = async (req: Request, res: Response, next: Ne
   }
 };
 export const listExitController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit, search } = req.qtransformed;
+  const { page, limit, search, sortBy } = req.qtransformed;
   try {
-    const response = await listExit(page, limit, search);
+    const response = await listExit(page, limit, search, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
