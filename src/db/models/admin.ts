@@ -180,7 +180,7 @@ export const ashTermlyTracking = p.pgTable(
     index("ash_termly_tracking_school_idx").on(table.schoolName),
     index("ash_termly_tracking_mentor_idx").on(table.mentorName),
     index("ash_termly_tracking_created_at_idx").on(table.createdAt),
-    index("ash_termly_tracking_feedback_search_index").using(
+    index("ash_termly_tracking_search_index").using(
       "gin",
       sql`(
         setweight(to_tsvector('english', ${table.studentId}), 'A') ||
@@ -227,7 +227,7 @@ export const ashWeeklyAttendance = p.pgTable(
   (table) => [
     index("ash_weekly_attendance_session_date_idx").on(table.sessionDate),
     index("ash_weekly_attendance_created_at_idx").on(table.createdAt),
-    index("ash_termly_tracking_search_index").using(
+    index("ash_weekly_attendance_search_index").using(
       "gin",
       sql`(
         setweight(to_tsvector('english', ${table.studentsInAttendance}), 'A') ||
@@ -487,8 +487,18 @@ export const tacotsFeedback = p.pgTable(
     index("tacots_feedback_class_idx").on(table.currentClass),
     index("tacots_feedback_parent_phone_idx").on(table.parentPhone),
     index("tacots_feedback_created_at_idx").on(table.createdAt),
-    index("tacots_feedback_most_helpful_support_idx").using("gin", table.mostHelpfulSupport),
-    index("tacots_feedback_current_challenges_idx").using("gin", table.currentChallenges),
+    index("tacots_feedback_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.studentFirstName}), 'A') ||
+        setweight(to_tsvector('english', ${table.studentSurname}), 'A') ||
+        setweight(to_tsvector('english', ${table.currentClass}), 'B') ||
+        setweight(to_tsvector('english', ${table.currentSchool}), 'A') ||
+        setweight(to_tsvector('english', ${table.parentPhone}), 'B') ||
+        setweight(to_tsvector('english', ${table.mostHelpfulSupport}), 'D') ||
+        setweight(to_tsvector('english', ${table.currentChallenges}), 'D')
+      )`,
+    ),
     check(
       "tacots_feedback_study_motivation_check",
       sql`${table.studyMotivationRating} >= 1 AND ${table.studyMotivationRating} <= 5`,
@@ -881,9 +891,22 @@ export const tacotsRecommendation = p.pgTable(
     ),
     index("tacots_recommendation_admin_status_idx").on(table.adminStatus),
     index("tacots_recommendation_created_at_idx").on(table.createdAt),
-    index("tacots_recommendation_catholic_sacraments_idx").using("gin", table.catholicSacraments),
-    index("tacots_recommendation_income_sources_idx").using("gin", table.incomeSources),
-    index("tacots_recommendation_support_types_needed_idx").using("gin", table.supportTypesNeeded),
+    index("tacots_recommendation_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.firstName}), 'A') ||
+        setweight(to_tsvector('english', ${table.surname}), 'A') ||
+        setweight(to_tsvector('english', ${table.stateOfOrigin}), 'B') ||
+        setweight(to_tsvector('english', ${table.lga}), 'B') ||
+        setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
+        setweight(to_tsvector('english', ${table.lastClass}), 'C') ||
+        setweight(to_tsvector('english', ${table.incomeSources}), 'D') ||
+        setweight(to_tsvector('english', ${table.recommenderFirstName}), 'C') ||
+        setweight(to_tsvector('english', ${table.recommenderLastName}), 'C') ||
+        setweight(to_tsvector('english', ${table.catholicSacraments}), 'D') ||
+        setweight(to_tsvector('english', ${table.supportTypesNeeded}), 'D')
+      )`,
+    ),
     check("tacots_recommendation_age_check", sql`${table.age} >= 6`),
     check("tacots_recommendation_household_size_check", sql`${table.householdSize} >= 2`),
     check(
@@ -964,17 +987,30 @@ export const tacotsOnboarding = p.pgTable(
   (table) => [
     index("tacots_onboarding_student_idx").on(table.studentId),
     index("tacots_onboarding_date_idx").on(table.onboardingDate),
+    index("tacots_onboarding_health_status_idx").on(table.generalHealthStatus),
     index("tacots_onboarding_school_idx").on(table.enrolledSchoolName),
     index("tacots_onboarding_school_state_idx").on(table.enrolledSchoolState),
     index("tacots_onboarding_class_idx").on(table.enrolledClass),
     index("tacots_onboarding_mentor_idx").on(table.mentorName),
     index("tacots_onboarding_sponsor_idx").on(table.sponsorName),
     index("tacots_onboarding_created_at_idx").on(table.createdAt),
-    index("tacots_onboarding_diagnosed_conditions_idx").using("gin", table.diagnosedConditions),
-    index("tacots_onboarding_behavioral_indicators_idx").using("gin", table.behavioralIndicators),
-    index("tacots_onboarding_chronic_conditions_idx").using("gin", table.chronicConditions),
-    index("tacots_onboarding_allergies_idx").using("gin", table.allergies),
-    index("tacots_onboarding_support_types_approved_idx").using("gin", table.supportTypesApproved),
+    index("tacots_onboarding_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
+        setweight(to_tsvector('english', ${table.generalHealthStatus}), 'C') ||
+        setweight(to_tsvector('english', ${table.enrolledSchoolName}), 'A') ||
+        setweight(to_tsvector('english', ${table.enrolledSchoolState}), 'A') ||
+        setweight(to_tsvector('english', ${table.enrolledClass}), 'C') ||
+        setweight(to_tsvector('english', ${table.mentorName}), 'B') ||
+        setweight(to_tsvector('english', ${table.sponsorName}), 'B') ||
+        setweight(to_tsvector('english', ${table.diagnosedConditions}), 'D') ||
+        setweight(to_tsvector('english', ${table.behavioralIndicators}), 'D') ||
+        setweight(to_tsvector('english', ${table.chronicConditions}), 'D') ||
+        setweight(to_tsvector('english', ${table.allergies}), 'D') ||
+        setweight(to_tsvector('english', ${table.supportTypesApproved}), 'D')
+      )`,
+    ),
     check(
       "tacots_onboarding_focus_ability_check",
       sql`${table.focusAbilityRating} >= 1 AND ${table.focusAbilityRating} <= 5`,
@@ -1091,6 +1127,15 @@ export const tacotsTracking = p.pgTable(
     index("tacots_tracking_mentorship_date_idx").on(table.mentorshipSessionDate),
     index("tacots_tracking_service_date_idx").on(table.serviceDate),
     index("tacots_tracking_created_at_idx").on(table.createdAt),
+    index("tacots_tracking_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
+        setweight(to_tsvector('english', ${table.schoolId}), 'A') ||
+        setweight(to_tsvector('english', ${table.academicTerm}), 'A') ||
+        setweight(to_tsvector('english', ${table.assessmentPeriod}), 'A') 
+      )`,
+    ),
     check(
       "tacots_tracking_social_behavior_check",
       sql`${table.socialBehaviorRating} >= 1 AND ${table.socialBehaviorRating} <= 5`,
@@ -1155,6 +1200,14 @@ export const tacotsExit = p.pgTable(
     index("tacots_exit_completed_by_idx").on(table.completedBy),
     index("tacots_exit_submission_date_idx").on(table.submissionDate),
     index("tacots_exit_created_at_idx").on(table.createdAt),
+    index("tacots_exit_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
+        setweight(to_tsvector('english', ${table.schoolAttendedDuringProgram}), 'A') ||
+        setweight(to_tsvector('english', ${table.exitReason}), 'C') ||
+      )`,
+    ),
     check(
       "tacots_exit_program_impact_rating_check",
       sql`${table.programImpactRating} >= 1 AND ${table.programImpactRating} <= 10`,

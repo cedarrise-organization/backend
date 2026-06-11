@@ -173,9 +173,9 @@ export const listRecommendationsController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit, status, sortBy } = req.qtransformed;
+  const { page, limit, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listRecommendations(page, limit, status, sortBy);
+    const response = await listRecommendations(page, limit, search, status, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -366,9 +366,9 @@ export const submitFeedbackController = async (req: Request, res: Response, next
   }
 };
 export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listTacotsFeedback(page, limit);
+    const response = await listTacotsFeedback(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -524,9 +524,9 @@ export const submitOnboardingController = async (
   }
 };
 export const listOnboardingController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listOnboarding(page, limit);
+    const response = await listOnboarding(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -704,9 +704,9 @@ export const listTacotsTrackingController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listTacotsTracking(page, limit);
+    const response = await listTacotsTracking(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -852,9 +852,9 @@ export const submitTacotsExitController = async (
   }
 };
 export const listTacotsExitController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listTacotsExit(page, limit);
+    const response = await listTacotsExit(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);

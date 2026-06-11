@@ -139,13 +139,59 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
     data: newTacotsRecommendation,
   };
 };
-
 export const listRecommendations = async (
   page: number,
   limit: number,
+  search: string,
   status: string,
   sortBy: keyof typeof sortMap,
 ) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${tacotsRecommendation.firstName}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.surname}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.stateOfOrigin}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.lga}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.schoolName}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.lastClass}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.incomeSources}), 'D') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.recommenderFirstName}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.recommenderLastName}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.catholicSacraments}), 'D') ||
+      setweight(to_tsvector('english', ${tacotsRecommendation.supportTypesNeeded}), 'D')
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [tacotsBeneficiaries, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(tacotsRecommendation)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(tacotsRecommendation.id) })
+        .from(tacotsRecommendation)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Tacots beneficiaries found successfully",
+      data: tacotsBeneficiaries,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:tacots:tacotsRecommendations:${page}:${limit}:${status}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
@@ -202,7 +248,6 @@ export const listRecommendations = async (
     },
   };
 };
-
 export const getRecommendation = async (id: string) => {
   /// cache
   const key = `cedarrise:tacots:tacotsRecommendation:${id}`;
@@ -231,7 +276,6 @@ export const getRecommendation = async (id: string) => {
     data: tacotBeneficiary,
   };
 };
-
 export const updateRecommendedStudentStatus = async (id: string, status: string) => {
   // update
   const [updatedStudent] = await db
@@ -269,7 +313,6 @@ export const updateRecommendedStudentStatus = async (id: string, status: string)
     data: updatedStudent,
   };
 };
-
 export const deleteRecommendation = async (id: string) => {
   const [data] = await db
     .select({
@@ -358,8 +401,49 @@ export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
     data: newTacotsFeedback,
   };
 };
+export const listTacotsFeedback = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${tacotsFeedback.studentFirstName}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsFeedback.studentSurname}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsFeedback.currentClass}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsFeedback.currentSchool}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsFeedback.parentPhone}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsFeedback.mostHelpfulSupport}), 'D') ||
+      setweight(to_tsvector('english', ${tacotsFeedback.currentChallenges}), 'D')
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-export const listTacotsFeedback = async (page: number, limit: number) => {
+    const [feedback, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(tacotsFeedback)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(tacotsFeedback.id) })
+        .from(tacotsFeedback)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Tacots feedback found successfully",
+      data: feedback,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:tacots:feedback:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -407,7 +491,6 @@ export const listTacotsFeedback = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getTacotsFeedback = async (id: string) => {
   /// cache
   const key = `cedarrise:tacots:feedback:${id}`;
@@ -433,7 +516,6 @@ export const getTacotsFeedback = async (id: string) => {
     data: feedback,
   };
 };
-
 export const deleteTacotsFeedback = async (id: string) => {
   await db.delete(tacotsFeedback).where(eq(tacotsFeedback.id, id));
 
@@ -529,8 +611,54 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
     data: onboarding,
   };
 };
+export const listOnboarding = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${tacotsOnboarding.studentId}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.generalHealthStatus}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolName}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolState}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.enrolledClass}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.mentorName}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.sponsorName}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.diagnosedConditions}), 'D') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.behavioralIndicators}), 'D') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.chronicConditions}), 'D') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.allergies}), 'D') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.supportTypesApproved}), 'D')
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-export const listOnboarding = async (page: number, limit: number) => {
+    const [onboarded, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(tacotsOnboarding)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(tacotsOnboarding.id) })
+        .from(tacotsOnboarding)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Tacots onboarded beneficiaries found successfully",
+      data: onboarded,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:tacots:onboarding:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -578,7 +706,6 @@ export const listOnboarding = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getOnboarding = async (id: string) => {
   /// cache
   const key = `cedarrise:tacots:onboarding:${id}`;
@@ -604,7 +731,6 @@ export const getOnboarding = async (id: string) => {
     data: onboarding,
   };
 };
-
 export const deleteOnboarding = async (id: string) => {
   const [data] = await db
     .select({
@@ -726,8 +852,46 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
     data: tracking,
   };
 };
+export const listTacotsTracking = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${tacotsTracking.studentId}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsTracking.schoolId}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsTracking.academicTerm}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsTracking.assessmentPeriod}), 'A')
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-export const listTacotsTracking = async (page: number, limit: number) => {
+    const [tracking, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(tacotsTracking)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(tacotsTracking.id) })
+        .from(tacotsTracking)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "All Tacots tracking data found successfully",
+      data: tracking,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:tacots:tracking:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -775,7 +939,6 @@ export const listTacotsTracking = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getTacotsTracking = async (id: string) => {
   /// cache
   const key = `cedarrise:tacots:tracking:${id}`;
@@ -801,7 +964,6 @@ export const getTacotsTracking = async (id: string) => {
     data: tracking,
   };
 };
-
 export const deleteTacotsTracking = async (id: string) => {
   const [data] = await db
     .select({
@@ -883,8 +1045,45 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
     data: exit,
   };
 };
+export const listTacotsExit = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${tacotsExit.studentId}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsExit.schoolAttendedDuringProgram}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsExit.exitReason}), 'C')
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-export const listTacotsExit = async (page: number, limit: number) => {
+    const [exit, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(tacotsExit)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(tacotsExit.id) })
+        .from(tacotsExit)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "All Tacots exit data found successfully",
+      data: exit,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:tacots:exit:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -931,7 +1130,6 @@ export const listTacotsExit = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getTacotsExit = async (id: string) => {
   /// cache
   const key = `cedarrise:tacots:exit:${id}`;
@@ -957,7 +1155,6 @@ export const getTacotsExit = async (id: string) => {
     data: exit,
   };
 };
-
 export const deleteTacotsExit = async (id: string) => {
   await db.delete(tacotsExit).where(eq(tacotsExit.id, id));
 
