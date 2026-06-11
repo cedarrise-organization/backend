@@ -3,8 +3,8 @@ import { refresh } from "../services/auth.services.js";
 import { Request, Response, NextFunction } from "express";
 import { getUserPermissions } from "../utils/rbac.util.js";
 import { verifyAccessToken } from "../utils/token.util.js";
-import { accessCookieOptions, refreshCookieOptions } from "../lib/cookie.js";
 import { ForbiddentError, UnauthorizedError } from "../lib/error.js";
+import { accessCookieOptions, refreshCookieOptions } from "../lib/cookie.js";
 
 export const authenticate = () => async (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies["cedaraccess"];

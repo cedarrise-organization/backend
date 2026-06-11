@@ -126,9 +126,54 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
 export const listRegistrations = async (
   page: number,
   limit: number,
+  search: string,
   status: string,
   sortBy: keyof typeof sortMap,
 ) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+    setweight(to_tsvector('english', ${ashStudent.firstName}), 'A') ||
+    setweight(to_tsvector('english', ${ashStudent.surname}), 'A') ||
+    setweight(to_tsvector('english', ${ashStudent.middleName}), 'A') ||
+    setweight(to_tsvector('english', ${ashStudent.currentClass}), 'B') ||
+    setweight(to_tsvector('english', ${ashStudent.assignedMentor}), 'B') ||
+    setweight(to_tsvector('english', ${ashStudent.schoolName}), 'B') ||
+    setweight(to_tsvector('english', ${ashStudent.schoolState}), 'C') ||
+    setweight(to_tsvector('english', ${ashStudent.schoolTown}), 'C') ||
+    setweight(to_tsvector('english', ${ashStudent.schoolLga}), 'C')
+  `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [ashStudents, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(ashStudent)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(ashStudent.id) })
+        .from(ashStudent)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Ash students found successfully",
+      data: ashStudents,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:ash:ashStudents:${page}:${limit}:${status}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
@@ -150,7 +195,7 @@ export const listRegistrations = async (
 
   const sortColumn = sortMap[sortBy] ?? ashStudent.createdAt;
   const [ashStudents, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(ashStudent)
       .orderBy(
@@ -164,7 +209,7 @@ export const listRegistrations = async (
       )
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(ashStudent.id) }).from(ashStudent),
+    db.select({ value: count(ashStudent.id) }).from(ashStudent),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -317,7 +362,7 @@ export const deleteRegistration = async (id: string) => {
 };
 export const exportAshStudentTableToCSV = async () => {
   const data = await db.select().from(ashStudent);
-  return data
+  return data;
 };
 
 // ASH FEEDBACK
@@ -364,7 +409,49 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
     data: newAshProgramFeedback,
   };
 };
-export const listFeedback = async (page: number, limit: number) => {
+export const listFeedback = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${ashProgramFeedback.studentFirstName}), 'A') ||
+      setweight(to_tsvector('english', ${ashProgramFeedback.studentSurname}), 'A') ||
+      setweight(to_tsvector('english', ${ashProgramFeedback.schoolName}), 'A') ||
+      setweight(to_tsvector('english', ${ashProgramFeedback.currentClass}), 'B') ||
+      setweight(to_tsvector('english', ${ashProgramFeedback.parentPhone}), 'B') ||
+      setweight(to_tsvector('english', ${ashProgramFeedback.enjoyedParts}), 'C') ||
+      setweight(to_tsvector('english', ${ashProgramFeedback.mostValuableAspects}), 'C')
+  `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [allProgramFeedback, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(ashProgramFeedback)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(ashProgramFeedback.id) })
+        .from(ashProgramFeedback)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Ash program feedback found successfully",
+      data: allProgramFeedback,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:ash:feedback:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -385,13 +472,13 @@ export const listFeedback = async (page: number, limit: number) => {
   ///
 
   const [allProgramFeedback, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(ashProgramFeedback)
       .orderBy(ashProgramFeedback.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(ashProgramFeedback.id) }).from(ashProgramFeedback),
+    db.select({ value: count(ashProgramFeedback.id) }).from(ashProgramFeedback),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -454,9 +541,8 @@ export const deleteFeedback = async (id: string) => {
 };
 export const exportAshFeedbackTableToCSV = async () => {
   const data = await db.select().from(ashProgramFeedback);
-  return data
+  return data;
 };
-
 
 // ASH TRACKING
 export const submitTracking = async (req: Request, options: AshtermlytrackingbodyType) => {
@@ -511,7 +597,47 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
     data: tracker,
   };
 };
-export const listTracking = async (page: number, limit: number) => {
+export const listTracking = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${ashTermlyTracking.studentId}), 'A') ||
+      setweight(to_tsvector('english', ${ashTermlyTracking.academicSession}), 'A') ||
+      setweight(to_tsvector('english', ${ashTermlyTracking.term}), 'A') ||
+      setweight(to_tsvector('english', ${ashTermlyTracking.schoolName}), 'B') ||
+      setweight(to_tsvector('english', ${ashTermlyTracking.mentorName}), 'B') 
+  `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [tracking, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(ashTermlyTracking)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(ashTermlyTracking.id) })
+        .from(ashTermlyTracking)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Tracking data found successfully",
+      data: tracking,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:ash:termlytracking:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -532,14 +658,14 @@ export const listTracking = async (page: number, limit: number) => {
   ///
 
   const [tracking, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(ashTermlyTracking)
       .orderBy(ashTermlyTracking.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
 
-    await db.select({ value: count(ashTermlyTracking.id) }).from(ashTermlyTracking),
+    db.select({ value: count(ashTermlyTracking.id) }).from(ashTermlyTracking),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -549,7 +675,7 @@ export const listTracking = async (page: number, limit: number) => {
 
   return {
     code: 200,
-    message: "Tracking  data found successfully",
+    message: "Tracking data found successfully",
     data: tracking,
     meta: {
       pagination: {
@@ -617,9 +743,8 @@ export const deleteTrack = async (id: string) => {
 };
 export const exportAshTermlyTrackingTableToCSV = async () => {
   const data = await db.select().from(ashTermlyTracking);
-  return data
+  return data;
 };
-
 
 // ASH ATTENDANCE
 export const submitAttendance = async (options: AshweeklyattendancebodyType) => {
@@ -650,7 +775,45 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
     data: attendance,
   };
 };
-export const listAttendance = async (page: number, limit: number) => {
+export const listAttendance = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${ashWeeklyAttendance.studentsInAttendance}), 'A') ||
+      setweight(to_tsvector('english', ${ashWeeklyAttendance.studentsMentored}), 'A') ||
+      setweight(to_tsvector('english', ${ashWeeklyAttendance.sessionsConducted}), 'A') 
+  `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [attendance, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(ashWeeklyAttendance)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(ashWeeklyAttendance.id) })
+        .from(ashWeeklyAttendance)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Attendance data found successfully",
+      data: attendance,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:ash:weeklyattendance:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -671,14 +834,14 @@ export const listAttendance = async (page: number, limit: number) => {
   ///
 
   const [attendance, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(ashWeeklyAttendance)
       .orderBy(ashWeeklyAttendance.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
 
-    await db.select({ value: count(ashWeeklyAttendance.id) }).from(ashWeeklyAttendance),
+    db.select({ value: count(ashWeeklyAttendance.id) }).from(ashWeeklyAttendance),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -741,9 +904,8 @@ export const deleteAttendance = async (id: string) => {
 };
 export const exportAshAttendanceTableToCSV = async () => {
   const data = await db.select().from(ashWeeklyAttendance);
-  return data
+  return data;
 };
-
 
 // ASH EXIT
 export const submitExit = async (options: AshexitbodyType) => {
@@ -782,7 +944,47 @@ export const submitExit = async (options: AshexitbodyType) => {
     data: exit,
   };
 };
-export const listExit = async (page: number, limit: number) => {
+export const listExit = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${ashExit.studentId}), 'A') ||
+      setweight(to_tsvector('english', ${ashExit.schoolName}), 'A') ||
+      setweight(to_tsvector('english', ${ashExit.classAtExit}), 'B') ||
+      setweight(to_tsvector('english', ${ashExit.durationInProgram}), 'B') ||
+      setweight(to_tsvector('english', ${ashExit.exitReason}), 'C') ||
+      setweight(to_tsvector('english', ${ashExit.areasOfImprovement}), 'C') 
+  `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [exit, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(ashExit)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(ashExit.id) })
+        .from(ashExit)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Exit data found successfully",
+      data: exit,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
   /// cache
   const key = `cedarrise:ash:exit:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -802,13 +1004,13 @@ export const listExit = async (page: number, limit: number) => {
   }
   ///
   const [exit, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(ashExit)
       .orderBy(ashExit.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(ashExit.id) }).from(ashExit),
+    db.select({ value: count(ashExit.id) }).from(ashExit),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -868,7 +1070,7 @@ export const deleteExit = async (id: string) => {
 };
 export const exportAshExitTableToCSV = async () => {
   const data = await db.select().from(ashExit);
-  return data
+  return data;
 };
 
 export const example = async (page: number, limit: number, id: string) => {};

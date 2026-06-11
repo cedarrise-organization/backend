@@ -11,7 +11,11 @@ const timestamps = {
 export const ashStudent = p.pgTable(
   "ash_student",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     programType: p.text("program_type").notNull(),
     firstName: p.text("first_name").notNull(),
@@ -58,7 +62,6 @@ export const ashStudent = p.pgTable(
     declarationConfirmed: p.boolean("declaration_confirmed").default(false).notNull(),
     parentSignatureUrl: p.text("parent_signature_url").notNull(),
     parentSignaturePublicId: p.text("parent_signature_public_id").notNull(),
-    
 
     assignedMentor: p.text("assigned_mentor"),
     pretestScore: p.numeric("pretest_score", {
@@ -76,9 +79,20 @@ export const ashStudent = p.pgTable(
     index("ash_student_current_class_idx").on(table.currentClass),
     index("ash_student_assigned_mentor_idx").on(table.assignedMentor),
     index("ash_student_created_at_idx").on(table.createdAt),
-    index("ash_student_learning_conditions_idx").using(
+    index("ash_student_learning_conditions_idx").using("gin", table.learningConditions),
+    index("ash_student_search_index").using(
       "gin",
-      table.learningConditions,
+      sql`(
+        setweight(to_tsvector('english', ${table.firstName}), 'A') ||
+        setweight(to_tsvector('english', ${table.surname}), 'A') ||
+        setweight(to_tsvector('english', ${table.middleName}), 'A') ||
+        setweight(to_tsvector('english', ${table.currentClass}), 'B') ||
+        setweight(to_tsvector('english', ${table.assignedMentor}), 'B') ||
+        setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
+        setweight(to_tsvector('english', ${table.schoolState}), 'C') ||
+        setweight(to_tsvector('english', ${table.schoolTown}), 'C') ||
+        setweight(to_tsvector('english', ${table.schoolLga}), 'C')
+      )`,
     ),
     check("ash_student_age_check", sql`${table.age} >= 6 AND ${table.age} <= 18`),
   ],
@@ -87,7 +101,11 @@ export const ashStudent = p.pgTable(
 export const ashTermlyTracking = p.pgTable(
   "ash_termly_tracking",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -158,13 +176,20 @@ export const ashTermlyTracking = p.pgTable(
   },
   (table) => [
     index("ash_termly_tracking_student_idx").on(table.studentId),
-    index("ash_termly_tracking_session_term_idx").on(
-      table.academicSession,
-      table.term,
-    ),
+    index("ash_termly_tracking_session_term_idx").on(table.academicSession, table.term),
     index("ash_termly_tracking_school_idx").on(table.schoolName),
     index("ash_termly_tracking_mentor_idx").on(table.mentorName),
     index("ash_termly_tracking_created_at_idx").on(table.createdAt),
+    index("ash_termly_tracking_feedback_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
+        setweight(to_tsvector('english', ${table.academicSession}), 'A') ||
+        setweight(to_tsvector('english', ${table.term}), 'A') ||
+        setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
+        setweight(to_tsvector('english', ${table.mentorName}), 'B') 
+      )`,
+    ),
     check(
       "ash_termly_discipline_rating_check",
       sql`${table.disciplineRating} >= 1 AND ${table.disciplineRating} <= 5`,
@@ -183,7 +208,11 @@ export const ashTermlyTracking = p.pgTable(
 export const ashWeeklyAttendance = p.pgTable(
   "ash_weekly_attendance",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     sessionDate: p.date("session_date").notNull(),
     studentsInAttendance: p.uuid("students_in_attendance").array().notNull(),
@@ -198,14 +227,13 @@ export const ashWeeklyAttendance = p.pgTable(
   (table) => [
     index("ash_weekly_attendance_session_date_idx").on(table.sessionDate),
     index("ash_weekly_attendance_created_at_idx").on(table.createdAt),
-    index("ash_weekly_students_in_attendance_idx").using(
+    index("ash_termly_tracking_search_index").using(
       "gin",
-      table.studentsInAttendance,
-    ),
-    index("ash_weekly_students_mentored_idx").using("gin", table.studentsMentored),
-    index("ash_weekly_sessions_conducted_idx").using(
-      "gin",
-      table.sessionsConducted,
+      sql`(
+        setweight(to_tsvector('english', ${table.studentsInAttendance}), 'A') ||
+        setweight(to_tsvector('english', ${table.studentsMentored}), 'A') ||
+        setweight(to_tsvector('english', ${table.sessionsConducted}), 'A') 
+      )`,
     ),
   ],
 );
@@ -213,7 +241,11 @@ export const ashWeeklyAttendance = p.pgTable(
 export const ashExit = p.pgTable(
   "ash_exit",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -255,9 +287,16 @@ export const ashExit = p.pgTable(
     index("ash_exit_reason_idx").on(table.exitReason),
     index("ash_exit_date_idx").on(table.exitDate),
     index("ash_exit_created_at_idx").on(table.createdAt),
-    index("ash_exit_areas_of_improvement_idx").using(
+    index("ash_exit_search_index").using(
       "gin",
-      table.areasOfImprovement,
+      sql`(
+        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
+        setweight(to_tsvector('english', ${table.schoolName}), 'A') ||
+        setweight(to_tsvector('english', ${table.classAtExit}), 'B') ||
+        setweight(to_tsvector('english', ${table.durationInProgram}), 'B') ||
+        setweight(to_tsvector('english', ${table.exitReason}), 'C') ||
+        setweight(to_tsvector('english', ${table.areasOfImprovement}), 'C') 
+      )`,
     ),
     check("ash_exit_age_check", sql`${table.ageAtExit} >= 6 AND ${table.ageAtExit} <= 18`),
     check(
@@ -274,7 +313,11 @@ export const ashExit = p.pgTable(
 export const capacityBuildingEvaluation = p.pgTable(
   "capacity_building_evaluation",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     programName: p.text("program_name").notNull(),
     programType: p.text("program_type").notNull(),
@@ -282,24 +325,32 @@ export const capacityBuildingEvaluation = p.pgTable(
     location: p.text().notNull(),
     programCoordinator: p.text("program_coordinator").notNull(),
 
-    numberOfSponsors: p.numeric("number_of_sponsors", {
-      mode: "number",
-    }).notNull(),
+    numberOfSponsors: p
+      .numeric("number_of_sponsors", {
+        mode: "number",
+      })
+      .notNull(),
     listOfSponsors: p.text("list_of_sponsors").notNull(),
     sponsorshipType: p.text("sponsorship_type").notNull(),
     partnerOrganizations: p.text("partner_organizations"),
     partnershipLevel: p.text("partnership_level").notNull(),
 
-    numberOfParticipants: p.numeric("number_of_participants", {
-      mode: "number",
-    }).notNull(),
+    numberOfParticipants: p
+      .numeric("number_of_participants", {
+        mode: "number",
+      })
+      .notNull(),
     targetAudience: p.text("target_audience").notNull(),
-    numberOfFacilitators: p.numeric("number_of_facilitators", {
-      mode: "number",
-    }).notNull(),
-    numberOfVolunteers: p.numeric("number_of_volunteers", {
-      mode: "number",
-    }).notNull(),
+    numberOfFacilitators: p
+      .numeric("number_of_facilitators", {
+        mode: "number",
+      })
+      .notNull(),
+    numberOfVolunteers: p
+      .numeric("number_of_volunteers", {
+        mode: "number",
+      })
+      .notNull(),
 
     participantEngagementLevel: p.text("participant_engagement_level").notNull(),
     programObjectives: p.text("program_objectives"),
@@ -309,21 +360,31 @@ export const capacityBuildingEvaluation = p.pgTable(
     majorActivities: p.text("major_activities"),
     effectiveActivities: p.text("effective_activities"),
 
-    venueSuitability: p.numeric("venue_suitability", {
-      mode: "number",
-    }).notNull(),
-    timeManagement: p.numeric("time_management", {
-      mode: "number",
-    }).notNull(),
-    resourceAvailability: p.numeric("resource_availability", {
-      mode: "number",
-    }).notNull(),
-    communicationAndCoordination: p.numeric("communication_and_coordination", {
-      mode: "number",
-    }).notNull(),
-    teamworkAmongOrganizers: p.numeric("teamwork_among_organizers", {
-      mode: "number",
-    }).notNull(),
+    venueSuitability: p
+      .numeric("venue_suitability", {
+        mode: "number",
+      })
+      .notNull(),
+    timeManagement: p
+      .numeric("time_management", {
+        mode: "number",
+      })
+      .notNull(),
+    resourceAvailability: p
+      .numeric("resource_availability", {
+        mode: "number",
+      })
+      .notNull(),
+    communicationAndCoordination: p
+      .numeric("communication_and_coordination", {
+        mode: "number",
+      })
+      .notNull(),
+    teamworkAmongOrganizers: p
+      .numeric("teamwork_among_organizers", {
+        mode: "number",
+      })
+      .notNull(),
 
     challengesEncountered: p.text("challenges_encountered"),
     challengesAddressed: p.text("challenges_addressed"),
@@ -378,7 +439,11 @@ export const capacityBuildingEvaluation = p.pgTable(
 export const tacotsFeedback = p.pgTable(
   "tacots_feedback",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     studentFirstName: p.text("student_first_name").notNull(),
     studentSurname: p.text("student_surname").notNull(),
@@ -394,9 +459,7 @@ export const tacotsFeedback = p.pgTable(
     studentImprovementSuggestions: p.text("student_improvement_suggestions"),
 
     parentGuardianName: p.text("parent_guardian_name").notNull(),
-    parentGuardianRelationship: p
-      .text("parent_guardian_relationship")
-      .notNull(),
+    parentGuardianRelationship: p.text("parent_guardian_relationship").notNull(),
     parentPhone: p.text("parent_phone"),
 
     scholarshipReducedBurden: p.text("scholarship_reduced_burden").notNull(),
@@ -410,22 +473,13 @@ export const tacotsFeedback = p.pgTable(
     ...timestamps,
   },
   (table) => [
-    index("tacots_feedback_student_name_idx").on(
-      table.studentFirstName,
-      table.studentSurname,
-    ),
+    index("tacots_feedback_student_name_idx").on(table.studentFirstName, table.studentSurname),
     index("tacots_feedback_school_idx").on(table.currentSchool),
     index("tacots_feedback_class_idx").on(table.currentClass),
     index("tacots_feedback_parent_phone_idx").on(table.parentPhone),
     index("tacots_feedback_created_at_idx").on(table.createdAt),
-    index("tacots_feedback_most_helpful_support_idx").using(
-      "gin",
-      table.mostHelpfulSupport,
-    ),
-    index("tacots_feedback_current_challenges_idx").using(
-      "gin",
-      table.currentChallenges,
-    ),
+    index("tacots_feedback_most_helpful_support_idx").using("gin", table.mostHelpfulSupport),
+    index("tacots_feedback_current_challenges_idx").using("gin", table.currentChallenges),
     check(
       "tacots_feedback_study_motivation_check",
       sql`${table.studyMotivationRating} >= 1 AND ${table.studyMotivationRating} <= 5`,
@@ -444,7 +498,11 @@ export const tacotsFeedback = p.pgTable(
 export const ashProgramFeedback = p.pgTable(
   "ash_program_feedback",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     studentFirstName: p.text("student_first_name").notNull(),
     studentSurname: p.text("student_surname").notNull(),
@@ -453,9 +511,7 @@ export const ashProgramFeedback = p.pgTable(
 
     attendanceFrequency: p.text("attendance_frequency").notNull(),
     enjoyedParts: p.text("enjoyed_parts").array(),
-    learningImprovementRating: p
-      .integer("learning_improvement_rating")
-      .notNull(),
+    learningImprovementRating: p.integer("learning_improvement_rating").notNull(),
     confidenceRating: p.integer("confidence_rating").notNull(),
     volunteerSupportRating: p.integer("volunteer_support_rating").notNull(),
 
@@ -463,9 +519,7 @@ export const ashProgramFeedback = p.pgTable(
     studentImprovementSuggestions: p.text("student_improvement_suggestions"),
 
     parentGuardianName: p.text("parent_guardian_name").notNull(),
-    parentGuardianRelationship: p
-      .text("parent_guardian_relationship")
-      .notNull(),
+    parentGuardianRelationship: p.text("parent_guardian_relationship").notNull(),
     parentPhone: p.text("parent_phone"),
 
     childBenefited: p.text("child_benefited").notNull(),
@@ -481,18 +535,22 @@ export const ashProgramFeedback = p.pgTable(
     ...timestamps,
   },
   (table) => [
-    index("ash_feedback_student_name_idx").on(
-      table.studentFirstName,
-      table.studentSurname,
-    ),
+    index("ash_feedback_student_name_idx").on(table.studentFirstName, table.studentSurname),
     index("ash_feedback_school_idx").on(table.schoolName),
     index("ash_feedback_class_idx").on(table.currentClass),
     index("ash_feedback_parent_phone_idx").on(table.parentPhone),
     index("ash_feedback_created_at_idx").on(table.createdAt),
-    index("ash_feedback_enjoyed_parts_idx").using("gin", table.enjoyedParts),
-    index("ash_feedback_most_valuable_aspects_idx").using(
+    index("ash_feedback_search_index").using(
       "gin",
-      table.mostValuableAspects,
+      sql`(
+        setweight(to_tsvector('english', ${table.studentFirstName}), 'A') ||
+        setweight(to_tsvector('english', ${table.studentSurname}), 'A') ||
+        setweight(to_tsvector('english', ${table.schoolName}), 'A') ||
+        setweight(to_tsvector('english', ${table.currentClass}), 'B') ||
+        setweight(to_tsvector('english', ${table.parentPhone}), 'B') ||
+        setweight(to_tsvector('english', ${table.enjoyedParts}), 'C') ||
+        setweight(to_tsvector('english', ${table.mostValuableAspects}), 'C') 
+      )`,
     ),
     check(
       "ash_feedback_learning_improvement_check",
@@ -516,7 +574,11 @@ export const ashProgramFeedback = p.pgTable(
 export const volunteerFeedback = p.pgTable(
   "volunteer_feedback",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     firstName: p.text("first_name").notNull(),
     surname: p.text().notNull(),
@@ -553,18 +615,9 @@ export const volunteerFeedback = p.pgTable(
     index("volunteer_feedback_would_recommend_idx").on(table.wouldRecommend),
     index("volunteer_feedback_submission_date_idx").on(table.submissionDate),
     index("volunteer_feedback_created_at_idx").on(table.createdAt),
-    index("volunteer_feedback_ways_helped_idx").using(
-      "gin",
-      table.waysProgramHelped,
-    ),
-    index("volunteer_feedback_activities_idx").using(
-      "gin",
-      table.activitiesInvolvedIn,
-    ),
-    index("volunteer_feedback_skills_gained_idx").using(
-      "gin",
-      table.skillsGained,
-    ),
+    index("volunteer_feedback_ways_helped_idx").using("gin", table.waysProgramHelped),
+    index("volunteer_feedback_activities_idx").using("gin", table.activitiesInvolvedIn),
+    index("volunteer_feedback_skills_gained_idx").using("gin", table.skillsGained),
     check(
       "volunteer_feedback_overall_experience_check",
       sql`${table.overallExperienceRating} >= 1 AND ${table.overallExperienceRating} <= 5`,
@@ -587,7 +640,11 @@ export const volunteerFeedback = p.pgTable(
 export const outreachTracker = p.pgTable(
   "outreach_tracker",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     outreachStartDate: p.date("outreach_start_date").notNull(),
     outreachEndDate: p.date("outreach_end_date").notNull(),
@@ -611,10 +668,7 @@ export const outreachTracker = p.pgTable(
     ...timestamps,
   },
   (table) => [
-    index("outreach_tracker_period_idx").on(
-      table.outreachStartDate,
-      table.outreachEndDate,
-    ),
+    index("outreach_tracker_period_idx").on(table.outreachStartDate, table.outreachEndDate),
     index("outreach_tracker_location_idx").on(
       table.outreachState,
       table.outreachLga,
@@ -624,21 +678,19 @@ export const outreachTracker = p.pgTable(
     index("outreach_tracker_submission_date_idx").on(table.submissionDate),
     index("outreach_tracker_created_at_idx").on(table.createdAt),
     index("outreach_tracker_type_idx").using("gin", table.outreachType),
-    check(
-      "outreach_num_volunteers_check",
-      sql`${table.numVolunteers} >= 0`,
-    ),
-    check(
-      "outreach_num_beneficiaries_check",
-      sql`${table.numBeneficiaries} >= 0`,
-    ),
+    check("outreach_num_volunteers_check", sql`${table.numVolunteers} >= 0`),
+    check("outreach_num_beneficiaries_check", sql`${table.numBeneficiaries} >= 0`),
   ],
 );
 
 export const volunteerRegistration = p.pgTable(
   "volunteer_registration",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     firstName: p.text("first_name").notNull(),
     middleName: p.text("middle_name"),
@@ -681,18 +733,9 @@ export const volunteerRegistration = p.pgTable(
     index("volunteer_registration_status_idx").on(table.status),
     index("volunteer_registration_created_at_idx").on(table.createdAt),
     index("volunteer_registration_areas_idx").using("gin", table.volunteerAreas),
-    index("volunteer_registration_skills_idx").using(
-      "gin",
-      table.skillsToContribute,
-    ),
-    index("volunteer_registration_availability_idx").using(
-      "gin",
-      table.availability,
-    ),
-    index("volunteer_registration_ash_extracurricular_idx").using(
-      "gin",
-      table.ashExtracurricular,
-    ),
+    index("volunteer_registration_skills_idx").using("gin", table.skillsToContribute),
+    index("volunteer_registration_availability_idx").using("gin", table.availability),
+    index("volunteer_registration_ash_extracurricular_idx").using("gin", table.ashExtracurricular),
     check("volunteer_registration_age_check", sql`${table.age} >= 16`),
   ],
 );
@@ -700,7 +743,11 @@ export const volunteerRegistration = p.pgTable(
 export const tacotsRecommendation = p.pgTable(
   "tacots_recommendation",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     firstName: p.text("first_name").notNull(),
     middleName: p.text("middle_name"),
@@ -796,23 +843,11 @@ export const tacotsRecommendation = p.pgTable(
     ),
     index("tacots_recommendation_admin_status_idx").on(table.adminStatus),
     index("tacots_recommendation_created_at_idx").on(table.createdAt),
-    index("tacots_recommendation_catholic_sacraments_idx").using(
-      "gin",
-      table.catholicSacraments,
-    ),
-    index("tacots_recommendation_income_sources_idx").using(
-      "gin",
-      table.incomeSources,
-    ),
-    index("tacots_recommendation_support_types_needed_idx").using(
-      "gin",
-      table.supportTypesNeeded,
-    ),
+    index("tacots_recommendation_catholic_sacraments_idx").using("gin", table.catholicSacraments),
+    index("tacots_recommendation_income_sources_idx").using("gin", table.incomeSources),
+    index("tacots_recommendation_support_types_needed_idx").using("gin", table.supportTypesNeeded),
     check("tacots_recommendation_age_check", sql`${table.age} >= 6`),
-    check(
-      "tacots_recommendation_household_size_check",
-      sql`${table.householdSize} >= 2`,
-    ),
+    check("tacots_recommendation_household_size_check", sql`${table.householdSize} >= 2`),
     check(
       "tacots_recommendation_discipline_rating_check",
       sql`${table.disciplineRating} >= 1 AND ${table.disciplineRating} <= 5`,
@@ -827,7 +862,11 @@ export const tacotsRecommendation = p.pgTable(
 export const tacotsOnboarding = p.pgTable(
   "tacots_onboarding",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -839,9 +878,7 @@ export const tacotsOnboarding = p.pgTable(
 
     onboardingDate: p.date("onboarding_date").notNull(),
 
-    hasMentalHealthDiagnosis: p
-      .text("has_mental_health_diagnosis")
-      .notNull(),
+    hasMentalHealthDiagnosis: p.text("has_mental_health_diagnosis").notNull(),
     diagnosedConditions: p.text("diagnosed_conditions").array(),
     behavioralIndicators: p.text("behavioral_indicators").array().notNull(),
     focusAbilityRating: p.integer("focus_ability_rating").notNull(),
@@ -872,10 +909,7 @@ export const tacotsOnboarding = p.pgTable(
     }),
 
     studentCommitment: p.boolean("student_commitment").default(false),
-    parentGuardianCommitment: p
-      .boolean("parent_guardian_commitment")
-      .default(false)
-      .notNull(),
+    parentGuardianCommitment: p.boolean("parent_guardian_commitment").default(false).notNull(),
     parentSignatureUrl: p.text("parent_signature_url"),
     parentSignaturePublicId: p.text("parent_signature_public_id"),
     admissionLetterUrl: p.text("admission_letter_url"),
@@ -898,23 +932,11 @@ export const tacotsOnboarding = p.pgTable(
     index("tacots_onboarding_mentor_idx").on(table.mentorName),
     index("tacots_onboarding_sponsor_idx").on(table.sponsorName),
     index("tacots_onboarding_created_at_idx").on(table.createdAt),
-    index("tacots_onboarding_diagnosed_conditions_idx").using(
-      "gin",
-      table.diagnosedConditions,
-    ),
-    index("tacots_onboarding_behavioral_indicators_idx").using(
-      "gin",
-      table.behavioralIndicators,
-    ),
-    index("tacots_onboarding_chronic_conditions_idx").using(
-      "gin",
-      table.chronicConditions,
-    ),
+    index("tacots_onboarding_diagnosed_conditions_idx").using("gin", table.diagnosedConditions),
+    index("tacots_onboarding_behavioral_indicators_idx").using("gin", table.behavioralIndicators),
+    index("tacots_onboarding_chronic_conditions_idx").using("gin", table.chronicConditions),
     index("tacots_onboarding_allergies_idx").using("gin", table.allergies),
-    index("tacots_onboarding_support_types_approved_idx").using(
-      "gin",
-      table.supportTypesApproved,
-    ),
+    index("tacots_onboarding_support_types_approved_idx").using("gin", table.supportTypesApproved),
     check(
       "tacots_onboarding_focus_ability_check",
       sql`${table.focusAbilityRating} >= 1 AND ${table.focusAbilityRating} <= 5`,
@@ -937,7 +959,11 @@ export const tacotsOnboarding = p.pgTable(
 export const tacotsTracking = p.pgTable(
   "tacots_tracking",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -963,9 +989,11 @@ export const tacotsTracking = p.pgTable(
 
     highestSubjectScore: p.text("highest_subject_score").notNull(),
     lowestSubjectScore: p.text("lowest_subject_score").notNull(),
-    studentAveragePct: p.numeric("student_average_pct", {
-      mode: "number",
-    }).notNull(),
+    studentAveragePct: p
+      .numeric("student_average_pct", {
+        mode: "number",
+      })
+      .notNull(),
     studentPositionInClass: p.text("student_position_in_class").notNull(),
     termResultUrl: p.text("term_result_url").notNull(),
     termResultPublicId: p.text("term_result_url_public_id").notNull(),
@@ -988,18 +1016,26 @@ export const tacotsTracking = p.pgTable(
     serviceDescription: p.text("service_description").notNull(),
     serviceSupervisor: p.text("service_supervisor").notNull(),
 
-    tuitionFeePaid: p.numeric("tuition_fee_paid", {
-      mode: "number",
-    }).notNull(),
-    resourcesSpent: p.numeric("resources_spent", {
-      mode: "number",
-    }).notNull(),
-    sundriesSpent: p.numeric("sundries_spent", {
-      mode: "number",
-    }).notNull(),
-    totalAmountSpent: p.numeric("total_amount_spent", {
-      mode: "number",
-    }).notNull(),
+    tuitionFeePaid: p
+      .numeric("tuition_fee_paid", {
+        mode: "number",
+      })
+      .notNull(),
+    resourcesSpent: p
+      .numeric("resources_spent", {
+        mode: "number",
+      })
+      .notNull(),
+    sundriesSpent: p
+      .numeric("sundries_spent", {
+        mode: "number",
+      })
+      .notNull(),
+    totalAmountSpent: p
+      .numeric("total_amount_spent", {
+        mode: "number",
+      })
+      .notNull(),
     paymentEvidenceUrl: p.text("payment_evidence_url"),
     paymentEvidencePublicId: p.text("payment_evidence_url_public_id"),
     financialNotes: p.text("financial_notes"),
@@ -1010,16 +1046,11 @@ export const tacotsTracking = p.pgTable(
     index("tacots_tracking_student_idx").on(table.studentId),
     index("tacots_tracking_school_idx").on(table.schoolId),
     index("tacots_tracking_region_idx").on(table.region),
-    index("tacots_tracking_session_term_idx").on(
-      table.academicSession,
-      table.academicTerm,
-    ),
+    index("tacots_tracking_session_term_idx").on(table.academicSession, table.academicTerm),
     index("tacots_tracking_assessment_period_idx").on(table.assessmentPeriod),
     index("tacots_tracking_submission_date_idx").on(table.submissionDate),
     index("tacots_tracking_mentor_idx").on(table.mentorName),
-    index("tacots_tracking_mentorship_date_idx").on(
-      table.mentorshipSessionDate,
-    ),
+    index("tacots_tracking_mentorship_date_idx").on(table.mentorshipSessionDate),
     index("tacots_tracking_service_date_idx").on(table.serviceDate),
     index("tacots_tracking_created_at_idx").on(table.createdAt),
     check(
@@ -1040,7 +1071,11 @@ export const tacotsTracking = p.pgTable(
 export const tacotsExit = p.pgTable(
   "tacots_exit",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
 
     studentId: p
       .uuid("student_id")
@@ -1050,9 +1085,7 @@ export const tacotsExit = p.pgTable(
         onDelete: "cascade",
       }),
 
-    schoolAttendedDuringProgram: p
-      .text("school_attended_during_program")
-      .notNull(),
+    schoolAttendedDuringProgram: p.text("school_attended_during_program").notNull(),
     yearOfExit: p.integer("year_of_exit").notNull(),
     exitReason: p.text("exit_reason").notNull(),
     highestEducationAttained: p.text("highest_education_attained").notNull(),
@@ -1092,11 +1125,19 @@ export const tacotsExit = p.pgTable(
 );
 
 export const projects = p.pgTable("projects", {
-   id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
-   title: p.text().notNull(),
-   description: p.text(),
-   imageUrl: p.text().default("https://res.cloudinary.com/dhdfwtjs5/image/upload/v1780649959/ongoing_project_result_raix7r.webp"), 
-   imagePublicId: p.text().default("ongoing_project_result_raix7r"), 
-   status: p.text().default("ongoing"), 
-   ...timestamps,
-}) 
+  id: p
+    .uuid()
+    .primaryKey()
+    .default(sql`uuid_generate_v4()`)
+    .notNull(),
+  title: p.text().notNull(),
+  description: p.text(),
+  imageUrl: p
+    .text()
+    .default(
+      "https://res.cloudinary.com/dhdfwtjs5/image/upload/v1780649959/ongoing_project_result_raix7r.webp",
+    ),
+  imagePublicId: p.text().default("ongoing_project_result_raix7r"),
+  status: p.text().default("ongoing"),
+  ...timestamps,
+});

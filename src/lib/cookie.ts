@@ -1,13 +1,13 @@
 export const accessCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
-  maxAge: 1000 * 60 * 15
-} as const; 
+  secure: process.env.NODE_ENV === "production", // should browser send the cookie over https?
+  sameSite: "none", // allows us to send cookies across different domains
+  maxAge: 1000 * 60 * 15, // matches access token exp age
+} as const;
 
 export const refreshCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "none",
-  maxAge: 1000 * 60 * 60 * 24 * 7
-} as const; 
+  secure: process.env.NODE_ENV === "production", // should browser send the cookie over https?
+  sameSite: "none", // allows us to send cookies across different domains
+  maxAge: 1000 * 60 * 60 * 24 * 7, // matches refresh token exp age
+} as const;

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { accessCookieOptions, refreshCookieOptions } from "../../lib/cookie.js";
 import { login, logout } from "../../services/auth.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
+import { accessCookieOptions, refreshCookieOptions } from "../../lib/cookie.js";
 
 export const loginController = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;

@@ -128,9 +128,9 @@ export const listRegistrationsController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit, status, sortBy } = req.qtransformed;
+  const { page, limit, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listRegistrations(page, limit, status, sortBy);
+    const response = await listRegistrations(page, limit, search, status, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -318,9 +318,9 @@ export const submitFeedbackController = async (req: Request, res: Response, next
   }
 };
 export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listFeedback(page, limit);
+    const response = await listFeedback(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -457,9 +457,9 @@ export const submitTrackingController = async (req: Request, res: Response, next
   }
 };
 export const listTrackingController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listTracking(page, limit);
+    const response = await listTracking(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -567,9 +567,9 @@ export const submitAttendanceController = async (
   }
 };
 export const listAttendanceController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listAttendance(page, limit);
+    const response = await listAttendance(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -682,9 +682,9 @@ export const submitExitController = async (req: Request, res: Response, next: Ne
   }
 };
 export const listExitController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listExit(page, limit);
+    const response = await listExit(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
