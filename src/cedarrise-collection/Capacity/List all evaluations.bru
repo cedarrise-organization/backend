@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/capacity-building?page=&limit=
+  url: {{baseUrl}}/api/v1/forms/capacity-building?page=&limit=&search=
   body: none
   auth: inherit
 }
@@ -13,6 +13,7 @@ get {
 params:query {
   page: 
   limit: 
+  search: 
 }
 
 vars:pre-request {
@@ -27,17 +28,27 @@ settings {
 docs {
   # List All Capacity Building Evaluations
 
-  Returns a paginated list of capacity building programme evaluation submissions. Results are ordered by creation date in ascending order.
+  Returns a paginated list of capacity building programme evaluation submissions. Results are ordered by creation date in ascending order. Supports full-text search via PostgreSQL GIN index.
 
   ## Authorization
   Requires `read` permission.
 
   ## Query Parameters
 
-  | Parameter | Type   | Required | Default | Description / Allowed Values          |
-  |-----------|--------|----------|---------|---------------------------------------|
-  | page      | number | No       | `1`     | Page number (integer ≥ 1)             |
-  | limit     | number | No       | `25`    | Items per page (integer, 1–100)       |
+  | Parameter | Type   | Required | Default | Description / Allowed Values                                                                            |
+  |-----------|--------|----------|---------|---------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`     | Page number (integer ≥ 1)                                                                               |
+  | limit     | number | No       | `25`    | Items per page (integer, 1–100)                                                                         |
+  | search    | string | No       | —       | Full-text search query. When provided, cache is bypassed and results are matched against the GIN index. |
+
+  ### Searchable Fields
+
+  | Field                | Weight |
+  |----------------------|--------|
+  | `programName`        | A      |
+  | `programType`        | A      |
+  | `location`           | A      |
+  | `programCoordinator` | A      |
 
   ## Response
 

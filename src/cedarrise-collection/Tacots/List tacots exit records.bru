@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/tacots/exit?page=&limit=
+  url: {{baseUrl}}/api/v1/forms/tacots/exit?page=&limit=&search=
   body: none
   auth: inherit
 }
@@ -13,6 +13,7 @@ get {
 params:query {
   page: 
   limit: 
+  search: 
 }
 
 vars:pre-request {
@@ -27,17 +28,26 @@ settings {
 docs {
   # List TACOTS Exit Records
   
-  Returns a paginated list of TACOTS exit/completion records. Results are ordered by creation date.
+  Returns a paginated list of TACOTS exit/completion records, ordered by creation date. Supports full-text search via PostgreSQL GIN index.
   
   ## Authorization
   Requires `read` permission.
   
   ## Query Parameters
   
-  | Parameter | Type   | Required | Default | Description                     |
-  |-----------|--------|----------|---------|---------------------------------|
-  | page      | number | No       | `1`     | Page number (integer >= 1)      |
-  | limit     | number | No       | `25`    | Items per page (integer, 1-100) |
+  | Parameter | Type   | Required | Default | Description                                                                                             |
+  |-----------|--------|----------|---------|---------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`     | Page number (integer >= 1)                                                                              |
+  | limit     | number | No       | `25`    | Items per page (integer, 1-100)                                                                         |
+  | search    | string | No       | —       | Full-text search query. When provided, cache is bypassed and results are matched against the GIN index. |
+  
+  ### Searchable Fields
+  
+  | Field                          | Weight |
+  |--------------------------------|--------|
+  | `studentId`                    | A      |
+  | `schoolAttendedDuringProgram`  | A      |
+  | `exitReason`                   | C      |
   
   ## Response
   

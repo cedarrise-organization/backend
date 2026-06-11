@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/tacots/recommendation?page=&limit=&status=&sortBy=
+  url: {{baseUrl}}/api/v1/forms/tacots/recommendation?page=&limit=&status=&sortBy=&search=
   body: none
   auth: inherit
 }
@@ -15,6 +15,7 @@ params:query {
   limit: 
   status: 
   sortBy: 
+  search: 
 }
 
 vars:pre-request {
@@ -31,7 +32,7 @@ settings {
 docs {
   # List All TACOTS Recommendations
   
-  Returns a paginated list of TACOTS scholarship recommendation submissions. Results can be filtered by admin selection status and sorted by various fields.
+  Returns a paginated list of TACOTS scholarship recommendation submissions. Results can be filtered by admin selection status and sorted by various fields. Supports full-text search via PostgreSQL GIN index.
   
   ## Authorization
   Requires `read` permission.
@@ -44,6 +45,23 @@ docs {
   | limit     | number | No       | `25`           | Items per page (integer, 1–100)                                                                                         |
   | status    | string | No       | `KEEP IN VIEW` | One of: `NOT SELECTED`, `KEEP IN VIEW`, `SELECTED`                                                                      |
   | sortBy    | string | No       | `createdAt`    | One of: `firstName`, `surname`, `createdAt`, `stateOfOrigin`, `lga`, `schoolName`, `gender`, `lastClass`                |
+  | search    | string | No       | —              | Full-text search query. When provided, cache and sort/status filters are bypassed and results are matched against the GIN index. |
+  
+  ### Searchable Fields
+  
+  | Field                    | Weight |
+  |--------------------------|--------|
+  | `firstName`              | A      |
+  | `surname`                | A      |
+  | `stateOfOrigin`          | B      |
+  | `lga`                    | B      |
+  | `schoolName`             | B      |
+  | `lastClass`              | C      |
+  | `recommenderFirstName`   | C      |
+  | `recommenderLastName`    | C      |
+  | `incomeSources`          | D      |
+  | `catholicSacraments`     | D      |
+  | `supportTypesNeeded`     | D      |
   
   ## Response
   

@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/volunteer?page=&limit=&status=&sortBy=
+  url: {{baseUrl}}/api/v1/volunteer?page=&limit=&status=&sortBy=&search=
   body: none
   auth: inherit
 }
@@ -15,6 +15,7 @@ params:query {
   limit: 
   status: 
   sortBy: 
+  search: 
 }
 
 vars:pre-request {
@@ -31,7 +32,7 @@ settings {
 docs {
   # List All Volunteers
   
-  Returns a paginated list of volunteer registrations. Results can be sorted by various fields.
+  Returns a paginated list of volunteer registrations. Results can be sorted by various fields. Supports full-text search via PostgreSQL GIN index.
   
   ## Authorization
   Requires 'read' permission
@@ -44,6 +45,20 @@ docs {
   | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                                               |
   | status    | string | No       | `pending`   | One of: `accepted`, `rejected`, `pending`                                                                                                     |
   | sortBy    | string | No       | `createdAt` | One of: `firstName`, `surname`, `emailAddress`, `phoneNumber`, `state`, `registrationDate`, `volunteerAreas`, `createdAt`                     |
+  | search    | string | No       | —           | Full-text search query. When provided, cache and sort/status filters are bypassed and results are matched against the GIN index.               |
+  
+  ### Searchable Fields
+  
+  | Field                | Weight |
+  |----------------------|--------|
+  | `firstName`          | A      |
+  | `surname`            | A      |
+  | `emailAddress`       | A      |
+  | `phoneNumber`        | B      |
+  | `state`              | B      |
+  | `volunteerAreas`     | C      |
+  | `skillsToContribute` | C      |
+  | `ashExtracurricular` | C      |
   
   ## Response
   
@@ -53,10 +68,12 @@ docs {
   {
     "success": true,
     "data": [ ... ],
-    "meta":  "pagination": {
-      "page": 1,
-      "limit": 25,
-      "totalPages": 2
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 2
+      }
     }
   }
   ```

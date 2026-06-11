@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/volunteer/all/feedback?page=&limit=
+  url: {{baseUrl}}/api/v1/volunteer/all/feedback?page=&limit=&search=
   body: none
   auth: inherit
 }
@@ -13,6 +13,7 @@ get {
 params:query {
   page: 
   limit: 
+  search: 
 }
 
 vars:pre-request {
@@ -27,17 +28,31 @@ settings {
 docs {
   # List Volunteer Feedback Submissions
   
-  Returns a paginated list of volunteer feedback submissions. Results can be paginated via `page` and `limit` query parameters.
+  Returns a paginated list of volunteer feedback submissions. Results can be paginated via `page` and `limit` query parameters. Supports full-text search via PostgreSQL GIN index.
   
   ## Authorization
   No authentication is required for this endpoint.
   
   ## Query Parameters
   
-  | Parameter | Type   | Required | Default | Description                                      |
-  |-----------|--------|----------|---------|--------------------------------------------------|
-  | page      | number | No       | `1`     | Page number (1-indexed, integer ≥ 1)             |
-  | limit     | number | No       | `25`    | Items per page (integer, 1–100)                  |
+  | Parameter | Type   | Required | Default | Description                                                                                             |
+  |-----------|--------|----------|---------|---------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`     | Page number (1-indexed, integer ≥ 1)                                                                    |
+  | limit     | number | No       | `25`    | Items per page (integer, 1–100)                                                                         |
+  | search    | string | No       | —       | Full-text search query. When provided, cache is bypassed and results are matched against the GIN index. |
+  
+  ### Searchable Fields
+  
+  | Field                  | Weight |
+  |------------------------|--------|
+  | `firstName`            | A      |
+  | `surname`              | A      |
+  | `programVolunteered`   | A      |
+  | `volunteerDuration`    | A      |
+  | `wouldRecommend`       | D      |
+  | `waysProgramHelped`    | C      |
+  | `activitiesInvolvedIn` | C      |
+  | `skillsGained`         | C      |
   
   ## Response
   
@@ -47,10 +62,12 @@ docs {
   {
     "success": true,
     "data": [ ... ],
-    "meta": "pagination": {
-      "page": 1,
-      "limit": 25,
-      "totalPages": 2
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 2
+      }
     }
   }
   ```

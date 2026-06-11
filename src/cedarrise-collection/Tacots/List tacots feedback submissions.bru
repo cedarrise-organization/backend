@@ -29,17 +29,30 @@ settings {
 docs {
   # List TACOTS Feedback Submissions
   
-  Returns a paginated list of TACOTS scholarship programme feedback submissions. Results can be paginated via `page` and `limit` query parameters.
+  Returns a paginated list of TACOTS scholarship programme feedback submissions. Supports full-text search via PostgreSQL GIN index.
   
   ## Authorization
   Requires `read` permission.
   
   ## Query Parameters
   
-  | Parameter | Type   | Required | Default | Description                                      |
-  |-----------|--------|----------|---------|--------------------------------------------------|
-  | page      | number | No       | `1`     | Page number (integer ≥ 1)                        |
-  | limit     | number | No       | `25`    | Items per page (integer, 1–100)                  |
+  | Parameter | Type   | Required | Default | Description                                                                                             |
+  |-----------|--------|----------|---------|---------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`     | Page number (integer ≥ 1)                                                                               |
+  | limit     | number | No       | `25`    | Items per page (integer, 1–100)                                                                         |
+  | search    | string | No       | —       | Full-text search query. When provided, cache is bypassed and results are matched against the GIN index. |
+  
+  ### Searchable Fields
+  
+  | Field                | Weight |
+  |----------------------|--------|
+  | `studentFirstName`   | A      |
+  | `studentSurname`     | A      |
+  | `currentSchool`      | A      |
+  | `currentClass`       | B      |
+  | `parentPhone`        | B      |
+  | `mostHelpfulSupport` | D      |
+  | `currentChallenges`  | D      |
   
   ## Response
   
