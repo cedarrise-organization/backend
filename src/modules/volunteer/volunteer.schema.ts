@@ -146,7 +146,6 @@ export const volunteerRegistrationQuerySchema = z.object({
           "emailAddress",
           "phoneNumber",
           "state",
-          "registrationDate",
           "volunteerAreas",
           "createdAt",
         ])

@@ -27,8 +27,6 @@ import db from "../db/db.js";
 const sortMap = {
   firstName: tacotsRecommendation.firstName,
   surname: tacotsRecommendation.surname,
-  stateOfOrigin: tacotsRecommendation.stateOfOrigin,
-  lga: tacotsRecommendation.lga,
   gender: tacotsRecommendation.gender,
   schoolName: tacotsRecommendation.schoolName,
   lastClass: tacotsRecommendation.lastClass,
@@ -39,7 +37,6 @@ const trackingSortMap = {
   academicSession: tacotsTracking.academicSession,
   academicTerm: tacotsTracking.academicTerm,
   assessmentPeriod: tacotsTracking.assessmentPeriod,
-  mentorName: tacotsTracking.mentorName,
   createdAt: tacotsTracking.createdAt,
 } as const;
 const onboardingSortMap = {
@@ -48,8 +45,6 @@ const onboardingSortMap = {
   enrolledSchoolName: tacotsOnboarding.enrolledSchoolName,
   enrolledSchoolState: tacotsOnboarding.enrolledSchoolState,
   enrolledClass: tacotsOnboarding.enrolledClass,
-  mentorName: tacotsOnboarding.mentorName,
-  sponsorName: tacotsOnboarding.sponsorName,
   createdAt: tacotsOnboarding.createdAt,
 } as const;
 const exitSortMap = {
@@ -894,7 +889,9 @@ export const listTacotsTracking = async (
       setweight(to_tsvector('english', ${tacotsTracking.studentId}), 'A') ||
       setweight(to_tsvector('english', ${tacotsTracking.schoolId}), 'A') ||
       setweight(to_tsvector('english', ${tacotsTracking.academicTerm}), 'A') ||
-      setweight(to_tsvector('english', ${tacotsTracking.assessmentPeriod}), 'A')
+      setweight(to_tsvector('english', ${tacotsTracking.assessmentPeriod}), 'A') ||
+      setweight(to_tsvector('english', ${tacotsTracking.region}), 'B') ||
+      setweight(to_tsvector('english', ${tacotsTracking.mentorName}), 'B') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -1092,7 +1089,9 @@ export const listTacotsExit = async (
     const searchVector = sql`
       setweight(to_tsvector('english', ${tacotsExit.studentId}), 'A') ||
       setweight(to_tsvector('english', ${tacotsExit.schoolAttendedDuringProgram}), 'A') ||
-      setweight(to_tsvector('english', ${tacotsExit.exitReason}), 'C')
+      setweight(to_tsvector('english', ${tacotsExit.exitReason}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsExit.currentStatus}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsExit.completedBy}), 'C') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 

@@ -76,6 +76,7 @@ export const ashStudent = p.pgTable(
     index("ash_student_name_idx").on(table.firstName, table.surname),
     index("ash_student_status_idx").on(table.status),
     index("ash_student_school_state_idx").on(table.schoolState),
+    index("ash_student_gender_idx").on(table.gender),
     index("ash_student_current_class_idx").on(table.currentClass),
     index("ash_student_assigned_mentor_idx").on(table.assignedMentor),
     index("ash_student_created_at_idx").on(table.createdAt),
@@ -284,7 +285,6 @@ export const ashExit = p.pgTable(
     index("ash_exit_student_idx").on(table.studentId),
     index("ash_exit_school_idx").on(table.schoolName),
     index("ash_exit_class_idx").on(table.classAtExit),
-    index("ash_exit_reason_idx").on(table.exitReason),
     index("ash_exit_date_idx").on(table.exitDate),
     index("ash_exit_created_at_idx").on(table.createdAt),
     index("ash_exit_search_index").using(
@@ -772,6 +772,7 @@ export const volunteerRegistration = p.pgTable(
     index("volunteer_registration_state_idx").on(table.state),
     index("volunteer_registration_status_idx").on(table.status),
     index("volunteer_registration_created_at_idx").on(table.createdAt),
+    index("volunteer_areas_idx").using("gin", table.volunteerAreas),
     index("volunteer_registration_search_index").using(
       "gin",
       sql`(
@@ -882,14 +883,8 @@ export const tacotsRecommendation = p.pgTable(
   (table) => [
     index("tacots_recommendation_name_idx").on(table.firstName, table.surname),
     index("tacots_recommendation_gender_idx").on(table.gender),
-    index("tacots_recommendation_state_idx").on(table.stateOfOrigin),
-    index("tacots_recommendation_lga_idx").on(table.lga),
     index("tacots_recommendation_school_idx").on(table.schoolName),
     index("tacots_recommendation_last_class_idx").on(table.lastClass),
-    index("tacots_recommendation_recommender_idx").on(
-      table.recommenderFirstName,
-      table.recommenderLastName,
-    ),
     index("tacots_recommendation_admin_status_idx").on(table.adminStatus),
     index("tacots_recommendation_created_at_idx").on(table.createdAt),
     index("tacots_recommendation_search_index").using(
@@ -992,8 +987,6 @@ export const tacotsOnboarding = p.pgTable(
     index("tacots_onboarding_school_idx").on(table.enrolledSchoolName),
     index("tacots_onboarding_school_state_idx").on(table.enrolledSchoolState),
     index("tacots_onboarding_class_idx").on(table.enrolledClass),
-    index("tacots_onboarding_mentor_idx").on(table.mentorName),
-    index("tacots_onboarding_sponsor_idx").on(table.sponsorName),
     index("tacots_onboarding_created_at_idx").on(table.createdAt),
     index("tacots_onboarding_search_index").using(
       "gin",
@@ -1120,11 +1113,9 @@ export const tacotsTracking = p.pgTable(
   (table) => [
     index("tacots_tracking_student_idx").on(table.studentId),
     index("tacots_tracking_school_idx").on(table.schoolId),
-    index("tacots_tracking_region_idx").on(table.region),
     index("tacots_tracking_session_term_idx").on(table.academicSession, table.academicTerm),
     index("tacots_tracking_assessment_period_idx").on(table.assessmentPeriod),
     index("tacots_tracking_submission_date_idx").on(table.submissionDate),
-    index("tacots_tracking_mentor_idx").on(table.mentorName),
     index("tacots_tracking_mentorship_date_idx").on(table.mentorshipSessionDate),
     index("tacots_tracking_service_date_idx").on(table.serviceDate),
     index("tacots_tracking_created_at_idx").on(table.createdAt),
@@ -1134,7 +1125,9 @@ export const tacotsTracking = p.pgTable(
         setweight(to_tsvector('english', ${table.studentId}), 'A') ||
         setweight(to_tsvector('english', ${table.schoolId}), 'A') ||
         setweight(to_tsvector('english', ${table.academicTerm}), 'A') ||
-        setweight(to_tsvector('english', ${table.assessmentPeriod}), 'A') 
+        setweight(to_tsvector('english', ${table.assessmentPeriod}), 'A') ||
+        setweight(to_tsvector('english', ${table.region}), 'B') ||
+        setweight(to_tsvector('english', ${table.mentorName}), 'B') 
       )`,
     ),
     check(
@@ -1197,8 +1190,6 @@ export const tacotsExit = p.pgTable(
     index("tacots_exit_school_idx").on(table.schoolAttendedDuringProgram),
     index("tacots_exit_year_idx").on(table.yearOfExit),
     index("tacots_exit_reason_idx").on(table.exitReason),
-    index("tacots_exit_current_status_idx").on(table.currentStatus),
-    index("tacots_exit_completed_by_idx").on(table.completedBy),
     index("tacots_exit_submission_date_idx").on(table.submissionDate),
     index("tacots_exit_created_at_idx").on(table.createdAt),
     index("tacots_exit_search_index").using(
@@ -1207,6 +1198,8 @@ export const tacotsExit = p.pgTable(
         setweight(to_tsvector('english', ${table.studentId}), 'A') ||
         setweight(to_tsvector('english', ${table.schoolAttendedDuringProgram}), 'A') ||
         setweight(to_tsvector('english', ${table.exitReason}), 'C') ||
+        setweight(to_tsvector('english', ${table.currentStatus}), 'C') ||
+        setweight(to_tsvector('english', ${table.completedBy}), 'C') 
       )`,
     ),
     check(

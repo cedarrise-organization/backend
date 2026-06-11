@@ -214,16 +214,7 @@ export const tacotsRecommendationQuerySchema = z.object({
     sortBy: z.preprocess(
       (v) => (v === "" ? undefined : v),
       z
-        .enum([
-          "firstName",
-          "surname",
-          "createdAt",
-          "stateOfOrigin",
-          "lga",
-          "schoolName",
-          "gender",
-          "lastClass",
-        ])
+        .enum(["firstName", "surname", "gender", "schoolName", "lastClass", "createdAt"])
         .default("createdAt"),
     ),
   }),
@@ -526,8 +517,6 @@ export const tacotsOnboardingQuerySchema = z.object({
           "enrolledSchoolName",
           "enrolledSchoolState",
           "enrolledClass",
-          "mentorName",
-          "sponsorName",
           "createdAt",
         ])
         .default("createdAt"),
@@ -628,8 +617,6 @@ export const tacotsTrackingQuerySchema = z.object({
           "academicSession",
           "academicTerm",
           "assessmentPeriod",
-          "submissionDate",
-          "mentorName",
           "createdAt",
         ])
         .default("createdAt"),
@@ -709,12 +696,7 @@ export const tacotsExitQuerySchema = z.object({
     sortBy: z.preprocess(
       (v) => (v === "" ? undefined : v),
       z
-        .enum([
-          "schoolAttendedDuringProgram",
-          "yearOfExit",
-          "exitReason",
-          "createdAt",
-        ])
+        .enum(["schoolAttendedDuringProgram", "yearOfExit", "exitReason", "createdAt"])
         .default("createdAt"),
     ),
   }),
