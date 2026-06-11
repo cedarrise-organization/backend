@@ -167,7 +167,7 @@ export const listRecommendations = async (
 
   const sortColumn = sortMap[sortBy] ?? tacotsRecommendation.createdAt;
   const [tacotsBeneficiaries, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(tacotsRecommendation)
       .orderBy(
@@ -181,7 +181,7 @@ export const listRecommendations = async (
       )
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(tacotsRecommendation.id) }).from(tacotsRecommendation),
+    db.select({ value: count(tacotsRecommendation.id) }).from(tacotsRecommendation),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -380,13 +380,13 @@ export const listTacotsFeedback = async (page: number, limit: number) => {
   ///
 
   const [feedback, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(tacotsFeedback)
       .orderBy(tacotsFeedback.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(tacotsFeedback.id) }).from(tacotsFeedback),
+    db.select({ value: count(tacotsFeedback.id) }).from(tacotsFeedback),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -551,13 +551,13 @@ export const listOnboarding = async (page: number, limit: number) => {
   ///
 
   const [onboarded, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(tacotsOnboarding)
       .orderBy(tacotsOnboarding.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
+    db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -748,13 +748,13 @@ export const listTacotsTracking = async (page: number, limit: number) => {
   ///
 
   const [tracking, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(tacotsTracking)
       .orderBy(tacotsTracking.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(tacotsTracking.id) }).from(tacotsTracking),
+    db.select({ value: count(tacotsTracking.id) }).from(tacotsTracking),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -905,13 +905,13 @@ export const listTacotsExit = async (page: number, limit: number) => {
   ///
 
   const [exit, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(tacotsExit)
       .orderBy(tacotsExit.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(tacotsExit.id) }).from(tacotsExit),
+    db.select({ value: count(tacotsExit.id) }).from(tacotsExit),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
   /// cache set

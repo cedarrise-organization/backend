@@ -82,47 +82,45 @@ export const getCards = async () => {
     [tacotsGraduated],
   ] = await Promise.all([
     // volunteersApplied
-    await db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration), // Count ids because it has an index
+    db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration), // Count ids because it has an index
     // volunteersAccepted
-    await db
+    db
       .select({ value: count(volunteerRegistration.id) })
       .from(volunteerRegistration)
       .where(eq(volunteerRegistration.status, "accepted")), // Count ids because it has an index
     // capacityParticipantsImpacted
-    await db
+    db
       .select({ value: sum(capacityBuildingEvaluation.numberOfParticipants) })
       .from(capacityBuildingEvaluation),
     // capacityOrganizationsPartneredWith
-    await db
+    db
       .select({
         value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
       })
       .from(capacityBuildingEvaluation), // transform values to lowercase to avoid counting similar records twice
     // capacityVolunteersEngaged
-    await db
+    db
       .select({ value: max(capacityBuildingEvaluation.numberOfVolunteers) })
       .from(capacityBuildingEvaluation),
     // capacityWorkshopsConducted
-    await db
-      .select({ value: count(capacityBuildingEvaluation.id) })
-      .from(capacityBuildingEvaluation), // Count ids because it has an index
+    db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation), // Count ids because it has an index
     // outreachesCommunitiesEngaged
-    await db
+    db
       .select({ value: countDistinct(sql`lower(trim(${outreachTracker.outreachCommunity}))`) })
       .from(outreachTracker), // count distinct outreach communities, transform values to lowercase to avoid counting similar records twice
     // outreachesBeneficiariesReached
-    await db.select({ value: sum(outreachTracker.numBeneficiaries) }).from(outreachTracker),
+    db.select({ value: sum(outreachTracker.numBeneficiaries) }).from(outreachTracker),
     // outreachesVolunteers
-    await db.select({ value: max(outreachTracker.numVolunteers) }).from(outreachTracker),
+    db.select({ value: max(outreachTracker.numVolunteers) }).from(outreachTracker),
     // outreachesOutreachEvents
-    await db.select({ value: count(outreachTracker.id) }).from(outreachTracker), // Count ids because it has an index
+    db.select({ value: count(outreachTracker.id) }).from(outreachTracker), // Count ids because it has an index
     //  ashStudentsEnrolled
-    await db
+    db
       .select({ value: count(ashStudent.id) })
       .from(ashStudent)
       .where(eq(ashStudent.status, "accepted")), // Count ids because it has an index
     // ashVolunteers
-    await db
+    db
       .select({ value: count(volunteerRegistration.id) })
       .from(volunteerRegistration)
       .where(
@@ -132,12 +130,12 @@ export const getCards = async () => {
         ),
       ),
     // ashCommunitiesEngaged
-    await db
+    db
       .select({ value: countDistinct(sql`lower(trim(${ashStudent.schoolLga}))`) })
       .from(ashStudent)
       .where(eq(ashStudent.status, "accepted")),
     // ashImprovedGrades
-    await db
+    db
       .select({ value: countDistinct(ashTermlyTracking.studentId) })
       .from(ashTermlyTracking)
       .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
@@ -148,46 +146,46 @@ export const getCards = async () => {
         ),
       ),
     // ashCurrentBeneficiaries
-    await db
+    db
       .select({ value: countDistinct(ashStudent.id) })
       .from(ashStudent)
       .leftJoin(ashExit, eq(ashExit.studentId, ashStudent.id))
       .where(and(eq(ashStudent.status, "accepted"), isNull(ashExit.studentId))),
     // ashGraduated
-    await db
+    db
       .select({ value: countDistinct(ashExit.studentId) })
       .from(ashExit)
       .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"])),
     // ashDropOuts
-    await db
+    db
       .select({ value: countDistinct(ashExit.studentId) })
       .from(ashExit)
       .where(eq(ashExit.exitReason, "DROPPED OUT")),
     // tacotsEnrolled
-    await db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
+    db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
     // tacotsCurrentlyInSchools
-    await db
+    db
       .select({ value: countDistinct(tacotsOnboarding.id) })
       .from(tacotsOnboarding)
       .leftJoin(tacotsExit, eq(tacotsExit.studentId, tacotsOnboarding.id))
       .where(isNull(tacotsExit.studentId)),
     // tacotsPartnerSchools
-    await db
+    db
       .select({
         value: countDistinct(sql`lower(trim(${tacotsOnboarding.enrolledSchoolName}))`),
       })
       .from(tacotsOnboarding),
     // tacotsBenefactors
-    await db
+    db
       .select({ value: count(tacotsRecommendation.id) })
       .from(tacotsRecommendation)
       .where(eq(tacotsRecommendation.adminStatus, "SELECTED")),
     // tacotsSponsors
-    await db
+    db
       .select({ value: countDistinct(sql`lower(trim(${tacotsOnboarding.sponsorName}))`) })
       .from(tacotsOnboarding),
     // tacotsGraduated
-    await db
+    db
       .select({ value: countDistinct(tacotsExit.studentId) })
       .from(tacotsExit)
       .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"])),
@@ -297,7 +295,7 @@ export const getStudentPerformance = async () => {
 
   const [ashGraduated, ashDropOuts, attendance, testScores, dropouts, [risk]] = await Promise.all([
     // ashGraduated
-    await db
+    db
       .select({
         value: countDistinct(ashExit.studentId),
         academicYear,
@@ -306,7 +304,7 @@ export const getStudentPerformance = async () => {
       .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"]))
       .groupBy(academicYear),
     // ashDropOuts
-    await db
+    db
       .select({
         value: countDistinct(ashExit.studentId),
         academicYear,
@@ -315,7 +313,7 @@ export const getStudentPerformance = async () => {
       .where(eq(ashExit.exitReason, "DROPPED OUT"))
       .groupBy(academicYear),
     // attendance
-    await db
+    db
       .select({
         value: sql<number>`COALESCE(SUM(cardinality(${ashWeeklyAttendance.studentsInAttendance})), 0)`,
         month: sql<string>`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`,
@@ -324,7 +322,7 @@ export const getStudentPerformance = async () => {
       .where(sql`EXTRACT(YEAR FROM ${ashWeeklyAttendance.sessionDate}) = ${currentYear}`)
       .groupBy(sql`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`),
     // testScores
-    await db
+    db
       .select({
         term: normalizedTerm,
         pretestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.pretestAverage}), 0)`,
@@ -335,7 +333,7 @@ export const getStudentPerformance = async () => {
       .where(sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`)
       .groupBy(normalizedTerm),
     // dropouts
-    await db
+    db
       .select({
         value: countDistinct(ashExit.studentId),
         month: sql<string>`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`,
@@ -349,7 +347,7 @@ export const getStudentPerformance = async () => {
       )
       .groupBy(sql`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`),
     // risk
-    await db
+    db
       .select({
         lowRisk: sql<number>`
         COUNT(DISTINCT ${ashTermlyTracking.studentId})
@@ -525,7 +523,7 @@ export const getEnrollment = async () => {
     ashStateCounts,
   ] = await Promise.all([
     // ashApplications
-    await db
+    db
       .select({
         value: count(ashStudent.id),
         month: sql<string>`TO_CHAR(${ashStudent.createdAt}, 'YYYY-MM')`,
@@ -534,7 +532,7 @@ export const getEnrollment = async () => {
       .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`)
       .groupBy(sql`TO_CHAR(${ashStudent.createdAt}, 'YYYY-MM')`),
     // tacotsApplications
-    await db
+    db
       .select({
         value: count(tacotsRecommendation.id),
         month: sql<string>`TO_CHAR(${tacotsRecommendation.createdAt}, 'YYYY-MM')`,
@@ -544,7 +542,7 @@ export const getEnrollment = async () => {
       .groupBy(sql`TO_CHAR(${tacotsRecommendation.createdAt}, 'YYYY-MM')`),
     // ashGenderCounts
     // if query is based on accepted students: .where(and(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`, eq(ashStudent.status, "accepted")))
-    await db
+    db
       .select({
         gender: normalizedAshGender,
         value: count(ashStudent.id),
@@ -554,7 +552,7 @@ export const getEnrollment = async () => {
       .groupBy(normalizedAshGender),
     // tacotsGenderCounts
     // if query is based on accepted students: .where(and(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`, eq(tacotsRecommendation.adminStatus, "SELECTED")))
-    await db
+    db
       .select({
         gender: normalizedTacotsGender,
         value: count(tacotsRecommendation.id),
@@ -563,7 +561,7 @@ export const getEnrollment = async () => {
       .where(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`)
       .groupBy(normalizedTacotsGender),
     // ashClassCounts
-    await db
+    db
       .select({
         currentClass: normalizedAshClass,
         value: count(ashStudent.id),
@@ -577,7 +575,7 @@ export const getEnrollment = async () => {
       )
       .groupBy(normalizedAshClass),
     // ashAcceptance
-    await db
+    db
       .select({
         total: count(ashStudent.id),
         accepted: sql<number>`
@@ -590,7 +588,7 @@ export const getEnrollment = async () => {
       .from(ashStudent)
       .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`),
     // tacotsAcceptance
-    await db
+    db
       .select({
         total: count(tacotsRecommendation.id),
         accepted: sql<number>`
@@ -603,7 +601,7 @@ export const getEnrollment = async () => {
       .from(tacotsRecommendation)
       .where(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`),
     // volunteerAcceptance
-    await db
+    db
       .select({
         total: count(volunteerRegistration.id),
         accepted: sql<number>`
@@ -616,7 +614,7 @@ export const getEnrollment = async () => {
       .from(volunteerRegistration)
       .where(sql`EXTRACT(YEAR FROM ${volunteerRegistration.createdAt}) = ${currentYear}`),
     // ashStateCounts
-    await db
+    db
       .select({
         state: normalizedAshSchoolState,
         value: count(ashStudent.id),
@@ -842,7 +840,7 @@ export const getInstEffectiveness = async () => {
     currentMonth >= 9
       ? `${currentYear}/${String(currentYear + 1).slice(2)}`
       : `${currentYear - 1}/${String(currentYear).slice(2)}`;
-      console.log(currentAcademicSession)
+  console.log(currentAcademicSession);
   const mentorshipHours = sql<number>`
     CASE ${tacotsTracking.mentorshipDuration}
       WHEN '15 MINUTES' THEN 0.25
@@ -863,7 +861,7 @@ export const getInstEffectiveness = async () => {
     studentBenchmark,
   ] = await Promise.all([
     // communityServiceHours
-    await db
+    db
       .select({
         academicSession: tacotsTracking.academicSession,
         totalHours: sql<number>`
@@ -879,7 +877,7 @@ export const getInstEffectiveness = async () => {
       .from(tacotsTracking)
       .groupBy(tacotsTracking.academicSession),
     // mentorshipData
-    await db
+    db
       .select({
         academicTerm: tacotsTracking.academicTerm,
         assessmentPeriod: tacotsTracking.assessmentPeriod,
@@ -889,7 +887,7 @@ export const getInstEffectiveness = async () => {
       .where(eq(tacotsTracking.academicSession, currentAcademicSession))
       .groupBy(tacotsTracking.academicTerm, tacotsTracking.assessmentPeriod),
     // spendPerStudent
-    await db
+    db
       .select({
         avgTuition: sql<number>`
         COALESCE(
@@ -919,7 +917,7 @@ export const getInstEffectiveness = async () => {
       .from(tacotsTracking)
       .where(eq(tacotsTracking.academicSession, currentAcademicSession)),
     // totalAccHours
-    await db
+    db
       .select({
         academicSession: tacotsTracking.academicSession,
         value: sql<number>`
@@ -929,7 +927,7 @@ export const getInstEffectiveness = async () => {
       .from(tacotsTracking)
       .groupBy(tacotsTracking.academicSession),
     // studentBenchmark
-    await db
+    db
       .select({
         term: normalizedAshTerm,
         value: countDistinct(ashTermlyTracking.studentId),

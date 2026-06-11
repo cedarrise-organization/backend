@@ -89,15 +89,13 @@ export const listAllEvaluation = async (page: number, limit: number) => {
   }
   ///
   const [evaluation, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(capacityBuildingEvaluation)
       .orderBy(asc(capacityBuildingEvaluation.createdAt))
       .limit(limit)
       .offset((page - 1) * limit),
-    await db
-      .select({ value: count(capacityBuildingEvaluation.id) })
-      .from(capacityBuildingEvaluation),
+    db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 

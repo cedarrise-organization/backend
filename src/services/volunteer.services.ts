@@ -92,7 +92,7 @@ export const listVolunteers = async (
 
   const sortColumn = sortMap[sortBy] ?? volunteerRegistration.createdAt;
   const [volunteers, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(volunteerRegistration)
       .orderBy(
@@ -106,7 +106,7 @@ export const listVolunteers = async (
       )
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration),
+    db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -271,13 +271,13 @@ export const listVolunteerFeedback = async (page: number, limit: number) => {
   ///
 
   const [feedback, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(volunteerFeedback)
       .orderBy(volunteerFeedback.createdAt)
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(volunteerFeedback.id) }).from(volunteerFeedback),
+    db.select({ value: count(volunteerFeedback.id) }).from(volunteerFeedback),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
@@ -293,7 +293,7 @@ export const listVolunteerFeedback = async (page: number, limit: number) => {
       pagination: {
         page,
         limit,
-        totalPages, 
+        totalPages,
       },
     },
   };

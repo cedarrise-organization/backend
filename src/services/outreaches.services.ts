@@ -66,13 +66,13 @@ export const listOutreaches = async (page: number, limit: number) => {
   ///
 
   const [outreaches, [totalDocuments]] = await Promise.all([
-    await db
+    db
       .select()
       .from(outreachTracker)
       .orderBy(asc(outreachTracker.createdAt))
       .limit(limit)
       .offset((page - 1) * limit),
-    await db.select({ value: count(outreachTracker.id) }).from(outreachTracker),
+    db.select({ value: count(outreachTracker.id) }).from(outreachTracker),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
