@@ -70,10 +70,10 @@ export const listAllOutreachController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
 
   try {
-    const response = await listOutreaches(page, limit);
+    const response = await listOutreaches(page, limit, search);
     return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);

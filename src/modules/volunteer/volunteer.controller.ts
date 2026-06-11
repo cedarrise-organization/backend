@@ -81,9 +81,9 @@ export const submitVolunteerRegistrationController = async (
   }
 };
 export const listVolunteersController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit, status, sortBy } = req.qtransformed;
+  const { page, limit, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listVolunteers(page, limit, status, sortBy);
+    const response = await listVolunteers(page, limit, search, status, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -239,9 +239,9 @@ export const listVolunteerFeedbackController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listVolunteerFeedback(page, limit);
+    const response = await listVolunteerFeedback(page, limit, search);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);

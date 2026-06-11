@@ -1,10 +1,7 @@
 import { CapacitybuildingevaluationbodyType } from "../modules/capacity/capacity.schema.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { capacityBuildingEvaluation } from "../db/models/admin.js";
-import { uploadToCloudinary } from "../utils/storage.util.js";
-import { UploadApiResponse } from "cloudinary";
 import { sql, eq, asc, count } from "drizzle-orm";
-import { Request } from "express";
 import db from "../db/db.js";
 
 export const createEvaluation = async (options: CapacitybuildingevaluationbodyType) => {
@@ -69,7 +66,46 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
   };
 };
 
-export const listAllEvaluation = async (page: number, limit: number) => {
+export const listAllEvaluation = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${capacityBuildingEvaluation.programName}), 'A') ||
+      setweight(to_tsvector('english', ${capacityBuildingEvaluation.programType}), 'A') ||
+      setweight(to_tsvector('english', ${capacityBuildingEvaluation.location}), 'A') ||
+      setweight(to_tsvector('english', ${capacityBuildingEvaluation.programCoordinator}), 'A')
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [evaluation, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(capacityBuildingEvaluation)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(capacityBuildingEvaluation.id) })
+        .from(capacityBuildingEvaluation)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "All evaluation found successfully",
+      data: evaluation,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:capacity:evaluation:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);

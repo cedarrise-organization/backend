@@ -1,15 +1,7 @@
 import { OutreachtrackerbodyType } from "../modules/outreaches/outreaches.schema.js";
 import { cacheGet, cacheDel, cacheSet, CACHE_TTL } from "../lib/cache.js";
-import {
-  uploadToCloudinary,
-  searchCloudinary,
-  deleteFromCloudinary,
-} from "../utils/storage.util.js";
 import { outreachTracker } from "../db/models/admin.js";
 import { sql, asc, eq, count } from "drizzle-orm";
-import { UploadApiResponse } from "cloudinary";
-import { Request } from "express";
-import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
 
 export const createOutreach = async (options: OutreachtrackerbodyType) => {
@@ -44,8 +36,48 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
     data: outreach,
   };
 };
+export const listOutreaches = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${outreachTracker.submittedBy}), 'A') ||
+      setweight(to_tsvector('english', ${outreachTracker.outreachType}), 'A') ||
+      setweight(to_tsvector('english', ${outreachTracker.outreachState}), 'A') ||
+      setweight(to_tsvector('english', ${outreachTracker.outreachCommunity}), 'A') ||
+      setweight(to_tsvector('english', ${outreachTracker.outreachCity}), 'B') ||
+      setweight(to_tsvector('english', ${outreachTracker.outreachLga}), 'B') 
+  `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-export const listOutreaches = async (page: number, limit: number) => {
+    const [outreaches, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(outreachTracker)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(outreachTracker.id) })
+        .from(outreachTracker)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Outreaches found successfully",
+      data: outreaches,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:outreaches:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -93,7 +125,6 @@ export const listOutreaches = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getOneOutreach = async (id: string) => {
   /// cache
   const key = `cedarrise:outreaches:outreach:${id}`;
@@ -119,7 +150,6 @@ export const getOneOutreach = async (id: string) => {
     data: outreach,
   };
 };
-
 export const deleteOutreach = async (id: string) => {
   const [search] = await db.select().from(outreachTracker).where(eq(outreachTracker.id, id));
 

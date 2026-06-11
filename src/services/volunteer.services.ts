@@ -64,13 +64,55 @@ export const submitVolunteerRegistration = async (options: Volunteerregistration
     data: newVolunteerSubmission,
   };
 };
-
 export const listVolunteers = async (
   page: number,
   limit: number,
+  search: string,
   status: string,
   sortBy: keyof typeof sortMap,
 ) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${volunteerRegistration.firstName}), 'A') ||
+      setweight(to_tsvector('english', ${volunteerRegistration.surname}), 'A') ||
+      setweight(to_tsvector('english', ${volunteerRegistration.emailAddress}), 'A') ||
+      setweight(to_tsvector('english', ${volunteerRegistration.phoneNumber}), 'B') ||
+      setweight(to_tsvector('english', ${volunteerRegistration.state}), 'B') ||
+      setweight(to_tsvector('english', ${volunteerRegistration.volunteerAreas}), 'C') ||
+      setweight(to_tsvector('english', ${volunteerRegistration.skillsToContribute}), 'C') ||
+      setweight(to_tsvector('english', ${volunteerRegistration.ashExtracurricular}), 'C') 
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [volunteers, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(volunteerRegistration)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ value: count(volunteerRegistration.id) })
+        .from(volunteerRegistration)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Volunteers found successfully",
+      data: volunteers,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:volunteer:volunteers:${page}:${limit}:${status}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
@@ -127,7 +169,6 @@ export const listVolunteers = async (
     },
   };
 };
-
 export const getVolunteer = async (id: string) => {
   /// cache
   const key = `cedarrise:volunteer:voluntee:${id}`;
@@ -156,7 +197,6 @@ export const getVolunteer = async (id: string) => {
     data: volunteer,
   };
 };
-
 export const updateVolunteerStatus = async (id: string, status: string) => {
   // update
   const [updatedVolunteer] = await db
@@ -188,7 +228,6 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
     data: updatedVolunteer,
   };
 };
-
 export const deleteVolunteer = async (id: string) => {
   await db.delete(volunteerRegistration).where(eq(volunteerRegistration.id, id));
 
@@ -249,8 +288,49 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
     data: newVolunteerFeedback,
   };
 };
+export const listVolunteerFeedback = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${volunteerFeedback.firstName}), 'A') ||
+      setweight(to_tsvector('english', ${volunteerFeedback.surname}), 'A') ||
+      setweight(to_tsvector('english', ${volunteerFeedback.programVolunteered}), 'A') ||
+      setweight(to_tsvector('english', ${volunteerFeedback.volunteerDuration}), 'A') ||
+      setweight(to_tsvector('english', ${volunteerFeedback.wouldRecommend}), 'D') ||
+      setweight(to_tsvector('english', ${volunteerFeedback.waysProgramHelped}), 'C') ||
+      setweight(to_tsvector('english', ${volunteerFeedback.activitiesInvolvedIn}), 'C') ||
+      setweight(to_tsvector('english', ${volunteerFeedback.skillsGained}), 'C') 
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-export const listVolunteerFeedback = async (page: number, limit: number) => {
+    const [feedback, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(volunteerFeedback)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ value: count(volunteerFeedback.id) })
+        .from(volunteerFeedback)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Volunteer feedback successfully",
+      data: feedback,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:volunteer:feedback:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -298,7 +378,6 @@ export const listVolunteerFeedback = async (page: number, limit: number) => {
     },
   };
 };
-
 export const getVolunteerFeedback = async (id: string) => {
   /// cache
   const key = `cedarrise:volunteer:feedback:${id}`;
@@ -324,7 +403,6 @@ export const getVolunteerFeedback = async (id: string) => {
     data: feedback,
   };
 };
-
 export const deleteVolunteerFeedback = async (id: string) => {
   await db.delete(volunteerFeedback).where(eq(volunteerFeedback.id, id));
 

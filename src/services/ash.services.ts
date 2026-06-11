@@ -141,6 +141,7 @@ export const listRegistrations = async (
     setweight(to_tsvector('english', ${ashStudent.schoolName}), 'B') ||
     setweight(to_tsvector('english', ${ashStudent.schoolState}), 'C') ||
     setweight(to_tsvector('english', ${ashStudent.schoolTown}), 'C') ||
+    setweight(to_tsvector('english', ${ashStudent.learningConditions}), 'C') ||
     setweight(to_tsvector('english', ${ashStudent.schoolLga}), 'C')
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;

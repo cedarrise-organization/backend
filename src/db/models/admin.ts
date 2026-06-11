@@ -79,7 +79,6 @@ export const ashStudent = p.pgTable(
     index("ash_student_current_class_idx").on(table.currentClass),
     index("ash_student_assigned_mentor_idx").on(table.assignedMentor),
     index("ash_student_created_at_idx").on(table.createdAt),
-    index("ash_student_learning_conditions_idx").using("gin", table.learningConditions),
     index("ash_student_search_index").using(
       "gin",
       sql`(
@@ -91,6 +90,7 @@ export const ashStudent = p.pgTable(
         setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
         setweight(to_tsvector('english', ${table.schoolState}), 'C') ||
         setweight(to_tsvector('english', ${table.schoolTown}), 'C') ||
+        setweight(to_tsvector('english', ${table.learningConditions}), 'C') ||
         setweight(to_tsvector('english', ${table.schoolLga}), 'C')
       )`,
     ),
@@ -413,6 +413,15 @@ export const capacityBuildingEvaluation = p.pgTable(
     index("capacity_coordinator_idx").on(table.programCoordinator),
     index("capacity_date_submitted_idx").on(table.dateSubmitted),
     index("capacity_created_at_idx").on(table.createdAt),
+    index("capacity_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.programName}), 'A') ||
+        setweight(to_tsvector('english', ${table.programType}), 'A') ||
+        setweight(to_tsvector('english', ${table.location}), 'A') ||
+        setweight(to_tsvector('english', ${table.programCoordinator}), 'A')
+      )`,
+    ),
     check(
       "capacity_venue_suitability_check",
       sql`${table.venueSuitability} >= 1 AND ${table.venueSuitability} <= 5`,
@@ -615,9 +624,19 @@ export const volunteerFeedback = p.pgTable(
     index("volunteer_feedback_would_recommend_idx").on(table.wouldRecommend),
     index("volunteer_feedback_submission_date_idx").on(table.submissionDate),
     index("volunteer_feedback_created_at_idx").on(table.createdAt),
-    index("volunteer_feedback_ways_helped_idx").using("gin", table.waysProgramHelped),
-    index("volunteer_feedback_activities_idx").using("gin", table.activitiesInvolvedIn),
-    index("volunteer_feedback_skills_gained_idx").using("gin", table.skillsGained),
+    index("volunteer_feedback_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.firstName}), 'A') ||
+        setweight(to_tsvector('english', ${table.surname}), 'A') ||
+        setweight(to_tsvector('english', ${table.programVolunteered}), 'A') ||
+        setweight(to_tsvector('english', ${table.volunteerDuration}), 'A') ||
+        setweight(to_tsvector('english', ${table.wouldRecommend}), 'D') ||
+        setweight(to_tsvector('english', ${table.waysProgramHelped}), 'C') ||
+        setweight(to_tsvector('english', ${table.activitiesInvolvedIn}), 'C') ||
+        setweight(to_tsvector('english', ${table.skillsGained}), 'C') 
+      )`,
+    ),
     check(
       "volunteer_feedback_overall_experience_check",
       sql`${table.overallExperienceRating} >= 1 AND ${table.overallExperienceRating} <= 5`,
@@ -677,7 +696,17 @@ export const outreachTracker = p.pgTable(
     index("outreach_tracker_submitted_by_idx").on(table.submittedBy),
     index("outreach_tracker_submission_date_idx").on(table.submissionDate),
     index("outreach_tracker_created_at_idx").on(table.createdAt),
-    index("outreach_tracker_type_idx").using("gin", table.outreachType),
+    index("outreach_tracker_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.submittedBy}), 'A') ||
+        setweight(to_tsvector('english', ${table.outreachType}), 'A') ||
+        setweight(to_tsvector('english', ${table.outreachState}), 'A') ||
+        setweight(to_tsvector('english', ${table.outreachCommunity}), 'A') ||
+        setweight(to_tsvector('english', ${table.outreachCity}), 'B') ||
+        setweight(to_tsvector('english', ${table.outreachLga}), 'B') 
+      )`,
+    ),
     check("outreach_num_volunteers_check", sql`${table.numVolunteers} >= 0`),
     check("outreach_num_beneficiaries_check", sql`${table.numBeneficiaries} >= 0`),
   ],
@@ -732,10 +761,19 @@ export const volunteerRegistration = p.pgTable(
     index("volunteer_registration_state_idx").on(table.state),
     index("volunteer_registration_status_idx").on(table.status),
     index("volunteer_registration_created_at_idx").on(table.createdAt),
-    index("volunteer_registration_areas_idx").using("gin", table.volunteerAreas),
-    index("volunteer_registration_skills_idx").using("gin", table.skillsToContribute),
-    index("volunteer_registration_availability_idx").using("gin", table.availability),
-    index("volunteer_registration_ash_extracurricular_idx").using("gin", table.ashExtracurricular),
+    index("volunteer_registration_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.firstName}), 'A') ||
+        setweight(to_tsvector('english', ${table.surname}), 'A') ||
+        setweight(to_tsvector('english', ${table.emailAddress}), 'A') ||
+        setweight(to_tsvector('english', ${table.phoneNumber}), 'B') ||
+        setweight(to_tsvector('english', ${table.state}), 'B') ||
+        setweight(to_tsvector('english', ${table.volunteerAreas}), 'C') ||
+        setweight(to_tsvector('english', ${table.skillsToContribute}), 'C') ||
+        setweight(to_tsvector('english', ${table.ashExtracurricular}), 'C') 
+      )`,
+    ),
     check("volunteer_registration_age_check", sql`${table.age} >= 16`),
   ],
 );
