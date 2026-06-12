@@ -11,7 +11,7 @@ delete {
 }
 
 params:path {
-  userId: ef2c74d5-128c-4728-abe2-d4a0f99f56c0
+  userId: 5385ec35-3e6a-418d-980c-5ea0ba1a2950
 }
 
 vars:pre-request {
@@ -24,21 +24,33 @@ settings {
 }
 
 docs {
-  # Delete one user
+  # Delete User
   
-  Deletes a user.
+  Permanently deletes a user and all associated data (roles, refresh tokens) via cascading deletes.
   
   ## Authorization
   Requires `delete` permission.
   
   ## Path Parameters
-  | Parameter | Type   | Required | Description                        |
-  |-----------|--------|----------|------------------------------------|
-  | userId    | string | Yes      | UUID of the user to delete|
+  | Parameter | Type   | Required | Description                |
+  |-----------|--------|----------|----------------------------|
+  | userId    | string | Yes      | UUID of the user to delete |
   
   ## Validation
   - `userId` must be a valid UUID.
   
   ## Response
-  Returns a success message
+  
+  **`200 OK`** — Returns a success message with no data payload.
+  
+  ```json
+  {
+    "success": true,
+    "message": "User deleted"
+  }
+  ```
+  
+  ## Errors
+  - `400 Bad Request` — Invalid `userId` format (must be a valid UUID).
+  - `500 Internal Server Error` — User could not be deleted.
 }

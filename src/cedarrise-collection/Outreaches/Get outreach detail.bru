@@ -38,7 +38,59 @@ docs {
   
   **`200 OK`** — Returns the complete outreach tracker record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": {
+      "id": "uuid",
+      "outreachStartDate": "YYYY-MM-DD",
+      "outreachEndDate": "YYYY-MM-DD",
+      "outreachState": "string",
+      "outreachLga": "string",
+      "outreachCity": "string",
+      "outreachCommunity": "string",
+      "numVolunteers": 10,
+      "numBeneficiaries": 50,
+      "outreachType": ["string"],
+      "activityDescription": "string",
+      "impactStories": "string" | null,
+      "challengesEncountered": "string" | null,
+      "recommendations": "string" | null,
+      "submittedBy": "string",
+      "submissionDate": "YYYY-MM-DD",
+      "updatedAt": "ISO 8601" | null,
+      "createdAt": "ISO 8601",
+      "deletedAt": "ISO 8601" | null
+    }
+  }
+  ```
+  
   The result is cached under the key `cedarrise:outreaches:outreach:<id>` using the `FORM_DATA` TTL.
+  
+  ### Response Fields (`data`)
+  
+  | Field                  | Type     | Description                                              |
+  |------------------------|----------|----------------------------------------------------------|
+  | id                     | string   | UUID primary key.                                        |
+  | outreachStartDate      | string   | Start date of the outreach (`YYYY-MM-DD`).               |
+  | outreachEndDate        | string   | End date of the outreach (`YYYY-MM-DD`).                 |
+  | outreachState          | string   | State where the outreach took place.                     |
+  | outreachLga            | string   | LGA where the outreach took place.                       |
+  | outreachCity           | string   | City where the outreach took place.                      |
+  | outreachCommunity      | string   | Community targeted by the outreach.                      |
+  | numVolunteers          | number   | Number of volunteers involved (≥ 0).                     |
+  | numBeneficiaries       | number   | Number of beneficiaries reached (≥ 0).                   |
+  | outreachType           | string[] | Types of outreach activities conducted.                  |
+  | activityDescription    | string   | Description of activities performed.                     |
+  | impactStories          | string   | Impact stories from the outreach (nullable).             |
+  | challengesEncountered  | string   | Challenges encountered during outreach (nullable).       |
+  | recommendations        | string   | Recommendations for future outreaches (nullable).        |
+  | submittedBy            | string   | Name of the person who submitted the record.             |
+  | submissionDate         | string   | Date of submission (`YYYY-MM-DD`).                       |
+  | updatedAt              | string   | ISO 8601 timestamp of last update (nullable).            |
+  | createdAt              | string   | ISO 8601 timestamp of record creation.                   |
+  | deletedAt              | string   | ISO 8601 soft-delete timestamp (nullable).               |
   
   ## Errors
   

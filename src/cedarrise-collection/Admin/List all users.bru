@@ -20,7 +20,30 @@ settings {
 }
 
 docs {
-  # List all users
+  # List All Users
   
-  List all users
+  Lists all registered users in the application. Returns only essential identification fields.
+  
+  ## Authorization
+  Requires `read` permission.
+  
+  ## Response
+  
+  **`200 OK`** — Returns an array of user objects.
+  
+  ```json
+  {
+    "success": true,
+    "message": "All users found successfully",
+    "data": [
+      {
+        "id": "uuid",
+        "name": "string",
+        "email": "string"
+      }
+    ]
+  }
+  ```
+  
+  > Note: Only `id`, `name`, and `email` are returned. Password, department, and timestamps are excluded from this endpoint.
 }

@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  baseUrl: https://backend-69mv.onrender.com
+  baseUrl: http://localhost:3000
 }
 
 settings {
@@ -22,11 +22,30 @@ settings {
 docs {
   # Get All Roles
   
-  Lists all available roles and their associated permissions.
+  Lists all available roles in the application.
   
   ## Authorization
   Requires `read` permission.
   
   ## Response
-  Returns an array of role objects, each containing the role name and its permissions.
+  
+  **`200 OK`** — Returns an array of role objects.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Cedarrise App roles found successfully",
+    "data": [
+      {
+        "id": "uuid",
+        "name": "volunteer | admin | superadmin",
+        "description": "string" | null,
+        "isDefault": true | false,
+        "updatedAt": "ISO 8601" | null,
+        "createdAt": "ISO 8601",
+        "deletedAt": "ISO 8601" | null
+      }
+    ]
+  }
+  ```
 }

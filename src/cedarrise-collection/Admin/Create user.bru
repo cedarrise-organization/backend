@@ -38,14 +38,34 @@ docs {
   ## Request Body (`form-urlencoded`)
   
   | Field        | Type   | Required | Constraints                                        |
-  |--------------|--------|----------|----------------------------------------------------|
+  |--------------|--------|----------|----------------------------------------------------
   | name         | string | Yes      | Minimum 3 characters. Stored as lowercase.         |
   | email        | string | Yes      | Must be a valid email. Stored as lowercase/trimmed. |
   | password     | string | Yes      | Minimum 8 characters.                              |
   | department   | string | Yes      | One of: `TACOTS`, `ASH`, `CAPACITY BUILDING`, `OUTREACHES` |
   
   ## Response
-  Returns the newly created user object.
+  
+  **`200 OK`** — Returns the newly created user object.
+  
+  ```json
+  {
+    "success": true,
+    "message": "User created successfully",
+    "data": {
+      "id": "uuid",
+      "name": "string",
+      "email": "string",
+      "password": "string (hashed)",
+      "department": "TACOTS | ASH | CAPACITY BUILDING | OUTREACHES",
+      "updatedAt": "ISO 8601" | null,
+      "createdAt": "ISO 8601",
+      "deletedAt": "ISO 8601" | null
+    }
+  }
+  ```
+  
+  > The user is also automatically assigned the default `volunteer` role.
   
   ## Errors
   - `409 Conflict` — Email already exists.

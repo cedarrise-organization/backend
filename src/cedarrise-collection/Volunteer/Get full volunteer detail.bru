@@ -42,7 +42,37 @@ docs {
   {
     "success": true,
     "message": "...",
-    "data": { ... }
+    "data": {
+      "id": "uuid",
+      "firstName": "string",
+      "middleName": "string" | null,
+      "surname": "string",
+      "gender": "MALE | FEMALE",
+      "dob": "YYYY-MM-DD",
+      "age": 22,
+      "phoneNumber": "string",
+      "emailAddress": "string",
+      "homeAddress": "string",
+      "city": "string",
+      "state": "string",
+      "occupation": "string" | null,
+      "highestEducation": "string" | null,
+      "reasonForVolunteering": "string",
+      "volunteerAreas": ["string"],
+      "skillsToContribute": ["string"] | null,
+      "availability": ["string"],
+      "commitmentDuration": "string" | null,
+      "ashSaturdayAvailability": "string" | null,
+      "ashAcademicArea": "string" | null,
+      "ashExtracurricular": ["string"] | null,
+      "safeguardingAgreement": "string",
+      "mediaConsent": true,
+      "additionalInfo": "string" | null,
+      "status": "pending | accepted | rejected",
+      "updatedAt": "ISO 8601" | null,
+      "createdAt": "ISO 8601",
+      "deletedAt": "ISO 8601" | null
+    }
   }
   ```
   

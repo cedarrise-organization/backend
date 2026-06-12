@@ -33,12 +33,30 @@ docs {
   
   ## Path Parameters
   | Parameter | Type   | Required | Description                        |
-  |-----------|--------|----------|------------------------------------|
+  |-----------|--------|----------|------------------------------------
   | userId    | string | Yes      | UUID of the user to look up roles for |
   
   ## Validation
   - `userId` must be a valid UUID.
   
   ## Response
-  Returns the list of roles assigned to the specified user.
+  
+  **`200 OK`** — Returns the list of roles assigned to the specified user.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Roles for user <userId> found successfully",
+    "data": [
+      {
+        "id": "uuid",
+        "name": "volunteer | admin | superadmin",
+        "description": "string" | null,
+        "isDefault": true | false
+      }
+    ]
+  }
+  ```
+  
+  > Note: The response only includes `id`, `name`, `description`, and `isDefault` from the roles table (joined via userroles). Timestamps are not returned.
 }

@@ -16,7 +16,7 @@ params:query {
 }
 
 params:path {
-  userId: 302a6bf6-99ea-4162-941b-cb4cb8bb714e
+  userId: 
 }
 
 vars:pre-request {
@@ -53,5 +53,35 @@ docs {
   - `rolename` must be one of: `admin`, `superadmin`.
   
   ## Response
-  Returns the result of the role action operation.
+  
+  ### Assign (`action=assign`)
+  
+  **`200 OK`** — Returns the newly created user-role assignment.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Role <rolename> assigned successfully",
+    "data": [
+      {
+        "userId": "uuid",
+        "roleId": "uuid",
+        "description": "string" | null,
+        "assignedAt": "ISO 8601",
+        "assignedBy": "string" | null
+      }
+    ]
+  }
+  ```
+  
+  ### Revoke (`action=revoke`)
+  
+  **`200 OK`** — Returns a success message with no data payload.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Role <rolename> revoked successfully"
+  }
+  ```
 }
