@@ -175,11 +175,8 @@ export const listRecommendations = async (
       setweight(to_tsvector('english', ${tacotsRecommendation.lga}), 'B') ||
       setweight(to_tsvector('english', ${tacotsRecommendation.schoolName}), 'B') ||
       setweight(to_tsvector('english', ${tacotsRecommendation.lastClass}), 'C') ||
-      setweight(to_tsvector('english', ${tacotsRecommendation.incomeSources}), 'D') ||
       setweight(to_tsvector('english', ${tacotsRecommendation.recommenderFirstName}), 'C') ||
-      setweight(to_tsvector('english', ${tacotsRecommendation.recommenderLastName}), 'C') ||
-      setweight(to_tsvector('english', ${tacotsRecommendation.catholicSacraments}), 'D') ||
-      setweight(to_tsvector('english', ${tacotsRecommendation.supportTypesNeeded}), 'D')
+      setweight(to_tsvector('english', ${tacotsRecommendation.recommenderLastName}), 'C') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -444,9 +441,7 @@ export const listTacotsFeedback = async (page: number, limit: number, search: st
       setweight(to_tsvector('english', ${tacotsFeedback.studentSurname}), 'A') ||
       setweight(to_tsvector('english', ${tacotsFeedback.currentClass}), 'B') ||
       setweight(to_tsvector('english', ${tacotsFeedback.currentSchool}), 'A') ||
-      setweight(to_tsvector('english', ${tacotsFeedback.parentPhone}), 'B') ||
-      setweight(to_tsvector('english', ${tacotsFeedback.mostHelpfulSupport}), 'D') ||
-      setweight(to_tsvector('english', ${tacotsFeedback.currentChallenges}), 'D')
+      setweight(to_tsvector('english', ${tacotsFeedback.parentPhone}), 'B') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -661,12 +656,7 @@ export const listOnboarding = async (
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolState}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledClass}), 'C') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.mentorName}), 'B') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.sponsorName}), 'B') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.diagnosedConditions}), 'D') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.behavioralIndicators}), 'D') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.chronicConditions}), 'D') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.allergies}), 'D') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.supportTypesApproved}), 'D')
+      setweight(to_tsvector('english', ${tacotsOnboarding.sponsorName}), 'B') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 

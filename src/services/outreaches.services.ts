@@ -55,7 +55,6 @@ export const listOutreaches = async (
   if (search) {
     const searchVector = sql`
       setweight(to_tsvector('english', ${outreachTracker.submittedBy}), 'A') ||
-      setweight(to_tsvector('english', ${outreachTracker.outreachType}), 'A') ||
       setweight(to_tsvector('english', ${outreachTracker.outreachState}), 'A') ||
       setweight(to_tsvector('english', ${outreachTracker.outreachCommunity}), 'A') ||
       setweight(to_tsvector('english', ${outreachTracker.outreachCity}), 'B') ||

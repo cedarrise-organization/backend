@@ -79,10 +79,7 @@ export const listVolunteers = async (
       setweight(to_tsvector('english', ${volunteerRegistration.surname}), 'A') ||
       setweight(to_tsvector('english', ${volunteerRegistration.emailAddress}), 'A') ||
       setweight(to_tsvector('english', ${volunteerRegistration.phoneNumber}), 'B') ||
-      setweight(to_tsvector('english', ${volunteerRegistration.state}), 'B') ||
-      setweight(to_tsvector('english', ${volunteerRegistration.volunteerAreas}), 'C') ||
-      setweight(to_tsvector('english', ${volunteerRegistration.skillsToContribute}), 'C') ||
-      setweight(to_tsvector('english', ${volunteerRegistration.ashExtracurricular}), 'C') 
+      setweight(to_tsvector('english', ${volunteerRegistration.state}), 'B') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -311,10 +308,7 @@ export const listVolunteerFeedback = async (page: number, limit: number, search:
       setweight(to_tsvector('english', ${volunteerFeedback.surname}), 'A') ||
       setweight(to_tsvector('english', ${volunteerFeedback.programVolunteered}), 'A') ||
       setweight(to_tsvector('english', ${volunteerFeedback.volunteerDuration}), 'A') ||
-      setweight(to_tsvector('english', ${volunteerFeedback.wouldRecommend}), 'D') ||
-      setweight(to_tsvector('english', ${volunteerFeedback.waysProgramHelped}), 'C') ||
-      setweight(to_tsvector('english', ${volunteerFeedback.activitiesInvolvedIn}), 'C') ||
-      setweight(to_tsvector('english', ${volunteerFeedback.skillsGained}), 'C') 
+      setweight(to_tsvector('english', ${volunteerFeedback.wouldRecommend}), 'D') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
