@@ -38,6 +38,48 @@ docs {
   
   **`200 OK`** — Returns the complete volunteer registration record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                      | Type     | Description                                                        |
+  |----------------------------|----------|--------------------------------------------------------------------|
+  | id                         | string   | UUID primary key.                                                  |
+  | firstName                  | string   | Volunteer's first name.                                            |
+  | middleName                 | string   | Volunteer's middle name (nullable).                                |
+  | surname                    | string   | Volunteer's surname.                                               |
+  | gender                     | string   | Volunteer's gender (`MALE` or `FEMALE`).                           |
+  | dob                        | string   | Date of birth (`YYYY-MM-DD`).                                      |
+  | age                        | number   | Volunteer's age (≥ 16).                                            |
+  | phoneNumber                | string   | Phone number.                                                      |
+  | emailAddress               | string   | Email address.                                                     |
+  | homeAddress                | string   | Home address.                                                      |
+  | city                       | string   | City of residence.                                                 |
+  | state                      | string   | State of residence.                                                |
+  | occupation                 | string   | Occupation (nullable).                                             |
+  | highestEducation           | string   | Highest level of education (nullable).                             |
+  | reasonForVolunteering      | string   | Reason for volunteering.                                           |
+  | volunteerAreas             | string[] | Areas the volunteer is interested in.                              |
+  | skillsToContribute         | string[] | Skills the volunteer can contribute (nullable).                    |
+  | availability               | string[] | Availability schedule.                                             |
+  | commitmentDuration         | string   | Desired commitment duration (nullable).                            |
+  | ashSaturdayAvailability    | string   | Availability for ASH Saturday sessions (nullable).                 |
+  | ashAcademicArea            | string   | Academic area for ASH support (nullable).                          |
+  | ashExtracurricular         | string[] | Extracurricular activities for ASH (nullable).                     |
+  | safeguardingAgreement      | string   | Safeguarding agreement acknowledgement.                            |
+  | mediaConsent               | boolean  | Whether media consent was given.                                   |
+  | additionalInfo             | string   | Additional information (nullable).                                 |
+  | status                     | string   | Registration status (`pending`, `accepted`, `rejected`).           |
+  | updatedAt                  | string   | ISO 8601 timestamp of last update (nullable).                      |
+  | createdAt                  | string   | ISO 8601 timestamp of record creation.                             |
+  | deletedAt                  | string   | ISO 8601 soft-delete timestamp (nullable).                         |
+  
   ## Errors
   
   | Status                      | Description                                             |

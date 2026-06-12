@@ -38,10 +38,53 @@ docs {
   
   **`200 OK`** — Returns the complete ASH termly tracking record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                      | Type   | Description                                                    |
+  |----------------------------|--------|----------------------------------------------------------------|
+  | id                         | string | UUID primary key.                                              |
+  | studentId                  | string | UUID reference to the ASH student record.                      |
+  | academicSession            | string | Academic session (e.g. `2025/26`).                             |
+  | term                       | string | Academic term.                                                 |
+  | schoolName                 | string | Name of the school.                                            |
+  | schoolNumeracyScore        | number | Numeracy score from school (nullable).                         |
+  | schoolLiteracyScore        | number | Literacy score from school (nullable).                         |
+  | schoolAverage              | number | School average score (nullable).                               |
+  | schoolPosition             | string | Position in school (nullable).                                 |
+  | pretestNumeracyScore       | number | Pre-test numeracy score (nullable).                            |
+  | pretestLiteracyScore       | number | Pre-test literacy score (nullable).                            |
+  | pretestAverage             | number | Pre-test average score (nullable).                             |
+  | midtestNumeracyScore       | number | Mid-test numeracy score (nullable).                            |
+  | midtestLiteracyScore       | number | Mid-test literacy score (nullable).                            |
+  | midtestAverage             | number | Mid-test average score (nullable).                             |
+  | posttestNumeracyScore      | number | Post-test numeracy score (nullable).                           |
+  | posttestLiteracyScore      | number | Post-test literacy score (nullable).                           |
+  | posttestAverage            | number | Post-test average score (nullable).                            |
+  | termResultUrl              | string | URL of the term result document.                               |
+  | termResultPublicId         | string | Cloudinary public ID for the term result.                      |
+  | disciplineRating           | number | Discipline rating (1–5).                                       |
+  | responsibilityRating       | number | Responsibility rating (1–5).                                   |
+  | leadershipRating           | number | Leadership rating (1–5).                                       |
+  | notableAchievements        | string | Notable achievements during the term (nullable).               |
+  | challengesObserved         | string | Challenges observed during the term (nullable).                |
+  | nextTermRecommendations    | string | Recommendations for the next term (nullable).                  |
+  | mentorName                 | string | Name of the assigned mentor.                                   |
+  | updatedAt                  | string | ISO 8601 timestamp of last update (nullable).                  |
+  | createdAt                  | string | ISO 8601 timestamp of record creation.                         |
+  | deletedAt                  | string | ISO 8601 soft-delete timestamp (nullable).                     |
+  
   ## Errors
   
   | Status                      | Description                                        |
-  |-----------------------------|----------------------------------------------------|
+  |-----------------------------|----------------------------------------------------
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).        |
   | `500 Internal Server Error` | Unexpected server error.                           |
 }

@@ -38,6 +38,86 @@ docs {
   
   **`200 OK`** — Returns the complete TACOTS recommendation record including all uploaded file URLs.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                    | Type     | Description                                                         |
+  |--------------------------|----------|---------------------------------------------------------------------|
+  | id                       | string   | UUID primary key.                                                   |
+  | firstName                | string   | Student's first name.                                               |
+  | middleName               | string   | Student's middle name (nullable).                                   |
+  | surname                  | string   | Student's surname.                                                  |
+  | gender                   | string   | Student's gender (`MALE` or `FEMALE`).                              |
+  | age                      | number   | Student's age (≥ 6).                                                |
+  | dob                      | string   | Date of birth (`YYYY-MM-DD`).                                       |
+  | religion                 | string   | Student's religion.                                                 |
+  | catholicSacraments       | string[] | Catholic sacraments received (nullable).                            |
+  | parishAttended           | string   | Parish attended (nullable).                                         |
+  | diocese                  | string   | Diocese (nullable).                                                 |
+  | primaryLanguage          | string   | Student's primary language.                                         |
+  | phoneNumber              | string   | Student's phone number (nullable).                                  |
+  | nationality              | string   | Student's nationality.                                              |
+  | stateOfOrigin            | string   | State of origin.                                                    |
+  | lga                      | string   | Local Government Area.                                              |
+  | homeAddress              | string   | Student's home address.                                             |
+  | schoolName               | string   | Name of the student's school.                                       |
+  | schoolTown               | string   | Town where the school is located.                                   |
+  | schoolState              | string   | State where the school is located.                                  |
+  | lastYearAttended         | number   | Last year the student attended school.                              |
+  | lastClass                | string   | Last class/grade attended.                                          |
+  | classPositionLastTerm    | string   | Class position last term.                                           |
+  | lastTermAverage          | number   | Last term average score (nullable).                                 |
+  | passportPhotoUrl         | string   | URL of the student's passport photograph.                           |
+  | passportPhotoPublicId    | string   | Cloudinary public ID for the passport photo.                        |
+  | lastResultUrl            | string   | URL of the student's last result.                                   |
+  | lastResultPublicId       | string   | Cloudinary public ID for the last result.                           |
+  | fathersName              | string   | Father's full name.                                                 |
+  | fathersOccupation        | string   | Father's occupation.                                                |
+  | fathersPhone             | string   | Father's phone number.                                              |
+  | mothersName              | string   | Mother's full name.                                                 |
+  | mothersOccupation        | string   | Mother's occupation.                                                |
+  | mothersPhone             | string   | Mother's phone number.                                              |
+  | parentsAddress           | string   | Parents' residential address.                                       |
+  | guardianName             | string   | Guardian's full name (nullable).                                    |
+  | guardianPhone            | string   | Guardian's phone number (nullable).                                 |
+  | guardianRelationship     | string   | Guardian's relationship to the student (nullable).                  |
+  | guardianOccupation       | string   | Guardian's occupation (nullable).                                   |
+  | guardianAddress          | string   | Guardian's address (nullable).                                      |
+  | householdSize            | number   | Number of people in the household (≥ 2).                            |
+  | numSiblings              | number   | Number of siblings.                                                 |
+  | familyPosition           | string   | Student's position in the family.                                   |
+  | specialCircumstances     | string   | Special circumstances (e.g. orphan, disability).                    |
+  | annualHouseholdIncome    | string   | Annual household income bracket.                                    |
+  | incomeSources            | string[] | Sources of household income.                                        |
+  | numIncomeEarners         | string   | Number of income earners in the household.                          |
+  | avgMonthlyIncome         | number   | Average monthly income (nullable).                                  |
+  | livesWith                | string   | Who the student lives with.                                         |
+  | residenceType            | string   | Type of residence.                                                  |
+  | hasElectricity           | string   | Whether the household has electricity.                              |
+  | recommenderFirstName     | string   | Recommender's first name.                                           |
+  | recommenderLastName      | string   | Recommender's last name.                                            |
+  | recommenderPhone         | string   | Recommender's phone number.                                         |
+  | recommenderAddress       | string   | Recommender's address.                                              |
+  | childBackgroundNotes     | string   | Notes on the child's background.                                    |
+  | supportTypesNeeded       | string[] | Types of support the student needs.                                 |
+  | otherImportantInfo       | string   | Other important information (nullable).                             |
+  | disciplineRating         | number   | Discipline rating (1–5).                                            |
+  | responsibilityRating     | number   | Responsibility rating (1–5).                                        |
+  | careerGoal               | string   | Student's career goal.                                              |
+  | studentStatement         | string   | Student's personal statement (nullable).                            |
+  | declarationConfirmed     | boolean  | Whether the declaration was confirmed.                              |
+  | adminStatus              | string   | Administrative status (`NOT SELECTED`, `KEEP IN VIEW`, `SELECTED`). |
+  | updatedAt                | string   | ISO 8601 timestamp of last update (nullable).                       |
+  | createdAt                | string   | ISO 8601 timestamp of record creation.                              |
+  | deletedAt                | string   | ISO 8601 soft-delete timestamp (nullable).                          |
+  
   ## Errors
   
   | Status                      | Description                                             |

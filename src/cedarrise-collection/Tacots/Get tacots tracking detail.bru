@@ -38,6 +38,58 @@ docs {
   
   **`200 OK`** — Returns the complete TACOTS tracking record including all uploaded file URLs.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                    | Type   | Description                                                    |
+  |--------------------------|--------|----------------------------------------------------------------|
+  | id                       | string | UUID primary key.                                              |
+  | studentId                | string | UUID reference to the TACOTS onboarding record.                |
+  | schoolId                 | string | UUID reference to the TACOTS onboarding record (school).       |
+  | region                   | string | Region of the student.                                         |
+  | academicSession          | string | Academic session (e.g. `2025/26`).                             |
+  | academicTerm             | string | Academic term.                                                 |
+  | assessmentPeriod         | string | Assessment period.                                             |
+  | submissionDate           | string | Date of form submission (`YYYY-MM-DD`).                        |
+  | highestSubjectScore      | string | Subject with the highest score.                                |
+  | lowestSubjectScore       | string | Subject with the lowest score.                                 |
+  | studentAveragePct        | number | Student's average percentage.                                  |
+  | studentPositionInClass   | string | Student's position in class.                                   |
+  | termResultUrl            | string | URL of the term result document.                               |
+  | termResultPublicId       | string | Cloudinary public ID for the term result.                      |
+  | academicComment          | string | Academic performance comment (nullable).                       |
+  | socialBehaviorRating     | number | Social behaviour rating (1–5).                                 |
+  | schoolRulesRating        | number | School rules compliance rating (1–5).                          |
+  | responsibilityRating     | number | Responsibility rating (1–5).                                   |
+  | formationComments        | string | Formation/character development comments (nullable).           |
+  | mentorName               | string | Name of the assigned mentor.                                   |
+  | mentorshipSessionDate    | string | Date of the mentorship session (`YYYY-MM-DD`).                 |
+  | mentorshipMode           | string | Mode of mentorship (e.g. in-person, virtual).                  |
+  | mentorshipDuration       | string | Duration of the mentorship session.                            |
+  | mentorshipNotes          | string | Notes from the mentorship session.                             |
+  | serviceActivityType      | string | Type of community service activity.                            |
+  | serviceDate              | string | Date of the service activity (`YYYY-MM-DD`).                   |
+  | serviceDuration          | string | Duration of the service activity.                              |
+  | serviceDescription       | string | Description of the service activity.                           |
+  | serviceSupervisor        | string | Name of the service supervisor.                                |
+  | tuitionFeePaid           | number | Tuition fee paid for the term.                                 |
+  | resourcesSpent           | number | Amount spent on resources.                                     |
+  | sundriesSpent            | number | Amount spent on sundries.                                      |
+  | totalAmountSpent         | number | Total amount spent for the term.                               |
+  | paymentEvidenceUrl       | string | URL of the payment evidence document (nullable).               |
+  | paymentEvidencePublicId  | string | Cloudinary public ID for the payment evidence (nullable).      |
+  | financialNotes           | string | Additional financial notes (nullable).                         |
+  | updatedAt                | string | ISO 8601 timestamp of last update (nullable).                  |
+  | createdAt                | string | ISO 8601 timestamp of record creation.                         |
+  | deletedAt                | string | ISO 8601 soft-delete timestamp (nullable).                     |
+  
   ## Errors
   
   | Status                      | Description                                             |

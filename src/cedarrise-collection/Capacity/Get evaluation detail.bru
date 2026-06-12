@@ -38,7 +38,64 @@ docs {
   
   **`200 OK`** — Returns the complete capacity building evaluation record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
   The result is cached under the key `cedarrise:capacity:evaluation:<id>` using the `FORM_DATA` TTL.
+  
+  ### Response Fields (`data`)
+  
+  | Field                          | Type   | Description                                                       |
+  |--------------------------------|--------|-------------------------------------------------------------------|
+  | id                             | string | UUID primary key.                                                 |
+  | programName                    | string | Name of the programme.                                            |
+  | programType                    | string | Type of programme.                                                |
+  | programDate                    | string | Date of the programme (`YYYY-MM-DD`).                             |
+  | location                       | string | Programme location.                                               |
+  | programCoordinator             | string | Name of the programme coordinator.                                |
+  | numberOfSponsors               | number | Number of sponsors.                                               |
+  | listOfSponsors                 | string | Names of sponsors.                                                |
+  | sponsorshipType                | string | Type of sponsorship.                                              |
+  | partnerOrganizations           | string | Partner organizations (nullable).                                 |
+  | partnershipLevel               | string | Level of partnership.                                             |
+  | numberOfParticipants           | number | Number of participants.                                           |
+  | targetAudience                 | string | Target audience for the programme.                                |
+  | numberOfFacilitators           | number | Number of facilitators.                                           |
+  | numberOfVolunteers             | number | Number of volunteers.                                             |
+  | participantEngagementLevel     | string | Level of participant engagement.                                  |
+  | programObjectives              | string | Programme objectives (nullable).                                  |
+  | objectiveAchievement           | string | Whether objectives were achieved.                                 |
+  | programOutcome                 | string | Programme outcome (nullable).                                     |
+  | programImpact                  | string | Programme impact description (nullable).                          |
+  | majorActivities                | string | Major activities conducted (nullable).                            |
+  | effectiveActivities            | string | Most effective activities (nullable).                             |
+  | venueSuitability               | number | Venue suitability rating (1–5).                                   |
+  | timeManagement                 | number | Time management rating (1–5).                                     |
+  | resourceAvailability           | number | Resource availability rating (1–5).                               |
+  | communicationAndCoordination   | number | Communication and coordination rating (1–5).                      |
+  | teamworkAmongOrganizers        | number | Teamwork among organizers rating (1–5).                            |
+  | challengesEncountered          | string | Challenges encountered (nullable).                                |
+  | challengesAddressed            | string | How challenges were addressed (nullable).                         |
+  | lessonsLearned                 | string | Lessons learned (nullable).                                       |
+  | budgetAllocated                | string | Budget allocated (nullable).                                      |
+  | budgetUtilized                 | string | Budget utilized (nullable).                                       |
+  | wereResourcesAdequate          | string | Whether resources were adequate (nullable).                       |
+  | inadequateResourcesExplanation | string | Explanation if resources were inadequate (nullable).              |
+  | overallSuccess                 | string | Overall success assessment (nullable).                            |
+  | recommendTheProgram            | string | Whether the evaluator recommends the programme (nullable).        |
+  | improvementSuggestions         | string | Suggestions for improvement (nullable).                           |
+  | recommendFuturePrograms        | string | Recommended future programmes (nullable).                         |
+  | name                           | string | Name of the evaluator.                                            |
+  | role                           | string | Role of the evaluator.                                            |
+  | dateSubmitted                  | string | Date of submission (`YYYY-MM-DD`).                                |
+  | updatedAt                      | string | ISO 8601 timestamp of last update (nullable).                     |
+  | createdAt                      | string | ISO 8601 timestamp of record creation.                            |
+  | deletedAt                      | string | ISO 8601 soft-delete timestamp (nullable).                        |
   
   ## Errors
   

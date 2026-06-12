@@ -38,10 +38,69 @@ docs {
   
   **`200 OK`** — Returns the complete ASH student registration record including all uploaded file URLs.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                    | Type     | Description                                                         |
+  |--------------------------|----------|---------------------------------------------------------------------|
+  | id                       | string   | UUID primary key.                                                   |
+  | programType              | string   | Type of ASH programme.                                              |
+  | firstName                | string   | Student's first name.                                               |
+  | middleName               | string   | Student's middle name (nullable).                                   |
+  | surname                  | string   | Student's surname.                                                  |
+  | gender                   | string   | Student's gender (`MALE` or `FEMALE`).                              |
+  | age                      | number   | Student's age (6–18).                                               |
+  | dob                      | string   | Date of birth (`YYYY-MM-DD`).                                       |
+  | primaryLanguage          | string   | Student's primary language.                                         |
+  | homeAddress              | string   | Student's home address.                                             |
+  | studentPhone             | string   | Student's phone number (nullable).                                  |
+  | passportPhotoUrl         | string   | URL of the student's passport photograph.                           |
+  | passportPhotoPublicId    | string   | Cloudinary public ID for the passport photo.                        |
+  | schoolName               | string   | Name of the student's school.                                       |
+  | schoolTown               | string   | Town where the school is located.                                   |
+  | schoolLga                | string   | LGA of the school.                                                  |
+  | schoolState              | string   | State where the school is located.                                  |
+  | currentClass             | string   | Student's current class/grade.                                      |
+  | classPositionLastTerm    | string   | Student's class position last term.                                 |
+  | lastResultUrl            | string   | URL of the student's last result (nullable).                        |
+  | lastResultPublicId       | string   | Cloudinary public ID for the last result (nullable).                |
+  | prevAfterschoolProgram   | string   | Previous after-school programme participation.                      |
+  | reasonForJoining         | string   | Reason for joining the ASH programme.                               |
+  | fathersName              | string   | Father's full name.                                                 |
+  | fathersPhone             | string   | Father's phone number (nullable).                                   |
+  | fathersOccupation        | string   | Father's occupation.                                                |
+  | mothersName              | string   | Mother's full name.                                                 |
+  | mothersPhone             | string   | Mother's phone number.                                              |
+  | mothersOccupation        | string   | Mother's occupation (nullable).                                     |
+  | guardianName             | string   | Guardian's full name (nullable).                                    |
+  | guardianRelationship     | string   | Guardian's relationship to the student (nullable).                  |
+  | guardianPhone            | string   | Guardian's phone number (nullable).                                 |
+  | guardianOccupation       | string   | Guardian's occupation (nullable).                                   |
+  | householdIncomeRange     | string   | Household income range (nullable).                                  |
+  | hasLearningCondition     | string   | Whether the student has a learning condition.                       |
+  | learningConditions       | string[] | List of learning conditions (nullable).                             |
+  | parentConsent            | boolean  | Whether parent consent was given.                                   |
+  | declarationConfirmed     | boolean  | Whether the declaration was confirmed.                              |
+  | parentSignatureUrl       | string   | URL of the parent's signature image.                                |
+  | parentSignaturePublicId  | string   | Cloudinary public ID for the parent signature.                      |
+  | assignedMentor           | string   | Name of the assigned mentor (nullable).                             |
+  | pretestScore             | number   | Pre-test score (nullable).                                          |
+  | status                   | string   | Registration status (`pending`, `accepted`, `rejected`).            |
+  | updatedAt                | string   | ISO 8601 timestamp of last update (nullable).                       |
+  | createdAt                | string   | ISO 8601 timestamp of record creation.                              |
+  | deletedAt                | string   | ISO 8601 soft-delete timestamp (nullable).                          |
+  
   ## Errors
   
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
-  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).             |              |
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).             |
   | `500 Internal Server Error` | Unexpected server error.                                |
 }

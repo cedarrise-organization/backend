@@ -38,6 +38,61 @@ docs {
   
   **`200 OK`** — Returns the complete TACOTS onboarding record including all uploaded file URLs.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                        | Type     | Description                                                        |
+  |------------------------------|----------|--------------------------------------------------------------------|
+  | id                           | string   | UUID primary key.                                                  |
+  | studentId                    | string   | UUID reference to the TACOTS recommendation record.                |
+  | onboardingDate               | string   | Date of onboarding (`YYYY-MM-DD`).                                 |
+  | hasMentalHealthDiagnosis     | string   | Whether the student has a mental health diagnosis.                 |
+  | diagnosedConditions          | string[] | Diagnosed mental health conditions (nullable).                     |
+  | behavioralIndicators         | string[] | Observed behavioural indicators.                                   |
+  | focusAbilityRating           | number   | Focus ability rating (1–5).                                        |
+  | emotionalStabilityRating     | number   | Emotional stability rating (1–5).                                  |
+  | peerInteractionRating        | number   | Peer interaction rating (1–5).                                     |
+  | receivedCounseling           | string   | Whether the student has received counseling.                       |
+  | needsSpecialSupport          | string   | Whether the student needs special support.                         |
+  | mentalHealthNotes            | string   | Additional mental health notes (nullable).                         |
+  | generalHealthStatus          | string   | General health status.                                             |
+  | immunizationStatus           | string   | Immunization status.                                               |
+  | hasChronicCondition          | string   | Whether the student has a chronic condition.                       |
+  | chronicConditions            | string[] | Chronic conditions (nullable).                                     |
+  | allergies                    | string[] | Known allergies.                                                   |
+  | requiresMedication           | string   | Whether the student requires regular medication.                   |
+  | physicalActivityLevel        | number   | Physical activity level rating (1–5).                              |
+  | physicalLimitations          | string   | Physical limitations description.                                  |
+  | additionalHealthNotes        | string   | Additional health notes (nullable).                                |
+  | enrolledSchoolName           | string   | Name of the enrolled school.                                       |
+  | enrolledSchoolTown           | string   | Town of the enrolled school.                                       |
+  | enrolledSchoolLga            | string   | LGA of the enrolled school.                                        |
+  | enrolledSchoolState          | string   | State of the enrolled school.                                      |
+  | enrolledClass                | string   | Class the student is enrolled in.                                  |
+  | termResumptionDate           | string   | Term resumption date (`YYYY-MM-DD`).                               |
+  | schoolFeesPerTerm            | number   | School fees per term (nullable).                                   |
+  | studentCommitment            | boolean  | Whether the student signed the commitment (nullable).              |
+  | parentGuardianCommitment     | boolean  | Whether the parent/guardian signed the commitment.                 |
+  | parentSignatureUrl           | string   | URL of the parent signature image (nullable).                      |
+  | parentSignaturePublicId      | string   | Cloudinary public ID for the parent signature (nullable).          |
+  | admissionLetterUrl           | string   | URL of the admission letter (nullable).                            |
+  | admissionLetterPublicId      | string   | Cloudinary public ID for the admission letter (nullable).          |
+  | programOfficerNotes          | string   | Notes from the programme officer (nullable).                       |
+  | supportTypesApproved         | string[] | Approved support types (nullable).                                 |
+  | mentorName                   | string   | Name of the assigned mentor (nullable).                            |
+  | sponsorName                  | string   | Name of the sponsor (nullable).                                    |
+  | additionalInfo               | string   | Additional information (nullable).                                 |
+  | updatedAt                    | string   | ISO 8601 timestamp of last update (nullable).                      |
+  | createdAt                    | string   | ISO 8601 timestamp of record creation.                             |
+  | deletedAt                    | string   | ISO 8601 soft-delete timestamp (nullable).                         |
+  
   ## Errors
   
   | Status                      | Description                                             |

@@ -38,10 +38,34 @@ docs {
   
   **`200 OK`** — Returns the complete ASH weekly attendance record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                    | Type       | Description                                              |
+  |--------------------------|------------|----------------------------------------------------------|
+  | id                       | string     | UUID primary key.                                        |
+  | sessionDate              | string     | Date of the attendance session (`YYYY-MM-DD`).           |
+  | studentsInAttendance     | string[]   | Array of UUIDs of students who attended.                 |
+  | studentsMentored         | string[]   | Array of UUIDs of students who were mentored.            |
+  | sessionsConducted        | string[]   | Array of session types conducted (nullable).             |
+  | sessionDetails           | string     | Free-text details about the session (nullable).          |
+  | volunteersInAttendance   | string     | Names/details of volunteers present.                     |
+  | programReview            | string     | Overall review of the programme session (nullable).      |
+  | updatedAt                | string     | ISO 8601 timestamp of last update (nullable).            |
+  | createdAt                | string     | ISO 8601 timestamp of record creation.                   |
+  | deletedAt                | string     | ISO 8601 soft-delete timestamp (nullable).               |
+  
   ## Errors
   
   | Status                      | Description                                        |
-  |-----------------------------|----------------------------------------------------|
+  |-----------------------------|----------------------------------------------------
   | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).        |
   | `500 Internal Server Error` | Unexpected server error.                           |
 }

@@ -38,6 +38,44 @@ docs {
   
   **`200 OK`** — Returns the complete volunteer feedback record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                      | Type     | Description                                                     |
+  |----------------------------|----------|-----------------------------------------------------------------|
+  | id                         | string   | UUID primary key.                                               |
+  | firstName                  | string   | Volunteer's first name.                                         |
+  | surname                    | string   | Volunteer's surname.                                            |
+  | programVolunteered         | string   | Programme the volunteer participated in.                        |
+  | specificProgramDetails     | string   | Specific programme details (nullable).                          |
+  | volunteerDuration          | string   | Duration of volunteering (nullable).                            |
+  | overallExperienceRating    | number   | Overall experience rating (1–5).                                |
+  | roleClarityRating          | number   | Role clarity rating (1–5).                                      |
+  | teamSupportRating          | number   | Team support rating (1–5).                                      |
+  | organizationRating         | number   | Organization rating (1–5).                                      |
+  | programMadeImpact          | string   | Whether the programme made an impact (nullable).                |
+  | waysProgramHelped          | string[] | Ways the programme helped (nullable).                           |
+  | activitiesInvolvedIn       | string[] | Activities the volunteer was involved in (nullable).            |
+  | skillsDeveloped            | string   | Description of skills developed (nullable).                     |
+  | skillsGained               | string[] | Skills gained through volunteering (nullable).                  |
+  | enjoyedMost                | string   | What the volunteer enjoyed most (nullable).                     |
+  | challengesExperienced      | string   | Challenges experienced (nullable).                              |
+  | improvementSuggestions     | string   | Suggestions for improvement (nullable).                         |
+  | continueVolunteering       | string   | Whether the volunteer would continue (nullable).                |
+  | wouldRecommend             | string   | Whether the volunteer would recommend the programme (nullable). |
+  | additionalComments         | string   | Any additional comments (nullable).                             |
+  | submissionDate             | string   | Date of form submission (`YYYY-MM-DD`).                         |
+  | updatedAt                  | string   | ISO 8601 timestamp of last update (nullable).                   |
+  | createdAt                  | string   | ISO 8601 timestamp of record creation.                          |
+  | deletedAt                  | string   | ISO 8601 soft-delete timestamp (nullable).                      |
+  
   ## Errors
   
   | Status                      | Description                                             |

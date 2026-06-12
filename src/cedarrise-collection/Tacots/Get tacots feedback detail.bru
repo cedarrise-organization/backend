@@ -38,6 +38,44 @@ docs {
   
   **`200 OK`** — Returns the complete TACOTS feedback record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                          | Type     | Description                                                       |
+  |--------------------------------|----------|-------------------------------------------------------------------|
+  | id                             | string   | UUID primary key.                                                 |
+  | studentFirstName               | string   | Student's first name.                                             |
+  | studentSurname                 | string   | Student's surname.                                                |
+  | currentSchool                  | string   | Student's current school.                                         |
+  | currentClass                   | string   | Student's current class/grade.                                    |
+  | scholarshipHelpedStay          | string   | Whether the scholarship helped the student stay in school.        |
+  | mostHelpfulSupport             | string[] | Types of support found most helpful (nullable).                   |
+  | studyMotivationRating          | number   | Study motivation rating (1–5).                                    |
+  | mentorshipImpactRating         | number   | Mentorship impact rating (1–5).                                   |
+  | currentChallenges              | string[] | Current challenges faced by the student (nullable).               |
+  | likedMost                      | string   | What the student liked most about the programme (nullable).       |
+  | studentImprovementSuggestions  | string   | Student's suggestions for improvement (nullable).                 |
+  | parentGuardianName             | string   | Parent/guardian's full name.                                      |
+  | parentGuardianRelationship     | string   | Relationship to the student.                                      |
+  | parentPhone                    | string   | Parent/guardian phone number (nullable).                           |
+  | scholarshipReducedBurden       | string   | Whether the scholarship reduced financial burden.                 |
+  | academicImprovementNoticed     | string   | Academic improvement noticed by parent (nullable).                |
+  | attitudeChangeNoticed          | string   | Attitude changes noticed (nullable).                              |
+  | parentSatisfactionRating       | number   | Parent satisfaction rating (1–5, nullable).                       |
+  | programImpactOnFamily          | string   | Programme impact on the family (nullable).                        |
+  | parentImprovementSuggestions   | string   | Parent's suggestions for improvement (nullable).                  |
+  | additionalComments             | string   | Any additional comments (nullable).                               |
+  | updatedAt                      | string   | ISO 8601 timestamp of last update (nullable).                     |
+  | createdAt                      | string   | ISO 8601 timestamp of record creation.                            |
+  | deletedAt                      | string   | ISO 8601 soft-delete timestamp (nullable).                        |
+  
   ## Errors
   
   | Status                      | Description                                             |

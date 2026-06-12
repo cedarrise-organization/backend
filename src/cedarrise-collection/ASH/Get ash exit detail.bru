@@ -38,6 +38,42 @@ docs {
   
   **`200 OK`** — Returns the complete ASH exit record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field                    | Type     | Description                                                      |
+  |--------------------------|----------|------------------------------------------------------------------|
+  | id                       | string   | UUID primary key.                                                |
+  | studentId                | string   | UUID reference to the ASH student record.                        |
+  | ageAtExit                | number   | Student's age at the time of exit (6–18).                        |
+  | schoolName               | string   | Name of the school at exit.                                      |
+  | classAtExit              | string   | Class/grade at the time of exit.                                 |
+  | durationInProgram        | string   | How long the student was in the programme.                       |
+  | exitReason               | string   | Reason for leaving the programme.                                |
+  | academicImpactRating     | number   | Rating of academic impact (1–10).                                |
+  | areasOfImprovement       | string[] | Areas where the student improved (nullable).                     |
+  | mentorshipReceived       | string   | Description of mentorship received.                              |
+  | mentorshipImpactRating   | number   | Rating of mentorship impact (1–10, nullable).                    |
+  | postAshStatus            | string   | Student's status after leaving ASH.                              |
+  | institutionName          | string   | Name of institution if continuing education (nullable).          |
+  | courseOfStudy             | string   | Course of study if applicable (nullable).                        |
+  | vocationalSkill          | string   | Vocational skill pursued if applicable (nullable).               |
+  | enjoyedMost              | string   | What the student enjoyed most about the programme (nullable).    |
+  | programImpact            | string   | Description of programme impact (nullable).                      |
+  | improvementSuggestions   | string   | Suggestions for programme improvement (nullable).                |
+  | facilitatorName          | string   | Name of the facilitator completing the form.                     |
+  | exitDate                 | string   | Date of exit (`YYYY-MM-DD`).                                     |
+  | updatedAt                | string   | ISO 8601 timestamp of last update (nullable).                    |
+  | createdAt                | string   | ISO 8601 timestamp of record creation.                           |
+  | deletedAt                | string   | ISO 8601 soft-delete timestamp (nullable).                       |
+  
   ## Errors
   
   | Status                      | Description                                 |
