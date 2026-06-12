@@ -656,7 +656,6 @@ export const listOnboarding = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${tacotsOnboarding.studentId}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.generalHealthStatus}), 'C') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolName}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolState}), 'A') ||
@@ -909,8 +908,6 @@ export const listTacotsTracking = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${tacotsTracking.studentId}), 'A') ||
-      setweight(to_tsvector('english', ${tacotsTracking.schoolId}), 'A') ||
       setweight(to_tsvector('english', ${tacotsTracking.academicTerm}), 'A') ||
       setweight(to_tsvector('english', ${tacotsTracking.assessmentPeriod}), 'A') ||
       setweight(to_tsvector('english', ${tacotsTracking.region}), 'B') ||
@@ -1116,7 +1113,6 @@ export const listTacotsExit = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${tacotsExit.studentId}), 'A') ||
       setweight(to_tsvector('english', ${tacotsExit.schoolAttendedDuringProgram}), 'A') ||
       setweight(to_tsvector('english', ${tacotsExit.exitReason}), 'C') ||
       setweight(to_tsvector('english', ${tacotsExit.currentStatus}), 'C') ||

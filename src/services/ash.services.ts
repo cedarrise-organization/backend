@@ -642,7 +642,6 @@ export const listTracking = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${ashTermlyTracking.studentId}), 'A') ||
       setweight(to_tsvector('english', ${ashTermlyTracking.academicSession}), 'A') ||
       setweight(to_tsvector('english', ${ashTermlyTracking.term}), 'A') ||
       setweight(to_tsvector('english', ${ashTermlyTracking.schoolName}), 'B') ||
@@ -826,8 +825,6 @@ export const listAttendance = async (page: number, limit: number, search: string
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${ashWeeklyAttendance.studentsInAttendance}), 'A') ||
-      setweight(to_tsvector('english', ${ashWeeklyAttendance.studentsMentored}), 'A') ||
       setweight(to_tsvector('english', ${ashWeeklyAttendance.sessionsConducted}), 'A') 
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
@@ -1001,7 +998,6 @@ export const listExit = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${ashExit.studentId}), 'A') ||
       setweight(to_tsvector('english', ${ashExit.schoolName}), 'A') ||
       setweight(to_tsvector('english', ${ashExit.classAtExit}), 'B') ||
       setweight(to_tsvector('english', ${ashExit.durationInProgram}), 'B') ||

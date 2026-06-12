@@ -184,7 +184,6 @@ export const ashTermlyTracking = p.pgTable(
     index("ash_termly_tracking_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
         setweight(to_tsvector('english', ${table.academicSession}), 'A') ||
         setweight(to_tsvector('english', ${table.term}), 'A') ||
         setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
@@ -231,8 +230,6 @@ export const ashWeeklyAttendance = p.pgTable(
     index("ash_weekly_attendance_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.studentsInAttendance}), 'A') ||
-        setweight(to_tsvector('english', ${table.studentsMentored}), 'A') ||
         setweight(to_tsvector('english', ${table.sessionsConducted}), 'A') 
       )`,
     ),
@@ -290,7 +287,6 @@ export const ashExit = p.pgTable(
     index("ash_exit_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
         setweight(to_tsvector('english', ${table.schoolName}), 'A') ||
         setweight(to_tsvector('english', ${table.classAtExit}), 'B') ||
         setweight(to_tsvector('english', ${table.durationInProgram}), 'B') ||
@@ -991,7 +987,6 @@ export const tacotsOnboarding = p.pgTable(
     index("tacots_onboarding_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
         setweight(to_tsvector('english', ${table.generalHealthStatus}), 'C') ||
         setweight(to_tsvector('english', ${table.enrolledSchoolName}), 'A') ||
         setweight(to_tsvector('english', ${table.enrolledSchoolState}), 'A') ||
@@ -1122,8 +1117,6 @@ export const tacotsTracking = p.pgTable(
     index("tacots_tracking_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
-        setweight(to_tsvector('english', ${table.schoolId}), 'A') ||
         setweight(to_tsvector('english', ${table.academicTerm}), 'A') ||
         setweight(to_tsvector('english', ${table.assessmentPeriod}), 'A') ||
         setweight(to_tsvector('english', ${table.region}), 'B') ||
@@ -1195,7 +1188,6 @@ export const tacotsExit = p.pgTable(
     index("tacots_exit_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.studentId}), 'A') ||
         setweight(to_tsvector('english', ${table.schoolAttendedDuringProgram}), 'A') ||
         setweight(to_tsvector('english', ${table.exitReason}), 'C') ||
         setweight(to_tsvector('english', ${table.currentStatus}), 'C') ||
