@@ -81,9 +81,9 @@ export const submitVolunteerRegistrationController = async (
   }
 };
 export const listVolunteersController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit, search, status, sortBy } = req.qtransformed;
+  const { page, limit, orderBy, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listVolunteers(page, limit, search, status, sortBy);
+    const response = await listVolunteers(page, limit, orderBy, search, status, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);

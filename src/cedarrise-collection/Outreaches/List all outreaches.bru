@@ -1,11 +1,11 @@
 meta {
-  name: List ASH exit records
+  name: List all outreaches
   type: http
-  seq: 23
+  seq: 2
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/ash/exit?page=&limit=&orderBy=&search=&sortBy=
+  url: {{baseUrl}}/api/v1/forms/outreaches?page=&limit=&orderBy=&search=&sortBy=
   body: none
   auth: inherit
 }
@@ -28,9 +28,9 @@ settings {
 }
 
 docs {
-  # List ASH Exit Records
+  # List All Outreach Tracker Records
   
-  Returns a paginated list of ASH exit records, ordered by creation date. Supports full-text search via PostgreSQL GIN index.
+  Returns a paginated list of outreach tracker records. Results can be sorted by various fields. Supports full-text search via PostgreSQL GIN index.
   
   ## Authorization
   Requires `read` permission.
@@ -42,23 +42,23 @@ docs {
   | page      | number | No       | `1`         | Page number (integer ≥ 1)                                                                                             |
   | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                       |
   | orderBy   | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                                 |
-  | sortBy    | string | No       | `createdAt` | One of: `schoolName`, `classAtExit`, `exitDate`, `createdAt`                                                          |
+  | sortBy    | string | No       | `createdAt` | One of: `outreachStartDate`, `outreachEndDate`, `outreachState`, `outreachType`, `createdAt`                          |
   | search    | string | No       | —           | Full-text search query. When provided, cache and sort filters are bypassed and results are matched against the GIN index. |
   
   ### Searchable Fields
   
   | Field                | Weight |
   |----------------------|--------|
-  | `studentId`          | A      |
-  | `schoolName`         | A      |
-  | `classAtExit`        | B      |
-  | `durationInProgram`  | B      |
-  | `exitReason`         | C      |
-  | `areasOfImprovement` | C      |
+  | `submittedBy`        | A      |
+  | `outreachType`       | A      |
+  | `outreachState`      | A      |
+  | `outreachCommunity`  | A      |
+  | `outreachCity`       | B      |
+  | `outreachLga`        | B      |
   
   ## Response
   
-  **`200 OK`** — Returns a paginated array of ASH exit records.
+  **`200 OK`** — Returns a paginated array of outreach tracker records.
   
   ```json
   {
@@ -74,10 +74,14 @@ docs {
   }
   ```
   
+  Results are cached under the key `cedarrise:outreaches:{page}:{limit}:{orderBy}:{sortBy}` using the `FORM_DATA` TTL.
+  
   ## Errors
   
-  | Status                      | Description                                         |
-  |-----------------------------|-----------------------------------------------------|
-  | `400 Bad Request`           | Invalid query parameters (e.g. non-numeric `page`). |
-  | `500 Internal Server Error` | Unexpected server error.                            |
+  | Status                      | Description                                           |
+  |-----------------------------|-------------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. unknown `sortBy` key). |
+  | `401 Unauthorized`          | Missing or invalid authentication token.              |
+  | `403 Forbidden`             | Authenticated user lacks `read` permission.           |
+  | `500 Internal Server Error` | Unexpected server error.                              |
 }

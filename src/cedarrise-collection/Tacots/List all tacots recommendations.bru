@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/tacots/recommendation?page=&limit=&status=&sortBy=&search=
+  url: {{baseUrl}}/api/v1/forms/tacots/recommendation?page=&limit=&orderBy=&status=&sortBy=&search=
   body: none
   auth: inherit
 }
@@ -13,6 +13,7 @@ get {
 params:query {
   page: 
   limit: 
+  orderBy: 
   status: 
   sortBy: 
   search: 
@@ -43,8 +44,9 @@ docs {
   |-----------|--------|----------|----------------|-------------------------------------------------------------------------------------------------------------------------|
   | page      | number | No       | `1`            | Page number (integer ≥ 1)                                                                                               |
   | limit     | number | No       | `25`           | Items per page (integer, 1–100)                                                                                         |
+  | orderBy   | string | No       | `desc`         | Sort direction. One of: `asc`, `desc`                                                                                   |
   | status    | string | No       | `KEEP IN VIEW` | One of: `NOT SELECTED`, `KEEP IN VIEW`, `SELECTED`                                                                      |
-  | sortBy    | string | No       | `createdAt`    | One of: `firstName`, `surname`, `createdAt`, `stateOfOrigin`, `lga`, `schoolName`, `gender`, `lastClass`                |
+  | sortBy    | string | No       | `createdAt`    | One of: `firstName`, `surname`, `gender`, `schoolName`, `lastClass`, `createdAt`                                        |
   | search    | string | No       | —              | Full-text search query. When provided, cache and sort/status filters are bypassed and results are matched against the GIN index. |
   
   ### Searchable Fields

@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/ash/registration?page=&limit=&search=&status=&sortBy=
+  url: {{baseUrl}}/api/v1/forms/ash/registration?page=&limit=&orderBy=&search=&status=&sortBy=
   body: none
   auth: inherit
 }
@@ -13,6 +13,7 @@ get {
 params:query {
   page: 
   limit: 
+  orderBy: 
   status: 
   sortBy: 
   search: 
@@ -43,6 +44,7 @@ docs {
   |-----------|--------|----------|-------------|-----------------------------------------------------------------------------------------------------------------------------------|
   | page      | number | No       | `1`         | Page number (integer ≥ 1)                                                                                                         |
   | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                                   |
+  | orderBy   | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                                             |
   | status    | string | No       | `pending`   | One of: `accepted`, `rejected`, `pending`                                                                                         |
   | sortBy    | string | No       | `createdAt` | One of: `firstName`, `surname`, `createdAt`, `schoolState`, `assignedMentor`, `currentClass`, `gender`                            |
   | search    | string | No       | —           | Full-text search query. When provided, cache and sort/status filters are bypassed and results are matched against the GIN index.   |

@@ -3,7 +3,7 @@ import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { TACOTS_EVENTS } from "../events/tacots.events.js";
 import { invalidateCache } from "../utils/cache.util.js";
-import { sql, asc, eq, count } from "drizzle-orm";
+import { sql, asc, desc, eq, count } from "drizzle-orm";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
 import { Request } from "express";
@@ -161,6 +161,7 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
 export const listRecommendations = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   status: string,
   sortBy: keyof typeof sortMap,
@@ -212,7 +213,7 @@ export const listRecommendations = async (
   }
 
   /// cache
-  const key = `cedarrise:tacots:tacotsRecommendations:${page}:${limit}:${status}:${sortBy}`;
+  const key = `cedarrise:tacots:tacotsRecommendations:${page}:${limit}:${orderBy}:${status}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -230,20 +231,35 @@ export const listRecommendations = async (
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = sortMap[sortBy] ?? tacotsRecommendation.createdAt;
+  const orderby =
+    sortColumn === tacotsRecommendation.createdAt
+      ? [
+          sql`
+            CASE
+              WHEN ${tacotsRecommendation.adminStatus} = ${status} THEN 0
+              ELSE 1
+            END
+          `,
+          desc(tacotsRecommendation.createdAt),
+        ]
+      : [
+          sql`
+            CASE
+              WHEN ${tacotsRecommendation.adminStatus} = ${status} THEN 0
+              ELSE 1
+            END
+          `,
+          sortDirection(sortColumn),
+          desc(tacotsRecommendation.createdAt),
+        ];
+
   const [tacotsBeneficiaries, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(tacotsRecommendation)
-      .orderBy(
-        sql`
-          CASE
-            WHEN ${tacotsRecommendation.adminStatus} = ${status} THEN 0
-            ELSE 1
-          END
-        `,
-        asc(sortColumn),
-      )
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsRecommendation.id) }).from(tacotsRecommendation),
@@ -486,7 +502,7 @@ export const listTacotsFeedback = async (page: number, limit: number, search: st
     db
       .select()
       .from(tacotsFeedback)
-      .orderBy(tacotsFeedback.createdAt)
+      .orderBy(desc(tacotsFeedback.createdAt))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsFeedback.id) }).from(tacotsFeedback),
@@ -633,6 +649,7 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
 export const listOnboarding = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   sortBy: keyof typeof onboardingSortMap,
 ) => {
@@ -684,7 +701,7 @@ export const listOnboarding = async (
   }
 
   /// cache
-  const key = `cedarrise:tacots:onboarding:${page}:${limit}`;
+  const key = `cedarrise:tacots:onboarding:${page}:${limit}:${orderBy}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -702,12 +719,17 @@ export const listOnboarding = async (
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = onboardingSortMap[sortBy] ?? tacotsOnboarding.createdAt;
+  const orderby =
+    sortColumn === tacotsOnboarding.createdAt
+      ? [desc(tacotsOnboarding.createdAt)]
+      : [sortDirection(sortColumn), desc(tacotsOnboarding.createdAt)];
   const [onboarded, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(tacotsOnboarding)
-      .orderBy(asc(sortColumn))
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
@@ -880,6 +902,7 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
 export const listTacotsTracking = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   sortBy: keyof typeof trackingSortMap,
 ) => {
@@ -925,7 +948,7 @@ export const listTacotsTracking = async (
   }
 
   /// cache
-  const key = `cedarrise:tacots:tracking:${page}:${limit}`;
+  const key = `cedarrise:tacots:tracking:${page}:${limit}:${orderBy}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -943,12 +966,17 @@ export const listTacotsTracking = async (
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = trackingSortMap[sortBy] ?? tacotsTracking.createdAt;
+  const orderby =
+    sortColumn === tacotsTracking.createdAt
+      ? [desc(tacotsTracking.createdAt)]
+      : [sortDirection(sortColumn), desc(tacotsTracking.createdAt)];
   const [tracking, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(tacotsTracking)
-      .orderBy(asc(sortColumn))
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsTracking.id) }).from(tacotsTracking),
@@ -1081,6 +1109,7 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
 export const listTacotsExit = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   sortBy: keyof typeof exitSortMap,
 ) => {
@@ -1125,7 +1154,7 @@ export const listTacotsExit = async (
   }
 
   /// cache
-  const key = `cedarrise:tacots:exit:${page}:${limit}`;
+  const key = `cedarrise:tacots:exit:${page}:${limit}:${orderBy}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -1143,12 +1172,17 @@ export const listTacotsExit = async (
   }
 
   ///
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = exitSortMap[sortBy] ?? tacotsExit.createdAt;
+  const orderby =
+    sortColumn === tacotsExit.createdAt
+      ? [desc(tacotsExit.createdAt)]
+      : [sortDirection(sortColumn), desc(tacotsExit.createdAt)];
   const [exit, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(tacotsExit)
-      .orderBy(asc(sortColumn))
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsExit.id) }).from(tacotsExit),

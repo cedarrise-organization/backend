@@ -128,9 +128,9 @@ export const listRegistrationsController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit, search, status, sortBy } = req.qtransformed;
+  const { page, limit, orderBy, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listRegistrations(page, limit, search, status, sortBy);
+    const response = await listRegistrations(page, limit, orderBy, search, status, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -457,9 +457,9 @@ export const submitTrackingController = async (req: Request, res: Response, next
   }
 };
 export const listTrackingController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit, search, sortBy } = req.qtransformed;
+  const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listTracking(page, limit, search, sortBy);
+    const response = await listTracking(page, limit, orderBy, search, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -682,9 +682,9 @@ export const submitExitController = async (req: Request, res: Response, next: Ne
   }
 };
 export const listExitController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit, search, sortBy } = req.qtransformed;
+  const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listExit(page, limit, search, sortBy);
+    const response = await listExit(page, limit, orderBy, search, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);

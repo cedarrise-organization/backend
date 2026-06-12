@@ -1,0 +1,51 @@
+meta {
+  name: Get outreach detail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/outreaches/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 67dd589c-348b-4f81-995b-9ab1a4e0f92d
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Outreach Tracker Detail
+  
+  Retrieves the complete detail of a single outreach tracker record by its unique identifier. Returns all outreach event details including location, dates, participant counts, activity descriptions, and impact assessment.
+  
+  ## Authorization
+  Requires `read` permission.
+  
+  ## Path Parameters
+  
+  | Parameter | Type   | Required | Description                                |
+  |-----------|--------|----------|--------------------------------------------|
+  | id        | string | Yes      | UUID of the outreach tracker record        |
+  
+  ## Response
+  
+  **`200 OK`** — Returns the complete outreach tracker record.
+  
+  The result is cached under the key `cedarrise:outreaches:outreach:<id>` using the `FORM_DATA` TTL.
+  
+  ## Errors
+  
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                 |
+  | `403 Forbidden`             | Authenticated user lacks `read` permission.              |
+  | `500 Internal Server Error` | Unexpected server error.                                 |
+}

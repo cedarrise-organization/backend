@@ -1,7 +1,7 @@
 import { CapacitybuildingevaluationbodyType } from "../modules/capacity/capacity.schema.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { capacityBuildingEvaluation } from "../db/models/admin.js";
-import { sql, eq, asc, count } from "drizzle-orm";
+import { sql, eq, asc, desc, count } from "drizzle-orm";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -75,7 +75,13 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
   };
 };
 
-export const listAllEvaluation = async (page: number, limit: number, search: string, sortBy: keyof typeof sortMap ) => {
+export const listAllEvaluation = async (
+  page: number,
+  limit: number,
+  orderBy: string,
+  search: string,
+  sortBy: keyof typeof sortMap,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -116,7 +122,7 @@ export const listAllEvaluation = async (page: number, limit: number, search: str
   }
 
   /// cache
-  const key = `cedarrise:capacity:evaluation:${page}:${limit}`;
+  const key = `cedarrise:capacity:evaluation:${page}:${limit}:${orderBy}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -134,12 +140,18 @@ export const listAllEvaluation = async (page: number, limit: number, search: str
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = sortMap[sortBy] ?? capacityBuildingEvaluation.createdAt;
+  const orderby =
+    sortColumn === capacityBuildingEvaluation.createdAt
+      ? [desc(capacityBuildingEvaluation.createdAt)]
+      : [sortDirection(sortColumn), desc(capacityBuildingEvaluation.createdAt)];
+
   const [evaluation, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(capacityBuildingEvaluation)
-      .orderBy(asc(sortColumn))
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation),

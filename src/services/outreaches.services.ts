@@ -1,7 +1,7 @@
 import { OutreachtrackerbodyType } from "../modules/outreaches/outreaches.schema.js";
 import { cacheGet, cacheDel, cacheSet, CACHE_TTL } from "../lib/cache.js";
 import { outreachTracker } from "../db/models/admin.js";
-import { sql, asc, eq, count } from "drizzle-orm";
+import { sql, asc, desc, eq, count } from "drizzle-orm";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -47,6 +47,7 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
 export const listOutreaches = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   sortBy: keyof typeof sortMap,
 ) => {
@@ -92,7 +93,7 @@ export const listOutreaches = async (
   }
 
   /// cache
-  const key = `cedarrise:outreaches:${page}:${limit}`;
+  const key = `cedarrise:outreaches:${page}:${limit}:${orderBy}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -110,12 +111,17 @@ export const listOutreaches = async (
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = sortMap[sortBy] ?? outreachTracker.createdAt;
+  const orderby =
+    sortColumn === outreachTracker.createdAt
+      ? [desc(outreachTracker.createdAt)]
+      : [sortDirection(sortColumn), desc(outreachTracker.createdAt)];
   const [outreaches, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(outreachTracker)
-      .orderBy(asc(sortColumn))
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(outreachTracker.id) }).from(outreachTracker),

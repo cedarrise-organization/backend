@@ -5,7 +5,7 @@ import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { ASH_EVENTS } from "../events/ash.events.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
-import { sql, asc, eq, count } from "drizzle-orm";
+import { sql, asc, eq, count, desc } from "drizzle-orm";
 import { Request } from "express";
 import {
   AshstudentbodyType,
@@ -144,6 +144,7 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
 export const listRegistrations = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   status: string,
   sortBy: keyof typeof sortMap,
@@ -194,7 +195,7 @@ export const listRegistrations = async (
   }
 
   /// cache
-  const key = `cedarrise:ash:ashStudents:${page}:${limit}:${status}:${sortBy}`;
+  const key = `cedarrise:ash:ashStudents:${page}:${limit}:${orderBy}:${status}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -212,20 +213,35 @@ export const listRegistrations = async (
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = sortMap[sortBy] ?? ashStudent.createdAt;
+  const orderby =
+    sortColumn === ashStudent.createdAt
+      ? [
+          sql`
+          CASE
+            WHEN ${ashStudent.status} = ${status} THEN 0
+            ELSE 1
+          END
+        `,
+          desc(ashStudent.createdAt),
+        ]
+      : [
+          sql`
+          CASE
+            WHEN ${ashStudent.status} = ${status} THEN 0
+            ELSE 1
+          END
+        `,
+          sortDirection(sortColumn),
+          desc(ashStudent.createdAt),
+        ];
+        
   const [ashStudents, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(ashStudent)
-      .orderBy(
-        sql`
-        CASE
-          WHEN ${ashStudent.status} = ${status} THEN 0
-          ELSE 1
-        END
-      `,
-        asc(sortColumn),
-      )
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(ashStudent.id) }).from(ashStudent),
@@ -494,7 +510,7 @@ export const listFeedback = async (page: number, limit: number, search: string) 
     db
       .select()
       .from(ashProgramFeedback)
-      .orderBy(ashProgramFeedback.createdAt)
+      .orderBy(desc(ashProgramFeedback.createdAt))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(ashProgramFeedback.id) }).from(ashProgramFeedback),
@@ -619,6 +635,7 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
 export const listTracking = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   sortBy: keyof typeof termlySortMap,
 ) => {
@@ -663,7 +680,7 @@ export const listTracking = async (
   }
 
   /// cache
-  const key = `cedarrise:ash:termlytracking:${page}:${limit}`;
+  const key = `cedarrise:ash:termlytracking:${page}:${limit}:${orderBy}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -681,12 +698,17 @@ export const listTracking = async (
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = termlySortMap[sortBy] ?? ashTermlyTracking.createdAt;
+  const orderby =
+    sortColumn === ashTermlyTracking.createdAt
+      ? [desc(ashTermlyTracking.createdAt)]
+      : [sortDirection(sortColumn), desc(ashTermlyTracking.createdAt)];
   const [tracking, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(ashTermlyTracking)
-      .orderBy(asc(sortColumn))
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
 
@@ -972,6 +994,7 @@ export const submitExit = async (options: AshexitbodyType) => {
 export const listExit = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   sortBy: keyof typeof exitSortMap,
 ) => {
@@ -1016,7 +1039,7 @@ export const listExit = async (
     };
   }
   /// cache
-  const key = `cedarrise:ash:exit:${page}:${limit}`;
+  const key = `cedarrise:ash:exit:${page}:${limit}:${orderBy}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -1033,12 +1056,18 @@ export const listExit = async (
     };
   }
   ///
+
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = exitSortMap[sortBy] ?? ashExit.createdAt;
+  const orderby =
+    sortColumn === ashExit.createdAt
+      ? [desc(ashExit.createdAt)]
+      : [sortDirection(sortColumn), desc(ashExit.createdAt)];
   const [exit, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(ashExit)
-      .orderBy(asc(sortColumn))
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(ashExit.id) }).from(ashExit),

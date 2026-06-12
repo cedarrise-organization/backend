@@ -1,0 +1,54 @@
+meta {
+  name: Delete outreach record
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/forms/outreaches/{{id}}
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  id: 67dd589c-348b-4f81-995b-9ab1a4e0f92d
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete Outreach Tracker Record
+  
+  Permanently deletes an outreach tracker record by its unique identifier. The corresponding cache entry is also invalidated.
+  
+  ## Authorization
+  Requires `delete` permission.
+  
+  ## Path Parameters
+  
+  | Parameter | Type   | Required | Description                                |
+  |-----------|--------|----------|--------------------------------------------|
+  | id        | string | Yes      | UUID of the outreach tracker to delete     |
+  
+  ## Validation
+  - `id` must be a valid UUID.
+  
+  ## Response
+  
+  **`200 OK`** — Returns a success message confirming deletion.
+  
+  The cache key `cedarrise:outreaches:outreach:<id>` is also deleted.
+  
+  ## Errors
+  
+  | Status                      | Description                                             |
+  |-----------------------------|---------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format (must be a valid UUID).              |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                 |
+  | `403 Forbidden`             | Authenticated user lacks `delete` permission.            |
+  | `500 Internal Server Error` | Unexpected server error.                                 |
+}

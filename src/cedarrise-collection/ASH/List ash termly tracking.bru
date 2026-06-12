@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/ash/tracking?page=&limit=&search=
+  url: {{baseUrl}}/api/v1/forms/ash/tracking?page=&limit=&orderBy=&search=&sortBy=
   body: none
   auth: inherit
 }
@@ -13,7 +13,9 @@ get {
 params:query {
   page: 
   limit: 
+  orderBy: 
   search: 
+  sortBy: 
 }
 
 vars:pre-request {
@@ -35,11 +37,13 @@ docs {
   
   ## Query Parameters
   
-  | Parameter | Type   | Required | Default | Description                                                                                             |
-  |-----------|--------|----------|---------|---------------------------------------------------------------------------------------------------------|
-  | page      | number | No       | `1`     | Page number (integer ≥ 1)                                                                               |
-  | limit     | number | No       | `25`    | Items per page (integer, 1–100)                                                                         |
-  | search    | string | No       | —       | Full-text search query. When provided, cache is bypassed and results are matched against the GIN index. |
+  | Parameter | Type   | Required | Default     | Description / Allowed Values                                                                            |
+  |-----------|--------|----------|-------------|---------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`         | Page number (integer ≥ 1)                                                                               |
+  | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                         |
+  | orderBy   | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                   |
+  | sortBy    | string | No       | `createdAt` | One of: `academicSession`, `term`, `schoolName`, `mentorName`, `createdAt`                              |
+  | search    | string | No       | —           | Full-text search query. When provided, cache and sort filters are bypassed and results are matched against the GIN index. |
   
   ### Searchable Fields
   

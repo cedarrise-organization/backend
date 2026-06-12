@@ -1,7 +1,7 @@
 import { volunteerRegistration, volunteerFeedback } from "../db/models/admin.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { invalidateCache } from "../utils/cache.util.js";
-import { sql, asc, eq, count } from "drizzle-orm";
+import { sql, asc, desc, eq, count } from "drizzle-orm";
 import {
   VolunteerregistrationbodyType,
   VolunteerfeedbackbodyType,
@@ -67,6 +67,7 @@ export const submitVolunteerRegistration = async (options: Volunteerregistration
 export const listVolunteers = async (
   page: number,
   limit: number,
+  orderBy: string,
   search: string,
   status: string,
   sortBy: keyof typeof sortMap,
@@ -114,7 +115,7 @@ export const listVolunteers = async (
   }
 
   /// cache
-  const key = `cedarrise:volunteer:volunteers:${page}:${limit}:${status}:${sortBy}`;
+  const key = `cedarrise:volunteer:volunteers:${page}:${limit}:${orderBy}:${status}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -132,20 +133,34 @@ export const listVolunteers = async (
   }
   ///
 
+  const sortDirection = orderBy === "asc" ? asc : desc;
   const sortColumn = sortMap[sortBy] ?? volunteerRegistration.createdAt;
+  const orderby =
+    sortColumn === volunteerRegistration.createdAt
+      ? [
+          sql`
+            CASE
+              WHEN ${volunteerRegistration.status} = ${status} THEN 0
+              ELSE 1
+            END
+          `,
+          desc(volunteerRegistration.createdAt),
+        ]
+      : [
+          sql`
+            CASE
+              WHEN ${volunteerRegistration.status} = ${status} THEN 0
+              ELSE 1
+            END
+          `,
+          sortDirection(sortColumn),
+          desc(volunteerRegistration.createdAt),
+        ];
   const [volunteers, [totalDocuments]] = await Promise.all([
     db
       .select()
       .from(volunteerRegistration)
-      .orderBy(
-        sql`
-        CASE
-          WHEN ${volunteerRegistration.status} = ${status} THEN 0
-          ELSE 1
-        END
-      `,
-        asc(sortColumn),
-      )
+      .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration),
@@ -354,7 +369,7 @@ export const listVolunteerFeedback = async (page: number, limit: number, search:
     db
       .select()
       .from(volunteerFeedback)
-      .orderBy(volunteerFeedback.createdAt)
+      .orderBy(desc(volunteerFeedback.createdAt))
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(volunteerFeedback.id) }).from(volunteerFeedback),

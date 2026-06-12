@@ -1,0 +1,69 @@
+meta {
+  name: Download outreach tracker
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/outreaches/download/outreachtracker
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download Outreach Tracker (CSV Export)
+  
+  Exports the entire `outreach_tracker` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  
+  ## Authorization
+  Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv`
+  **Content-Disposition:** `attachment; filename="outreach_tracker.csv"`
+  
+  The CSV contains one row per outreach record with the following columns (in order):
+  
+  | Column                  | Description                                             |
+  |-------------------------|---------------------------------------------------------|
+  | `id`                    | UUID primary key                                        |
+  | `outreachStartDate`     | Start date of the outreach event                        |
+  | `outreachEndDate`       | End date of the outreach event                          |
+  | `outreachState`         | Nigerian state where the outreach took place            |
+  | `outreachLga`           | Local Government Area                                   |
+  | `outreachCity`          | City of the outreach event                              |
+  | `outreachCommunity`     | Specific community name                                 |
+  | `numVolunteers`         | Number of volunteers involved                           |
+  | `numBeneficiaries`      | Number of beneficiaries reached                         |
+  | `outreachType`          | Type(s) of outreach activity                            |
+  | `activityDescription`   | Description of activities conducted                     |
+  | `impactStories`         | Notable impact stories                                  |
+  | `challengesEncountered` | Challenges encountered during the outreach              |
+  | `recommendations`       | Recommendations for future outreaches                   |
+  | `submittedBy`           | Name of the person who submitted the report             |
+  | `submissionDate`        | Date the report was submitted                           |
+  | `updatedAt`             | Last update timestamp                                   |
+  | `createdAt`             | Creation timestamp                                      |
+  | `deletedAt`             | Soft-delete timestamp (null if active)                  |
+  
+  ## Errors
+  
+  | Status                      | Description                                          |
+  |-----------------------------|------------------------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid access token / refresh token.     |
+  | `403 Forbidden`             | User lacks the `"read"` permission.                  |
+  | `500 Internal Server Error` | Unexpected server error.                             |
+}

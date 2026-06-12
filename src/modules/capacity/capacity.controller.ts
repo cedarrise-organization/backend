@@ -110,9 +110,9 @@ export const listAllEvaluationController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit, search, sortBy } = req.qtransformed;
+  const { page, limit, orderBy, search, sortBy} = req.qtransformed;
   try {
-    const response = await listAllEvaluation(page, limit, search, sortBy);
+    const response = await listAllEvaluation(page, limit, orderBy, search, sortBy);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -146,7 +146,7 @@ export const exportCapacityEvaluationController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportCapacityEvaluationTableToCSV();
+    const response: any = await exportCapacityEvaluationTableToCSV();
 
     const fields = [
       "id",

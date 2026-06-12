@@ -1,0 +1,91 @@
+meta {
+  name: Submit outreach tracker
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/outreaches
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "outreachStartDate": "2026-03-01",
+    "outreachEndDate": "2026-03-05",
+    "outreachState": "LAGOS",
+    "outreachLga": "ikeja",
+    "outreachCity": "ikeja",
+    "outreachCommunity": "alausa community",
+    "numVolunteers": 12,
+    "numBeneficiaries": 85,
+    "outreachType": ["EDUCATIONAL", "SOFT SKILLS"],
+    "activityDescription": "educational workshops and soft skills training for community youth",
+    "impactStories": "several beneficiaries reported improved confidence after sessions",
+    "challengesEncountered": "limited space at the community hall",
+    "recommendations": "secure larger venue for future outreaches",
+    "submittedBy": "john doe",
+    "submissionDate": "2026-03-06"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit Outreach Tracker
+  
+  Creates a new outreach tracker record. Captures details about a community outreach event including location, dates, participant counts, activity descriptions, and impact assessment.
+  
+  ## Authorization
+  Requires `create` permission.
+  
+  ## Request Body (`application/json`)
+  
+  | Field                  | Type       | Required | Description                                                                     |
+  |------------------------|------------|----------|---------------------------------------------------------------------------------|
+  | `outreachStartDate`    | date       | Yes      | Start date of the outreach (format: `YYYY-MM-DD`)                               |
+  | `outreachEndDate`      | date       | Yes      | End date of the outreach (format: `YYYY-MM-DD`)                                 |
+  | `outreachState`        | string     | Yes      | Nigerian state. One of the 36 states + `FCT` + `OTHER`                          |
+  | `outreachLga`          | string     | Yes      | Local Government Area                                                           |
+  | `outreachCity`         | string     | Yes      | City where the outreach took place                                              |
+  | `outreachCommunity`    | string     | Yes      | Specific community name                                                         |
+  | `numVolunteers`        | number     | Yes      | Number of volunteers involved (integer ≥ 0)                                     |
+  | `numBeneficiaries`     | number     | Yes      | Number of beneficiaries reached (integer ≥ 0)                                   |
+  | `outreachType`         | string[]   | Yes      | Array of types: `SOFT SKILLS`, `VOCATIONAL SKILLS`, `MEDICAL`, `EDUCATIONAL`    |
+  | `activityDescription`  | string     | Yes      | Description of activities conducted                                             |
+  | `impactStories`        | string     | No       | Notable impact stories from the outreach                                        |
+  | `challengesEncountered`| string     | No       | Challenges encountered during the outreach                                      |
+  | `recommendations`      | string     | No       | Recommendations for future outreaches                                           |
+  | `submittedBy`          | string     | Yes      | Name of the person submitting the report                                        |
+  | `submissionDate`       | date       | Yes      | Date the report was submitted (format: `YYYY-MM-DD`)                            |
+  
+  ## Response
+  
+  **`201 Created`** — Returns the newly created outreach tracker record.
+  
+  ```json
+  {
+    "success": true,
+    "data": { ... }
+  }
+  ```
+  
+  The result is cached under the key `cedarrise:outreaches:outreach:<id>` using the `FORM_DATA` TTL.
+  
+  ## Errors
+  
+  | Status                      | Description                                          |
+  |-----------------------------|------------------------------------------------------|
+  | `400 Bad Request`           | Validation error (missing or invalid fields).        |
+  | `401 Unauthorized`          | Missing or invalid authentication token.             |
+  | `403 Forbidden`             | Authenticated user lacks `create` permission.        |
+  | `500 Internal Server Error` | Unexpected server error.                             |
+}
