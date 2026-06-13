@@ -125,6 +125,7 @@ export const listVolunteers = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        metadata: cacheRes.metadata,
       },
     };
   }
@@ -153,7 +154,7 @@ export const listVolunteers = async (
           sortDirection(sortColumn),
           desc(volunteerRegistration.createdAt),
         ];
-  const [volunteers, [totalDocuments]] = await Promise.all([
+  const [volunteers, [totalDocuments], [metaData]] = await Promise.all([
     db
       .select()
       .from(volunteerRegistration)
@@ -161,11 +162,37 @@ export const listVolunteers = async (
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration),
+    db
+      .select({
+        acceptedStudents: sql<number>`
+          COUNT(${volunteerRegistration.id}) FILTER (WHERE ${volunteerRegistration.status} = 'accepted')
+        `,
+        rejectedStudents: sql<number>`
+          COUNT(${volunteerRegistration.id}) FILTER (WHERE ${volunteerRegistration.status} = 'rejected')
+        `,
+        pendingStudents: sql<number>`
+          COUNT(${volunteerRegistration.id}) FILTER (WHERE ${volunteerRegistration.status} = 'pending')
+        `,
+      })
+      .from(volunteerRegistration),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, { data: volunteers, totalPages }, CACHE_TTL.FORM_DATA);
+  await cacheSet(
+    key,
+    {
+      data: volunteers,
+      totalPages,
+      metadata: {
+        totalSubmissions: totalDocuments!.value,
+        acceptedStudents: Number(metaData!.acceptedStudents),
+        rejectedStudents: Number(metaData!.rejectedStudents),
+        pendingStudents: Number(metaData!.pendingStudents),
+      },
+    },
+    CACHE_TTL.FORM_DATA,
+  );
   ///
 
   return {
@@ -177,6 +204,12 @@ export const listVolunteers = async (
         page,
         limit,
         totalPages,
+      },
+      metadata: {
+        totalSubmissions: totalDocuments!.value,
+        acceptedStudents: Number(metaData!.acceptedStudents),
+        rejectedStudents: Number(metaData!.rejectedStudents),
+        pendingStudents: Number(metaData!.pendingStudents),
       },
     },
   };

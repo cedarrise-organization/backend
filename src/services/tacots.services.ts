@@ -223,6 +223,7 @@ export const listRecommendations = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        metadata: cacheRes.metadata,
       },
     };
   }
@@ -252,7 +253,7 @@ export const listRecommendations = async (
           desc(tacotsRecommendation.createdAt),
         ];
 
-  const [tacotsBeneficiaries, [totalDocuments]] = await Promise.all([
+  const [tacotsBeneficiaries, [totalDocuments], [metaData]] = await Promise.all([
     db
       .select()
       .from(tacotsRecommendation)
@@ -260,11 +261,37 @@ export const listRecommendations = async (
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsRecommendation.id) }).from(tacotsRecommendation),
+    db
+      .select({
+        acceptedStudents: sql<number>`
+          COUNT(${tacotsRecommendation.id}) FILTER (WHERE ${tacotsRecommendation.adminStatus} = 'SELECTED')
+        `,
+        rejectedStudents: sql<number>`
+          COUNT(${tacotsRecommendation.id}) FILTER (WHERE ${tacotsRecommendation.adminStatus} = 'NOT SELECTED')
+        `,
+        pendingStudents: sql<number>`
+          COUNT(${tacotsRecommendation.id}) FILTER (WHERE ${tacotsRecommendation.adminStatus} = 'KEEP IN VIEW')
+        `,
+      })
+      .from(tacotsRecommendation),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, { data: tacotsBeneficiaries, totalPages }, CACHE_TTL.FORM_DATA);
+  await cacheSet(
+    key,
+    {
+      data: tacotsBeneficiaries,
+      totalPages,
+      metadata: {
+        totalSubmissions: totalDocuments!.value,
+        acceptedStudents: Number(metaData!.acceptedStudents),
+        rejectedStudents: Number(metaData!.rejectedStudents),
+        pendingStudents: Number(metaData!.pendingStudents),
+      },
+    },
+    CACHE_TTL.FORM_DATA,
+  );
   ///
 
   return {
@@ -276,6 +303,12 @@ export const listRecommendations = async (
         page,
         limit,
         totalPages,
+      },
+      metadata: {
+        totalSubmissions: totalDocuments!.value,
+        acceptedStudents: Number(metaData!.acceptedStudents),
+        rejectedStudents: Number(metaData!.rejectedStudents),
+        pendingStudents: Number(metaData!.pendingStudents),
       },
     },
   };
