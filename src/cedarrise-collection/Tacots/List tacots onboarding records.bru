@@ -63,12 +63,59 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns a paginated array of TACOTS onboarding records.
+  **`200 OK`** — Returns a paginated array of TACOTS onboarding records. Each item includes `firstName` and `surname` from the joined TACOTS recommendation record.
   
   ```json
   {
     "success": true,
-    "data": [ ... ],
+    "data": [
+      {
+        "firstName": "string",
+        "surname": "string",
+        "id": "uuid",
+        "studentId": "uuid",
+        "onboardingDate": "YYYY-MM-DD",
+        "hasMentalHealthDiagnosis": "string",
+        "diagnosedConditions": ["string"] | null,
+        "behavioralIndicators": ["string"],
+        "focusAbilityRating": 3,
+        "emotionalStabilityRating": 4,
+        "peerInteractionRating": 3,
+        "receivedCounseling": "string",
+        "needsSpecialSupport": "string",
+        "mentalHealthNotes": "string" | null,
+        "generalHealthStatus": "string",
+        "immunizationStatus": "string",
+        "hasChronicCondition": "string",
+        "chronicConditions": ["string"] | null,
+        "allergies": ["string"],
+        "requiresMedication": "string",
+        "physicalActivityLevel": 4,
+        "physicalLimitations": "string",
+        "additionalHealthNotes": "string" | null,
+        "enrolledSchoolName": "string",
+        "enrolledSchoolTown": "string",
+        "enrolledSchoolLga": "string",
+        "enrolledSchoolState": "string",
+        "enrolledClass": "string",
+        "termResumptionDate": "YYYY-MM-DD",
+        "schoolFeesPerTerm": 50000 | null,
+        "studentCommitment": true | null,
+        "parentGuardianCommitment": true,
+        "parentSignatureUrl": "string" | null,
+        "parentSignaturePublicId": "string" | null,
+        "admissionLetterUrl": "string" | null,
+        "admissionLetterPublicId": "string" | null,
+        "programOfficerNotes": "string" | null,
+        "supportTypesApproved": ["string"] | null,
+        "mentorName": "string" | null,
+        "sponsorName": "string" | null,
+        "additionalInfo": "string" | null,
+        "updatedAt": "ISO 8601" | null,
+        "createdAt": "ISO 8601",
+        "deletedAt": "ISO 8601" | null
+      }
+    ],
     "meta": {
       "pagination": {
         "page": 1,

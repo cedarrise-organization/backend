@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: e5d6b085-91a3-44c6-b44b-a20c1566b7d4
+  id: 7efc37c4-903a-4eac-adc8-054a158b2762
   baseUrl: http://localhost:3000
 }
 
@@ -43,6 +43,8 @@ docs {
     "success": true,
     "message": "...",
     "data": {
+      "firstName": "string",
+      "surname": "string",
       "id": "uuid",
       "studentId": "uuid",
       "onboardingDate": "YYYY-MM-DD",
@@ -93,6 +95,8 @@ docs {
   
   | Field                        | Type     | Description                                                        |
   |------------------------------|----------|--------------------------------------------------------------------|
+  | firstName                    | string   | Student's first name (joined from TACOTS recommendation record).   |
+  | surname                      | string   | Student's surname (joined from TACOTS recommendation record).      |
   | id                           | string   | UUID primary key.                                                  |
   | studentId                    | string   | UUID reference to the TACOTS recommendation record.                |
   | onboardingDate               | string   | Date of onboarding (`YYYY-MM-DD`).                                 |

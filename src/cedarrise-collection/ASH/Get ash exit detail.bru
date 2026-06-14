@@ -43,6 +43,8 @@ docs {
     "success": true,
     "message": "...",
     "data": {
+      "firstName": "string",
+      "surname": "string",
       "id": "uuid",
       "studentId": "uuid",
       "ageAtExit": 14,
@@ -74,6 +76,8 @@ docs {
   
   | Field                    | Type     | Description                                                      |
   |--------------------------|----------|------------------------------------------------------------------|
+  | firstName                | string   | Student's first name (joined from ASH student record).           |
+  | surname                  | string   | Student's surname (joined from ASH student record).              |
   | id                       | string   | UUID primary key.                                                |
   | studentId                | string   | UUID reference to the ASH student record.                        |
   | ageAtExit                | number   | Student's age at the time of exit (6–18).                        |

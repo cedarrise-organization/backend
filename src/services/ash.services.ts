@@ -155,9 +155,9 @@ export const listRegistrations = async (
     const searchVector = sql`
     setweight(to_tsvector('english', ${ashStudent.firstName}), 'A') ||
     setweight(to_tsvector('english', ${ashStudent.surname}), 'A') ||
-    setweight(to_tsvector('english', ${ashStudent.middleName}), 'A') ||
+    setweight(to_tsvector('english', coalesce(${ashStudent.middleName}, '')), 'A')
     setweight(to_tsvector('english', ${ashStudent.currentClass}), 'B') ||
-    setweight(to_tsvector('english', ${ashStudent.assignedMentor}), 'B') ||
+    setweight(to_tsvector('english', coalesce(${ashStudent.assignedMentor}, '')), 'B')
     setweight(to_tsvector('english', ${ashStudent.schoolName}), 'B') ||
     setweight(to_tsvector('english', ${ashStudent.schoolState}), 'C') ||
     setweight(to_tsvector('english', ${ashStudent.schoolTown}), 'C') ||
@@ -485,7 +485,7 @@ export const listFeedback = async (page: number, limit: number, search: string) 
       setweight(to_tsvector('english', ${ashProgramFeedback.studentSurname}), 'A') ||
       setweight(to_tsvector('english', ${ashProgramFeedback.schoolName}), 'A') ||
       setweight(to_tsvector('english', ${ashProgramFeedback.currentClass}), 'B') ||
-      setweight(to_tsvector('english', ${ashProgramFeedback.parentPhone}), 'B') 
+      setweight(to_tsvector('english', coalesce(${ashProgramFeedback.parentPhone}, '')), 'B')
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -682,8 +682,42 @@ export const listTracking = async (
 
     const [tracking, [totalDocuments]] = await Promise.all([
       db
-        .select()
+        .select({
+          firstName: ashStudent.firstName,
+          surname: ashStudent.surname,
+          id: ashTermlyTracking.id,
+          studentId: ashTermlyTracking.studentId,
+          academicSession: ashTermlyTracking.academicSession,
+          term: ashTermlyTracking.term,
+          schoolName: ashTermlyTracking.schoolName,
+          schoolNumeracyScore: ashTermlyTracking.schoolNumeracyScore,
+          schoolLiteracyScore: ashTermlyTracking.schoolLiteracyScore,
+          schoolAverage: ashTermlyTracking.schoolAverage,
+          schoolPosition: ashTermlyTracking.schoolPosition,
+          pretestNumeracyScore: ashTermlyTracking.pretestNumeracyScore,
+          pretestLiteracyScore: ashTermlyTracking.pretestLiteracyScore,
+          pretestAverage: ashTermlyTracking.pretestAverage,
+          midtestNumeracyScore: ashTermlyTracking.midtestNumeracyScore,
+          midtestLiteracyScore: ashTermlyTracking.midtestLiteracyScore,
+          midtestAverage: ashTermlyTracking.midtestAverage,
+          posttestNumeracyScore: ashTermlyTracking.posttestNumeracyScore,
+          posttestLiteracyScore: ashTermlyTracking.posttestLiteracyScore,
+          posttestAverage: ashTermlyTracking.posttestAverage,
+          disciplineRating: ashTermlyTracking.disciplineRating,
+          responsibilityRating: ashTermlyTracking.responsibilityRating,
+          leadershipRating: ashTermlyTracking.leadershipRating,
+          notableAchievements: ashTermlyTracking.notableAchievements,
+          challengesObserved: ashTermlyTracking.challengesObserved,
+          nextTermRecommendations: ashTermlyTracking.nextTermRecommendations,
+          mentorName: ashTermlyTracking.mentorName,
+          termResultUrl: ashTermlyTracking.termResultUrl,
+          termResultPublicId: ashTermlyTracking.termResultPublicId,
+          updatedAt: ashTermlyTracking.updatedAt,
+          createdAt: ashTermlyTracking.createdAt,
+          deletedAt: ashTermlyTracking.deletedAt,
+        })
         .from(ashTermlyTracking)
+        .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`)
         .limit(limit)
         .offset((page - 1) * limit),
@@ -736,8 +770,42 @@ export const listTracking = async (
       : [sortDirection(sortColumn), desc(ashTermlyTracking.createdAt)];
   const [tracking, [totalDocuments]] = await Promise.all([
     db
-      .select()
+      .select({
+        firstName: ashStudent.firstName,
+        surname: ashStudent.surname,
+        id: ashTermlyTracking.id,
+        studentId: ashTermlyTracking.studentId,
+        academicSession: ashTermlyTracking.academicSession,
+        term: ashTermlyTracking.term,
+        schoolName: ashTermlyTracking.schoolName,
+        schoolNumeracyScore: ashTermlyTracking.schoolNumeracyScore,
+        schoolLiteracyScore: ashTermlyTracking.schoolLiteracyScore,
+        schoolAverage: ashTermlyTracking.schoolAverage,
+        schoolPosition: ashTermlyTracking.schoolPosition,
+        pretestNumeracyScore: ashTermlyTracking.pretestNumeracyScore,
+        pretestLiteracyScore: ashTermlyTracking.pretestLiteracyScore,
+        pretestAverage: ashTermlyTracking.pretestAverage,
+        midtestNumeracyScore: ashTermlyTracking.midtestNumeracyScore,
+        midtestLiteracyScore: ashTermlyTracking.midtestLiteracyScore,
+        midtestAverage: ashTermlyTracking.midtestAverage,
+        posttestNumeracyScore: ashTermlyTracking.posttestNumeracyScore,
+        posttestLiteracyScore: ashTermlyTracking.posttestLiteracyScore,
+        posttestAverage: ashTermlyTracking.posttestAverage,
+        disciplineRating: ashTermlyTracking.disciplineRating,
+        responsibilityRating: ashTermlyTracking.responsibilityRating,
+        leadershipRating: ashTermlyTracking.leadershipRating,
+        notableAchievements: ashTermlyTracking.notableAchievements,
+        challengesObserved: ashTermlyTracking.challengesObserved,
+        nextTermRecommendations: ashTermlyTracking.nextTermRecommendations,
+        mentorName: ashTermlyTracking.mentorName,
+        termResultUrl: ashTermlyTracking.termResultUrl,
+        termResultPublicId: ashTermlyTracking.termResultPublicId,
+        updatedAt: ashTermlyTracking.updatedAt,
+        createdAt: ashTermlyTracking.createdAt,
+        deletedAt: ashTermlyTracking.deletedAt,
+      })
       .from(ashTermlyTracking)
+      .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
       .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
@@ -776,7 +844,44 @@ export const getTrack = async (id: string) => {
   }
   ///
 
-  const [track] = await db.select().from(ashTermlyTracking).where(eq(ashTermlyTracking.id, id));
+  const [track] = await db
+    .select({
+      firstName: ashStudent.firstName,
+      surname: ashStudent.surname,
+      id: ashTermlyTracking.id,
+      studentId: ashTermlyTracking.studentId,
+      academicSession: ashTermlyTracking.academicSession,
+      term: ashTermlyTracking.term,
+      schoolName: ashTermlyTracking.schoolName,
+      schoolNumeracyScore: ashTermlyTracking.schoolNumeracyScore,
+      schoolLiteracyScore: ashTermlyTracking.schoolLiteracyScore,
+      schoolAverage: ashTermlyTracking.schoolAverage,
+      schoolPosition: ashTermlyTracking.schoolPosition,
+      pretestNumeracyScore: ashTermlyTracking.pretestNumeracyScore,
+      pretestLiteracyScore: ashTermlyTracking.pretestLiteracyScore,
+      pretestAverage: ashTermlyTracking.pretestAverage,
+      midtestNumeracyScore: ashTermlyTracking.midtestNumeracyScore,
+      midtestLiteracyScore: ashTermlyTracking.midtestLiteracyScore,
+      midtestAverage: ashTermlyTracking.midtestAverage,
+      posttestNumeracyScore: ashTermlyTracking.posttestNumeracyScore,
+      posttestLiteracyScore: ashTermlyTracking.posttestLiteracyScore,
+      posttestAverage: ashTermlyTracking.posttestAverage,
+      disciplineRating: ashTermlyTracking.disciplineRating,
+      responsibilityRating: ashTermlyTracking.responsibilityRating,
+      leadershipRating: ashTermlyTracking.leadershipRating,
+      notableAchievements: ashTermlyTracking.notableAchievements,
+      challengesObserved: ashTermlyTracking.challengesObserved,
+      nextTermRecommendations: ashTermlyTracking.nextTermRecommendations,
+      mentorName: ashTermlyTracking.mentorName,
+      termResultUrl: ashTermlyTracking.termResultUrl,
+      termResultPublicId: ashTermlyTracking.termResultPublicId,
+      updatedAt: ashTermlyTracking.updatedAt,
+      createdAt: ashTermlyTracking.createdAt,
+      deletedAt: ashTermlyTracking.deletedAt,
+    })
+    .from(ashTermlyTracking)
+    .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
+    .where(eq(ashTermlyTracking.id, id));
 
   /// cache set
   await cacheSet(key, track, CACHE_TTL.FORM_DATA);
@@ -857,7 +962,7 @@ export const listAttendance = async (page: number, limit: number, search: string
   if (search) {
     const searchVector = sql` 
       setweight(to_tsvector('english', ${ashWeeklyAttendance.volunteersInAttendance}), 'A') ||
-      setweight(to_tsvector('english', ${ashWeeklyAttendance.sessionDetails}), 'A') 
+      setweight(to_tsvector('english', coalesce(${ashWeeklyAttendance.sessionDetails}, '')), 'A')
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -1039,8 +1144,35 @@ export const listExit = async (
 
     const [exit, [totalDocuments]] = await Promise.all([
       db
-        .select()
+        .select({
+          firstName: ashStudent.firstName,
+          surname: ashStudent.surname,
+          id: ashExit.id,
+          studentId: ashExit.studentId,
+          ageAtExit: ashExit.ageAtExit,
+          schoolName: ashExit.schoolName,
+          classAtExit: ashExit.classAtExit,
+          durationInProgram: ashExit.durationInProgram,
+          exitReason: ashExit.exitReason,
+          academicImpactRating: ashExit.academicImpactRating,
+          areasOfImprovement: ashExit.areasOfImprovement,
+          mentorshipReceived: ashExit.mentorshipReceived,
+          mentorshipImpactRating: ashExit.mentorshipImpactRating,
+          postAshStatus: ashExit.postAshStatus,
+          institutionName: ashExit.institutionName,
+          courseOfStudy: ashExit.courseOfStudy,
+          vocationalSkill: ashExit.vocationalSkill,
+          enjoyedMost: ashExit.enjoyedMost,
+          programImpact: ashExit.programImpact,
+          improvementSuggestions: ashExit.improvementSuggestions,
+          facilitatorName: ashExit.facilitatorName,
+          exitDate: ashExit.exitDate,
+          updatedAt: ashExit.updatedAt,
+          createdAt: ashExit.createdAt,
+          deletedAt: ashExit.deletedAt,
+        })
         .from(ashExit)
+        .innerJoin(ashStudent, eq(ashStudent.id, ashExit.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`)
         .limit(limit)
         .offset((page - 1) * limit),
@@ -1092,8 +1224,35 @@ export const listExit = async (
       : [sortDirection(sortColumn), desc(ashExit.createdAt)];
   const [exit, [totalDocuments]] = await Promise.all([
     db
-      .select()
+      .select({
+        firstName: ashStudent.firstName,
+        surname: ashStudent.surname,
+        id: ashExit.id,
+        studentId: ashExit.studentId,
+        ageAtExit: ashExit.ageAtExit,
+        schoolName: ashExit.schoolName,
+        classAtExit: ashExit.classAtExit,
+        durationInProgram: ashExit.durationInProgram,
+        exitReason: ashExit.exitReason,
+        academicImpactRating: ashExit.academicImpactRating,
+        areasOfImprovement: ashExit.areasOfImprovement,
+        mentorshipReceived: ashExit.mentorshipReceived,
+        mentorshipImpactRating: ashExit.mentorshipImpactRating,
+        postAshStatus: ashExit.postAshStatus,
+        institutionName: ashExit.institutionName,
+        courseOfStudy: ashExit.courseOfStudy,
+        vocationalSkill: ashExit.vocationalSkill,
+        enjoyedMost: ashExit.enjoyedMost,
+        programImpact: ashExit.programImpact,
+        improvementSuggestions: ashExit.improvementSuggestions,
+        facilitatorName: ashExit.facilitatorName,
+        exitDate: ashExit.exitDate,
+        updatedAt: ashExit.updatedAt,
+        createdAt: ashExit.createdAt,
+        deletedAt: ashExit.deletedAt,
+      })
       .from(ashExit)
+      .innerJoin(ashStudent, eq(ashStudent.id, ashExit.studentId))
       .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
@@ -1131,7 +1290,37 @@ export const getExit = async (id: string) => {
   }
   ///
 
-  const [exit] = await db.select().from(ashExit).where(eq(ashExit.id, id));
+  const [exit] = await db
+    .select({
+      firstName: ashStudent.firstName,
+      surname: ashStudent.surname,
+      id: ashExit.id,
+      studentId: ashExit.studentId,
+      ageAtExit: ashExit.ageAtExit,
+      schoolName: ashExit.schoolName,
+      classAtExit: ashExit.classAtExit,
+      durationInProgram: ashExit.durationInProgram,
+      exitReason: ashExit.exitReason,
+      academicImpactRating: ashExit.academicImpactRating,
+      areasOfImprovement: ashExit.areasOfImprovement,
+      mentorshipReceived: ashExit.mentorshipReceived,
+      mentorshipImpactRating: ashExit.mentorshipImpactRating,
+      postAshStatus: ashExit.postAshStatus,
+      institutionName: ashExit.institutionName,
+      courseOfStudy: ashExit.courseOfStudy,
+      vocationalSkill: ashExit.vocationalSkill,
+      enjoyedMost: ashExit.enjoyedMost,
+      programImpact: ashExit.programImpact,
+      improvementSuggestions: ashExit.improvementSuggestions,
+      facilitatorName: ashExit.facilitatorName,
+      exitDate: ashExit.exitDate,
+      updatedAt: ashExit.updatedAt,
+      createdAt: ashExit.createdAt,
+      deletedAt: ashExit.deletedAt,
+    })
+    .from(ashExit)
+    .innerJoin(ashStudent, eq(ashStudent.id, ashExit.studentId))
+    .where(eq(ashExit.id, id));
 
   /// cache set
   await cacheSet(key, exit, CACHE_TTL.FORM_DATA);

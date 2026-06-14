@@ -474,7 +474,7 @@ export const listTacotsFeedback = async (page: number, limit: number, search: st
       setweight(to_tsvector('english', ${tacotsFeedback.studentSurname}), 'A') ||
       setweight(to_tsvector('english', ${tacotsFeedback.currentClass}), 'B') ||
       setweight(to_tsvector('english', ${tacotsFeedback.currentSchool}), 'A') ||
-      setweight(to_tsvector('english', ${tacotsFeedback.parentPhone}), 'B') 
+      setweight(to_tsvector('english', coalesce(${tacotsFeedback.parentPhone}, '')), 'B')
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -688,15 +688,61 @@ export const listOnboarding = async (
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolName}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolState}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledClass}), 'C') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.mentorName}), 'B') ||
-      setweight(to_tsvector('english', ${tacotsOnboarding.sponsorName}), 'B') 
+      setweight(to_tsvector('english', coalesce(${tacotsOnboarding.mentorName}, '')), 'B') ||
+      setweight(to_tsvector('english', coalesce(${tacotsOnboarding.sponsorName}, '')), 'B') 
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
     const [onboarded, [totalDocuments]] = await Promise.all([
       db
-        .select()
+        .select({
+          firstName: tacotsRecommendation.firstName,
+          surname: tacotsRecommendation.surname,
+          id: tacotsOnboarding.id,
+          studentId: tacotsOnboarding.studentId,
+          onboardingDate: tacotsOnboarding.onboardingDate,
+          hasMentalHealthDiagnosis: tacotsOnboarding.hasMentalHealthDiagnosis,
+          diagnosedConditions: tacotsOnboarding.diagnosedConditions,
+          behavioralIndicators: tacotsOnboarding.behavioralIndicators,
+          focusAbilityRating: tacotsOnboarding.focusAbilityRating,
+          emotionalStabilityRating: tacotsOnboarding.emotionalStabilityRating,
+          peerInteractionRating: tacotsOnboarding.peerInteractionRating,
+          receivedCounseling: tacotsOnboarding.receivedCounseling,
+          needsSpecialSupport: tacotsOnboarding.needsSpecialSupport,
+          mentalHealthNotes: tacotsOnboarding.mentalHealthNotes,
+          generalHealthStatus: tacotsOnboarding.generalHealthStatus,
+          immunizationStatus: tacotsOnboarding.immunizationStatus,
+          hasChronicCondition: tacotsOnboarding.hasChronicCondition,
+          chronicConditions: tacotsOnboarding.chronicConditions,
+          allergies: tacotsOnboarding.allergies,
+          requiresMedication: tacotsOnboarding.requiresMedication,
+          physicalActivityLevel: tacotsOnboarding.physicalActivityLevel,
+          physicalLimitations: tacotsOnboarding.physicalLimitations,
+          additionalHealthNotes: tacotsOnboarding.additionalHealthNotes,
+          enrolledSchoolName: tacotsOnboarding.enrolledSchoolName,
+          enrolledSchoolTown: tacotsOnboarding.enrolledSchoolTown,
+          enrolledSchoolLga: tacotsOnboarding.enrolledSchoolLga,
+          enrolledSchoolState: tacotsOnboarding.enrolledSchoolState,
+          enrolledClass: tacotsOnboarding.enrolledClass,
+          termResumptionDate: tacotsOnboarding.termResumptionDate,
+          schoolFeesPerTerm: tacotsOnboarding.schoolFeesPerTerm,
+          studentCommitment: tacotsOnboarding.studentCommitment,
+          parentGuardianCommitment: tacotsOnboarding.parentGuardianCommitment,
+          parentSignatureUrl: tacotsOnboarding.parentSignatureUrl,
+          parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
+          admissionLetterUrl: tacotsOnboarding.admissionLetterUrl,
+          admissionLetterPublicId: tacotsOnboarding.admissionLetterPublicId,
+          programOfficerNotes: tacotsOnboarding.programOfficerNotes,
+          supportTypesApproved: tacotsOnboarding.supportTypesApproved,
+          mentorName: tacotsOnboarding.mentorName,
+          sponsorName: tacotsOnboarding.sponsorName,
+          additionalInfo: tacotsOnboarding.additionalInfo,
+          updatedAt: tacotsOnboarding.updatedAt,
+          createdAt: tacotsOnboarding.updatedAt,
+          deletedAt: tacotsOnboarding.deletedAt,
+        })
         .from(tacotsOnboarding)
+        .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`)
         .limit(limit)
         .offset((page - 1) * limit),
@@ -749,8 +795,54 @@ export const listOnboarding = async (
       : [sortDirection(sortColumn), desc(tacotsOnboarding.createdAt)];
   const [onboarded, [totalDocuments]] = await Promise.all([
     db
-      .select()
+      .select({
+        firstName: tacotsRecommendation.firstName,
+        surname: tacotsRecommendation.surname,
+        id: tacotsOnboarding.id,
+        studentId: tacotsOnboarding.studentId,
+        onboardingDate: tacotsOnboarding.onboardingDate,
+        hasMentalHealthDiagnosis: tacotsOnboarding.hasMentalHealthDiagnosis,
+        diagnosedConditions: tacotsOnboarding.diagnosedConditions,
+        behavioralIndicators: tacotsOnboarding.behavioralIndicators,
+        focusAbilityRating: tacotsOnboarding.focusAbilityRating,
+        emotionalStabilityRating: tacotsOnboarding.emotionalStabilityRating,
+        peerInteractionRating: tacotsOnboarding.peerInteractionRating,
+        receivedCounseling: tacotsOnboarding.receivedCounseling,
+        needsSpecialSupport: tacotsOnboarding.needsSpecialSupport,
+        mentalHealthNotes: tacotsOnboarding.mentalHealthNotes,
+        generalHealthStatus: tacotsOnboarding.generalHealthStatus,
+        immunizationStatus: tacotsOnboarding.immunizationStatus,
+        hasChronicCondition: tacotsOnboarding.hasChronicCondition,
+        chronicConditions: tacotsOnboarding.chronicConditions,
+        allergies: tacotsOnboarding.allergies,
+        requiresMedication: tacotsOnboarding.requiresMedication,
+        physicalActivityLevel: tacotsOnboarding.physicalActivityLevel,
+        physicalLimitations: tacotsOnboarding.physicalLimitations,
+        additionalHealthNotes: tacotsOnboarding.additionalHealthNotes,
+        enrolledSchoolName: tacotsOnboarding.enrolledSchoolName,
+        enrolledSchoolTown: tacotsOnboarding.enrolledSchoolTown,
+        enrolledSchoolLga: tacotsOnboarding.enrolledSchoolLga,
+        enrolledSchoolState: tacotsOnboarding.enrolledSchoolState,
+        enrolledClass: tacotsOnboarding.enrolledClass,
+        termResumptionDate: tacotsOnboarding.termResumptionDate,
+        schoolFeesPerTerm: tacotsOnboarding.schoolFeesPerTerm,
+        studentCommitment: tacotsOnboarding.studentCommitment,
+        parentGuardianCommitment: tacotsOnboarding.parentGuardianCommitment,
+        parentSignatureUrl: tacotsOnboarding.parentSignatureUrl,
+        parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
+        admissionLetterUrl: tacotsOnboarding.admissionLetterUrl,
+        admissionLetterPublicId: tacotsOnboarding.admissionLetterPublicId,
+        programOfficerNotes: tacotsOnboarding.programOfficerNotes,
+        supportTypesApproved: tacotsOnboarding.supportTypesApproved,
+        mentorName: tacotsOnboarding.mentorName,
+        sponsorName: tacotsOnboarding.sponsorName,
+        additionalInfo: tacotsOnboarding.additionalInfo,
+        updatedAt: tacotsOnboarding.updatedAt,
+        createdAt: tacotsOnboarding.updatedAt,
+        deletedAt: tacotsOnboarding.deletedAt,
+      })
       .from(tacotsOnboarding)
+      .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
       .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
@@ -788,7 +880,56 @@ export const getOnboarding = async (id: string) => {
   }
   ///
 
-  const [onboarding] = await db.select().from(tacotsOnboarding).where(eq(tacotsOnboarding.id, id));
+  const [onboarding] = await db
+    .select({
+      firstName: tacotsRecommendation.firstName,
+      surname: tacotsRecommendation.surname,
+      id: tacotsOnboarding.id,
+      studentId: tacotsOnboarding.studentId,
+      onboardingDate: tacotsOnboarding.onboardingDate,
+      hasMentalHealthDiagnosis: tacotsOnboarding.hasMentalHealthDiagnosis,
+      diagnosedConditions: tacotsOnboarding.diagnosedConditions,
+      behavioralIndicators: tacotsOnboarding.behavioralIndicators,
+      focusAbilityRating: tacotsOnboarding.focusAbilityRating,
+      emotionalStabilityRating: tacotsOnboarding.emotionalStabilityRating,
+      peerInteractionRating: tacotsOnboarding.peerInteractionRating,
+      receivedCounseling: tacotsOnboarding.receivedCounseling,
+      needsSpecialSupport: tacotsOnboarding.needsSpecialSupport,
+      mentalHealthNotes: tacotsOnboarding.mentalHealthNotes,
+      generalHealthStatus: tacotsOnboarding.generalHealthStatus,
+      immunizationStatus: tacotsOnboarding.immunizationStatus,
+      hasChronicCondition: tacotsOnboarding.hasChronicCondition,
+      chronicConditions: tacotsOnboarding.chronicConditions,
+      allergies: tacotsOnboarding.allergies,
+      requiresMedication: tacotsOnboarding.requiresMedication,
+      physicalActivityLevel: tacotsOnboarding.physicalActivityLevel,
+      physicalLimitations: tacotsOnboarding.physicalLimitations,
+      additionalHealthNotes: tacotsOnboarding.additionalHealthNotes,
+      enrolledSchoolName: tacotsOnboarding.enrolledSchoolName,
+      enrolledSchoolTown: tacotsOnboarding.enrolledSchoolTown,
+      enrolledSchoolLga: tacotsOnboarding.enrolledSchoolLga,
+      enrolledSchoolState: tacotsOnboarding.enrolledSchoolState,
+      enrolledClass: tacotsOnboarding.enrolledClass,
+      termResumptionDate: tacotsOnboarding.termResumptionDate,
+      schoolFeesPerTerm: tacotsOnboarding.schoolFeesPerTerm,
+      studentCommitment: tacotsOnboarding.studentCommitment,
+      parentGuardianCommitment: tacotsOnboarding.parentGuardianCommitment,
+      parentSignatureUrl: tacotsOnboarding.parentSignatureUrl,
+      parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
+      admissionLetterUrl: tacotsOnboarding.admissionLetterUrl,
+      admissionLetterPublicId: tacotsOnboarding.admissionLetterPublicId,
+      programOfficerNotes: tacotsOnboarding.programOfficerNotes,
+      supportTypesApproved: tacotsOnboarding.supportTypesApproved,
+      mentorName: tacotsOnboarding.mentorName,
+      sponsorName: tacotsOnboarding.sponsorName,
+      additionalInfo: tacotsOnboarding.additionalInfo,
+      updatedAt: tacotsOnboarding.updatedAt,
+      createdAt: tacotsOnboarding.updatedAt,
+      deletedAt: tacotsOnboarding.deletedAt,
+    })
+    .from(tacotsOnboarding)
+    .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
+    .where(eq(tacotsOnboarding.id, id));
 
   /// cache set
   await cacheSet(key, onboarding, CACHE_TTL.FORM_DATA);
@@ -1237,7 +1378,36 @@ export const getTacotsExit = async (id: string) => {
   }
   ///
 
-  const [exit] = await db.select().from(tacotsExit).where(eq(tacotsExit.id, id));
+  const [exit] = await db
+    .select({
+      // firstName: tacotsRecommendation.firstName,
+      // surname: tacotsRecommendation.firstName,
+      id: tacotsExit.id,
+      studentId: tacotsExit.studentId,
+      schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,
+      yearOfExit: tacotsExit.yearOfExit,
+      exitReason: tacotsExit.exitReason,
+      highestEducationAttained: tacotsExit.highestEducationAttained,
+      currentStatus: tacotsExit.currentStatus,
+      higherInstitutionName: tacotsExit.higherInstitutionName,
+      higherInstitutionCity: tacotsExit.higherInstitutionCity,
+      higherInstitutionState: tacotsExit.higherInstitutionState,
+      employmentType: tacotsExit.employmentType,
+      vocationalSkill: tacotsExit.vocationalSkill,
+      newSchoolName: tacotsExit.newSchoolName,
+      completedSecondaryElsewhere: tacotsExit.completedSecondaryElsewhere,
+      programImpactDescription: tacotsExit.programImpactDescription,
+      programImpactRating: tacotsExit.programImpactRating,
+      additionalSituationInfo: tacotsExit.additionalSituationInfo,
+      completedBy: tacotsExit.completedBy,
+      submissionDate: tacotsExit.submissionDate,
+      updatedAt: tacotsExit.updatedAt,
+      createdAt: tacotsExit.createdAt,
+      deletedAt: tacotsExit.deletedAt,
+    })
+    .from(tacotsExit)
+    // .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.studentId, tacotsExit.id))
+    .where(eq(tacotsExit.id, id));
 
   /// cache set
   await cacheSet(key, exit, CACHE_TTL.FORM_DATA);

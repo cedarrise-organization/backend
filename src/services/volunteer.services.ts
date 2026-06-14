@@ -340,8 +340,8 @@ export const listVolunteerFeedback = async (page: number, limit: number, search:
       setweight(to_tsvector('english', ${volunteerFeedback.firstName}), 'A') ||
       setweight(to_tsvector('english', ${volunteerFeedback.surname}), 'A') ||
       setweight(to_tsvector('english', ${volunteerFeedback.programVolunteered}), 'A') ||
-      setweight(to_tsvector('english', ${volunteerFeedback.volunteerDuration}), 'A') ||
-      setweight(to_tsvector('english', ${volunteerFeedback.wouldRecommend}), 'D') 
+      setweight(to_tsvector('english', coalesce(${volunteerFeedback.volunteerDuration}, '')), 'A') ||
+      setweight(to_tsvector('english', coalesce(${volunteerFeedback.wouldRecommend}, '')), 'D')
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
