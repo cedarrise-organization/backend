@@ -23,18 +23,31 @@ export const ashDropdown = async () => {
   ///
 
   const students = await db
-    .select({ id: ashStudent.id, name: ashStudent.firstName, status: ashStudent.status })
+    .select({
+      id: ashStudent.id,
+      firstName: ashStudent.firstName,
+      surname: ashStudent.surname,
+      status: ashStudent.status,
+    })
     .from(ashStudent)
     .where(eq(ashStudent.status, "accepted"));
 
+  const returnStudents = students.map((student) => {
+    return {
+      id: student.id,
+      name: `${student.firstName} ${student.surname}`,
+      status: student.status,
+    };
+  });
+
   /// cache set
-  await cacheSet(key, students, CACHE_TTL.LISTS);
+  await cacheSet(key, returnStudents, CACHE_TTL.LISTS);
   ///
 
   return {
     code: 200,
     message: "students found successfully",
-    data: students,
+    data: returnStudents,
   };
 };
 
@@ -54,20 +67,29 @@ export const recommendedDropdown = async () => {
   const students = await db
     .select({
       id: tacotsRecommendation.id,
-      name: tacotsRecommendation.firstName,
+      firstName: tacotsRecommendation.firstName,
+      surname: tacotsRecommendation.surname,
       status: tacotsRecommendation.adminStatus,
     })
     .from(tacotsRecommendation)
     .where(eq(tacotsRecommendation.adminStatus, "SELECTED"));
 
+  const returnStudents = students.map((student) => {
+    return {
+      id: student.id,
+      name: `${student.firstName} ${student.surname}`,
+      status: student.status,
+    };
+  });
+
   /// cache set
-  await cacheSet(key, students, CACHE_TTL.LISTS);
+  await cacheSet(key, returnStudents, CACHE_TTL.LISTS);
   ///
 
   return {
     code: 200,
     message: "students found successfully",
-    data: students,
+    data: returnStudents,
   };
 };
 
@@ -84,7 +106,11 @@ export const onboardedDropdown = async () => {
   }
   ///
   const students = await db
-    .select({ id: tacotsOnboarding.id, name: tacotsRecommendation.firstName })
+    .select({
+      id: tacotsOnboarding.id,
+      firstName: tacotsRecommendation.firstName,
+      surname: tacotsRecommendation.surname,
+    })
     .from(tacotsOnboarding)
     .innerJoin(
       tacotsRecommendation,
@@ -94,6 +120,13 @@ export const onboardedDropdown = async () => {
       ),
     );
 
+  const returnStudents = students.map((student) => {
+    return {
+      id: student.id,
+      name: `${student.firstName} ${student.surname}`
+    };
+  });
+
   /// cache set
   await cacheSet(key, students, CACHE_TTL.LISTS);
   ///
@@ -101,7 +134,7 @@ export const onboardedDropdown = async () => {
   return {
     code: 200,
     message: "students found successfully",
-    data: students,
+    data: returnStudents,
   };
 };
 
@@ -121,20 +154,29 @@ export const volunteerDropdown = async () => {
   const students = await db
     .select({
       id: volunteerRegistration.id,
-      name: volunteerRegistration.firstName,
+      firstName: volunteerRegistration.firstName,
+      surname: volunteerRegistration.surname,
       status: volunteerRegistration.status,
     })
     .from(volunteerRegistration)
     .where(eq(volunteerRegistration.status, "accepted"));
 
+  const returnStudents = students.map((student) => {
+    return {
+      id: student.id,
+      name: `${student.firstName} ${student.surname}`,
+      status: student.status,
+    };
+  });
+
   /// cache set
-  await cacheSet(key, students, CACHE_TTL.LISTS);
+  await cacheSet(key, returnStudents, CACHE_TTL.LISTS);
   ///
 
   return {
     code: 200,
     message: "students found successfully",
-    data: students,
+    data: returnStudents,
   };
 };
 

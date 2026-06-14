@@ -22,21 +22,21 @@ settings {
 docs {
   # List TACOTS Recommended Students Dropdown
 
-  Returns a lightweight list of TACOTS recommendation records with `SELECTED` admin status for use in onboarding dropdown/select components. Each entry contains only the student `id` and `name` (first name).
+  Returns a lightweight list of TACOTS recommendation records with `SELECTED` admin status for use in onboarding dropdown/select components. Each entry contains only the student `id`, `name` (first name + surname) and `status`.
 
   ## Authorization
   No authentication required. This is a public lookup endpoint.
 
   ## Response
 
-  **`200 OK`** — Returns an array of `{ id, name }` objects for selected TACOTS recommendations.
+  **`200 OK`** — Returns an array of `{ id, name, status }` objects for selected TACOTS recommendations. name is a concatenation of firstName and surname from the queried database table. 
 
   ```json
   {
     "success": true,
     "message": "students found successfully",
     "data": [
-      { "id": "uuid", "name": "Jane" }
+      { "id": "uuid", "name": "Jane Doe", "status": "SELECTED" }
     ]
   }
   ```

@@ -22,7 +22,7 @@ settings {
 docs {
   # List TACOTS Onboarded Students Dropdown
 
-  Returns a lightweight list of TACOTS onboarded students for use in tracking and exit form dropdown/select components. Joins `tacots_onboarding` with `tacots_recommendation` to resolve student names. Each entry contains only the student `id` and `name` (first name).
+  Returns a lightweight list of TACOTS onboarded students for use in tracking and exit form dropdown/select components. Joins `tacots_onboarding` with `tacots_recommendation` to resolve student names. Each entry contains only the student `id` and `name` (first name + surname).
 
   ## Authorization
   No authentication required. This is a public lookup endpoint.
@@ -36,7 +36,7 @@ docs {
     "success": true,
     "message": "students found successfully",
     "data": [
-      { "id": "uuid", "name": "Alice" }
+      { "id": "uuid", "name": "Alice Wonderland" }
     ]
   }
   ```

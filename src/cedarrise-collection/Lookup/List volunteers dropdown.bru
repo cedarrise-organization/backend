@@ -22,21 +22,21 @@ settings {
 docs {
   # List Volunteers Dropdown
 
-  Returns a lightweight list of accepted volunteer registrations for use in mentorship assignment dropdown/select components. Each entry contains only the volunteer `id` and `name` (first name).
+  Returns a lightweight list of accepted volunteer registrations for use in mentorship assignment dropdown/select components. Each entry contains only the volunteer `id`, `name` (first name + surname) and `status`.
 
   ## Authorization
   No authentication required. This is a public lookup endpoint.
 
   ## Response
 
-  **`200 OK`** — Returns an array of `{ id, name }` objects for accepted volunteers.
+  **`200 OK`** — Returns an array of `{ id, name, status }` objects for accepted volunteers. name is a concatenation of firstName and surname from the queried database table. 
 
   ```json
   {
     "success": true,
     "message": "students found successfully",
     "data": [
-      { "id": "uuid", "name": "Bob" }
+      { "id": "uuid", "name": "Bob Zayne", "status": "accepted" }
     ]
   }
   ```
