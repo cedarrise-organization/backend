@@ -15,9 +15,9 @@ import tacotsRouter from "./modules/tacots/tacots.routes.js";
 import lookupRouter from "./modules/lookup/lookup.routes.js";
 import capacityRouter from "./modules/capacity/capacity.routes.js";
 import volunteerRouter from "./modules/volunteer/volunteer.routes.js";
-import outreachRouter from "./modules/outreaches/outreaches.routes.js"
+import outreachRouter from "./modules/outreaches/outreaches.routes.js";
 import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
-import generalRouter from "./modules/general/general.routes.js"
+import generalRouter from "./modules/general/general.routes.js";
 // import featureRouter from "./modules/feature/feature.routes.js";
 import "./events/admin.events.js";
 import "./events/auth.events.js";
@@ -30,22 +30,22 @@ import "./queues/workers/deleteCloudinaryAsset.worker.js";
 
 const app = express();
 
-const whitelist = [`http://localhost:3002`, `https://cederrise.vercel.app`];
+const whitelist = [`http://localhost:3002`, `https://cedarrise.vercel.app`];
 const corsOptions = {
-  origin: function (
-    origin: string | undefined,
-    callback: (err: Error | null, allowed?: boolean) => void,
-  ) {
-    if (whitelist.indexOf(origin || "") !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-  credentials: true, //Allow cookies/auth headers
-  allowedHeaders: ["Content-Type", "Authorization", "Content-Disposition"],
-  maxAge: 86400, // Cache preflight requests for 24 hours
+	origin: function (
+		origin: string | undefined,
+		callback: (err: Error | null, allowed?: boolean) => void,
+	) {
+		if (whitelist.indexOf(origin || "") !== -1 || !origin) {
+			callback(null, true);
+		} else {
+			callback(new Error("Not allowed by CORS"));
+		}
+	},
+	methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+	credentials: true, //Allow cookies/auth headers
+	allowedHeaders: ["Content-Type", "Authorization", "Content-Disposition"],
+	maxAge: 86400, // Cache preflight requests for 24 hours
 };
 
 app.use(express.json());
@@ -55,7 +55,7 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 
 (async () => {
-  await connectRedis();
+	await connectRedis();
 })();
 
 //ROUTES
@@ -80,18 +80,18 @@ app.use("/api/v1/queues", bullBoardAdapter.getRouter());
 
 // INTRO ROUTE HANDLER
 app.get("/api/v1", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Welcome to the cedarrise api",
-  });
+	res.status(200).json({
+		success: true,
+		message: "Welcome to the cedarrise api",
+	});
 });
 
 // HANDLER FOR UNKNOWN ROUTES
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: { code: "NOT_FOUND", message: `Route ${req.path} not found` },
-  });
+	res.status(404).json({
+		success: false,
+		error: { code: "NOT_FOUND", message: `Route ${req.path} not found` },
+	});
 });
 
 //GLOBAL ERROR HANDLER
