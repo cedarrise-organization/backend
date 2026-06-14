@@ -36,13 +36,15 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns the complete TACOTS exit record.
+  **`200 OK`** — Returns the complete TACOTS exit record. `firstName` and `surname` are joined from the TACOTS recommendation record via the onboarding link.
   
   ```json
   {
     "success": true,
     "message": "...",
     "data": {
+      "firstName": "string",
+      "surname": "string",
       "id": "uuid",
       "studentId": "uuid",
       "schoolAttendedDuringProgram": "string",
@@ -71,30 +73,32 @@ docs {
   
   ### Response Fields (`data`)
   
-  | Field                          | Type   | Description                                                     |
-  |--------------------------------|--------|-----------------------------------------------------------------|
-  | id                             | string | UUID primary key.                                               |
-  | studentId                      | string | UUID reference to the TACOTS onboarding record.                 |
-  | schoolAttendedDuringProgram    | string | School attended while in the programme.                         |
-  | yearOfExit                     | number | Year the student exited the programme.                          |
-  | exitReason                     | string | Reason for exiting the programme.                               |
-  | highestEducationAttained       | string | Highest level of education attained.                            |
-  | currentStatus                  | string | Student's current status after exit.                            |
-  | higherInstitutionName          | string | Name of higher institution (nullable).                          |
-  | higherInstitutionCity          | string | City of the higher institution (nullable).                      |
-  | higherInstitutionState         | string | State of the higher institution (nullable).                     |
-  | employmentType                 | string | Type of employment if applicable (nullable).                    |
-  | vocationalSkill                | string | Vocational skill pursued if applicable (nullable).              |
-  | newSchoolName                  | string | Name of new school if transferred (nullable).                   |
-  | completedSecondaryElsewhere    | string | Whether secondary was completed elsewhere (nullable).           |
-  | programImpactDescription       | string | Description of programme impact (nullable).                     |
-  | programImpactRating            | number | Programme impact rating (1–10, nullable).                       |
-  | additionalSituationInfo        | string | Additional situational information (nullable).                  |
-  | completedBy                    | string | Name of the person completing the form.                         |
-  | submissionDate                 | string | Date of form submission (`YYYY-MM-DD`).                         |
-  | updatedAt                      | string | ISO 8601 timestamp of last update (nullable).                   |
-  | createdAt                      | string | ISO 8601 timestamp of record creation.                          |
-  | deletedAt                      | string | ISO 8601 soft-delete timestamp (nullable).                      |
+  | Field                          | Type   | Description                                                                        |
+  |--------------------------------|--------|------------------------------------------------------------------------------------|
+  | firstName                      | string | Student's first name (joined from TACOTS recommendation via onboarding).           |
+  | surname                        | string | Student's surname (joined from TACOTS recommendation via onboarding).              |
+  | id                             | string | UUID primary key.                                                                  |
+  | studentId                      | string | UUID reference to the TACOTS onboarding record.                                    |
+  | schoolAttendedDuringProgram    | string | School attended while in the programme.                                            |
+  | yearOfExit                     | number | Year the student exited the programme.                                             |
+  | exitReason                     | string | Reason for exiting the programme.                                                  |
+  | highestEducationAttained       | string | Highest level of education attained.                                               |
+  | currentStatus                  | string | Student's current status after exit.                                               |
+  | higherInstitutionName          | string | Name of higher institution (nullable).                                             |
+  | higherInstitutionCity          | string | City of the higher institution (nullable).                                         |
+  | higherInstitutionState         | string | State of the higher institution (nullable).                                        |
+  | employmentType                 | string | Type of employment if applicable (nullable).                                       |
+  | vocationalSkill                | string | Vocational skill pursued if applicable (nullable).                                 |
+  | newSchoolName                  | string | Name of new school if transferred (nullable).                                      |
+  | completedSecondaryElsewhere    | string | Whether secondary was completed elsewhere (nullable).                              |
+  | programImpactDescription       | string | Description of programme impact (nullable).                                        |
+  | programImpactRating            | number | Programme impact rating (1–10, nullable).                                          |
+  | additionalSituationInfo        | string | Additional situational information (nullable).                                     |
+  | completedBy                    | string | Name of the person completing the form.                                            |
+  | submissionDate                 | string | Date of form submission (`YYYY-MM-DD`).                                            |
+  | updatedAt                      | string | ISO 8601 timestamp of last update (nullable).                                      |
+  | createdAt                      | string | ISO 8601 timestamp of record creation.                                             |
+  | deletedAt                      | string | ISO 8601 soft-delete timestamp (nullable).                                         |
   
   ## Errors
   

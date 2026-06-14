@@ -5,7 +5,7 @@ import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { ASH_EVENTS } from "../events/ash.events.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
-import { sql, asc, eq, count, desc } from "drizzle-orm";
+import { sql, asc, eq, count, desc, inArray } from "drizzle-orm";
 import { Request } from "express";
 import {
   AshstudentbodyType,
@@ -20,6 +20,8 @@ import {
   ashTermlyTracking,
   ashWeeklyAttendance,
   ashExit,
+  tacotsRecommendation,
+  tacotsOnboarding,
 } from "../db/models/admin.js";
 import db from "../db/db.js";
 import logger from "../configs/logger.config.js";
@@ -34,7 +36,6 @@ const sortMap = {
   assignedMentor: ashStudent.assignedMentor,
   createdAt: ashStudent.createdAt,
 } as const;
-
 const termlySortMap = {
   // ashTermlyTracking
   academicSession: ashTermlyTracking.academicSession,
@@ -43,7 +44,6 @@ const termlySortMap = {
   mentorName: ashTermlyTracking.mentorName,
   createdAt: ashTermlyTracking.createdAt,
 } as const;
-
 const exitSortMap = {
   // ashExit
   schoolName: ashExit.schoolName,
@@ -981,10 +981,27 @@ export const listAttendance = async (page: number, limit: number, search: string
     ]);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
 
+    const allStudentIds = [
+      ...new Set(attendance.flatMap((r) => [...r.studentsInAttendance, ...r.studentsMentored])),
+    ];
+    const studentRows = allStudentIds.length
+      ? await db
+          .select({ id: ashStudent.id, firstName: ashStudent.firstName, surname: ashStudent.surname })
+          .from(ashStudent)
+          .where(inArray(ashStudent.id, allStudentIds))
+      : [];
+    const nameMap = Object.fromEntries(studentRows.map((s) => [s.id, `${s.firstName} ${s.surname}`]));
+
+    const resolvedAttendance = attendance.map((r) => ({
+      ...r,
+      studentsInAttendance: r.studentsInAttendance.map((id) => nameMap[id] ?? id),
+      studentsMentored: r.studentsMentored.map((id) => nameMap[id] ?? id),
+    }));
+
     return {
       code: 200,
       message: "Attendance data found successfully",
-      data: attendance,
+      data: resolvedAttendance,
       meta: {
         pagination: {
           page,
@@ -1026,14 +1043,31 @@ export const listAttendance = async (page: number, limit: number, search: string
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
+  const allStudentIds = [
+    ...new Set(attendance.flatMap((r) => [...r.studentsInAttendance, ...r.studentsMentored])),
+  ];
+  const studentRows = allStudentIds.length
+    ? await db
+        .select({ id: ashStudent.id, firstName: ashStudent.firstName, surname: ashStudent.surname })
+        .from(ashStudent)
+        .where(inArray(ashStudent.id, allStudentIds))
+    : [];
+  const nameMap = Object.fromEntries(studentRows.map((s) => [s.id, `${s.firstName} ${s.surname}`]));
+
+  const resolvedAttendance = attendance.map((r) => ({
+    ...r,
+    studentsInAttendance: r.studentsInAttendance.map((id) => nameMap[id] ?? id),
+    studentsMentored: r.studentsMentored.map((id) => nameMap[id] ?? id),
+  }));
+
   /// cache set
-  await cacheSet(key, { data: attendance, totalPages }, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: resolvedAttendance, totalPages }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
     code: 200,
     message: "Attendance data found successfully",
-    data: attendance,
+    data: resolvedAttendance,
     meta: {
       pagination: {
         page,
@@ -1061,14 +1095,46 @@ export const getAttendance = async (id: string) => {
     .from(ashWeeklyAttendance)
     .where(eq(ashWeeklyAttendance.id, id));
 
+  const [studentsAttended, studentsMentored] = await Promise.all([
+    db
+      .select({
+        firstName: ashStudent.firstName,
+        surname: ashStudent.surname,
+      })
+      .from(ashStudent)
+      .where(inArray(ashStudent.id, attendance!.studentsInAttendance)),
+    db
+      .select({
+        firstName: ashStudent.firstName,
+        surname: ashStudent.surname,
+      })
+      .from(ashStudent)
+      .where(inArray(ashStudent.id, attendance!.studentsMentored)),
+  ]);
+
+  const studentsAttendedNames = studentsAttended.map((s) => `${s.firstName} ${s.surname}`);
+  const studentsMentoredNames = studentsMentored.map((s) => `${s.firstName} ${s.surname}`);
+
   /// cache set
-  await cacheSet(key, attendance, CACHE_TTL.FORM_DATA);
+  await cacheSet(
+    key,
+    {
+      ...attendance,
+      studentsInAttendance: studentsAttendedNames,
+      studentsMentored: studentsMentoredNames,
+    },
+    CACHE_TTL.FORM_DATA,
+  );
   ///
 
   return {
     code: 200,
     message: "Attendance found successfully",
-    data: attendance,
+    data: {
+      ...attendance,
+      studentsInAttendance: studentsAttendedNames,
+      studentsMentored: studentsMentoredNames,
+    },
   };
 };
 export const deleteAttendance = async (id: string) => {

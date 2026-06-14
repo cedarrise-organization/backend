@@ -56,12 +56,53 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns a paginated array of TACOTS tracking records.
+  **`200 OK`** — Returns a paginated array of TACOTS tracking records. Each item includes `firstName` and `surname` joined from the TACOTS recommendation record via the onboarding link.
   
   ```json
   {
     "success": true,
-    "data": [ ... ],
+    "data": [
+      {
+        "firstName": "string",
+        "surname": "string",
+        "id": "uuid",
+        "studentId": "uuid",
+        "schoolId": "uuid",
+        "region": "string",
+        "academicSession": "2025/26",
+        "academicTerm": "string",
+        "assessmentPeriod": "string",
+        "submissionDate": "YYYY-MM-DD",
+        "highestSubjectScore": "string",
+        "lowestSubjectScore": "string",
+        "studentAveragePct": 78.5,
+        "studentPositionInClass": "string",
+        "academicComment": "string" | null,
+        "socialBehaviorRating": 4,
+        "schoolRulesRating": 3,
+        "responsibilityRating": 5,
+        "formationComments": "string" | null,
+        "mentorName": "string",
+        "mentorshipSessionDate": "YYYY-MM-DD",
+        "mentorshipMode": "string",
+        "mentorshipDuration": "string",
+        "mentorshipNotes": "string",
+        "serviceActivityType": "string",
+        "serviceDate": "YYYY-MM-DD",
+        "serviceDuration": "string",
+        "serviceDescription": "string",
+        "serviceSupervisor": "string",
+        "tuitionFeePaid": 50000,
+        "resourcesSpent": 15000,
+        "sundriesSpent": 5000,
+        "totalAmountSpent": 70000,
+        "financialNotes": "string" | null,
+        "termResultUrl": "string",
+        "termResultPublicId": "string",
+        "paymentEvidenceUrl": "string" | null,
+        "paymentEvidencePublicId": "string" | null
+      }
+    ],
     "meta": {
       "pagination": {
         "page": 1,

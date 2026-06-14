@@ -49,16 +49,30 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns a paginated array of ASH weekly attendance records.
+  **`200 OK`** — Returns a paginated array of ASH weekly attendance records. Student UUID arrays within each item are resolved to full names via a batch lookup.
   
   ```json
   {
     "success": true,
-    "data": [ ... ],
+    "data": [
+      {
+        "id": "uuid",
+        "sessionDate": "YYYY-MM-DD",
+        "studentsInAttendance": ["First Surname", "First Surname"],
+        "studentsMentored": ["First Surname", "First Surname"],
+        "sessionsConducted": ["string"] | null,
+        "sessionDetails": "string" | null,
+        "volunteersInAttendance": "string",
+        "programReview": "string" | null,
+        "updatedAt": "ISO 8601" | null,
+        "createdAt": "ISO 8601",
+        "deletedAt": "ISO 8601" | null
+      }
+    ],
     "meta": {
       "pagination": {
         "page": 1,
-        "limit": 25, 
+        "limit": 25,
         "totalPages": 1
       }
     }

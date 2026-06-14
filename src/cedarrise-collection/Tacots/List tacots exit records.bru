@@ -56,12 +56,39 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns a paginated array of TACOTS exit records.
+  **`200 OK`** — Returns a paginated array of TACOTS exit records. Each item includes `firstName` and `surname` joined from the TACOTS recommendation record via the onboarding link.
   
   ```json
   {
     "success": true,
-    "data": [ ... ],
+    "data": [
+      {
+        "firstName": "string",
+        "surname": "string",
+        "id": "uuid",
+        "studentId": "uuid",
+        "schoolAttendedDuringProgram": "string",
+        "yearOfExit": 2026,
+        "exitReason": "string",
+        "highestEducationAttained": "string",
+        "currentStatus": "string",
+        "higherInstitutionName": "string" | null,
+        "higherInstitutionCity": "string" | null,
+        "higherInstitutionState": "string" | null,
+        "employmentType": "string" | null,
+        "vocationalSkill": "string" | null,
+        "newSchoolName": "string" | null,
+        "completedSecondaryElsewhere": "string" | null,
+        "programImpactDescription": "string" | null,
+        "programImpactRating": 8 | null,
+        "additionalSituationInfo": "string" | null,
+        "completedBy": "string",
+        "submissionDate": "YYYY-MM-DD",
+        "updatedAt": "ISO 8601" | null,
+        "createdAt": "ISO 8601",
+        "deletedAt": "ISO 8601" | null
+      }
+    ],
     "meta": {
       "pagination": {
         "page": 1,

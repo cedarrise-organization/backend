@@ -32,7 +32,6 @@ const sortMap = {
   lastClass: tacotsRecommendation.lastClass,
   createdAt: tacotsRecommendation.createdAt,
 } as const;
-
 const trackingSortMap = {
   academicSession: tacotsTracking.academicSession,
   academicTerm: tacotsTracking.academicTerm,
@@ -1081,8 +1080,49 @@ export const listTacotsTracking = async (
 
     const [tracking, [totalDocuments]] = await Promise.all([
       db
-        .select()
+        .select({
+          firstName: tacotsRecommendation.firstName,
+          surname: tacotsRecommendation.surname,
+          id: tacotsTracking.id,
+          studentId: tacotsTracking.studentId,
+          schoolId: tacotsTracking.schoolId,
+          region: tacotsTracking.region,
+          academicSession: tacotsTracking.academicSession,
+          academicTerm: tacotsTracking.academicTerm,
+          assessmentPeriod: tacotsTracking.assessmentPeriod,
+          submissionDate: tacotsTracking.submissionDate,
+          highestSubjectScore: tacotsTracking.highestSubjectScore,
+          lowestSubjectScore: tacotsTracking.lowestSubjectScore,
+          studentAveragePct: tacotsTracking.studentAveragePct,
+          studentPositionInClass: tacotsTracking.studentPositionInClass,
+          academicComment: tacotsTracking.academicComment,
+          socialBehaviorRating: tacotsTracking.socialBehaviorRating,
+          schoolRulesRating: tacotsTracking.schoolRulesRating,
+          responsibilityRating: tacotsTracking.responsibilityRating,
+          formationComments: tacotsTracking.formationComments,
+          mentorName: tacotsTracking.mentorName,
+          mentorshipSessionDate: tacotsTracking.mentorshipSessionDate,
+          mentorshipMode: tacotsTracking.mentorshipMode,
+          mentorshipDuration: tacotsTracking.mentorshipDuration,
+          mentorshipNotes: tacotsTracking.mentorshipNotes,
+          serviceActivityType: tacotsTracking.serviceActivityType,
+          serviceDate: tacotsTracking.serviceDate,
+          serviceDuration: tacotsTracking.serviceDuration,
+          serviceDescription: tacotsTracking.serviceDescription,
+          serviceSupervisor: tacotsTracking.serviceSupervisor,
+          tuitionFeePaid: tacotsTracking.tuitionFeePaid,
+          resourcesSpent: tacotsTracking.resourcesSpent,
+          sundriesSpent: tacotsTracking.sundriesSpent,
+          totalAmountSpent: tacotsTracking.totalAmountSpent,
+          financialNotes: tacotsTracking.financialNotes,
+          termResultUrl: tacotsTracking.termResultUrl,
+          termResultPublicId: tacotsTracking.termResultPublicId,
+          paymentEvidenceUrl: tacotsTracking.paymentEvidenceUrl,
+          paymentEvidencePublicId: tacotsTracking.paymentEvidencePublicId,
+        })
         .from(tacotsTracking)
+        .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsTracking.studentId))
+        .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`)
         .limit(limit)
         .offset((page - 1) * limit),
@@ -1135,8 +1175,49 @@ export const listTacotsTracking = async (
       : [sortDirection(sortColumn), desc(tacotsTracking.createdAt)];
   const [tracking, [totalDocuments]] = await Promise.all([
     db
-      .select()
+      .select({
+        firstName: tacotsRecommendation.firstName,
+        surname: tacotsRecommendation.surname,
+        id: tacotsTracking.id,
+        studentId: tacotsTracking.studentId,
+        schoolId: tacotsTracking.schoolId,
+        region: tacotsTracking.region,
+        academicSession: tacotsTracking.academicSession,
+        academicTerm: tacotsTracking.academicTerm,
+        assessmentPeriod: tacotsTracking.assessmentPeriod,
+        submissionDate: tacotsTracking.submissionDate,
+        highestSubjectScore: tacotsTracking.highestSubjectScore,
+        lowestSubjectScore: tacotsTracking.lowestSubjectScore,
+        studentAveragePct: tacotsTracking.studentAveragePct,
+        studentPositionInClass: tacotsTracking.studentPositionInClass,
+        academicComment: tacotsTracking.academicComment,
+        socialBehaviorRating: tacotsTracking.socialBehaviorRating,
+        schoolRulesRating: tacotsTracking.schoolRulesRating,
+        responsibilityRating: tacotsTracking.responsibilityRating,
+        formationComments: tacotsTracking.formationComments,
+        mentorName: tacotsTracking.mentorName,
+        mentorshipSessionDate: tacotsTracking.mentorshipSessionDate,
+        mentorshipMode: tacotsTracking.mentorshipMode,
+        mentorshipDuration: tacotsTracking.mentorshipDuration,
+        mentorshipNotes: tacotsTracking.mentorshipNotes,
+        serviceActivityType: tacotsTracking.serviceActivityType,
+        serviceDate: tacotsTracking.serviceDate,
+        serviceDuration: tacotsTracking.serviceDuration,
+        serviceDescription: tacotsTracking.serviceDescription,
+        serviceSupervisor: tacotsTracking.serviceSupervisor,
+        tuitionFeePaid: tacotsTracking.tuitionFeePaid,
+        resourcesSpent: tacotsTracking.resourcesSpent,
+        sundriesSpent: tacotsTracking.sundriesSpent,
+        totalAmountSpent: tacotsTracking.totalAmountSpent,
+        financialNotes: tacotsTracking.financialNotes,
+        termResultUrl: tacotsTracking.termResultUrl,
+        termResultPublicId: tacotsTracking.termResultPublicId,
+        paymentEvidenceUrl: tacotsTracking.paymentEvidenceUrl,
+        paymentEvidencePublicId: tacotsTracking.paymentEvidencePublicId,
+      })
       .from(tacotsTracking)
+      .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsTracking.studentId))
+      .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
       .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
@@ -1174,7 +1255,51 @@ export const getTacotsTracking = async (id: string) => {
   }
   ///
 
-  const [tracking] = await db.select().from(tacotsTracking).where(eq(tacotsTracking.id, id));
+  const [tracking] = await db
+    .select({
+      firstName: tacotsRecommendation.firstName,
+      surname: tacotsRecommendation.surname,
+      id: tacotsTracking.id,
+      studentId: tacotsTracking.studentId,
+      schoolId: tacotsTracking.schoolId,
+      region: tacotsTracking.region,
+      academicSession: tacotsTracking.academicSession,
+      academicTerm: tacotsTracking.academicTerm,
+      assessmentPeriod: tacotsTracking.assessmentPeriod,
+      submissionDate: tacotsTracking.submissionDate,
+      highestSubjectScore: tacotsTracking.highestSubjectScore,
+      lowestSubjectScore: tacotsTracking.lowestSubjectScore,
+      studentAveragePct: tacotsTracking.studentAveragePct,
+      studentPositionInClass: tacotsTracking.studentPositionInClass,
+      academicComment: tacotsTracking.academicComment,
+      socialBehaviorRating: tacotsTracking.socialBehaviorRating,
+      schoolRulesRating: tacotsTracking.schoolRulesRating,
+      responsibilityRating: tacotsTracking.responsibilityRating,
+      formationComments: tacotsTracking.formationComments,
+      mentorName: tacotsTracking.mentorName,
+      mentorshipSessionDate: tacotsTracking.mentorshipSessionDate,
+      mentorshipMode: tacotsTracking.mentorshipMode,
+      mentorshipDuration: tacotsTracking.mentorshipDuration,
+      mentorshipNotes: tacotsTracking.mentorshipNotes,
+      serviceActivityType: tacotsTracking.serviceActivityType,
+      serviceDate: tacotsTracking.serviceDate,
+      serviceDuration: tacotsTracking.serviceDuration,
+      serviceDescription: tacotsTracking.serviceDescription,
+      serviceSupervisor: tacotsTracking.serviceSupervisor,
+      tuitionFeePaid: tacotsTracking.tuitionFeePaid,
+      resourcesSpent: tacotsTracking.resourcesSpent,
+      sundriesSpent: tacotsTracking.sundriesSpent,
+      totalAmountSpent: tacotsTracking.totalAmountSpent,
+      financialNotes: tacotsTracking.financialNotes,
+      termResultUrl: tacotsTracking.termResultUrl,
+      termResultPublicId: tacotsTracking.termResultPublicId,
+      paymentEvidenceUrl: tacotsTracking.paymentEvidenceUrl,
+      paymentEvidencePublicId: tacotsTracking.paymentEvidencePublicId,
+    })
+    .from(tacotsTracking)
+    .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsTracking.studentId))
+    .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
+    .where(eq(tacotsTracking.id, id));
 
   /// cache set
   await cacheSet(key, tracking, CACHE_TTL.FORM_DATA);
@@ -1286,8 +1411,35 @@ export const listTacotsExit = async (
 
     const [exit, [totalDocuments]] = await Promise.all([
       db
-        .select()
+        .select({
+          firstName: tacotsRecommendation.firstName,
+          surname: tacotsRecommendation.firstName,
+          id: tacotsExit.id,
+          studentId: tacotsExit.studentId,
+          schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,
+          yearOfExit: tacotsExit.yearOfExit,
+          exitReason: tacotsExit.exitReason,
+          highestEducationAttained: tacotsExit.highestEducationAttained,
+          currentStatus: tacotsExit.currentStatus,
+          higherInstitutionName: tacotsExit.higherInstitutionName,
+          higherInstitutionCity: tacotsExit.higherInstitutionCity,
+          higherInstitutionState: tacotsExit.higherInstitutionState,
+          employmentType: tacotsExit.employmentType,
+          vocationalSkill: tacotsExit.vocationalSkill,
+          newSchoolName: tacotsExit.newSchoolName,
+          completedSecondaryElsewhere: tacotsExit.completedSecondaryElsewhere,
+          programImpactDescription: tacotsExit.programImpactDescription,
+          programImpactRating: tacotsExit.programImpactRating,
+          additionalSituationInfo: tacotsExit.additionalSituationInfo,
+          completedBy: tacotsExit.completedBy,
+          submissionDate: tacotsExit.submissionDate,
+          updatedAt: tacotsExit.updatedAt,
+          createdAt: tacotsExit.createdAt,
+          deletedAt: tacotsExit.deletedAt,
+        })
         .from(tacotsExit)
+        .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsExit.studentId))
+        .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`)
         .limit(limit)
         .offset((page - 1) * limit),
@@ -1340,8 +1492,35 @@ export const listTacotsExit = async (
       : [sortDirection(sortColumn), desc(tacotsExit.createdAt)];
   const [exit, [totalDocuments]] = await Promise.all([
     db
-      .select()
+      .select({
+        firstName: tacotsRecommendation.firstName,
+        surname: tacotsRecommendation.firstName,
+        id: tacotsExit.id,
+        studentId: tacotsExit.studentId,
+        schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,
+        yearOfExit: tacotsExit.yearOfExit,
+        exitReason: tacotsExit.exitReason,
+        highestEducationAttained: tacotsExit.highestEducationAttained,
+        currentStatus: tacotsExit.currentStatus,
+        higherInstitutionName: tacotsExit.higherInstitutionName,
+        higherInstitutionCity: tacotsExit.higherInstitutionCity,
+        higherInstitutionState: tacotsExit.higherInstitutionState,
+        employmentType: tacotsExit.employmentType,
+        vocationalSkill: tacotsExit.vocationalSkill,
+        newSchoolName: tacotsExit.newSchoolName,
+        completedSecondaryElsewhere: tacotsExit.completedSecondaryElsewhere,
+        programImpactDescription: tacotsExit.programImpactDescription,
+        programImpactRating: tacotsExit.programImpactRating,
+        additionalSituationInfo: tacotsExit.additionalSituationInfo,
+        completedBy: tacotsExit.completedBy,
+        submissionDate: tacotsExit.submissionDate,
+        updatedAt: tacotsExit.updatedAt,
+        createdAt: tacotsExit.createdAt,
+        deletedAt: tacotsExit.deletedAt,
+      })
       .from(tacotsExit)
+      .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsExit.studentId))
+      .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
       .orderBy(...orderby)
       .limit(limit)
       .offset((page - 1) * limit),
@@ -1380,8 +1559,8 @@ export const getTacotsExit = async (id: string) => {
 
   const [exit] = await db
     .select({
-      // firstName: tacotsRecommendation.firstName,
-      // surname: tacotsRecommendation.firstName,
+      firstName: tacotsRecommendation.firstName,
+      surname: tacotsRecommendation.firstName,
       id: tacotsExit.id,
       studentId: tacotsExit.studentId,
       schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,
@@ -1406,7 +1585,8 @@ export const getTacotsExit = async (id: string) => {
       deletedAt: tacotsExit.deletedAt,
     })
     .from(tacotsExit)
-    // .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.studentId, tacotsExit.id))
+    .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsExit.studentId))
+    .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
     .where(eq(tacotsExit.id, id));
 
   /// cache set
