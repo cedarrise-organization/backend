@@ -855,8 +855,7 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
 export const listAttendance = async (page: number, limit: number, search: string) => {
   // search
   if (search) {
-    const searchVector = sql`
-      setweight(to_tsvector('english', ${ashWeeklyAttendance.sessionsConducted}), 'A') || 
+    const searchVector = sql` 
       setweight(to_tsvector('english', ${ashWeeklyAttendance.volunteersInAttendance}), 'A') ||
       setweight(to_tsvector('english', ${ashWeeklyAttendance.sessionDetails}), 'A') 
   `;
