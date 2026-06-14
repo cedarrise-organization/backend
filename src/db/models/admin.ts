@@ -229,7 +229,6 @@ export const ashWeeklyAttendance = p.pgTable(
     index("ash_weekly_attendance_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.sessionsConducted}), 'A') || 
         setweight(to_tsvector('english', ${table.volunteersInAttendance}), 'A') ||
         setweight(to_tsvector('english', ${table.sessionDetails}), 'A') 
       )`,
