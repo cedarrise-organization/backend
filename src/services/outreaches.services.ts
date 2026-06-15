@@ -1,6 +1,7 @@
 import { OutreachtrackerbodyType } from "../modules/outreaches/outreaches.schema.js";
 import { cacheGet, cacheDel, cacheSet, CACHE_TTL } from "../lib/cache.js";
 import { outreachTracker } from "../db/models/admin.js";
+import { invalidateCache } from "../utils/cache.util.js";
 import { sql, asc, desc, eq, count } from "drizzle-orm";
 import db from "../db/db.js";
 
@@ -34,6 +35,8 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:outreaches:*`);
   /// cache set
   await cacheSet(`cedarrise:outreaches:outreach:${outreach?.id}`, outreach, CACHE_TTL.FORM_DATA);
   ///

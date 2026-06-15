@@ -143,6 +143,8 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:tacots:tacotsRecommendations:*`);
   /// cache set
   await cacheSet(
     `cedarrise:tacots:tacotsRecommendation:${newTacotsRecommendation?.id}`,
@@ -451,6 +453,8 @@ export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:tacots:feedback:*`);
   /// cache set
   await cacheSet(
     `cedarrise:tacots:feedback:${newTacotsFeedback?.id}`,
@@ -663,6 +667,8 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:tacots:onboarding:*`);
   /// cache set
   await cacheSet(`cedarrise:tacots:onboarding:${onboarding?.id}`, onboarding, CACHE_TTL.FORM_DATA);
   ///
@@ -1051,6 +1057,8 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:tacots:tracking:*`);
   /// cache set
   await cacheSet(`cedarrise:tacots:tracking:${tracking?.id}`, tracking, CACHE_TTL.FORM_DATA);
   ///
@@ -1382,6 +1390,8 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:tacots:exit:*`);
   /// cache set
   await cacheSet(`cedarrise:tacots:exit:${exit?.id}`, exit, CACHE_TTL.FORM_DATA);
   ///

@@ -128,7 +128,7 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
     .returning();
 
   /// delete related cache
-  // await invalidateCache(undefined, `cedarrise:ash:ashStudents:*`);
+  await invalidateCache(undefined, `cedarrise:ash:ashStudents:*`);
   /// cache set
   await cacheSet(
     `cedarrise:ash:ashStudent:${newAshStudent?.id}`,
@@ -465,6 +465,8 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:ash:feedback:*`);
   /// cache set
   await cacheSet(
     `cedarrise:ash:feedback:${newAshProgramFeedback?.id}`,
@@ -655,6 +657,8 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:ash:termlytracking:*`);
   /// cache set
   await cacheSet(`cedarrise:ash:termlytracking:${tracker?.id}`, tracker, CACHE_TTL.FORM_DATA);
   ///
@@ -945,6 +949,8 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:ash:weeklyattendance:*`);
   /// cache set
   await cacheSet(
     `cedarrise:ash:weeklyattendance:${attendance?.id}`,
@@ -988,11 +994,17 @@ export const listAttendance = async (page: number, limit: number, search: string
     ];
     const studentRows = allStudentIds.length
       ? await db
-          .select({ id: ashStudent.id, firstName: ashStudent.firstName, surname: ashStudent.surname })
+          .select({
+            id: ashStudent.id,
+            firstName: ashStudent.firstName,
+            surname: ashStudent.surname,
+          })
           .from(ashStudent)
           .where(inArray(ashStudent.id, allStudentIds))
       : [];
-    const nameMap = Object.fromEntries(studentRows.map((s) => [s.id, `${s.firstName} ${s.surname}`]));
+    const nameMap = Object.fromEntries(
+      studentRows.map((s) => [s.id, `${s.firstName} ${s.surname}`]),
+    );
 
     const resolvedAttendance = attendance.map((r) => ({
       ...r,
@@ -1183,6 +1195,8 @@ export const submitExit = async (options: AshexitbodyType) => {
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:ash:exit:*`);
   /// cache set
   await cacheSet(`cedarrise:ash:exit:${exit?.id}`, exit, CACHE_TTL.FORM_DATA);
   ///

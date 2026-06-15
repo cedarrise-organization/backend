@@ -1,6 +1,7 @@
 import { CapacitybuildingevaluationbodyType } from "../modules/capacity/capacity.schema.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { capacityBuildingEvaluation } from "../db/models/admin.js";
+import { invalidateCache } from "../utils/cache.util.js";
 import { sql, eq, asc, desc, count } from "drizzle-orm";
 import db from "../db/db.js";
 
@@ -60,6 +61,8 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:capacity:evaluation:*`);
   /// cache set
   await cacheSet(
     `cedarrise:capacity:evaluation:${evaluation?.id}`,

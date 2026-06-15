@@ -50,6 +50,8 @@ export const submitVolunteerRegistration = async (options: Volunteerregistration
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:volunteer:volunteers:*`);
   /// cache set
   await cacheSet(
     `cedarrise:volunteer:voluntee:${newVolunteerSubmission?.id}`,
@@ -319,6 +321,8 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
     })
     .returning();
 
+  /// delete related cache
+  await invalidateCache(undefined, `cedarrise:volunteer:feedback:*`);
   /// cache set
   await cacheSet(
     `cedarrise:volunteer:feedback:${newVolunteerFeedback?.id}`,
