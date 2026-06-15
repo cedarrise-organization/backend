@@ -127,6 +127,8 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
     })
     .returning();
 
+  /// delete related cache
+  // await invalidateCache(undefined, `cedarrise:ash:ashStudents:*`);
   /// cache set
   await cacheSet(
     `cedarrise:ash:ashStudent:${newAshStudent?.id}`,

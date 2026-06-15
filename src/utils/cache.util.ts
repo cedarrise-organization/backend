@@ -1,5 +1,6 @@
 import { cacheDel, cacheDelPattern, cacheGet } from "../lib/cache.js";
 import redisClient from "../configs/cache.config.js";
+import logger from "../configs/logger.config.js";
 
 export const doKeysForThisPatternExist = async (pattern: string): Promise<boolean> => {
   const isExistsArr = [];
@@ -24,12 +25,14 @@ export const invalidateCache = async (singleKey?: string, patternKey?: string) =
   if (singleKey) {
     const cacheRes = await cacheGet<any>(singleKey);
     if (cacheRes) await cacheDel(singleKey);
+    logger.debug("single cache key invalidated successfully");
   }
 
   // delete items with a pattern
   if (patternKey) {
     const cacheRes = await doKeysForThisPatternExist(patternKey);
     if (cacheRes) await cacheDelPattern(patternKey);
+    logger.debug("key pattern invalidated successfully");
   }
 
   return true;
