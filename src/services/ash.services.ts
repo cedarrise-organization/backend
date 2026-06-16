@@ -5,7 +5,7 @@ import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
 import { ASH_EVENTS } from "../events/ash.events.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
-import { sql, asc, eq, count, desc, inArray } from "drizzle-orm";
+import { sql, asc, and, eq, lt, count, countDistinct, desc, inArray } from "drizzle-orm";
 import { Request } from "express";
 import {
   AshstudentbodyType,
@@ -614,6 +614,100 @@ export const exportAshFeedbackTableToCSV = async () => {
   return data;
 };
 
+// ASH TRACKERS CARDS DATA
+export const getAshTrackersCardsData = async () => {
+  /// cache
+  const key = "cedarrise:ashtrackercardsdata";
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return cacheRes;
+  }
+  ///
+
+  const currentYear = new Date().getFullYear();
+
+  const [
+    [totalAshTermlyTrackingRecords],
+    [totalWeeklyAttendanceRecords],
+    [totalAshExitRecords],
+    [studentStats],
+    [totalAtRiskStudents],
+    [attendanceStats],
+    [totalCompletedExitRecords],
+  ] = await Promise.all([
+    // totalRecords (ashTermlyTracking + ashWeeklyAttendance + totalAshExitRecords)
+    db.select({ value: count(ashTermlyTracking.id) }).from(ashTermlyTracking),
+    db.select({ value: count(ashWeeklyAttendance.id) }).from(ashWeeklyAttendance),
+    db.select({ value: count(ashExit.id) }).from(ashExit),
+    // total accepted students
+    db
+      .select({ value: count(ashStudent.id) })
+      .from(ashStudent)
+      .where(eq(ashStudent.status, "accepted")),
+    // highRiskStudents (ashTermlyTracking)
+    db
+      .select({
+        value: countDistinct(ashTermlyTracking.studentId),
+      })
+      .from(ashTermlyTracking)
+      .where(
+        and(
+          sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`,
+          lt(ashTermlyTracking.posttestAverage, 50),
+        ),
+      ),
+    // avgAttendance
+    db
+      .select({
+        totalAttendees: sql<number>`
+      COALESCE(SUM(cardinality(${ashWeeklyAttendance.studentsInAttendance})), 0)
+    `,
+        totalSessions: sql<number>`
+      COUNT(${ashWeeklyAttendance.id})
+    `,
+      })
+      .from(ashWeeklyAttendance)
+      .where(sql`EXTRACT(YEAR FROM ${ashWeeklyAttendance.sessionDate}) = ${currentYear}`),
+    // completed (ashExit)
+    db
+      .select({ value: countDistinct(ashExit.studentId) })
+      .from(ashExit)
+      .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"])),
+  ]);
+
+  const totalPossibleAttendance = attendanceStats!.totalSessions * studentStats!.value;
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      totalRecords:
+        Number(totalAshTermlyTrackingRecords!.value) +
+        Number(totalWeeklyAttendanceRecords!.value) +
+        Number(totalAshExitRecords!.value),
+      highRiskStudents: Number(totalAtRiskStudents!.value),
+      avgAttendanceRate:
+        totalPossibleAttendance > 0
+          ? Math.ceil((attendanceStats!.totalAttendees / totalPossibleAttendance) * 100)
+          : 0,
+      completed: Number(totalCompletedExitRecords!.value),
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+
+  return {
+    totalRecords:
+      Number(totalAshTermlyTrackingRecords!.value) +
+      Number(totalWeeklyAttendanceRecords!.value) +
+      Number(totalAshExitRecords!.value),
+    highRiskStudents: Number(totalAtRiskStudents!.value),
+    avgAttendanceRate:
+      totalPossibleAttendance > 0
+        ? Math.ceil((attendanceStats!.totalAttendees / totalPossibleAttendance) * 100)
+        : 0,
+    completed: Number(totalCompletedExitRecords!.value),
+  };
+};
+
 // ASH TRACKING
 export const submitTracking = async (req: Request, options: AshtermlytrackingbodyType) => {
   const termResultUpload: UploadApiResponse | undefined = await uploadToCloudinary(
@@ -763,6 +857,7 @@ export const listTracking = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        metadata: cacheRes.metadata,
       },
     };
   }
@@ -774,7 +869,8 @@ export const listTracking = async (
     sortColumn === ashTermlyTracking.createdAt
       ? [desc(ashTermlyTracking.createdAt)]
       : [sortDirection(sortColumn), desc(ashTermlyTracking.createdAt)];
-  const [tracking, [totalDocuments]] = await Promise.all([
+
+  const [tracking, [totalDocuments], metaData] = await Promise.all([
     db
       .select({
         firstName: ashStudent.firstName,
@@ -817,11 +913,12 @@ export const listTracking = async (
       .offset((page - 1) * limit),
 
     db.select({ value: count(ashTermlyTracking.id) }).from(ashTermlyTracking),
+    getAshTrackersCardsData(),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, { data: tracking, totalPages }, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: tracking, totalPages, metadata: metaData }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -834,6 +931,7 @@ export const listTracking = async (
         limit,
         totalPages,
       },
+      metadata: metaData,
     },
   };
 };

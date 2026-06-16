@@ -2,7 +2,7 @@ import { OutreachtrackerbodyType } from "../modules/outreaches/outreaches.schema
 import { cacheGet, cacheDel, cacheSet, CACHE_TTL } from "../lib/cache.js";
 import { outreachTracker } from "../db/models/admin.js";
 import { invalidateCache } from "../utils/cache.util.js";
-import { sql, asc, desc, eq, count } from "drizzle-orm";
+import { max, sum, sql, asc, desc, eq, count, countDistinct } from "drizzle-orm";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -45,6 +45,51 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
     code: 201,
     message: "Outreach tracker created successfully",
     data: outreach,
+  };
+};
+export const getOutreachCardsData = async () => {
+  /// cache
+  const key = "cedarrise:outreachcardsdata";
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return cacheRes;
+  }
+  ///
+  const [
+    [outreachesCommunitiesEngaged],
+    [outreachesBeneficiariesReached],
+    [outreachesVolunteers],
+    [outreachesOutreachEvents],
+  ] = await Promise.all([
+    // outreachesCommunitiesEngaged
+    db
+      .select({ value: countDistinct(sql`lower(trim(${outreachTracker.outreachCommunity}))`) })
+      .from(outreachTracker), // count distinct outreach communities, transform values to lowercase to avoid counting similar records twice
+    // outreachesBeneficiariesReached
+    db.select({ value: sum(outreachTracker.numBeneficiaries) }).from(outreachTracker),
+    // outreachesVolunteers
+    db.select({ value: max(outreachTracker.numVolunteers) }).from(outreachTracker),
+    // outreachesOutreachEvents
+    db.select({ value: count(outreachTracker.id) }).from(outreachTracker), // Count ids because it has an index
+  ]);
+
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      communitiesEngaged: outreachesCommunitiesEngaged!.value,
+      beneficiariesReached: Number(outreachesBeneficiariesReached!.value),
+      volunteers: outreachesVolunteers!.value,
+      outreachEvents: outreachesOutreachEvents!.value,
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+
+  return {
+    communitiesEngaged: outreachesCommunitiesEngaged!.value,
+    beneficiariesReached: Number(outreachesBeneficiariesReached!.value),
+    volunteers: outreachesVolunteers!.value,
+    outreachEvents: outreachesOutreachEvents!.value,
   };
 };
 export const listOutreaches = async (
@@ -108,6 +153,7 @@ export const listOutreaches = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        metadata: cacheRes.metadata,
       },
     };
   }
@@ -119,7 +165,8 @@ export const listOutreaches = async (
     sortColumn === outreachTracker.createdAt
       ? [desc(outreachTracker.createdAt)]
       : [sortDirection(sortColumn), desc(outreachTracker.createdAt)];
-  const [outreaches, [totalDocuments]] = await Promise.all([
+
+  const [outreaches, [totalDocuments], metaData] = await Promise.all([
     db
       .select()
       .from(outreachTracker)
@@ -127,11 +174,12 @@ export const listOutreaches = async (
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(outreachTracker.id) }).from(outreachTracker),
+    getOutreachCardsData(),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, { data: outreaches, totalPages }, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: outreaches, totalPages, metadata: metaData }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -144,6 +192,7 @@ export const listOutreaches = async (
         limit,
         totalPages,
       },
+      metadata: metaData,
     },
   };
 };

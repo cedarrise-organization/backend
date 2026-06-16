@@ -74,7 +74,7 @@ export const listAllOutreachController = async (
 
   try {
     const response = await listOutreaches(page, limit, orderBy, search, sortBy);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }

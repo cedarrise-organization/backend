@@ -36,6 +36,7 @@ import {
 } from "../db/models/admin.js";
 import db from "../db/db.js";
 import { Dataset, LineData } from "../types/dashboard.js";
+import { Data } from "ejs";
 
 export const getCards = async () => {
   /// cache
@@ -288,83 +289,103 @@ export const getStudentPerformance = async () => {
     )
   END
 `;
-  const currentYear = new Date().getFullYear();
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentAcademicSession =
+    currentMonth >= 9
+      ? `${currentYear}/${String(currentYear + 1).slice(2)}`
+      : `${currentYear - 1}/${String(currentYear).slice(2)}`;
   const sessionLabels = ["2025/2026", "2026/2027", "2027/2028", "2028/2029", "2029/2030"];
   const termLabels = ["Term 1", "Term 2", "Term 3"];
   const normalizedTerm = sql<string>`lower(trim(${ashTermlyTracking.term}))`;
 
-  const [ashGraduated, ashDropOuts, attendance, testScores, dropouts, [risk]] = await Promise.all([
-    // ashGraduated
-    db
-      .select({
-        value: countDistinct(ashExit.studentId),
-        academicYear,
-      })
-      .from(ashExit)
-      .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"]))
-      .groupBy(academicYear),
-    // ashDropOuts
-    db
-      .select({
-        value: countDistinct(ashExit.studentId),
-        academicYear,
-      })
-      .from(ashExit)
-      .where(eq(ashExit.exitReason, "DROPPED OUT"))
-      .groupBy(academicYear),
-    // attendance
-    db
-      .select({
-        value: sql<number>`COALESCE(SUM(cardinality(${ashWeeklyAttendance.studentsInAttendance})), 0)`,
-        month: sql<string>`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`,
-      })
-      .from(ashWeeklyAttendance)
-      .where(sql`EXTRACT(YEAR FROM ${ashWeeklyAttendance.sessionDate}) = ${currentYear}`)
-      .groupBy(sql`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`),
-    // testScores
-    db
-      .select({
-        term: normalizedTerm,
-        pretestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.pretestAverage}), 0)`,
-        midtestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.midtestAverage}), 0)`,
-        posttestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.posttestAverage}), 0)`,
-      })
-      .from(ashTermlyTracking)
-      .where(sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`)
-      .groupBy(normalizedTerm),
-    // dropouts
-    db
-      .select({
-        value: countDistinct(ashExit.studentId),
-        month: sql<string>`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`,
-      })
-      .from(ashExit)
-      .where(
-        and(
-          eq(ashExit.exitReason, "DROPPED OUT"),
-          sql`EXTRACT(YEAR FROM ${ashExit.exitDate}) = ${currentYear}`,
-        ),
-      )
-      .groupBy(sql`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`),
-    // risk
-    db
-      .select({
-        lowRisk: sql<number>`
+  const [ashGraduated, ashDropOuts, attendance, testScores, dropouts, [risk], tacotsScores] =
+    await Promise.all([
+      // ashGraduated
+      db
+        .select({
+          value: countDistinct(ashExit.studentId),
+          academicYear,
+        })
+        .from(ashExit)
+        .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"]))
+        .groupBy(academicYear),
+      // ashDropOuts
+      db
+        .select({
+          value: countDistinct(ashExit.studentId),
+          academicYear,
+        })
+        .from(ashExit)
+        .where(eq(ashExit.exitReason, "DROPPED OUT"))
+        .groupBy(academicYear),
+      // attendance
+      db
+        .select({
+          value: sql<number>`COALESCE(SUM(cardinality(${ashWeeklyAttendance.studentsInAttendance})), 0)`,
+          month: sql<string>`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`,
+        })
+        .from(ashWeeklyAttendance)
+        .where(sql`EXTRACT(YEAR FROM ${ashWeeklyAttendance.sessionDate}) = ${currentYear}`)
+        .groupBy(sql`TO_CHAR(${ashWeeklyAttendance.sessionDate}, 'YYYY-MM')`),
+      // testScores
+      db
+        .select({
+          term: normalizedTerm,
+          pretestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.pretestAverage}), 0)`,
+          midtestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.midtestAverage}), 0)`,
+          posttestAverage: sql<number>`COALESCE(AVG(${ashTermlyTracking.posttestAverage}), 0)`,
+        })
+        .from(ashTermlyTracking)
+        .where(sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`)
+        .groupBy(normalizedTerm),
+      // dropouts
+      db
+        .select({
+          value: countDistinct(ashExit.studentId),
+          month: sql<string>`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`,
+        })
+        .from(ashExit)
+        .where(
+          and(
+            eq(ashExit.exitReason, "DROPPED OUT"),
+            sql`EXTRACT(YEAR FROM ${ashExit.exitDate}) = ${currentYear}`,
+          ),
+        )
+        .groupBy(sql`TO_CHAR(${ashExit.exitDate}, 'YYYY-MM')`),
+      // risk
+      db
+        .select({
+          lowRisk: sql<number>`
         COUNT(DISTINCT ${ashTermlyTracking.studentId})
         FILTER (
           WHERE ${ashTermlyTracking.posttestAverage} >= 50
         )
       `,
-        atRisk: sql<number>`
+          atRisk: sql<number>`
         COUNT(DISTINCT ${ashTermlyTracking.studentId})
         FILTER (
           WHERE ${ashTermlyTracking.posttestAverage} < 50
         )
       `,
-      })
-      .from(ashTermlyTracking)
-      .where(sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`),
-  ]);
+        })
+        .from(ashTermlyTracking)
+        .where(sql`EXTRACT(YEAR FROM ${ashTermlyTracking.createdAt}) = ${currentYear}`),
+      // tacotsScores
+      db
+        .select({
+          academicTerm: tacotsTracking.academicTerm,
+          assessmentPeriod: tacotsTracking.assessmentPeriod,
+          averageScore: sql<number>`
+        COALESCE(AVG(${tacotsTracking.studentAveragePct}), 0)
+      `,
+        })
+        .from(tacotsTracking)
+        .where(eq(tacotsTracking.academicSession, currentAcademicSession))
+        .groupBy(tacotsTracking.academicTerm, tacotsTracking.assessmentPeriod),
+    ]);
 
   ////
   /* ashGraduated, ashDropOuts */
@@ -463,6 +484,72 @@ export const getStudentPerformance = async () => {
   };
   ////
 
+  ////
+  /** tacots test scores */
+  const tacotsScoreKeys = [
+    {
+      label: "Term 1 Mid",
+      term: "1ST TERM",
+      period: "MIDTERM",
+    },
+    {
+      label: "Term 1 End",
+      term: "1ST TERM",
+      period: "END OF TERM",
+    },
+    {
+      label: "Term 2 Mid",
+      term: "2ND TERM",
+      period: "MIDTERM",
+    },
+    {
+      label: "Term 2 End",
+      term: "2ND TERM",
+      period: "END OF TERM",
+    },
+    {
+      label: "Term 3 Mid",
+      term: "3RD TERM",
+      period: "MIDTERM",
+    },
+    {
+      label: "Term 3 End",
+      term: "3RD TERM",
+      period: "END OF TERM",
+    },
+  ] as const;
+
+  const tacotsScoresMap = new Map(
+    tacotsScores.map((row) => [
+      `${row.academicTerm}-${row.assessmentPeriod}`,
+      Number(Number(row.averageScore).toFixed(2)),
+    ]),
+  );
+
+  const getTacotsScore = (term: string, period: string) =>
+    tacotsScoresMap.get(`${term}-${period}`) ?? 0;
+
+  // Average score = AVG(studentAveragePct) for the matching academic term and assessment period within the current academic session
+  const c_tacots_scores: Dataset = {
+    type: "bar",
+    labels: tacotsScoreKeys.map((item) => item.label),
+    datasets: [
+      {
+        label: "Mid-term",
+        data: tacotsScoreKeys.map((item) =>
+          item.period === "MIDTERM" ? getTacotsScore(item.term, item.period) : null,
+        ),
+      },
+      {
+        label: "End-of-term",
+        data: tacotsScoreKeys.map((item) =>
+          item.period === "END OF TERM" ? getTacotsScore(item.term, item.period) : null,
+        ),
+      },
+    ],
+  };
+  ////
+
   /// cache set
   await cacheSet(
     key,
@@ -472,6 +559,7 @@ export const getStudentPerformance = async () => {
       c_testScores,
       c_dropoutTrend,
       c_risk,
+      c_tacots_scores,
     },
     CACHE_TTL.DASHBOARD_CARDS,
   );
@@ -486,6 +574,7 @@ export const getStudentPerformance = async () => {
       c_testScores,
       c_dropoutTrend,
       c_risk,
+      c_tacots_scores,
     },
   };
 };

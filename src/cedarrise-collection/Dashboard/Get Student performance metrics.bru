@@ -39,7 +39,7 @@ docs {
   {
     type: "bar" | "line" | "doughnut" | "pie";
     labels: string[];
-    datasets: { label?: string; data: number[] }[];
+    datasets: { label?: string; data: (number | null)[] }[];
   }
   ```
   
@@ -56,7 +56,8 @@ docs {
       "c_attendanceTrend": Dataset,
       "c_testScores": Dataset,
       "c_dropoutTrend": Dataset,
-      "c_risk": Dataset
+      "c_risk": Dataset,
+      "c_tacots_scores": Dataset
     }
   }
   ```
@@ -148,6 +149,25 @@ docs {
   - Queries `ashTermlyTracking` filtered to `EXTRACT(YEAR FROM createdAt) = currentYear`.
   - **Low-risk:** `COUNT(DISTINCT studentId) FILTER (WHERE posttestAverage >= 50)`.
   - **At-risk:** `COUNT(DISTINCT studentId) FILTER (WHERE posttestAverage < 50)`.
+  
+  ---
+  
+  ### `c_tacots_scores` — `Dataset` (bar)
+  
+  Average TACOTS scores (mid-term and end-of-term) across all terms for the current academic session.
+  
+  | Field    | Value |
+  |----------|-------|
+  | type     | `"bar"` |
+  | labels   | `["Term 1 Mid", "Term 1 End", "Term 2 Mid", "Term 2 End", "Term 3 Mid", "Term 3 End"]` |
+  | datasets | Two series: `"Mid-term"` and `"End-of-term"` |
+  
+  **Computation:**
+  - Queries `tacotsTracking` filtered to `academicSession = currentAcademicSession`.
+  - Grouped by `academicTerm` and `assessmentPeriod`.
+  - Calculates `COALESCE(AVG(studentAveragePct), 0)`.
+  - Mid-term series maps only `"MIDTERM"` values, defaulting `"END OF TERM"` positions to `null`.
+  - End-of-term series maps only `"END OF TERM"` values, defaulting `"MIDTERM"` positions to `null`.
   
   ## Caching
   

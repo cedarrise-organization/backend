@@ -63,12 +63,41 @@ docs {
   ```json
   {
     "success": true,
-    "data": [ ... ],
+    "message": "Outreaches found successfully",
+    "data": [
+      {
+        "id": "uuid",
+        "outreachStartDate": "YYYY-MM-DD",
+        "outreachEndDate": "YYYY-MM-DD",
+        "outreachState": "string",
+        "outreachLga": "string",
+        "outreachCity": "string",
+        "outreachCommunity": "string",
+        "numVolunteers": 10,
+        "numBeneficiaries": 50,
+        "outreachType": ["string"],
+        "activityDescription": "string",
+        "impactStories": "string" | null,
+        "challengesEncountered": "string" | null,
+        "recommendations": "string" | null,
+        "submittedBy": "string",
+        "submissionDate": "YYYY-MM-DD",
+        "updatedAt": "ISO 8601" | null,
+        "createdAt": "ISO 8601",
+        "deletedAt": "ISO 8601" | null
+      }
+    ],
     "meta": {
       "pagination": {
         "page": 1,
         "limit": 25,
         "totalPages": 1
+      },
+      "metadata": {
+        "communitiesEngaged": 5,
+        "beneficiariesReached": 100,
+        "volunteers": 10,
+        "outreachEvents": 15
       }
     }
   }

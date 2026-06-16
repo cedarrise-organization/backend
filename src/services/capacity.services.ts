@@ -2,7 +2,7 @@ import { CapacitybuildingevaluationbodyType } from "../modules/capacity/capacity
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { capacityBuildingEvaluation } from "../db/models/admin.js";
 import { invalidateCache } from "../utils/cache.util.js";
-import { sql, eq, asc, desc, count } from "drizzle-orm";
+import { sql, eq, max, sum, asc, desc, count, countDistinct } from "drizzle-orm";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -77,7 +77,57 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
     data: evaluation,
   };
 };
+export const getCapacityCardsData = async () => {
+  /// cache
+  const key = "cedarrise:capacitycardsdata";
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return cacheRes;
+  }
+  ///
+  const [
+    [capacityParticipantsImpacted],
+    [capacityOrganizationsPartneredWith],
+    [capacityVolunteersEngaged],
+    [capacityWorkshopsConducted],
+  ] = await Promise.all([
+    // capacityParticipantsImpacted
+    db
+      .select({ value: sum(capacityBuildingEvaluation.numberOfParticipants) })
+      .from(capacityBuildingEvaluation),
+    // capacityOrganizationsPartneredWith
+    db
+      .select({
+        value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
+      })
+      .from(capacityBuildingEvaluation), // transform values to lowercase to avoid counting similar records twice
+    // capacityVolunteersEngaged
+    db
+      .select({ value: max(capacityBuildingEvaluation.numberOfVolunteers) })
+      .from(capacityBuildingEvaluation),
+    // capacityWorkshopsConducted
+    db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation), // Count ids because it has an index
+  ]);
 
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      participantsImpacted: Number(capacityParticipantsImpacted!.value),
+      organizationsPartneredWith: Number(capacityOrganizationsPartneredWith!.value),
+      volunteersEngaged: Number(capacityVolunteersEngaged!.value),
+      workshopsConducted: Number(capacityWorkshopsConducted!.value),
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+
+  return {
+    participantsImpacted: Number(capacityParticipantsImpacted!.value),
+    organizationsPartneredWith: Number(capacityOrganizationsPartneredWith!.value),
+    volunteersEngaged: Number(capacityVolunteersEngaged!.value),
+    workshopsConducted: Number(capacityWorkshopsConducted!.value),
+  };
+};
 export const listAllEvaluation = async (
   page: number,
   limit: number,
@@ -138,6 +188,7 @@ export const listAllEvaluation = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        metadata: cacheRes.metadata,
       },
     };
   }
@@ -150,7 +201,7 @@ export const listAllEvaluation = async (
       ? [desc(capacityBuildingEvaluation.createdAt)]
       : [sortDirection(sortColumn), desc(capacityBuildingEvaluation.createdAt)];
 
-  const [evaluation, [totalDocuments]] = await Promise.all([
+  const [evaluation, [totalDocuments], metaData] = await Promise.all([
     db
       .select()
       .from(capacityBuildingEvaluation)
@@ -158,11 +209,12 @@ export const listAllEvaluation = async (
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation),
+    getCapacityCardsData(),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, { data: evaluation, totalPages }, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: evaluation, totalPages, metadata: metaData }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -175,10 +227,10 @@ export const listAllEvaluation = async (
         limit,
         totalPages,
       },
+      metadata: metaData,
     },
   };
 };
-
 export const getEvaluation = async (id: string) => {
   /// cache
   const key = `cedarrise:capacity:evaluation:${id}`;
@@ -207,7 +259,6 @@ export const getEvaluation = async (id: string) => {
     data: evaluation,
   };
 };
-
 export const deleteEvaluation = async (id: string) => {
   const [evaluation] = await db
     .delete(capacityBuildingEvaluation)

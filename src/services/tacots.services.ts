@@ -3,7 +3,7 @@ import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { TACOTS_EVENTS } from "../events/tacots.events.js";
 import { invalidateCache } from "../utils/cache.util.js";
-import { sql, asc, desc, eq, count } from "drizzle-orm";
+import { sql, asc, and, desc, eq, lt, count, inArray, countDistinct } from "drizzle-orm";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
 import { Request } from "express";
@@ -991,6 +991,80 @@ export const exportTacotsOnboardingTableToCSV = async () => {
   return data;
 };
 
+// TACOTS TRACKERS CARDS DATA
+export const getTacotsTrackersCardsData = async () => {
+  /// cache
+  const key = "cedarrise:tacotstrackercardsdata";
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return cacheRes;
+  }
+  ///
+
+  const currentYear = new Date().getFullYear();
+
+  const [
+    [totalTacotsRecommendations],
+    [totalTacotsTracking],
+    [totalTacotsOnboarding],
+    [totalTacotsExit],
+    [highRiskBeneficiaries],
+    [totalCompletedExitRecords],
+  ] = await Promise.all([
+    //totalRecords
+    db.select({ value: count(tacotsRecommendation.id) }).from(tacotsRecommendation),
+    db.select({ value: count(tacotsTracking.id) }).from(tacotsTracking),
+    db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
+    db.select({ value: count(tacotsExit.id) }).from(tacotsExit),
+    // highRiskStudents
+    db
+      .select({
+        value: countDistinct(tacotsTracking.studentId),
+      })
+      .from(tacotsTracking)
+      .where(
+        and(
+          sql`EXTRACT(YEAR FROM ${tacotsTracking.createdAt}) = ${currentYear}`,
+          lt(tacotsTracking.studentAveragePct, 50),
+        ),
+      ),
+    // completed
+    db
+      .select({ value: countDistinct(tacotsExit.studentId) })
+      .from(tacotsExit)
+      .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"])),
+  ]);
+
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      totalRecords:
+        Number(totalTacotsTracking!.value) +
+        Number(totalTacotsOnboarding!.value) +
+        Number(totalTacotsExit!.value),
+      highRiskStudents: Number(highRiskBeneficiaries!.value),
+      onboardingRate: Number(
+        (totalTacotsOnboarding!.value / totalTacotsRecommendations!.value) * 100,
+      ),
+      completed: Number(totalCompletedExitRecords!.value),
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+
+  return {
+    totalRecords:
+      Number(totalTacotsTracking!.value) +
+      Number(totalTacotsOnboarding!.value) +
+      Number(totalTacotsExit!.value),
+    highRiskStudents: Number(highRiskBeneficiaries!.value),
+    onboardingRate: Number(
+      (totalTacotsOnboarding!.value / totalTacotsRecommendations!.value) * 100,
+    ),
+    completed: Number(totalCompletedExitRecords!.value),
+  };
+};
+
 // TRACKING
 export const submitTacotsTracking = async (req: Request, options: TacotstrackingbodyType) => {
   const files = req.files as {
@@ -1170,6 +1244,7 @@ export const listTacotsTracking = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        metadata: cacheRes.metadata,
       },
     };
   }
@@ -1181,7 +1256,8 @@ export const listTacotsTracking = async (
     sortColumn === tacotsTracking.createdAt
       ? [desc(tacotsTracking.createdAt)]
       : [sortDirection(sortColumn), desc(tacotsTracking.createdAt)];
-  const [tracking, [totalDocuments]] = await Promise.all([
+
+  const [tracking, [totalDocuments], metaData] = await Promise.all([
     db
       .select({
         firstName: tacotsRecommendation.firstName,
@@ -1230,11 +1306,12 @@ export const listTacotsTracking = async (
       .limit(limit)
       .offset((page - 1) * limit),
     db.select({ value: count(tacotsTracking.id) }).from(tacotsTracking),
+    getTacotsTrackersCardsData(),
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, { data: tracking, totalPages }, CACHE_TTL.FORM_DATA);
+  await cacheSet(key, { data: tracking, totalPages, metadata: metaData }, CACHE_TTL.FORM_DATA);
   ///
 
   return {
@@ -1247,6 +1324,7 @@ export const listTacotsTracking = async (
         limit,
         totalPages,
       },
+      metadata: metaData
     },
   };
 };
