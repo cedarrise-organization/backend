@@ -1,8 +1,8 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { Parser } from "json2csv";
 import { ValidationError } from "../../lib/error.js";
 import { successResponse } from "../../utils/responseHandler.js";
+import { Parser } from "json2csv";
 import {
   createOutreach,
   getOneOutreach,
@@ -94,7 +94,7 @@ export const exportOutreachTrackerController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportOutreachTrackerTableToCSV();
+    const data = await exportOutreachTrackerTableToCSV();
 
     const fields = [
       "id",
@@ -118,12 +118,12 @@ export const exportOutreachTrackerController = async (
       "deletedAt",
     ];
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="outreach_tracker.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }

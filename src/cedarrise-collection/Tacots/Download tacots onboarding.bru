@@ -22,7 +22,7 @@ settings {
 docs {
   # Download TACOTS Onboarding (CSV Export)
   
-  Exports the entire `tacots_onboarding` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts them to CSV using `json2csv` in the controller layer. The response is sent directly as a `text/csv` attachment — this endpoint does **not** return JSON.
+  Exports the entire `tacots_onboarding` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts the records to CSV using json2csv, and returns the CSV as raw file bytes with Content-Type: text/csv and Content-Disposition: attachment. The response is not JSON; frontend clients should read it as a Blob and trigger a browser download.
   
   ## Authorization
   Requires authentication (`authenticate()`) and `"read"` permission (`authorize("read")`).
@@ -32,7 +32,7 @@ docs {
   
   ## Response — `200 OK`
   
-  **Content-Type:** `text/csv`
+  **Content-Type:** `text/csv; charset=utf-8`
   **Content-Disposition:** `attachment; filename="tacots_onboarding.csv"`
   
   The CSV contains one row per onboarding record with the following columns (in order):

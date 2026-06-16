@@ -1,8 +1,8 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { Parser } from "json2csv";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
+import { Parser } from "json2csv";
 import {
   submitRecommendation,
   listRecommendations,
@@ -228,7 +228,7 @@ export const exportTacotsRecommendationController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportTacotsRecommendationTableToCSV();
+    const data = await exportTacotsRecommendationTableToCSV();
 
     const fields = [
       "id",
@@ -300,12 +300,12 @@ export const exportTacotsRecommendationController = async (
       "deletedAt",
     ];
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="tacots_recommendation.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -430,7 +430,7 @@ export const exportTacotsFeedbackController = async (
     const json2csvParser = new Parser({ fields });
     const csv = json2csvParser.parse(response);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="tacots_feedback.csv"');
 
     return res.status(200).send(csv);
@@ -560,7 +560,7 @@ export const exportTacotsOnboardingController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportTacotsOnboardingTableToCSV();
+    const data = await exportTacotsOnboardingTableToCSV();
 
     const fields = [
       "id",
@@ -607,12 +607,12 @@ export const exportTacotsOnboardingController = async (
       "deletedAt",
     ];
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="tacots_onboarding.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -744,7 +744,7 @@ export const exportTacotsTrackingController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportTacotsTrackingTableToCSV();
+    const data = await exportTacotsTrackingTableToCSV();
 
     const fields = [
       "id",
@@ -788,12 +788,12 @@ export const exportTacotsTrackingController = async (
       "deletedAt",
     ];
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="tacots_tracking.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -888,7 +888,7 @@ export const exportTacotsExitController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportTacotsExitTableToCSV();
+    const data = await exportTacotsExitTableToCSV();
 
     const fields = [
       "id",
@@ -915,12 +915,12 @@ export const exportTacotsExitController = async (
       "deletedAt",
     ];
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="tacots_exit.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }

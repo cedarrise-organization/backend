@@ -22,7 +22,7 @@ settings {
 docs {
   # Download TACOTS Tracking (CSV Export)
   
-  Exports the entire `tacots_tracking` table as a CSV file download. Selects all rows (no filters, no pagination) and converts to CSV via `json2csv`. The response is a `text/csv` attachment — **not** JSON.
+  Exports the entire `tacots_tracking` table as a CSV file download. Selects all rows (no filters, no pagination) and converts the records to CSV using json2csv, and returns the CSV as raw file bytes with Content-Type: text/csv and Content-Disposition: attachment. The response is not JSON; frontend clients should read it as a Blob and trigger a browser download.
   
   ## Authorization
   Requires `authenticate()` and `authorize("read")`.
@@ -32,7 +32,7 @@ docs {
   
   ## Response — `200 OK`
   
-  **Content-Type:** `text/csv`
+  **Content-Type:** `text/csv; charset=utf-8`
   **Content-Disposition:** `attachment; filename="tacots_tracking.csv"`
   
   CSV columns (in order): `id`, `studentId`, `schoolId`, `region`, `academicSession`, `academicTerm`, `assessmentPeriod`, `submissionDate`, `highestSubjectScore`, `lowestSubjectScore`, `studentAveragePct`, `studentPositionInClass`, `termResultUrl`, `termResultPublicId`, `academicComment`, `socialBehaviorRating`, `schoolRulesRating`, `responsibilityRating`, `formationComments`, `mentorName`, `mentorshipSessionDate`, `mentorshipMode`, `mentorshipDuration`, `mentorshipNotes`, `serviceActivityType`, `serviceDate`, `serviceDuration`, `serviceDescription`, `serviceSupervisor`, `tuitionFeePaid`, `resourcesSpent`, `sundriesSpent`, `totalAmountSpent`, `paymentEvidenceUrl`, `paymentEvidencePublicId`, `financialNotes`, `updatedAt`, `createdAt`, `deletedAt`.

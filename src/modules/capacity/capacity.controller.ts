@@ -1,5 +1,6 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
+import { successResponse } from "../../utils/responseHandler.js";
 import { Parser } from "json2csv";
 import {
   createEvaluation,
@@ -8,7 +9,6 @@ import {
   deleteEvaluation,
   exportCapacityEvaluationTableToCSV,
 } from "../../services/capacity.services.js";
-import { successResponse } from "../../utils/responseHandler.js";
 
 export const createEvaluationController = async (
   req: Request,
@@ -146,7 +146,7 @@ export const exportCapacityEvaluationController = async (
   next: NextFunction,
 ) => {
   try {
-    const response: any = await exportCapacityEvaluationTableToCSV();
+    const data = await exportCapacityEvaluationTableToCSV();
 
     const fields = [
       "id",
@@ -196,12 +196,12 @@ export const exportCapacityEvaluationController = async (
     ];
 
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="capacity_building_evaluation.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }

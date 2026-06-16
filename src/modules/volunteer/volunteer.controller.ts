@@ -1,7 +1,7 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { Parser } from "json2csv";
 import { successResponse } from "../../utils/responseHandler.js";
+import { Parser } from "json2csv";
 import {
   submitVolunteerRegistration,
   listVolunteers,
@@ -132,7 +132,7 @@ export const exportVolunteerRegistrationController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportVolunteerRegistrationTableToCSV();
+    const data = await exportVolunteerRegistrationTableToCSV();
 
     const fields = [
       "id",
@@ -166,12 +166,12 @@ export const exportVolunteerRegistrationController = async (
       "deletedAt",
     ];
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="volunteer_registration.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -279,7 +279,7 @@ export const exportVolunteerFeedbackController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportVolunteerFeedbackTableToCSV();
+    const data = await exportVolunteerFeedbackTableToCSV();
 
     const fields = [
       "id",
@@ -309,12 +309,12 @@ export const exportVolunteerFeedbackController = async (
       "deletedAt",
     ];
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="volunteer_feedback.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }

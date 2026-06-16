@@ -1,8 +1,8 @@
 //CONTROLLER
 import { Request, Response, NextFunction } from "express";
-import { Parser } from "json2csv";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
+import { Parser } from "json2csv";
 import {
   submitRegistration,
   listRegistrations,
@@ -196,7 +196,7 @@ export const exportAshStudentController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportAshStudentTableToCSV();
+    const data = await exportAshStudentTableToCSV();
 
     const fields = [
       "id",
@@ -248,12 +248,12 @@ export const exportAshStudentController = async (
     ];
 
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="ash_students.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -350,7 +350,7 @@ export const exportAshFeedbackController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportAshFeedbackTableToCSV();
+    const data = await exportAshFeedbackTableToCSV();
 
     const fields = [
       "id",
@@ -382,12 +382,12 @@ export const exportAshFeedbackController = async (
     ];
 
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="ash_program_feedback.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -489,7 +489,7 @@ export const exportAshTermlyTrackingController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportAshTermlyTrackingTableToCSV();
+    const data = await exportAshTermlyTrackingTableToCSV();
 
     const fields = [
       "id",
@@ -525,12 +525,12 @@ export const exportAshTermlyTrackingController = async (
     ];
 
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="ash_termly_tracking.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -603,7 +603,7 @@ export const exportAshAttendanceController = async (
   next: NextFunction,
 ) => {
   try {
-    const response = await exportAshAttendanceTableToCSV();
+    const data = await exportAshAttendanceTableToCSV();
 
     const fields = [
       "id",
@@ -620,12 +620,12 @@ export const exportAshAttendanceController = async (
     ];
 
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="ash_weekly_attendance.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
@@ -710,7 +710,7 @@ export const deleteExitController = async (req: Request, res: Response, next: Ne
 };
 export const exportAshExitController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const response = await exportAshExitTableToCSV();
+    const data = await exportAshExitTableToCSV();
 
     const fields = [
       "id",
@@ -739,12 +739,12 @@ export const exportAshExitController = async (req: Request, res: Response, next:
     ];
 
     const json2csvParser = new Parser({ fields });
-    const csv = json2csvParser.parse(response);
+    const csv = json2csvParser.parse(data);
 
-    res.header("Content-Type", "text/csv");
+    res.header("Content-Type", "text/csv; charset=utf-8");
     res.header("Content-Disposition", 'attachment; filename="ash_exit.csv"');
 
-    return res.status(200).send(csv);
+    return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
   }
