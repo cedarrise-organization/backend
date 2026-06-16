@@ -157,9 +157,9 @@ export const listRegistrations = async (
     const searchVector = sql`
     setweight(to_tsvector('english', ${ashStudent.firstName}), 'A') ||
     setweight(to_tsvector('english', ${ashStudent.surname}), 'A') ||
-    setweight(to_tsvector('english', coalesce(${ashStudent.middleName}, '')), 'A')
+    setweight(to_tsvector('english', coalesce(${ashStudent.middleName}, '')), 'A') ||
     setweight(to_tsvector('english', ${ashStudent.currentClass}), 'B') ||
-    setweight(to_tsvector('english', coalesce(${ashStudent.assignedMentor}, '')), 'B')
+    setweight(to_tsvector('english', coalesce(${ashStudent.assignedMentor}, '')), 'B') ||
     setweight(to_tsvector('english', ${ashStudent.schoolName}), 'B') ||
     setweight(to_tsvector('english', ${ashStudent.schoolState}), 'C') ||
     setweight(to_tsvector('english', ${ashStudent.schoolTown}), 'C') ||

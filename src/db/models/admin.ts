@@ -85,9 +85,9 @@ export const ashStudent = p.pgTable(
       sql`(
         setweight(to_tsvector('english', ${table.firstName}), 'A') ||
         setweight(to_tsvector('english', ${table.surname}), 'A') ||
-        setweight(to_tsvector('english', coalesce(${table.middleName}, '')), 'A')
+        setweight(to_tsvector('english', coalesce(${table.middleName}, '')), 'A') ||
         setweight(to_tsvector('english', ${table.currentClass}), 'B') ||
-        setweight(to_tsvector('english', coalesce(${table.assignedMentor}, '')), 'B')
+        setweight(to_tsvector('english', coalesce(${table.assignedMentor}, '')), 'B') ||
         setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
         setweight(to_tsvector('english', ${table.schoolState}), 'C') ||
         setweight(to_tsvector('english', ${table.schoolTown}), 'C') ||
