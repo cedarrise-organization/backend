@@ -16,7 +16,7 @@ params:query {
 
 vars:pre-request {
   baseUrl: http://localhost:3000
-  id: 9e23a69f-008d-4eea-8caf-03fdc7472221
+  id: 52463189-12af-4304-aaa1-af3768871a96
 }
 
 settings {
@@ -26,30 +26,30 @@ settings {
 
 docs {
   # Update ASH Student Status
-
+  
   Updates the admin review status of an ASH student registration record. Used to accept, reject, or reset a student application to pending. On status change, all related cache entries (single record and paginated lists) are invalidated.
-
+  
   ## Authorization
   Requires `update` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                          |
   |-----------|--------|----------|--------------------------------------|
   | id        | string | Yes      | UUID of the ASH student record       |
-
+  
   ## Query Parameters
-
+  
   | Parameter | Type   | Required | Default   | Description / Allowed Values                  |
   |-----------|--------|----------|-----------|-----------------------------------------------|
   | status    | string | No       | `pending` | One of: `accepted`, `rejected`, `pending`     |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the updated student record with `id` and `status` fields.
-
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format or unknown `status` value.          |

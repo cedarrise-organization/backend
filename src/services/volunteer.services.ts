@@ -81,7 +81,10 @@ export const listVolunteers = async (
       setweight(to_tsvector('english', ${volunteerRegistration.surname}), 'A') ||
       setweight(to_tsvector('english', ${volunteerRegistration.emailAddress}), 'A') ||
       setweight(to_tsvector('english', ${volunteerRegistration.phoneNumber}), 'B') ||
-      setweight(to_tsvector('english', ${volunteerRegistration.state}), 'B') 
+      setweight(to_tsvector('english', ${volunteerRegistration.state}), 'B') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${volunteerRegistration.skillsToContribute}, ' '), '')), 'C') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${volunteerRegistration.ashExtracurricular}, ' '), '')), 'C') ||
+      setweight(to_tsvector('english', array_to_string(${volunteerRegistration.volunteerAreas}, ' ')), 'C')
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -345,6 +348,9 @@ export const listVolunteerFeedback = async (page: number, limit: number, search:
       setweight(to_tsvector('english', ${volunteerFeedback.surname}), 'A') ||
       setweight(to_tsvector('english', ${volunteerFeedback.programVolunteered}), 'A') ||
       setweight(to_tsvector('english', coalesce(${volunteerFeedback.volunteerDuration}, '')), 'A') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${volunteerFeedback.waysProgramHelped}, ' '), '')), 'C') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${volunteerFeedback.activitiesInvolvedIn}, ' '), '')), 'C') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${volunteerFeedback.skillsGained}, ' '), '')), 'C') ||
       setweight(to_tsvector('english', coalesce(${volunteerFeedback.wouldRecommend}, '')), 'D')
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;

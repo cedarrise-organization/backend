@@ -177,7 +177,10 @@ export const listRecommendations = async (
       setweight(to_tsvector('english', ${tacotsRecommendation.schoolName}), 'B') ||
       setweight(to_tsvector('english', ${tacotsRecommendation.lastClass}), 'C') ||
       setweight(to_tsvector('english', ${tacotsRecommendation.recommenderFirstName}), 'C') ||
-      setweight(to_tsvector('english', ${tacotsRecommendation.recommenderLastName}), 'C') 
+      setweight(to_tsvector('english', ${tacotsRecommendation.recommenderLastName}), 'C') ||
+      setweight(to_tsvector('english', array_to_string(${tacotsRecommendation.incomeSources}, ' ')), 'D') ||
+      setweight(to_tsvector('english', array_to_string(${tacotsRecommendation.supportTypesNeeded}, ' ')), 'D') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${tacotsRecommendation.catholicSacraments}, ' '), '')), 'D')
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -477,7 +480,9 @@ export const listTacotsFeedback = async (page: number, limit: number, search: st
       setweight(to_tsvector('english', ${tacotsFeedback.studentSurname}), 'A') ||
       setweight(to_tsvector('english', ${tacotsFeedback.currentClass}), 'B') ||
       setweight(to_tsvector('english', ${tacotsFeedback.currentSchool}), 'A') ||
-      setweight(to_tsvector('english', coalesce(${tacotsFeedback.parentPhone}, '')), 'B')
+      setweight(to_tsvector('english', coalesce(${tacotsFeedback.parentPhone}, '')), 'B') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${tacotsFeedback.mostHelpfulSupport}, ' '), '')), 'D') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${tacotsFeedback.currentChallenges}, ' '), '')), 'D')
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -689,12 +694,17 @@ export const listOnboarding = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${tacotsOnboarding.generalHealthStatus}), 'C') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolName}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolState}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledClass}), 'C') ||
+      setweight(to_tsvector('english', ${tacotsOnboarding.generalHealthStatus}), 'C') ||
       setweight(to_tsvector('english', coalesce(${tacotsOnboarding.mentorName}, '')), 'B') ||
-      setweight(to_tsvector('english', coalesce(${tacotsOnboarding.sponsorName}, '')), 'B') 
+      setweight(to_tsvector('english', coalesce(${tacotsOnboarding.sponsorName}, '')), 'B') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${tacotsOnboarding.diagnosedConditions}, ' '), '')), 'D') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${tacotsOnboarding.chronicConditions}, ' '), '')), 'D') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${tacotsOnboarding.supportTypesApproved}, ' '), '')), 'D') ||
+      setweight(to_tsvector('english', array_to_string(${tacotsOnboarding.allergies}, ' ')), 'D') ||        
+      setweight(to_tsvector('english', array_to_string(${tacotsOnboarding.behavioralIndicators}, ' ')), 'D')
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 

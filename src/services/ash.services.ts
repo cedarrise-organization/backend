@@ -163,7 +163,8 @@ export const listRegistrations = async (
     setweight(to_tsvector('english', ${ashStudent.schoolName}), 'B') ||
     setweight(to_tsvector('english', ${ashStudent.schoolState}), 'C') ||
     setweight(to_tsvector('english', ${ashStudent.schoolTown}), 'C') ||
-    setweight(to_tsvector('english', ${ashStudent.schoolLga}), 'C')
+    setweight(to_tsvector('english', ${ashStudent.schoolLga}), 'C') ||
+    setweight(to_tsvector('english', coalesce(array_to_string(${ashStudent.learningConditions}, ' '), '')), 'C')
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -489,7 +490,9 @@ export const listFeedback = async (page: number, limit: number, search: string) 
       setweight(to_tsvector('english', ${ashProgramFeedback.studentSurname}), 'A') ||
       setweight(to_tsvector('english', ${ashProgramFeedback.schoolName}), 'A') ||
       setweight(to_tsvector('english', ${ashProgramFeedback.currentClass}), 'B') ||
-      setweight(to_tsvector('english', coalesce(${ashProgramFeedback.parentPhone}, '')), 'B')
+      setweight(to_tsvector('english', coalesce(${ashProgramFeedback.parentPhone}, '')), 'B') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${ashProgramFeedback.enjoyedParts}, ' '), '')), 'C') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${ashProgramFeedback.mostValuableAspects}, ' '), '')), 'C')
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -1068,7 +1071,8 @@ export const listAttendance = async (page: number, limit: number, search: string
   if (search) {
     const searchVector = sql` 
       setweight(to_tsvector('english', ${ashWeeklyAttendance.volunteersInAttendance}), 'A') ||
-      setweight(to_tsvector('english', coalesce(${ashWeeklyAttendance.sessionDetails}, '')), 'A')
+      setweight(to_tsvector('english', coalesce(${ashWeeklyAttendance.sessionDetails}, '')), 'A') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${ashWeeklyAttendance.sessionsConducted}, ' '), '')), 'A')
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
@@ -1318,7 +1322,8 @@ export const listExit = async (
       setweight(to_tsvector('english', ${ashExit.schoolName}), 'A') ||
       setweight(to_tsvector('english', ${ashExit.classAtExit}), 'B') ||
       setweight(to_tsvector('english', ${ashExit.durationInProgram}), 'B') ||
-      setweight(to_tsvector('english', ${ashExit.exitReason}), 'C') 
+      setweight(to_tsvector('english', ${ashExit.exitReason}), 'C') ||
+      setweight(to_tsvector('english', coalesce(array_to_string(${ashExit.areasOfImprovement}, ' '), '')), 'C') 
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 

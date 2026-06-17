@@ -91,7 +91,8 @@ export const ashStudent = p.pgTable(
         setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
         setweight(to_tsvector('english', ${table.schoolState}), 'C') ||
         setweight(to_tsvector('english', ${table.schoolTown}), 'C') ||
-        setweight(to_tsvector('english', ${table.schoolLga}), 'C')
+        setweight(to_tsvector('english', ${table.schoolLga}), 'C') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.learningConditions}, ' '), '')), 'C')
       )`,
     ),
     check("ash_student_age_check", sql`${table.age} >= 6 AND ${table.age} <= 18`),
@@ -230,7 +231,8 @@ export const ashWeeklyAttendance = p.pgTable(
       "gin",
       sql`(
         setweight(to_tsvector('english', ${table.volunteersInAttendance}), 'A') ||
-        setweight(to_tsvector('english', coalesce(${table.sessionDetails}, '')), 'A')
+        setweight(to_tsvector('english', coalesce(${table.sessionDetails}, '')), 'A') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.sessionsConducted}, ' '), '')), 'A')
       )`,
     ),
   ],
@@ -290,7 +292,8 @@ export const ashExit = p.pgTable(
         setweight(to_tsvector('english', ${table.schoolName}), 'A') ||
         setweight(to_tsvector('english', ${table.classAtExit}), 'B') ||
         setweight(to_tsvector('english', ${table.durationInProgram}), 'B') ||
-        setweight(to_tsvector('english', ${table.exitReason}), 'C')  
+        setweight(to_tsvector('english', ${table.exitReason}), 'C') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.areasOfImprovement}, ' '), '')), 'C') 
       )`,
     ),
     check("ash_exit_age_check", sql`${table.ageAtExit} >= 6 AND ${table.ageAtExit} <= 18`),
@@ -489,7 +492,9 @@ export const tacotsFeedback = p.pgTable(
         setweight(to_tsvector('english', ${table.studentSurname}), 'A') ||
         setweight(to_tsvector('english', ${table.currentClass}), 'B') ||
         setweight(to_tsvector('english', ${table.currentSchool}), 'A') ||
-        setweight(to_tsvector('english', coalesce(${table.parentPhone}, '')), 'B')
+        setweight(to_tsvector('english', coalesce(${table.parentPhone}, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.mostHelpfulSupport}, ' '), '')), 'D') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.currentChallenges}, ' '), '')), 'D')
       )`,
     ),
     check(
@@ -559,7 +564,9 @@ export const ashProgramFeedback = p.pgTable(
         setweight(to_tsvector('english', ${table.studentSurname}), 'A') ||
         setweight(to_tsvector('english', ${table.schoolName}), 'A') ||
         setweight(to_tsvector('english', ${table.currentClass}), 'B') ||
-        setweight(to_tsvector('english', coalesce(${table.parentPhone}, '')), 'B')
+        setweight(to_tsvector('english', coalesce(${table.parentPhone}, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.enjoyedParts}, ' '), '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.mostValuableAspects}, ' '), '')), 'C')
       )`,
     ),
     check(
@@ -632,7 +639,10 @@ export const volunteerFeedback = p.pgTable(
         setweight(to_tsvector('english', ${table.surname}), 'A') ||
         setweight(to_tsvector('english', ${table.programVolunteered}), 'A') ||
         setweight(to_tsvector('english', coalesce(${table.volunteerDuration}, '')), 'A') ||
-        setweight(to_tsvector('english', coalesce(${table.wouldRecommend}, '')), 'D')
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.waysProgramHelped}, ' '), '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.activitiesInvolvedIn}, ' '), '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.skillsGained}, ' '), '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(${table.wouldRecommend}, '')), 'D') 
       )`,
     ),
     check(
@@ -699,6 +709,7 @@ export const outreachTracker = p.pgTable(
       "gin",
       sql`(
         setweight(to_tsvector('english', ${table.submittedBy}), 'A') ||
+        setweight(to_tsvector('english', array_to_string(${table.outreachType}, ' ')), 'A') ||
         setweight(to_tsvector('english', ${table.outreachState}), 'A') ||
         setweight(to_tsvector('english', ${table.outreachCommunity}), 'A') ||
         setweight(to_tsvector('english', ${table.outreachCity}), 'B') ||
@@ -767,7 +778,10 @@ export const volunteerRegistration = p.pgTable(
         setweight(to_tsvector('english', ${table.surname}), 'A') ||
         setweight(to_tsvector('english', ${table.emailAddress}), 'A') ||
         setweight(to_tsvector('english', ${table.phoneNumber}), 'B') ||
-        setweight(to_tsvector('english', ${table.state}), 'B') 
+        setweight(to_tsvector('english', ${table.state}), 'B') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.skillsToContribute}, ' '), '')), 'C') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.ashExtracurricular}, ' '), '')), 'C') ||
+        setweight(to_tsvector('english', array_to_string(${table.volunteerAreas}, ' ')), 'C')
       )`,
     ),
     check("volunteer_registration_age_check", sql`${table.age} >= 16`),
@@ -881,7 +895,10 @@ export const tacotsRecommendation = p.pgTable(
         setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
         setweight(to_tsvector('english', ${table.lastClass}), 'C') ||
         setweight(to_tsvector('english', ${table.recommenderFirstName}), 'C') ||
-        setweight(to_tsvector('english', ${table.recommenderLastName}), 'C') 
+        setweight(to_tsvector('english', ${table.recommenderLastName}), 'C') ||
+        setweight(to_tsvector('english', array_to_string(${table.incomeSources}, ' ')), 'D') ||
+        setweight(to_tsvector('english', array_to_string(${table.supportTypesNeeded}, ' ')), 'D') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.catholicSacraments}, ' '), '')), 'D')
       )`,
     ),
     check("tacots_recommendation_age_check", sql`${table.age} >= 6`),
@@ -972,12 +989,17 @@ export const tacotsOnboarding = p.pgTable(
     index("tacots_onboarding_search_index").using(
       "gin",
       sql`(
-        setweight(to_tsvector('english', ${table.generalHealthStatus}), 'C') ||
         setweight(to_tsvector('english', ${table.enrolledSchoolName}), 'A') ||
         setweight(to_tsvector('english', ${table.enrolledSchoolState}), 'A') ||
         setweight(to_tsvector('english', ${table.enrolledClass}), 'C') ||
+        setweight(to_tsvector('english', ${table.generalHealthStatus}), 'C') ||
         setweight(to_tsvector('english', coalesce(${table.mentorName}, '')), 'B') ||
-        setweight(to_tsvector('english', coalesce(${table.sponsorName}, '')), 'B') 
+        setweight(to_tsvector('english', coalesce(${table.sponsorName}, '')), 'B') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.diagnosedConditions}, ' '), '')), 'D') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.chronicConditions}, ' '), '')), 'D') ||
+        setweight(to_tsvector('english', coalesce(array_to_string(${table.supportTypesApproved}, ' '), '')), 'D') ||
+        setweight(to_tsvector('english', array_to_string(${table.allergies}, ' ')), 'D') ||
+        setweight(to_tsvector('english', array_to_string(${table.behavioralIndicators}, ' ')), 'D')
       )`,
     ),
     check(
