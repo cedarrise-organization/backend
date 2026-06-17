@@ -10,6 +10,7 @@ import {
   createReceipts,
   deleteReceipts,
   exportReceiptsTableToCSV,
+  uploadPhotos,
 } from "../../services/general.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
@@ -112,5 +113,22 @@ export const exportReceiptsController = async (req: Request, res: Response, next
     return res.status(200).send(Buffer.from(csv, "utf-8"));
   } catch (error) {
     next(error);
+  }
+};
+
+// PHOTO UPLOADS
+export const uploadPhotosController = async (req: Request, res: Response, next: NextFunction) => {
+  const { folder } = req.qtransformed;
+
+  if (!req.files) {
+    throw new ValidationError("No photos were uploaded");
+  }
+
+  const files = req.files as Express.Multer.File[];
+  try {
+    const response = await uploadPhotos(files, folder);
+    return successResponse(res, response.code, response.message);
+  } catch (err) {
+    next(err);
   }
 };

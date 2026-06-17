@@ -1,6 +1,6 @@
 //MODELS
 import * as z from "zod";
-import { baseQueryBody } from "../../db/globalschema/global.schema.js";
+import { baseQueryBody, imageFileSchema } from "../../db/globalschema/global.schema.js";
 
 export const generalParamSchema = z.object({
   params: z.object({
@@ -64,4 +64,17 @@ export const receiptsQuerySchema = z.object({
       z.enum(["name", "amount", "description", "uploadedBy", "createdAt"]).default("createdAt"),
     ),
   }),
+});
+
+export const gallerySchema = z.object({
+  query: z.object({
+    folder: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z.enum(["ASH", "OUTREACHES", "CAPACITY_BUILDING"]).default("ASH"),
+    ),
+  }),
+
+  files: imageFileSchema
+    .min(1, "At least one photo is required")
+    .max(3, "Maximum of 3 photos allowed"),
 });

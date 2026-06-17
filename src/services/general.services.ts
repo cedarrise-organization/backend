@@ -342,4 +342,27 @@ export const exportReceiptsTableToCSV = async () => {
   return data;
 };
 
+const FOLDER_MAP = {
+  ASH: "/Cedarrise Initiative/ASH",
+  OUTREACHES: "/Cedarrise Initiative/OUTREACHES",
+  CAPACITY_BUILDING: "/Cedarrise Initiative/CAPACITY BUILDING",
+} as const;
+
+// PHOTO UPLOADS
+export const uploadPhotos = async (
+  files: Express.Multer.File[],
+  folder: keyof typeof FOLDER_MAP,
+) => {
+  // console.log(files);
+  const uploadFolder = FOLDER_MAP[folder] ?? FOLDER_MAP.ASH;
+  for (const file of files) {
+    await uploadToCloudinary(file, uploadFolder);
+  }
+
+  return {
+    code: 201,
+    message: "Photos uploaded successfully",
+  };
+};
+
 export const feature = async (req: Request, options: any) => {};

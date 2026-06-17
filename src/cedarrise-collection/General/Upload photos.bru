@@ -1,0 +1,83 @@
+meta {
+  name: Upload photos
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/v1/general/gallery?folder=
+  body: multipartForm
+  auth: inherit
+}
+
+params:query {
+  folder: 
+}
+
+body:multipart-form {
+  photos: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Upload Photos to Gallery
+  
+  Uploads up to 3 photos to Cloudinary into the program-specific folder.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `create` — enforced by `authorize("create")`.
+  
+  ## Request
+  
+  **Content-Type:** `multipart/form-data`
+  
+  ### Query Parameters
+  
+  | Parameter | Type   | Required | Default | Description / Allowed Values                                                 |
+  |-----------|--------|----------|---------|------------------------------------------------------------------------------|
+  | `folder`  | string | No       | `ASH`   | The target program folder. One of: `ASH`, `OUTREACHES`, `CAPACITY_BUILDING` |
+  
+  ### Body Fields
+  
+  | Field    | Type   | Required | Validation                                                       |
+  |----------|--------|----------|------------------------------------------------------------------|
+  | `photos` | file[] | ✅       | Up to 3 image files (jpeg, jpg, png, webp). Max 20 MB per file. |
+  
+  ### Cloudinary Folder Mapping
+  
+  Based on the `folder` parameter, the images are uploaded to the following Cloudinary directories:
+  
+  - `ASH` ➡️ `/Cedarrise Initiative/ASH`
+  - `OUTREACHES` ➡️ `/Cedarrise Initiative/OUTREACHES`
+  - `CAPACITY_BUILDING` ➡️ `/Cedarrise Initiative/CAPACITY BUILDING`
+  
+  ## Response
+  
+  **`201 Created`** — Confirms successful upload.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Photos uploaded successfully"
+  }
+  ```
+  
+  ## Errors
+  
+  | Status                      | Description                                                  |
+  |-----------------------------|--------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed (invalid folder name, no files uploaded).  |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                             |
+  | `403 Forbidden`             | Insufficient permissions.                                    |
+  | `500 Internal Server Error` | Unexpected server error or Cloudinary upload failure.        |
+}

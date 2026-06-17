@@ -4,7 +4,7 @@ import cloudinary from "../../configs/cloudinary.config.js";
 import { CACHE_TTL, cacheDel, cacheGet, cacheSet } from "../../lib/cache.js";
 import { blogs } from "../../db/models/blogs.js";
 import { UploadApiResponse } from "cloudinary";
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import { Request } from "express";
 import {
   uploadToCloudinary,
@@ -30,7 +30,7 @@ export const listBlogs = async (page: number, limit: number) => {
     .from(blogs)
     .offset((page - 1) * limit)
     .limit(limit)
-    .orderBy(asc(blogs.date), asc(blogs.id));
+    .orderBy(desc(blogs.date));
 
   /// cache set
   await cacheSet(key, allBlogs, CACHE_TTL.BLOGS);
