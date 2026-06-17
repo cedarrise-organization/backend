@@ -1,6 +1,6 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/storage.util.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
-import { projects } from "../db/models/admin.js";
+import { projects } from "../db/models/dashboard.js"
 import { UploadApiResponse } from "cloudinary";
 import { eq, desc, count } from "drizzle-orm";
 import { Request } from "express";

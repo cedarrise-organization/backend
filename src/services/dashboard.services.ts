@@ -35,7 +35,7 @@ import {
   outreachTracker,
 } from "../db/models/admin.js";
 import db from "../db/db.js";
-import { Dataset, LineData } from "../types/dashboard.js";
+import { Dataset, Linedata, Notificationcandidate } from "../types/dashboard.js";
 import { Data } from "ejs";
 
 export const getCards = async () => {
@@ -808,7 +808,7 @@ export const getEnrollment = async () => {
 
   ////
   /* ashAcceptance, tacotsAcceptance, volunteerAcceptance */
-  const c_acceptanceRate: LineData = [
+  const c_acceptanceRate: Linedata = [
     {
       title: "ASH",
       amount: getPercentage(
@@ -841,7 +841,7 @@ export const getEnrollment = async () => {
     if (featuredStates.includes(row.state)) return total;
     return total + Number(row.value);
   }, 0);
-  const c_geographicalDistribution: LineData = [
+  const c_geographicalDistribution: Linedata = [
     {
       title: "ENUGU",
       amount: ashStateCountMap.get("ENUGU") ?? 0,
@@ -1122,7 +1122,7 @@ export const getInstEffectiveness = async () => {
   const totalAccHoursMap = new Map(
     totalAccHours.map((row) => [row.academicSession, Number(row.value)]),
   );
-  const c_totalAccHours: LineData = sessionLabels.map((session) => {
+  const c_totalAccHours: Linedata = sessionLabels.map((session) => {
     const [startYear, endYear] = session.split("/");
     return {
       title: `${startYear}/20${endYear}`,
@@ -1176,6 +1176,92 @@ export const getInstEffectiveness = async () => {
       c_studentBenchMark,
     },
   };
+};
+
+export const checkPotentialDropoutRisk = async (): Promise<Notificationcandidate[]> => {
+  
+  return [
+    {
+      type: "POTENTIAL_DROPOUT_RISK",
+      title: "string",
+      message: "string",
+      severity: "low",
+      entityType: "ash",
+      dedupeKey: "string",
+      metadata: JSON.stringify({
+        stuff: "i",
+      }),
+      expiresAt: new Date(Date.now()),
+    },
+  ];
+};
+
+export const checkLowAttendanceRate = async (): Promise<Notificationcandidate[]> => {
+  return [
+    {
+      type: "POTENTIAL_DROPOUT_RISK",
+      title: "string",
+      message: "string",
+      severity: "low",
+      entityType: "ash",
+      dedupeKey: "string",
+      metadata: JSON.stringify({
+        stuff: "i",
+      }),
+      expiresAt: new Date(Date.now()),
+    },
+  ];
+};
+
+export const checkLowMentorshipEngagement = async (): Promise<Notificationcandidate[]> => {
+  return [
+    {
+      type: "POTENTIAL_DROPOUT_RISK",
+      title: "string",
+      message: "string",
+      severity: "low",
+      entityType: "ash",
+      dedupeKey: "string",
+      metadata: JSON.stringify({
+        stuff: "i",
+      }),
+      expiresAt: new Date(Date.now()),
+    },
+  ];
+};
+
+export const checkScoreDropAlert = async (): Promise<Notificationcandidate[]> => {
+  return [
+    {
+      type: "POTENTIAL_DROPOUT_RISK",
+      title: "string",
+      message: "string",
+      severity: "low",
+      entityType: "ash",
+      dedupeKey: "string",
+      metadata: JSON.stringify({
+        stuff: "i",
+      }),
+      expiresAt: new Date(Date.now()),
+    },
+  ];
+};
+
+export const checkVolunteerInactivity = async (): Promise<Notificationcandidate[]> => {
+  return [
+    {
+      type: "POTENTIAL_DROPOUT_RISK",
+      title: "string",
+      message: "string",
+      severity: "low",
+      entityType: "ash",
+      dedupeKey: "string",
+      metadata: JSON.stringify({
+        stuff: "i",
+      }),
+      expiresAt: new Date(Date.now()),
+    },
+  ];
 };
 
 export const feature = async (req: Request, options: any) => {};

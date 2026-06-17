@@ -22,7 +22,7 @@ settings {
 docs {
   # Get Institutional Effectiveness Metrics
   
-  Returns chart-ready metrics for the Institutional Effectiveness dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `LineData` (key-value list), ready for direct consumption by the frontend charting library.
+  Returns chart-ready metrics for the Institutional Effectiveness dashboard tab. Each field in the response is either a `Dataset` (chart object) or a `Linedata` (key-value list), ready for direct consumption by the frontend charting library.
   
   All metrics are fully database-driven. Most are sourced from the `tacots_tracking` table, with `c_studentBenchMark` sourced from `ash_termly_tracking`. Several metrics are **scoped to the current academic session**, which is derived at runtime: if the current month is September or later, the session is `<currentYear>/<nextYear>`; otherwise it is `<previousYear>/<currentYear>` (e.g. in June 2026 → `2025/26`, in October 2026 → `2026/27`). Results are cached under the key `cedarrise:dashboard:institutional-effectiveness` with the `DASHBOARD_CARDS` TTL.
   
@@ -45,7 +45,7 @@ docs {
   }
   ```
   
-  ### `LineData`
+  ### `Linedata`
   ```typescript
   Array<{ title: string, amount: number }>
   ```
@@ -62,7 +62,7 @@ docs {
       "c_communityServiceHours": Dataset,
       "c_averageMentorshipHours": Dataset,
       "c_spendPerstudent": Dataset,
-      "c_totalAccHours": LineData,
+      "c_totalAccHours": Linedata,
       "c_studentBenchMark": Dataset
     }
   }
@@ -129,7 +129,7 @@ docs {
   | labels   | `["Tuition", "Resources", "Sundries", "Total"]`               |
   | datasets | Single series `"Avg spend"` — amounts in Naira (₦).           |
   
-  ### `c_totalAccHours` — `LineData`
+  ### `c_totalAccHours` — `Linedata`
   
   Total accumulated mentorship hours by academic session.
   

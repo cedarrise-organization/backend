@@ -19,8 +19,8 @@ import {
   volunteerRegistration,
   volunteerFeedback,
   outreachTracker,
-  projects,
 } from "./models/admin.js";
+import { projects } from "./models/dashboard.js";
 import { refreshtoken } from "./models/auth.js";
 
 // CLEAR TABLES
