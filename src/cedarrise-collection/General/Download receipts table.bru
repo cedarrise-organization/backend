@@ -1,0 +1,62 @@
+meta {
+  name: Download receipts table
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/general/download/receipts
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download Receipts (CSV Export)
+  
+  Exports the entire `receipts` table as a CSV file download. Selects all rows from the table (no filters, no pagination) and converts the records to CSV using json2csv, and returns the CSV as raw file bytes with Content-Type: text/csv and Content-Disposition: attachment. The response is not JSON; frontend clients should read it as a Blob and trigger a browser download.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv; charset=utf-8`
+  **Content-Disposition:** `attachment; filename="receipts.csv"`
+  
+  The CSV contains one row per receipt record with the following columns (in order):
+  
+  | Column          | Description                                             |
+  |-----------------|---------------------------------------------------------|
+  | `id`            | UUID primary key                                        |
+  | `name`          | Name / title of the receipt                             |
+  | `amount`        | Receipt transaction amount                              |
+  | `description`   | Optional description / notes                            |
+  | `uploadedBy`    | Username of the person who uploaded the receipt         |
+  | `imageUrl`      | Cloudinary secure URL of the receipt image              |
+  | `imagePublicId` | Cloudinary public ID of the uploaded image              |
+  | `updatedAt`     | Last update timestamp                                   |
+  | `createdAt`     | Creation timestamp                                      |
+  | `deletedAt`     | Soft-delete timestamp (null if active)                  |
+  
+  ## Errors
+  
+  | Status                      | Description                                          |
+  |-----------------------------|------------------------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                     |
+  | `403 Forbidden`             | Insufficient permissions.                            |
+  | `500 Internal Server Error` | Unexpected server error.                             |
+}

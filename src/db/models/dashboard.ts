@@ -17,11 +17,11 @@ export const projects = p.pgTable("projects", {
   title: p.text().notNull(),
   description: p.text(),
   imageUrl: p
-    .text()
+    .text("image_url")
     .default(
       "https://res.cloudinary.com/dhdfwtjs5/image/upload/v1780649959/ongoing_project_result_raix7r.webp",
     ),
-  imagePublicId: p.text().default("ongoing_project_result_raix7r"),
+  imagePublicId: p.text("image_public_id").default("ongoing_project_result_raix7r"),
   status: p.text().default("ongoing"),
   ...timestamps,
 });

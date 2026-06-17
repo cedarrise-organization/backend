@@ -1,5 +1,12 @@
 //MODELS
 import * as z from "zod";
+import { baseQueryBody } from "../../db/globalschema/global.schema.js";
+
+export const generalParamSchema = z.object({
+  params: z.object({
+    id: z.uuid("Invalid ID"),
+  }),
+});
 
 export const projectsSchema = z.object({
   body: z.object({
@@ -30,8 +37,31 @@ export const projectStatusSchema = z.object({
   }),
 });
 
-export const generalParamSchema = z.object({
-  params: z.object({
-    id: z.uuid("Invalid ID"),
+export const receiptsSchema = z.object({
+  body: z.object({
+    name: z.string().min(3, "title should be at least 3 characters").max(150),
+    amount: z.coerce.number().int().min(1000),
+    description: z.string().optional(),
+  }),
+  file: z.object({
+    fieldname: z.string(),
+    originalname: z.string(),
+    encoding: z.string(),
+    mimetype: z.enum(
+      ["image/jpeg", "image/jpg", "image/png", "image/webp"],
+      "Uploaded file should be a jpg, jpeg, png or webp",
+    ),
+    size: z.number().max(20 * 1024 * 1024, "file must not be more than 20mb"), // 20MB,
+    buffer: z.instanceof(Buffer),
+  }),
+});
+
+export const receiptsQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z.enum(["name", "amount", "description", "uploadedBy", "createdAt"]).default("createdAt"),
+    ),
   }),
 });

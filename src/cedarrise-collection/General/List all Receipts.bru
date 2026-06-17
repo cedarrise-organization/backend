@@ -1,0 +1,111 @@
+meta {
+  name: List all Receipts
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/general/receipts?page=&limit=&orderBy=&search=&sortBy=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+  orderBy: 
+  search: 
+  sortBy: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List all Receipts
+  
+  Returns a paginated list of receipt records. Results can be sorted and filtered by search terms.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  
+  ### Query Parameters
+  
+  | Parameter | Type   | Required | Default     | Description / Allowed Values                                                                                              |
+  |-----------|--------|----------|-------------|---------------------------------------------------------------------------------------------------------------------------|
+  | `page`    | number | No       | `1`         | Page number (integer ≥ 1)                                                                                                 |
+  | `limit`   | number | No       | `25`        | Items per page (integer, 1–100)                                                                                           |
+  | `orderBy` | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                                     |
+  | `sortBy`  | string | No       | `createdAt` | Field to sort by. One of: `name`, `amount`, `description`, `uploadedBy`, `createdAt`                                      |
+  | `search`  | string | No       | —           | Full-text search query. When provided, cache is bypassed and results are matched against the text search vector.          |
+  
+  ### Searchable Fields
+  
+  Full-text search queries match against the following columns using PostgreSQL text search:
+  
+  | Field         | Weight |
+  |---------------|--------|
+  | `name`        | A      |
+  | `uploadedBy`  | A      |
+  | `amount`      | B      |
+  | `description` | C      |
+  
+  Plain text amount search is also performed using a fallback ILIKE comparison.
+  
+  ## Response
+  
+  **`200 OK`** — Returns a paginated list of receipts.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Found all receipts successfully",
+    "data": [
+      {
+        "id": "69d6a93c-25f2-4d52-8155-53025f0cb775",
+        "name": "Printing Receipts",
+        "amount": 12500,
+        "description": "Printing flyers and registration materials",
+        "uploadedBy": "admin",
+        "imageUrl": "https://res.cloudinary.com/...",
+        "imagePublicId": "cloudinary_public_id",
+        "createdAt": "2026-06-17T17:49:47.256Z",
+        "updatedAt": null,
+        "deletedAt": null
+      }
+    ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 1
+      }
+    }
+  }
+  ```
+  
+  ## Caching
+  
+  - **Cache Key:** `cedarrise:dashboard:receipts:{page}:{limit}:{orderBy}:{sortBy}`
+  - **TTL:** 1 hour (3600 seconds — `DASHBOARD_CARDS`)
+  - **Bypass:** Caching is bypassed entirely when a `search` query parameter is provided.
+  
+  ## Errors
+  
+  | Status                      | Description                                                  |
+  |-----------------------------|--------------------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. invalid `sortBy` or `limit`). |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                             |
+  | `403 Forbidden`             | Insufficient permissions.                                    |
+  | `500 Internal Server Error` | Unexpected server error.                                     |
+}

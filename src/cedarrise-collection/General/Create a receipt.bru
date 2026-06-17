@@ -1,0 +1,87 @@
+meta {
+  name: Create a receipt
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/v1/general/receipts
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  name: Printing Receipts
+  amount: 6666
+  description: Printing flyers and registration materials
+  file: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Create a Receipt
+  
+  Uploads a receipt image to Cloudinary (under `/Cedarrise Initiative/DASHBOARD-ASSETS/RECEIPTS`) and creates a new receipt record in the database. Auto-populates `uploadedBy` with the authenticated user's name. Invalidates all cached receipts lists on success.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `create` — enforced by `authorize("create")`.
+  
+  ## Request
+  
+  **Content-Type:** `multipart/form-data`
+  
+  ### Body Fields
+  
+  | Field         | Type   | Required | Validation                                                          |
+  |---------------|--------|----------|---------------------------------------------------------------------|
+  | `name`        | string | ✅       | Min 3 characters, max 150 characters.                               |
+  | `amount`      | number | ✅       | Must be an integer >= 1000.                                         |
+  | `description` | string | ❌       | Optional description of the receipt.                                |
+  | `file`        | file   | ✅       | Uploaded receipt image file (jpg, jpeg, png, webp). Max size 20 MB. |
+  
+  ## Response
+  
+  **`200 OK`** — Returns the newly created receipt record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Receipt record created successfully",
+    "data": {
+      "id": "69d6a93c-25f2-4d52-8155-53025f0cb775",
+      "name": "Printing Receipts",
+      "amount": 12500,
+      "description": "Printing flyers and registration materials",
+      "uploadedBy": "admin",
+      "imageUrl": "https://res.cloudinary.com/...",
+      "imagePublicId": "cloudinary_public_id",
+      "createdAt": "2026-06-17T18:47:54.000Z",
+      "updatedAt": null,
+      "deletedAt": null
+    }
+  }
+  ```
+  
+  ## Cache Invalidation
+  
+  - **Invalidated Keys:** Bypasses and deletes all caches matching pattern `cedarrise:general:receipts:*`
+  
+  ## Errors
+  
+  | Status                      | Description                                                                 |
+  |-----------------------------|-----------------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed (e.g. name too short, amount too low, file missing/invalid). |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                                            |
+  | `403 Forbidden`             | Insufficient permissions.                                                   |
+  | `500 Internal Server Error` | Unexpected server error or Cloudinary upload failure.                       |
+}

@@ -22,6 +22,7 @@ import {
 } from "./models/admin.js";
 import { projects } from "./models/dashboard.js";
 import { refreshtoken } from "./models/auth.js";
+import { receipts } from "./models/general.js";
 
 // CLEAR TABLES
 const clearTables = async () => {
@@ -48,6 +49,7 @@ const clearTables = async () => {
     await db.delete(outreachTracker);
     await db.delete(capacityBuildingEvaluation);
     await db.delete(projects);
+    await db.delete(receipts);
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -711,6 +713,24 @@ async function seedProjects() {
   }
 }
 
+// RECEIPTS
+async function seedReceipts() {
+  try {
+    const file = await fs.readFile(`${process.cwd()}/src/db/seeddata/receipts.jsonl`, "utf-8");
+
+    const rows = file
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line) => JSON.parse(line));
+
+    await db.insert(receipts).values(rows);
+
+    logger.info(`Inserted ${rows.length} rows into receipts`);
+  } catch (error) {
+    logger.error("could not seed receipts table", { error });
+  }
+}
+
 await clearTables();
 await installExtensions();
 await seedRolesAndPermissions();
@@ -730,3 +750,4 @@ await seedTacotsFeedback();
 await seedOutreachTracker();
 await seedCapacityBuildingEvaluation();
 await seedProjects();
+await seedReceipts();

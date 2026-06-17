@@ -4,6 +4,7 @@ import { appEvents } from "../lib/events.js";
 import { ADMIN_EVENTS } from "../events/admin.events.js";
 import { hashPassword } from "../utils/password.util.js";
 import { roles, userroles, users } from "../db/models/auth.js";
+import { cacheGet, cacheSet, CACHE_TTL } from "../lib/cache.js";
 import { conflictError } from "../lib/error.js";
 
 export const listAllRoles = async () => {
@@ -146,9 +147,25 @@ export const createUser = async (options: {
 };
 
 export const listAllUsers = async () => {
+  /// cache
+  const key = `cedarrise:lookup:users`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "All users  found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
   const allUsers = await db
     .select({ id: users.id, name: users.name, email: users.email })
     .from(users);
+
+  /// cache set
+  await cacheSet(key, allUsers, CACHE_TTL.LISTS);
+  ///
 
   return {
     code: 200,

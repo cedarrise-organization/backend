@@ -1,0 +1,74 @@
+meta {
+  name: List all projects
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/general/projects
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List all projects
+  
+  Returns a list of all project records, ordered by creation date (newest first) and status.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  
+  No query parameters or request body required.
+  
+  ## Response
+  
+  **`200 OK`** — Returns a list of all projects and meta count of ongoing projects.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Found all projects successfully",
+    "data": [
+      {
+        "id": "6a962a3d-31b3-4632-82ab-85fae44da2e0",
+        "title": "Example Project Title",
+        "description": "An optional project description",
+        "imageUrl": "https://res.cloudinary.com/...",
+        "imagePublicId": "public_id_string",
+        "status": "ongoing",
+        "createdAt": "2026-06-01T00:00:00.000Z",
+        "updatedAt": "2026-06-01T00:00:00.000Z"
+      }
+    ],
+    "meta": {
+      "ongoingProjectCount": 1
+    }
+  }
+  ```
+  
+  ## Caching
+  
+  - **Cache Key:** `cedarrise:dashboard:projects`
+  - **TTL:** 1 hour (3600 seconds — `DASHBOARD_CARDS`)
+  
+  ## Errors
+  
+  | Status                      | Description                         |
+  |-----------------------------|-------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid Bearer token.    |
+  | `403 Forbidden`             | Insufficient permissions.           |
+  | `500 Internal Server Error` | Unexpected server error.            |
+}

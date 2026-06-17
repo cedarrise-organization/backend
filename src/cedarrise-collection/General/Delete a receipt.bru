@@ -1,17 +1,17 @@
 meta {
-  name: Delete a project
+  name: Delete a receipt
   type: http
-  seq: 4
+  seq: 8
 }
 
 delete {
-  url: {{baseUrl}}/api/v1/general/projects/:id
+  url: {{baseUrl}}/api/v1/general/receipts/:id
   body: none
   auth: inherit
 }
 
 params:path {
-  id: 7cfaf843-e41d-49d8-a82e-be5495142d48
+  id: 8270146e-3203-4850-ad17-94f17e48600e
 }
 
 vars:pre-request {
@@ -24,14 +24,14 @@ settings {
 }
 
 docs {
-  # Delete a Project
+  # Delete a Receipt
   
-  Deletes a project record by ID. If the request includes a file context, the associated Cloudinary image is also deleted. Invalidates the projects cache on success.
+  Deletes a receipt record from the database by its ID and deletes its corresponding receipt image from Cloudinary. Invalidates all cached receipts lists on success.
   
   ## Authorization
   
   - **Authentication:** Required — Bearer token via `authenticate()`.
-  - **Permission:** `read` — enforced by `authorize("read")`.
+  - **Permission:** `delete` — enforced by `authorize("delete")`.
   
   ## Request
   
@@ -39,25 +39,25 @@ docs {
   
   | Parameter | Type | Required | Description                      |
   |-----------|------|----------|----------------------------------|
-  | `id`      | uuid | ✅       | The ID of the project to delete. |
+  | `id`      | uuid | ✅       | The ID of the receipt to delete. |
   
-  No request body or query parameters.
+  No query parameters or request body required.
   
   ## Response
   
-  **`200 OK`** — Confirms deletion.
+  **`200 OK`** — Confirms successful deletion.
   
   ```json
   {
     "success": true,
-    "message": "Project deleted successfully"
+    "message": "Receipts deleted successfully"
   }
   ```
   
   ## Side Effects
   
-  - If the project has an associated Cloudinary image, it is deleted from Cloudinary. A failed Cloudinary deletion is logged but does not block the database deletion.
-  - **Deleted Cache Key:** `cedarrise:dashboard:projects`
+  - Deletes the associated receipt image from Cloudinary. If Cloudinary deletion fails, the failure is logged, but the database deletion proceeds.
+  - **Invalidated Keys:** Bypasses and deletes all caches matching pattern `cedarrise:general:receipts:*`
   
   ## Errors
   
@@ -66,5 +66,6 @@ docs {
   | `400 Bad Request`           | Invalid ID format.                       |
   | `401 Unauthorized`          | Missing or invalid Bearer token.         |
   | `403 Forbidden`             | Insufficient permissions.                |
+  | `404 Not Found`             | Receipt record not found in the database.|
   | `500 Internal Server Error` | Unexpected server error.                 |
 }
