@@ -278,7 +278,7 @@ export const createReceipts = async (
 ) => {
   const receiptImage: UploadApiResponse | undefined = await uploadToCloudinary(
     (req as any).file,
-    "/Cedarrise Initiative/DASHBOARD-ASSETS/RECEIPTS",
+    "/Cedarrise Initiative/RECEIPTS",
   );
 
   if (!receiptImage) {
@@ -337,7 +337,6 @@ export const deleteReceipts = async (req: Request, id: string) => {
     message: "Receipts deleted successfully",
   };
 };
-
 export const exportReceiptsTableToCSV = async () => {
   const data = await db.select().from(receipts);
   return data;

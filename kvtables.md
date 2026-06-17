@@ -191,6 +191,7 @@
 | Carousel — TACOTS            | `Cedarrise Initiative/TACOTS`                           |
 | Carousel — Outreaches        | `Cedarrise Initiative/OUTREACHES`                       |
 | Carousel — Capacity Building | `Cedarrise Initiative/CAPACITY BUILDING`                |
+| RECEIPTS — Receipt image     | `/Cedarrise Initiative/RECEIPTS`                        |
 | ASH — Passport Photos        | `/Cedarrise Initiative/ASH-ASSETS/PASSPORTS`            |
 | ASH — Last Results           | `/Cedarrise Initiative/ASH-ASSETS/RESULTS`              |
 | ASH — Parent Signatures      | `/Cedarrise Initiative/ASH-ASSETS/SIGNATURES`           |
@@ -201,7 +202,6 @@
 | TACOTS — Admission Letters   | `/Cedarrise Initiative/TACOTS-ASSETS/ADMISSION-LETTERS` |
 | TACOTS — Term Results        | `/Cedarrise Initiative/TACOTS-ASSETS/TERM-RESULTS`      |
 | TACOTS — Payment Evidence    | `/Cedarrise Initiative/TACOTS-ASSETS/PAYMENT-EVIDENCE`  |
-| RECEIPTS — Receipt image     | `/Cedarrise Initiative/TACOTS-ASSETS/RECEIPTS`          |
 
 ---
 
