@@ -43,15 +43,10 @@ export const notifications = p.pgTable(
     status: p.text().notNull().default("active"),
     metadata: p.text("metadata"),
 
-    createdAt: p.timestamp("created_at").defaultNow().notNull(),
-    updatedAt: p
-      .timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date()),
     dismissedAt: p.timestamp("dismissed_at"),
     resolvedAt: p.timestamp("resolved_at"),
     expiresAt: p.timestamp("expires_at"),
-    deletedAt: p.timestamp("deleted_at"),
+    ...timestamps,
   },
   (table) => [
     index("notifications_status_idx").on(table.status),

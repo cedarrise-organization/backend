@@ -172,7 +172,6 @@ export const getReceipts = async (
     const searchVector = sql`
     setweight(to_tsvector('english', ${receipts.name}), 'A') ||
     setweight(to_tsvector('english', ${receipts.uploadedBy}), 'A') ||
-    setweight(to_tsvector('english', coalesce(${receipts.amount}::text, '')), 'B') ||
     setweight(to_tsvector('english', coalesce(${receipts.description}, '')), 'C') 
   `;
 
