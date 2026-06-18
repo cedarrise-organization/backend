@@ -86,6 +86,7 @@
 | `cedarrise:dashboard:projects`                                                      | Cached list of all projects. Set on read, deleted on project creation, status update, or deletion.                                                                     | `services/general.services.ts`              |
 | `cedarrise:general:receipts:{page}:{limit}:{orderBy}:{sortBy}`                      | Cached paginated receipts list. Set on read, bypassed on search.                                                                                                       | `services/general.services.ts`              |
 | `cedarrise:general:googleform`                                                      | Cached active Google Form details (src + title). Set on read, cleared on upload.                                                                                      | `services/general.services.ts`              |
+| `cedarrise:general:metadata`                                                        | Cached general uploads' page metadata (active projects, receipts, users, and photos). Set on read.                                                                     | `services/general.services.ts`              |
 
 ---
 

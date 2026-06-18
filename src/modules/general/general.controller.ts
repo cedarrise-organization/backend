@@ -12,7 +12,8 @@ import {
   exportReceiptsTableToCSV,
   uploadPhotos,
   uploadGoogleForm,
-  getGoogleForm
+  getGoogleForm,
+  getMetadata
 } from "../../services/general.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
@@ -152,6 +153,16 @@ export const uploadGoogleFormController = async (
 export const getGoogleFormController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const response = await getGoogleForm();
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Metadata
+export const getMetadataController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await getMetadata();
     return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);

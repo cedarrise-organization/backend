@@ -24,13 +24,13 @@ import {
   uploadPhotosController,
   uploadGoogleFormController,
   getGoogleFormController,
+  getMetadataController
 } from "./general.controller.js";
 const router = express.Router();
 
 // PROJECTS
 // Retrieve a list of all project records, ordered by creation date and status.
 router.get("/projects", authenticate(), authorize("read"), getProjectsController);
-
 // Create a new project record and optionally upload a project banner/image to Cloudinary.
 router.post(
   "/projects",
@@ -40,7 +40,6 @@ router.post(
   validateRequest(projectsSchema),
   createProjectsController,
 );
-
 // Update the status of an existing project.
 router.patch(
   "/projects/:id",
@@ -49,7 +48,6 @@ router.patch(
   validateRequest(projectStatusSchema),
   updateProjectStatusController,
 );
-
 //Delete a project record and its associated image from Cloudinary.
 router.delete(
   "/projects/:id",
@@ -68,7 +66,6 @@ router.get(
   validateRequest(receiptsQuerySchema),
   getReceiptsController,
 );
-
 // Create a new receipt record, upload the receipt image to Cloudinary, and save details.
 router.post(
   "/receipts",
@@ -78,7 +75,6 @@ router.post(
   validateRequest(receiptsSchema),
   createReceiptsController,
 );
-
 // Delete a receipt record by ID and its corresponding image from Cloudinary.
 router.delete(
   "/receipts/:id",
@@ -104,6 +100,7 @@ router.post(
 // GOOGLE-FORM UPLOADS
 // Get google form 
 router.get("/google-forms", getGoogleFormController)
+router.get("/metadata", authenticate(), authorize("read"), getMetadataController)
 // Upload google form
 router.post(
   "/google-forms",

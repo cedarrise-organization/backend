@@ -1,0 +1,73 @@
+meta {
+  name: Get General Upload Page's Metadata
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/v1/general/metadata
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get General Upload Page's Metadata
+  
+  Retrieves various statistics and metadata for the general uploads page, including count of ongoing projects, logged receipts, and system users.
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `read` — enforced by `authorize("read")`.
+  
+  ## Request
+  
+  No query parameters or request body required.
+  
+  ## Response
+  
+  **`200 OK`** — Returns the aggregated metadata stats.
+  
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "General uploads' page metadata found successfully",
+    "data": {
+      "photosUploaded": 0,
+      "activeProjects": 12,
+      "receiptsLogged": 45,
+      "systemUsers": 8
+    }
+  }
+  ```
+  
+  ### Metadata Fields Description
+  
+  - **`photosUploaded`**: Count of photos uploaded (currently hardcoded/defaults to `0`).
+  - **`activeProjects`**: The number of ongoing projects (where `status = 'ongoing'`).
+  - **`receiptsLogged`**: The total count of receipts recorded in the database.
+  - **`systemUsers`**: The total count of registered system users.
+  
+  ## Caching
+  
+  - **Cache Key:** `cedarrise:general:metadata`
+  - **TTL:** 12 hours (43200 seconds — `GALLERY` cache bucket)
+  
+  ## Errors
+  
+  | Status                      | Description                         |
+  |-----------------------------|-------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid Bearer token.    |
+  | `403 Forbidden`             | Insufficient permissions.           |
+  | `500 Internal Server Error` | Unexpected server error.            |
+}

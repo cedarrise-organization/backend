@@ -8,6 +8,7 @@ import { UploadApiResponse } from "cloudinary";
 import { Request } from "express";
 import db from "../db/db.js";
 import logger from "../configs/logger.config.js";
+import { users } from "../db/models/auth.js";
 
 const sortMap = {
   name: receipts.name,
@@ -431,6 +432,54 @@ export const getGoogleForm = async () => {
     code: 200,
     message: "Form Link Retrieved Successfully",
     data: googleFormDetails,
+  };
+};
+
+export const getMetadata = async () => {
+  /// cache
+  const key = `cedarrise:general:metadata`;
+  const cacheRes = await cacheGet<any>(key);
+
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "General uploads' page metadata found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [[activeProjects], [receiptsLogged], [systemUsers]] = await Promise.all([
+    db
+      .select({ value: count(projects.id) })
+      .from(projects)
+      .where(eq(projects.status, "ongoing")),
+    db.select({ value: count(receipts.id) }).from(receipts),
+    db.select({ value: count(users.id) }).from(users),
+  ]);
+
+  ///
+  await cacheSet(
+    key,
+    {
+      photosUploaded: 0,
+      activeProjects: Number(activeProjects!.value) ?? 0,
+      receiptsLogged: Number(receiptsLogged!.value) ?? 0,
+      systemUsers: Number(systemUsers!.value) ?? 0,
+    },
+    CACHE_TTL.GALLERY,
+  );
+  ///
+
+  return {
+    code: 200,
+    message: "General uploads' page metadata found successfully",
+    data: {
+      photosUploaded: 0,
+      activeProjects: Number(activeProjects!.value) ?? 0,
+      receiptsLogged: Number(receiptsLogged!.value) ?? 0,
+      systemUsers: Number(systemUsers!.value) ?? 0,
+    },
   };
 };
 
