@@ -41,7 +41,7 @@ docs {
   | name         | string | Yes      | Minimum 3 characters. Stored as lowercase.         |
   | email        | string | Yes      | Must be a valid email. Stored as lowercase/trimmed. |
   | password     | string | Yes      | Minimum 8 characters.                              |
-  | department   | string | Yes      | One of: `TACOTS`, `ASH`, `CAPACITY BUILDING`, `OUTREACHES` |
+  | department   | string | Yes      | One of: `TACOTS`, `ASH`, `CAPACITY BUILDING`, `CEDAR OUTREACHES`, `ADMINISTRATIVE SUPPORT` |
   
   ## Response
   
@@ -56,7 +56,7 @@ docs {
       "name": "string",
       "email": "string",
       "password": "string (hashed)",
-      "department": "TACOTS | ASH | CAPACITY BUILDING | OUTREACHES",
+      "department": "TACOTS | ASH | CAPACITY BUILDING | CEDAR OUTREACHES | ADMINISTRATIVE SUPPORT",
       "updatedAt": "ISO 8601" | null,
       "createdAt": "ISO 8601",
       "deletedAt": "ISO 8601" | null

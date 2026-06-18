@@ -160,7 +160,7 @@ export const listAllUsers = async () => {
   ///
 
   const allUsers = await db
-    .select({ id: users.id, name: users.name, email: users.email })
+    .select({ id: users.id, name: users.name, email: users.email, department: users.department })
     .from(users);
 
   /// cache set

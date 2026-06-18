@@ -25,7 +25,7 @@ export const newUserSchema = z.object({
       .transform((v) => v.toLowerCase()),
     email: z.email().transform((v) => v.toLowerCase().trim()),
     password: z.string().min(8),
-    department: z.enum(["TACOTS", "ASH", "CAPACITY BUILDING", "OUTREACHES"]),
+    department: z.enum(["TACOTS", "ASH", "CAPACITY BUILDING", "CEDAR OUTREACHES", "ADMINISTRATIVE SUPPORT"]),
   }),
 });
 // create custom types for request bodies with enums
