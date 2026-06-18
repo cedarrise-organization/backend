@@ -1,9 +1,9 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/storage.util.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { invalidateCache } from "../utils/cache.util.js";
-import { eq, asc, sql, desc, count } from "drizzle-orm";
+import { eq, lt, asc, sql, desc, count } from "drizzle-orm";
 import { projects } from "../db/models/dashboard.js";
-import { receipts } from "../db/models/general.js";
+import { googleForms, receipts } from "../db/models/general.js";
 import { UploadApiResponse } from "cloudinary";
 import { Request } from "express";
 import db from "../db/db.js";
@@ -362,6 +362,76 @@ export const uploadPhotos = async (
   return {
     code: 201,
     message: "Photos uploaded successfully",
+  };
+};
+
+// GOOGLE-FORM UPLOADS
+export const uploadGoogleForm = async (
+  url: string,
+  title: string,
+  deadline: Date,
+  description?: string,
+) => {
+  const [googleFormDetails] = await db
+    .insert(googleForms)
+    .values({
+      src: url,
+      title,
+      deadline: sql`TO_DATE(${deadline}, 'YYYY-MM-DD')`,
+      description,
+    })
+    .returning();
+
+  // cache delete
+  await cacheDel("cedarrise:general:googleform");
+
+  return {
+    code: 201,
+    message: "Form Link Uploaded successfully",
+    data: googleFormDetails,
+  };
+};
+export const getGoogleForm = async () => {
+  /// cache
+  const key = `cedarrise:general:googleform`;
+  const cacheRes = await cacheGet<any>(key);
+
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Form Link Retrieved Successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const todaysDate = new Date(Date.now());
+  const [googleFormDetails] = await db
+    .select({
+      src: googleForms.src,
+      title: googleForms?.title,
+    })
+    .from(googleForms)
+    .where(lt(sql`TO_DATE(${todaysDate}, 'YYYY-MM-DD')`, googleForms.deadline));
+
+  if (!googleFormDetails) {
+    return {
+      code: 200,
+      message: "Form Link Retrieved Successfully",
+      data: {
+        src: "",
+        title: "Form",
+      },
+    };
+  }
+
+  // cache set
+  await cacheSet(key, googleFormDetails, CACHE_TTL.GALLERY);
+
+  return {
+    code: 200,
+    message: "Form Link Retrieved Successfully",
+    data: googleFormDetails,
   };
 };
 

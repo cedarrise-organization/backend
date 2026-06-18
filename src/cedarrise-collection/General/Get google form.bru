@@ -1,0 +1,68 @@
+meta {
+  name: Get google form
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/v1/general/google-forms
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Active Google Form Link
+  
+  Retrieves the source URL and title of the active Google Form whose deadline is in the future.
+  
+  ## Authorization
+  
+  - **Authentication:** None (Public endpoint).
+  - **Permission:** None.
+  
+  ## Request
+  
+  No query parameters, path parameters, or request body required.
+  
+  ## Response
+  
+  **`200 OK`** — Returns the active form link details.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Form Link Retrieved Successfully",
+    "data": {
+      "src": "https://docs.google.com/forms/d/e/1FAIpQLSf...",
+      "title": "Volunteer Registration Form"
+    }
+  }
+  ```
+  
+  If no active form is found in the database (or the deadline has passed), a default fallback object is returned in `data`:
+  
+  ```json
+  {
+    "success": true,
+    "message": "Form Link Retrieved Successfully",
+    "data": {
+      "src": "",
+      "title": "Form"
+    }
+  }
+  ```
+  ## Errors
+  
+  | Status                      | Description              |
+  |-----------------------------|--------------------------|
+  | `500 Internal Server Error` | Unexpected server error. |
+}

@@ -10,6 +10,7 @@ import {
   receiptsSchema,
   receiptsQuerySchema,
   gallerySchema,
+  googleSchema,
 } from "./general.schema.js";
 import {
   getProjectsController,
@@ -21,6 +22,8 @@ import {
   deleteReceiptsController,
   exportReceiptsController,
   uploadPhotosController,
+  uploadGoogleFormController,
+  getGoogleFormController,
 } from "./general.controller.js";
 const router = express.Router();
 
@@ -96,6 +99,18 @@ router.post(
   authorize("create"),
   validateRequest(gallerySchema),
   uploadPhotosController,
+);
+
+// GOOGLE-FORM UPLOADS
+// Get google form 
+router.get("/google-forms", getGoogleFormController)
+// Upload google form
+router.post(
+  "/google-forms",
+  authenticate(),
+  authorize("create"),
+  validateRequest(googleSchema),
+  uploadGoogleFormController,
 );
 
 export default router;

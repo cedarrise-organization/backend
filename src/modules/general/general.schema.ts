@@ -78,3 +78,12 @@ export const gallerySchema = z.object({
     .min(1, "At least one photo is required")
     .max(3, "Maximum of 3 photos allowed"),
 });
+
+export const googleSchema = z.object({
+  body: z.object({
+    title: z.string().min(3, "title should be at least 3 characters").max(100),
+    src: z.string(),
+    description: z.string().optional(),
+    deadline: z.coerce.date(),
+  }),
+});

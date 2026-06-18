@@ -11,6 +11,8 @@ import {
   deleteReceipts,
   exportReceiptsTableToCSV,
   uploadPhotos,
+  uploadGoogleForm,
+  getGoogleForm
 } from "../../services/general.services.js";
 import { successResponse } from "../../utils/responseHandler.js";
 import { ValidationError } from "../../lib/error.js";
@@ -128,6 +130,29 @@ export const uploadPhotosController = async (req: Request, res: Response, next: 
   try {
     const response = await uploadPhotos(files, folder);
     return successResponse(res, response.code, response.message);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GOOGLE-FORM UPLOADS
+export const uploadGoogleFormController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { url, title, deadline, description } = req.body;
+  try {
+    const response = await uploadGoogleForm(url, title, deadline, description);
+    return successResponse(res, response.code, response.message, response.data);
+  } catch (err) {
+    next(err);
+  }
+};
+export const getGoogleFormController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await getGoogleForm();
+    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }

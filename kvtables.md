@@ -85,8 +85,7 @@
 | `cedarrise:dashboard:institutional-effectiveness`                                   | Cached institutional effectiveness chart data (community service hours, mentorship hours, spend per student, total accumulated hours, student benchmark). Set on read. | `services/dashboard.services.ts`            |
 | `cedarrise:dashboard:projects`                                                      | Cached list of all projects. Set on read, deleted on project creation, status update, or deletion.                                                                     | `services/general.services.ts`              |
 | `cedarrise:general:receipts:{page}:{limit}:{orderBy}:{sortBy}`                      | Cached paginated receipts list. Set on read, bypassed on search.                                                                                                       | `services/general.services.ts`              |
-| 
-
+| `cedarrise:general:googleform`                                                      | Cached active Google Form details (src + title). Set on read, cleared on upload.                                                                                      | `services/general.services.ts`              |
 
 ---
 

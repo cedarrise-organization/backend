@@ -41,3 +41,16 @@ export const receipts = p.pgTable(
     ),
   ],
 );
+
+export const googleForms = p.pgTable("google_forms", {
+  id: p
+    .uuid()
+    .primaryKey()
+    .default(sql`uuid_generate_v4()`)
+    .notNull(),
+  title: p.text().notNull(),
+  src: p.text().notNull(),
+  description: p.text(),
+  deadline: p.timestamp(),
+  createdAt: p.timestamp("created_at").defaultNow().notNull(),
+});
