@@ -12,7 +12,9 @@ import {
   avg,
   max,
   min,
+  aliasedTable,
   count,
+  isNotNull,
   isNull,
   inArray,
   arrayContains,
@@ -36,7 +38,6 @@ import {
 } from "../db/models/admin.js";
 import db from "../db/db.js";
 import { Dataset, Linedata, Notificationcandidate } from "../types/dashboard.js";
-import { Data } from "ejs";
 
 export const getCards = async () => {
   /// cache
@@ -929,7 +930,7 @@ export const getInstEffectiveness = async () => {
     currentMonth >= 9
       ? `${currentYear}/${String(currentYear + 1).slice(2)}`
       : `${currentYear - 1}/${String(currentYear).slice(2)}`;
-  console.log(currentAcademicSession);
+  // console.log(currentAcademicSession);
   const mentorshipHours = sql<number>`
     CASE ${tacotsTracking.mentorshipDuration}
       WHEN '15 MINUTES' THEN 0.25
@@ -1178,90 +1179,476 @@ export const getInstEffectiveness = async () => {
   };
 };
 
+// Student absent from students_in_attendance[] for 3+ consecutive sessions
 export const checkPotentialDropoutRisk = async (): Promise<Notificationcandidate[]> => {
-  
-  return [
-    {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  // const currentAcademicSession =
+  //   currentMonth >= 9
+  //     ? `${currentYear}/${String(currentYear + 1).slice(2)}`
+  //     : `${currentYear - 1}/${String(currentYear).slice(2)}`;
+
+  const currentAcademicTerm =
+    currentMonth >= 9 && currentMonth <= 12
+      ? "TERM 1"
+      : currentMonth >= 1 && currentMonth <= 4
+        ? "TERM 2"
+        : "TERM 3";
+
+  const termStartDate =
+    currentAcademicTerm === "TERM 1"
+      ? `${currentYear}-09-01`
+      : currentAcademicTerm === "TERM 2"
+        ? `${currentYear}-01-01`
+        : `${currentYear}-05-01`;
+
+  const termEndDate =
+    currentAcademicTerm === "TERM 1"
+      ? `${currentYear}-12-31`
+      : currentAcademicTerm === "TERM 2"
+        ? `${currentYear}-04-30`
+        : `${currentYear}-08-31`;
+
+  const dropoutRiskRows = await db
+    .select({
+      studentId: ashStudent.id,
+      firstName: ashStudent.firstName,
+      middleName: ashStudent.middleName,
+      surname: ashStudent.surname,
+      assignedMentor: ashStudent.assignedMentor,
+
+      missedSessions: sql<number>`3`,
+    })
+    .from(ashStudent)
+    .where(
+      and(
+        eq(ashStudent.status, "accepted"),
+
+        sql`
+          (
+            SELECT COUNT(*)
+            FROM (
+              SELECT ${ashWeeklyAttendance.id}, ${ashWeeklyAttendance.studentsInAttendance}
+              FROM ${ashWeeklyAttendance}
+              WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+              AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+              ORDER BY ${ashWeeklyAttendance.sessionDate} DESC
+              LIMIT 3
+            ) AS latest_sessions
+            WHERE NOT (${ashStudent.id} = ANY(latest_sessions.students_in_attendance))
+          ) = 3
+        `,
+
+        sql`
+          (
+            SELECT COUNT(*)
+            FROM ${ashWeeklyAttendance}
+            WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+            AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+          ) >= 3
+        `,
+      ),
+    );
+
+  return dropoutRiskRows.map((row) => {
+    const studentName = [row.firstName, row.middleName, row.surname].filter(Boolean).join(" ");
+
+    return {
       type: "POTENTIAL_DROPOUT_RISK",
-      title: "string",
-      message: "string",
-      severity: "low",
+      title: "Potential dropout risk",
+      message: `${studentName} has missed the last 3 consecutive ASH sessions.`,
+      severity: "high",
       entityType: "ash",
-      dedupeKey: "string",
+      dedupeKey: `POTENTIAL_DROPOUT_RISK:ash:${row.studentId}`,
       metadata: JSON.stringify({
-        stuff: "i",
+        studentId: row.studentId,
+        studentName,
+        assignedMentor: row.assignedMentor,
+        missedConsecutiveSessions: 3,
+        reason: "Student absent from the latest 3 ASH attendance sessions",
       }),
-      expiresAt: new Date(Date.now()),
-    },
-  ];
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    };
+  });
 };
 
+// Student attendance rate < 75% over a term in ashweeklyattendance
 export const checkLowAttendanceRate = async (): Promise<Notificationcandidate[]> => {
-  return [
-    {
-      type: "POTENTIAL_DROPOUT_RISK",
-      title: "string",
-      message: "string",
-      severity: "low",
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  const currentAcademicSession =
+    currentMonth >= 9
+      ? `${currentYear}/${String(currentYear + 1).slice(2)}`
+      : `${currentYear - 1}/${String(currentYear).slice(2)}`;
+
+  const currentAcademicTerm =
+    currentMonth >= 9 && currentMonth <= 12
+      ? "TERM 1"
+      : currentMonth >= 1 && currentMonth <= 4
+        ? "TERM 2"
+        : "TERM 3";
+
+  const termStartDate =
+    currentAcademicTerm === "TERM 1"
+      ? `${currentYear}-09-01`
+      : currentAcademicTerm === "TERM 2"
+        ? `${currentYear}-01-01`
+        : `${currentYear}-05-01`;
+
+  const termEndDate =
+    currentAcademicTerm === "TERM 1"
+      ? `${currentYear}-12-31`
+      : currentAcademicTerm === "TERM 2"
+        ? `${currentYear}-04-30`
+        : `${currentYear}-08-31`;
+
+  const lowAttendanceRows = await db
+    .select({
+      studentId: ashStudent.id,
+      firstName: ashStudent.firstName,
+      middleName: ashStudent.middleName,
+      surname: ashStudent.surname,
+      assignedMentor: ashStudent.assignedMentor,
+
+      totalSessions: sql<number>`
+        (
+          SELECT COUNT(*)
+          FROM ${ashWeeklyAttendance}
+          WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+          AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+        )
+      `,
+
+      attendedSessions: sql<number>`
+        (
+          SELECT COUNT(*)
+          FROM ${ashWeeklyAttendance}
+          WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+          AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+          AND ${ashStudent.id} = ANY(${ashWeeklyAttendance.studentsInAttendance})
+        )
+      `,
+
+      attendanceRate: sql<number>`
+        COALESCE(
+          (
+            (
+              SELECT COUNT(*)
+              FROM ${ashWeeklyAttendance}
+              WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+              AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+              AND ${ashStudent.id} = ANY(${ashWeeklyAttendance.studentsInAttendance})
+            )::numeric
+            /
+            NULLIF(
+              (
+                SELECT COUNT(*)
+                FROM ${ashWeeklyAttendance}
+                WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+                AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+              ),
+              0
+            )
+          ) * 100,
+          0
+        )
+      `,
+    })
+    .from(ashStudent)
+    .where(
+      and(
+        eq(ashStudent.status, "accepted"),
+
+        sql`
+          (
+            SELECT COUNT(*)
+            FROM ${ashWeeklyAttendance}
+            WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+            AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+          ) > 0
+        `,
+
+        sql`
+          COALESCE(
+            (
+              (
+                SELECT COUNT(*)
+                FROM ${ashWeeklyAttendance}
+                WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+                AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+                AND ${ashStudent.id} = ANY(${ashWeeklyAttendance.studentsInAttendance})
+              )::numeric
+              /
+              NULLIF(
+                (
+                  SELECT COUNT(*)
+                  FROM ${ashWeeklyAttendance}
+                  WHERE ${ashWeeklyAttendance.sessionDate} >= ${termStartDate}
+                  AND ${ashWeeklyAttendance.sessionDate} <= ${termEndDate}
+                ),
+                0
+              )
+            ) * 100,
+            0
+          ) < 75
+        `,
+      ),
+    );
+
+  return lowAttendanceRows.map((row) => {
+    const studentName = [row.firstName, row.middleName, row.surname].filter(Boolean).join(" ");
+
+    const attendanceRate = Number(Number(row.attendanceRate).toFixed(2));
+
+    return {
+      type: "LOW_ATTENDANCE_RATE",
+      title: "Low attendance rate",
+      message: `${studentName}'s attendance rate is ${attendanceRate}% for ${currentAcademicTerm}, below the required 75%.`,
+      severity: attendanceRate < 50 ? "high" : "medium",
       entityType: "ash",
-      dedupeKey: "string",
+      dedupeKey: `LOW_ATTENDANCE_RATE:ash:${row.studentId}:${currentAcademicSession}:${currentAcademicTerm}`,
       metadata: JSON.stringify({
-        stuff: "i",
+        studentId: row.studentId,
+        studentName,
+        assignedMentor: row.assignedMentor,
+        academicSession: currentAcademicSession,
+        academicTerm: currentAcademicTerm,
+        termStartDate,
+        termEndDate,
+        attendedSessions: Number(row.attendedSessions),
+        totalSessions: Number(row.totalSessions),
+        attendanceRate,
+        threshold: 75,
       }),
-      expiresAt: new Date(Date.now()),
-    },
-  ];
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    };
+  });
 };
 
+// No mentorship record for student in current term. IF student Id does not appear in tacotsTracking table
 export const checkLowMentorshipEngagement = async (): Promise<Notificationcandidate[]> => {
-  return [
-    {
-      type: "POTENTIAL_DROPOUT_RISK",
-      title: "string",
-      message: "string",
-      severity: "low",
-      entityType: "ash",
-      dedupeKey: "string",
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  const currentAcademicSession =
+    currentMonth >= 9
+      ? `${currentYear}/${String(currentYear + 1).slice(2)}`
+      : `${currentYear - 1}/${String(currentYear).slice(2)}`;
+
+  const currentAcademicTerm =
+    currentMonth >= 9 && currentMonth <= 12
+      ? "1ST TERM"
+      : currentMonth >= 1 && currentMonth <= 4
+        ? "2ND TERM"
+        : "3RD TERM";
+
+  const missingMentorshipRows = await db
+    .select({
+      onboardingId: tacotsOnboarding.id,
+      recommendationId: tacotsRecommendation.id,
+      firstName: tacotsRecommendation.firstName,
+      middleName: tacotsRecommendation.middleName,
+      surname: tacotsRecommendation.surname,
+      academicSession: sql<string>`${currentAcademicSession}`,
+      academicTerm: sql<string>`${currentAcademicTerm}`,
+      mentorName: tacotsOnboarding.mentorName,
+    })
+    .from(tacotsOnboarding)
+    .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
+    .where(
+      and(
+        eq(tacotsRecommendation.adminStatus, "SELECTED"),
+
+        sql`
+          NOT EXISTS (
+            SELECT 1
+            FROM ${tacotsTracking}
+            WHERE ${tacotsTracking.studentId} = ${tacotsOnboarding.id}
+            AND ${tacotsTracking.academicSession} = ${currentAcademicSession}
+            AND upper(trim(${tacotsTracking.academicTerm})) = ${currentAcademicTerm}
+          )
+        `,
+      ),
+    );
+
+  return missingMentorshipRows.map((row) => {
+    const studentName = [row.firstName, row.middleName, row.surname].filter(Boolean).join(" ");
+
+    return {
+      type: "LOW_MENTORSHIP_ENGAGEMENT",
+      title: "Low mentorship engagement",
+      message: `${studentName} has no mentorship tracking record for ${currentAcademicTerm}, ${currentAcademicSession}.`,
+      severity: "medium",
+      entityType: "tacots",
+      dedupeKey: `LOW_MENTORSHIP_ENGAGEMENT:tacots:${row.onboardingId}:${currentAcademicSession}:${currentAcademicTerm}`,
       metadata: JSON.stringify({
-        stuff: "i",
+        onboardingId: row.onboardingId,
+        recommendationId: row.recommendationId,
+        studentName,
+        mentorName: row.mentorName,
+        academicSession: currentAcademicSession,
+        academicTerm: currentAcademicTerm,
+        reason: "No TACOTS tracking record found for current academic term",
       }),
-      expiresAt: new Date(Date.now()),
-    },
-  ];
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    };
+  });
 };
 
+// posttest_average drops >15 points vs prior term
 export const checkScoreDropAlert = async (): Promise<Notificationcandidate[]> => {
-  return [
-    {
-      type: "POTENTIAL_DROPOUT_RISK",
-      title: "string",
-      message: "string",
-      severity: "low",
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  const currentAcademicSession =
+    currentMonth >= 9
+      ? `${currentYear}/${String(currentYear + 1).slice(2)}`
+      : `${currentYear - 1}/${String(currentYear).slice(2)}`;
+
+  const previousTracking = aliasedTable(ashTermlyTracking, "previous_tracking");
+
+  const currentTerm = sql<string>`upper(trim(${ashTermlyTracking.term}))`;
+  const previousTerm = sql<string>`upper(trim(${previousTracking.term}))`;
+
+  const scoreDropRows = await db
+    .select({
+      studentId: ashTermlyTracking.studentId,
+      firstName: ashStudent.firstName,
+      surname: ashStudent.surname,
+
+      academicSession: ashTermlyTracking.academicSession,
+      currentTerm,
+      previousTerm,
+
+      currentPosttestAverage: ashTermlyTracking.posttestAverage,
+      previousPosttestAverage: previousTracking.posttestAverage,
+
+      scoreDrop: sql<number>`
+        ${previousTracking.posttestAverage} - ${ashTermlyTracking.posttestAverage}
+      `,
+    })
+    .from(ashTermlyTracking)
+    .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
+    .innerJoin(
+      previousTracking,
+      and(
+        eq(previousTracking.studentId, ashTermlyTracking.studentId),
+        eq(previousTracking.academicSession, ashTermlyTracking.academicSession),
+
+        sql`
+          CASE
+            WHEN ${currentTerm} = 'TERM 2' THEN ${previousTerm} = 'TERM 1'
+            WHEN ${currentTerm} = 'TERM 3' THEN ${previousTerm} = 'TERM 2'
+            ELSE false
+          END
+        `,
+      ),
+    )
+    .where(
+      and(
+        eq(ashTermlyTracking.academicSession, currentAcademicSession),
+        isNotNull(ashTermlyTracking.posttestAverage),
+        isNotNull(previousTracking.posttestAverage),
+        gte(
+          sql<number>`
+            ${previousTracking.posttestAverage} - ${ashTermlyTracking.posttestAverage}
+          `,
+          15,
+        ),
+      ),
+    );
+
+  return scoreDropRows.map((row) => {
+    const studentName = `${row.firstName} ${row.surname}`;
+    const scoreDrop = Number(row.scoreDrop);
+
+    return {
+      type: "SCORE_DROP_ALERT",
+      title: "Score drop alert",
+      message: `${studentName}'s post-test average dropped by ${scoreDrop} points from ${row.previousTerm} to ${row.currentTerm}.`,
+      severity: scoreDrop >= 25 ? "high" : "medium",
       entityType: "ash",
-      dedupeKey: "string",
+      dedupeKey: `SCORE_DROP_ALERT:ash:${row.studentId}:${row.academicSession}:${row.currentTerm}`,
       metadata: JSON.stringify({
-        stuff: "i",
+        studentId: row.studentId,
+        studentName,
+        academicSession: row.academicSession,
+        previousTerm: row.previousTerm,
+        currentTerm: row.currentTerm,
+        previousPosttestAverage: row.previousPosttestAverage,
+        currentPosttestAverage: row.currentPosttestAverage,
+        scoreDrop,
+        threshold: 15,
       }),
-      expiresAt: new Date(Date.now()),
-    },
-  ];
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    };
+  });
 };
 
+// Accepted volunteer with no activity record in the past 30 days: i.e does not appear in ashWeeklyAttendance.volunteersInAttendance
 export const checkVolunteerInactivity = async (): Promise<Notificationcandidate[]> => {
-  return [
-    {
-      type: "POTENTIAL_DROPOUT_RISK",
-      title: "string",
-      message: "string",
-      severity: "low",
-      entityType: "ash",
-      dedupeKey: "string",
+  const inactiveVolunteers = await db
+    .select({
+      volunteerId: volunteerRegistration.id,
+      firstName: volunteerRegistration.firstName,
+      middleName: volunteerRegistration.middleName,
+      surname: volunteerRegistration.surname,
+      emailAddress: volunteerRegistration.emailAddress,
+      phoneNumber: volunteerRegistration.phoneNumber,
+    })
+    .from(volunteerRegistration)
+    .where(
+      and(
+        eq(volunteerRegistration.status, "accepted"),
+
+        sql`
+          NOT EXISTS (
+            SELECT 1
+            FROM ${ashWeeklyAttendance}
+            WHERE ${ashWeeklyAttendance.sessionDate} >= CURRENT_DATE - INTERVAL '30 days'
+            AND (
+              regexp_replace(lower(${ashWeeklyAttendance.volunteersInAttendance}), '\\s+', ' ', 'g')
+              LIKE '%' || regexp_replace(lower(${volunteerRegistration.firstName} || ' ' || ${volunteerRegistration.surname}), '\\s+', ' ', 'g') || '%'
+
+              OR regexp_replace(lower(${ashWeeklyAttendance.volunteersInAttendance}), '\\s+', ' ', 'g')
+              LIKE '%' || regexp_replace(lower(${volunteerRegistration.surname} || ' ' || ${volunteerRegistration.firstName}), '\\s+', ' ', 'g') || '%'
+
+              OR regexp_replace(lower(${ashWeeklyAttendance.volunteersInAttendance}), '\\s+', ' ', 'g')
+              LIKE '%' || regexp_replace(lower(${volunteerRegistration.firstName} || ' ' || coalesce(${volunteerRegistration.middleName}, '') || ' ' || ${volunteerRegistration.surname}), '\\s+', ' ', 'g') || '%'
+            )
+          )
+        `,
+      ),
+    );
+
+  return inactiveVolunteers.map((volunteer) => {
+    const fullName = [volunteer.firstName, volunteer.middleName, volunteer.surname]
+      .filter(Boolean)
+      .join(" ");
+
+    return {
+      type: "VOLUNTEER_INACTIVITY",
+      title: "Volunteer inactivity",
+      message: `${fullName} has not appeared in ASH attendance records in the last 30 days.`,
+      severity: "medium",
+      entityType: "volunteer",
+      dedupeKey: `VOLUNTEER_INACTIVITY:volunteer:${volunteer.volunteerId}`,
       metadata: JSON.stringify({
-        stuff: "i",
+        volunteerId: volunteer.volunteerId,
+        volunteerName: fullName,
+        emailAddress: volunteer.emailAddress,
+        phoneNumber: volunteer.phoneNumber,
+        thresholdDays: 30,
       }),
-      expiresAt: new Date(Date.now()),
-    },
-  ];
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    };
+  });
 };
 
 export const feature = async (req: Request, options: any) => {};

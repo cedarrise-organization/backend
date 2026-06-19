@@ -25,6 +25,6 @@ router.get(
   authorize("read"),
   getInstEffectivenessController,
 );
-// router.get("/");
+
 
 export default router;
