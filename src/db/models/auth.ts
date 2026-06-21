@@ -1,6 +1,6 @@
 import * as p from "drizzle-orm/pg-core";
 import { index, primaryKey, unique } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm"
+import { sql } from "drizzle-orm";
 
 // TIMESTAMPS
 const timestamps = {
@@ -13,19 +13,37 @@ const timestamps = {
 export const users = p.pgTable(
   "users",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
     name: p.text().notNull(),
     email: p.text().notNull().unique(),
     password: p.text().notNull(),
     department: p.text().notNull(),
     ...timestamps,
   },
-  (table) => [index("user_name_idx").on(table.name)],
+  (table) => [
+    index("user_name_idx").on(table.name),
+    index("user_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.name}), 'A') ||
+        setweight(to_tsvector('english', ${table.email}), 'A') ||
+        setweight(to_tsvector('english', ${table.department}), 'A')
+      )`,
+    ),
+  ],
 );
 
 // REFRESHTOKEN
 export const refreshtoken = p.pgTable("refreshtoken", {
-  id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+  id: p
+    .uuid()
+    .primaryKey()
+    .default(sql`uuid_generate_v4()`)
+    .notNull(),
   userId: p.uuid("user_id").references(() => users.id, {
     onDelete: "cascade",
   }),
@@ -38,7 +56,11 @@ export const refreshtoken = p.pgTable("refreshtoken", {
 export const roles = p.pgTable(
   "roles",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
     name: p.text().notNull().unique(), // volunteer, admin, superadmin
     description: p.text(),
     isDefault: p.boolean("is_default").default(false),
@@ -51,7 +73,11 @@ export const roles = p.pgTable(
 export const permissions = p.pgTable(
   "permissions",
   {
-    id: p.uuid().primaryKey().default(sql`uuid_generate_v4()`).notNull(),
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
     name: p.text().notNull().unique(), // create, read, update, delete
     description: p.text(),
     ...timestamps,

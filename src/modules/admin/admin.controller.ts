@@ -8,6 +8,7 @@ import {
   listAllUsers,
   roleAction,
   deleteUser,
+  listUsersForUserPage,
 } from "../../services/admin.services.js";
 
 export const listAllRolesController = async (req: Request, res: Response, next: NextFunction) => {
@@ -66,6 +67,20 @@ export const deleteUserController = async (req: Request, res: Response, next: Ne
   try {
     const response = await deleteUser(userId);
     return successResponse(res, response.code, response.message);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const listUsersForUserPageController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { page, limit, search } = req.qtransformed;
+  try {
+    const response = await listUsersForUserPage(page, limit, search);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }

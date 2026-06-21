@@ -1,0 +1,127 @@
+meta {
+  name: Browse the team roster
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/admin/listusers?page=1&limit=25
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 1
+  limit: 25
+  ~search: ash
+  ~orderBy: asc
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Browse the Team Roster
+  
+  Returns a paginated, searchable list of all registered users in the system. Results are ordered alphabetically by name (ascending) by default. Supports full-text search across user name, email, and department fields via a GIN index.
+  
+  ## Authorization
+  
+  All admin routes share a router-level `authenticate()` middleware. This route additionally requires:
+  
+  | Middleware     | Value  |
+  |----------------|--------|
+  | `authenticate` | ✅     |
+  | `authorize`    | `read` |
+  
+  ## Request
+  
+  ### Query Parameters
+  
+  | Parameter | Type   | Required | Default | Description                                                                                         |
+  |-----------|--------|----------|---------|-----------------------------------------------------------------------------------------------------|
+  | `page`    | number | No       | `1`     | Page number (min: 1, max: 100).                                                                     |
+  | `limit`   | number | No       | `25`    | Items per page (min: 1, max: 100).                                                                  |
+  | `orderBy` | string | No       | `desc`  | Sort direction. One of: `asc`, `desc`. Non-search results are always sorted by `name` ascending.    |
+  | `search`  | string | No       | —       | Full-text search query. Searches across `name` (A), `email` (A), and `department` (A) using GIN index. When provided, results bypass the cache. |
+  
+  No request body.
+  
+  ## Response
+  
+  **`200 OK`** — Returns an array of user objects with pagination metadata.
+  
+  ```json
+  {
+    "success": true,
+    "message": "All users found successfully",
+    "data": [
+      {
+        "id": "uuid",
+        "name": "string",
+        "email": "string",
+        "password": "string (hashed)",
+        "department": "TACOTS | ASH | CAPACITY BUILDING | CEDAR OUTREACHES | ADMINISTRATIVE SUPPORT",
+        "updatedAt": "ISO 8601 | null",
+        "createdAt": "ISO 8601",
+        "deletedAt": "ISO 8601 | null"
+      }
+    ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 1
+      }
+    }
+  }
+  ```
+  
+  ---
+  
+  ### Field Reference
+  
+  | Field        | Type   | Description                                                                 |
+  |--------------|--------|-----------------------------------------------------------------------------|
+  | `id`         | uuid   | User's unique identifier.                                                   |
+  | `name`       | string | User's full name (stored lowercase).                                        |
+  | `email`      | string | User's email address (unique, stored lowercase).                            |
+  | `password`   | string | Bcrypt-hashed password. Always returned but should not be exposed client-side. |
+  | `department` | string | One of: `TACOTS`, `ASH`, `CAPACITY BUILDING`, `CEDAR OUTREACHES`, `ADMINISTRATIVE SUPPORT`. |
+  | `updatedAt`  | date   | Last update timestamp, or `null`.                                           |
+  | `createdAt`  | date   | Record creation timestamp.                                                  |
+  | `deletedAt`  | date   | Soft-delete timestamp, or `null`.                                           |
+  
+  ## Full-Text Search
+  
+  When the `search` query parameter is provided, the service performs a PostgreSQL full-text search using `plainto_tsquery` against a weighted GIN index:
+  
+  | Field        | Weight | Priority |
+  |--------------|--------|----------|
+  | `name`       | A      | Highest  |
+  | `email`      | A      | Highest  |
+  | `department` | A      | Highest  |
+  
+  Search results **bypass the cache** and are queried directly from the database.
+  
+  ## Caching
+  
+  - **Key:** `cedarrise:lookup:users:{page}:{limit}`
+  - **TTL:** `CACHE_TTL.DASHBOARD_CARDS` (3600s / 1 hour)
+  - Set after the first successful non-search database fetch; subsequent requests within the TTL window return cached data.
+  - **Bypassed** when a `search` parameter is provided.
+  
+  ## Errors
+  
+  | Status                      | Description                                   |
+  |-----------------------------|-----------------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid authentication token.      |
+  | `403 Forbidden`             | User lacks the `read` permission.             |
+  | `500 Internal Server Error` | Unexpected server error.                      |
+}

@@ -2,7 +2,7 @@
 import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
-import { userIdSchema, roleActionSchema, newUserSchema } from "./admin.schema.js";
+import { userIdSchema, roleActionSchema, newUserSchema, userQuerySchema } from "./admin.schema.js";
 import {
   listUserRolesController,
   listAllRolesController,
@@ -48,4 +48,6 @@ router.delete(
   deleteUserController,
 );
 
+// List all users for user page
+router.get("/listusers", authorize("read"), validateRequest(userQuerySchema), listAllUsersController);
 export default router;

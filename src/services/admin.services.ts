@@ -1,5 +1,5 @@
 import db from "../db/db.js";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, asc, count } from "drizzle-orm";
 import { appEvents } from "../lib/events.js";
 import { ADMIN_EVENTS } from "../events/admin.events.js";
 import { hashPassword } from "../utils/password.util.js";
@@ -171,6 +171,92 @@ export const listAllUsers = async () => {
     code: 200,
     message: "All users found successfully",
     data: allUsers,
+  };
+};
+
+export const listUsersForUserPage = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${users.name}), 'A') ||
+      setweight(to_tsvector('english', ${users.email}), 'A') ||
+      setweight(to_tsvector('english', ${users.department}), 'A')
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [allUsers, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(users)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+      db
+        .select({ value: count(users.id) })
+        .from(users)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "All users found successfully",
+      data: allUsers,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
+  /// cache
+  const key = `cedarrise:lookup:users:${page}:${limit}`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "All users  found successfully",
+      data: cacheRes,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages: cacheRes.totalPages,
+        },
+      },
+    };
+  }
+  ///
+
+  const [allUsers, [totalDocuments]] = await Promise.all([
+    db
+      .select()
+      .from(users)
+      .orderBy(asc(users.name))
+      .limit(limit)
+      .offset((page - 1) * limit),
+    db.select({ value: count(users.id) }).from(users),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+  /// cache set
+  await cacheSet(key, { data: allUsers, totalPages }, CACHE_TTL.DASHBOARD_CARDS);
+  ///
+
+  return {
+    code: 200,
+    message: "All users found successfully",
+    data: allUsers,
+    meta: {
+      pagination: {
+        page,
+        limit,
+        totalPages,
+      },
+    },
   };
 };
 

@@ -1,5 +1,6 @@
 //MODELS
 import * as z from "zod";
+import { baseQueryBody } from "../../db/globalschema/global.schema.js";
 
 export const userIdSchema = z.object({
   params: z.object({
@@ -25,7 +26,20 @@ export const newUserSchema = z.object({
       .transform((v) => v.toLowerCase()),
     email: z.email().transform((v) => v.toLowerCase().trim()),
     password: z.string().min(8),
-    department: z.enum(["TACOTS", "ASH", "CAPACITY BUILDING", "CEDAR OUTREACHES", "ADMINISTRATIVE SUPPORT"]),
+    department: z.enum([
+      "TACOTS",
+      "ASH",
+      "CAPACITY BUILDING",
+      "CEDAR OUTREACHES",
+      "ADMINISTRATIVE SUPPORT",
+    ]),
   }),
 });
+
+export const userQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+  }),
+});
+
 // create custom types for request bodies with enums
