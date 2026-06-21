@@ -113,19 +113,19 @@ export const getCapacityCardsData = async () => {
   await cacheSet(
     key,
     {
-      participantsImpacted: Number(capacityParticipantsImpacted!.value),
-      organizationsPartneredWith: Number(capacityOrganizationsPartneredWith!.value),
-      volunteersEngaged: Number(capacityVolunteersEngaged!.value),
-      workshopsConducted: Number(capacityWorkshopsConducted!.value),
+      participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
+      organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
+      volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
+      workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
     },
     CACHE_TTL.DASHBOARD_CARDS,
   );
 
   return {
-    participantsImpacted: Number(capacityParticipantsImpacted!.value),
-    organizationsPartneredWith: Number(capacityOrganizationsPartneredWith!.value),
-    volunteersEngaged: Number(capacityVolunteersEngaged!.value),
-    workshopsConducted: Number(capacityWorkshopsConducted!.value),
+    participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
+    organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
+    volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
+    workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
   };
 };
 export const listAllEvaluation = async (

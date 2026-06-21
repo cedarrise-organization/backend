@@ -272,10 +272,10 @@ export const listRegistrations = async (
       data: ashStudents,
       totalPages,
       metadata: {
-        totalSubmissions: totalDocuments!.value,
-        acceptedStudents: Number(metaData!.acceptedStudents),
-        rejectedStudents: Number(metaData!.rejectedStudents),
-        pendingStudents: Number(metaData!.pendingStudents),
+        totalSubmissions: Number(totalDocuments?.value ?? 0),
+        acceptedStudents: Number(metaData?.acceptedStudents ?? 0),
+        rejectedStudents: Number(metaData?.rejectedStudents ?? 0),
+        pendingStudents: Number(metaData?.pendingStudents ?? 0),
       },
     },
     CACHE_TTL.FORM_DATA,
@@ -293,10 +293,10 @@ export const listRegistrations = async (
         totalPages,
       },
       metadata: {
-        totalSubmissions: totalDocuments!.value,
-        acceptedStudents: Number(metaData!.acceptedStudents),
-        rejectedStudents: Number(metaData!.rejectedStudents),
-        pendingStudents: Number(metaData!.pendingStudents),
+        totalSubmissions: Number(totalDocuments?.value ?? 0),
+        acceptedStudents: Number(metaData?.acceptedStudents ?? 0),
+        rejectedStudents: Number(metaData?.rejectedStudents ?? 0),
+        pendingStudents: Number(metaData?.pendingStudents ?? 0),
       },
     },
   };
@@ -678,36 +678,37 @@ export const getAshTrackersCardsData = async () => {
       .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"])),
   ]);
 
-  const totalPossibleAttendance = attendanceStats!.totalSessions * studentStats!.value;
+  const totalPossibleAttendance =
+    Number(attendanceStats?.totalSessions ?? 0) * Number(studentStats?.value ?? 0);
   /// cache set
   await cacheSet(
     key,
     {
       totalRecords:
-        Number(totalAshTermlyTrackingRecords!.value) +
-        Number(totalWeeklyAttendanceRecords!.value) +
-        Number(totalAshExitRecords!.value),
-      highRiskStudents: Number(totalAtRiskStudents!.value),
+        Number(totalAshTermlyTrackingRecords?.value ?? 0) +
+        Number(totalWeeklyAttendanceRecords?.value ?? 0) +
+        Number(totalAshExitRecords?.value ?? 0),
+      highRiskStudents: Number(totalAtRiskStudents?.value ?? 0),
       avgAttendanceRate:
         totalPossibleAttendance > 0
-          ? Math.ceil((attendanceStats!.totalAttendees / totalPossibleAttendance) * 100)
+          ? Math.ceil(((attendanceStats?.totalAttendees ?? 0) / totalPossibleAttendance) * 100)
           : 0,
-      completed: Number(totalCompletedExitRecords!.value),
+      completed: Number(totalCompletedExitRecords?.value ?? 0),
     },
     CACHE_TTL.DASHBOARD_CARDS,
   );
 
   return {
     totalRecords:
-      Number(totalAshTermlyTrackingRecords!.value) +
-      Number(totalWeeklyAttendanceRecords!.value) +
-      Number(totalAshExitRecords!.value),
-    highRiskStudents: Number(totalAtRiskStudents!.value),
+      Number(totalAshTermlyTrackingRecords?.value ?? 0) +
+      Number(totalWeeklyAttendanceRecords?.value ?? 0) +
+      Number(totalAshExitRecords?.value ?? 0),
+    highRiskStudents: Number(totalAtRiskStudents?.value ?? 0),
     avgAttendanceRate:
       totalPossibleAttendance > 0
-        ? Math.ceil((attendanceStats!.totalAttendees / totalPossibleAttendance) * 100)
+        ? Math.ceil(((attendanceStats?.totalAttendees ?? 0) / totalPossibleAttendance) * 100)
         : 0,
-    completed: Number(totalCompletedExitRecords!.value),
+    completed: Number(totalCompletedExitRecords?.value ?? 0),
   };
 };
 

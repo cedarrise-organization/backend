@@ -199,45 +199,45 @@ export const getCards = async () => {
   ]);
 
   const volunteer = {
-    applied: volunteersApplied!.value,
-    accepted: volunteersAccepted!.value,
+    applied: Number(volunteersApplied?.value ?? 0),
+    accepted: Number(volunteersAccepted?.value ?? 0),
     Partners: volunteerPartners, // NOT-SUPPORTED-IN-TABLES
-    currentVolunteers: volunteersAccepted!.value,
+    currentVolunteers: Number(volunteersAccepted?.value ?? 0),
     sponsors: volunteersponsors, // NOT-SUPPORTED-IN-TABLES
   };
   const capacityBuilding = {
-    participantsImpacted: Number(capacityParticipantsImpacted!.value),
-    organizationsPartneredWith: capacityOrganizationsPartneredWith!.value,
-    volunteersEngaged: capacityVolunteersEngaged!.value,
-    workshopsConducted: capacityWorkshopsConducted!.value,
+    participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
+    organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
+    volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
+    workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
   };
   const outreaches = {
-    communitiesEngaged: outreachesCommunitiesEngaged!.value,
-    beneficiariesReached: Number(outreachesBeneficiariesReached!.value),
+    communitiesEngaged: Number(outreachesCommunitiesEngaged?.value ?? 0),
+    beneficiariesReached: Number(outreachesBeneficiariesReached?.value ?? 0),
     partners: outreachesPartners, // NOT-SUPPORTED-IN-TABLES
-    volunteers: outreachesVolunteers!.value,
-    outreachEvents: outreachesOutreachEvents!.value,
+    volunteers: Number(outreachesVolunteers?.value ?? 0),
+    outreachEvents: Number(outreachesOutreachEvents?.value ?? 0),
   };
   const ash = {
-    studentsEnrolled: ashStudentsEnrolled!.value,
-    volunteers: ashVolunteers!.value,
-    communitiesEngaged: ashCommunitiesEngaged!.value,
+    studentsEnrolled: Number(ashStudentsEnrolled?.value ?? 0),
+    volunteers: Number(ashVolunteers?.value ?? 0),
+    communitiesEngaged: Number(ashCommunitiesEngaged?.value ?? 0),
     improvedGrades:
-      ashStudentsEnrolled!.value === 0
+      (ashStudentsEnrolled?.value ?? 0) === 0
         ? 0
-        : (ashImprovedGrades!.value / ashStudentsEnrolled!.value) * 100,
-    currentBeneficiaries: ashCurrentBeneficiaries!.value,
-    graduated: ashGraduated!.value,
-    dropOuts: ashDropOuts!.value,
+        : ((ashImprovedGrades?.value ?? 0) / (ashStudentsEnrolled?.value ?? 0)) * 100,
+    currentBeneficiaries: Number(ashCurrentBeneficiaries!.value ?? 0),
+    graduated: Number(ashGraduated?.value ?? 0),
+    dropOuts: Number(ashDropOuts?.value ?? 0),
   };
   const tacots = {
-    enrolled: tacotsEnrolled!.value,
-    currentlyInSchools: tacotsCurrentlyInSchools!.value,
-    partnerSchools: tacotsPartnerSchools!.value,
-    benefactors: tacotsBenefactors!.value,
-    sponsors: tacotsSponsors!.value,
+    enrolled: Number(tacotsEnrolled?.value ?? 0),
+    currentlyInSchools: Number(tacotsCurrentlyInSchools?.value ?? 0),
+    partnerSchools: Number(tacotsPartnerSchools?.value ?? 0),
+    benefactors: Number(tacotsBenefactors?.value ?? 0),
+    sponsors: Number(tacotsSponsors?.value ?? 0),
     partners: tacotsPartners, // NOT-SUPPORTED-IN-TABLES
-    graduated: tacotsGraduated!.value,
+    graduated: Number(tacotsGraduated?.value ?? 0),
   };
 
   /// cache set

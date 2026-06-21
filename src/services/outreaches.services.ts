@@ -77,19 +77,19 @@ export const getOutreachCardsData = async () => {
   await cacheSet(
     key,
     {
-      communitiesEngaged: outreachesCommunitiesEngaged!.value,
-      beneficiariesReached: Number(outreachesBeneficiariesReached!.value),
-      volunteers: outreachesVolunteers!.value,
-      outreachEvents: outreachesOutreachEvents!.value,
+      communitiesEngaged: Number(outreachesCommunitiesEngaged?.value ?? 0),
+      beneficiariesReached: Number(outreachesBeneficiariesReached?.value ?? 0),
+      volunteers: Number(outreachesVolunteers?.value ?? 0),
+      outreachEvents: Number(outreachesOutreachEvents?.value ?? 0),
     },
     CACHE_TTL.DASHBOARD_CARDS,
   );
 
   return {
-    communitiesEngaged: outreachesCommunitiesEngaged!.value,
-    beneficiariesReached: Number(outreachesBeneficiariesReached!.value),
-    volunteers: outreachesVolunteers!.value,
-    outreachEvents: outreachesOutreachEvents!.value,
+    communitiesEngaged: Number(outreachesCommunitiesEngaged?.value ?? 0),
+    beneficiariesReached: Number(outreachesBeneficiariesReached?.value ?? 0),
+    volunteers: Number(outreachesVolunteers?.value ?? 0),
+    outreachEvents: Number(outreachesOutreachEvents?.value ?? 0),
   };
 };
 export const listOutreaches = async (

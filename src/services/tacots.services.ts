@@ -288,10 +288,10 @@ export const listRecommendations = async (
       data: tacotsBeneficiaries,
       totalPages,
       metadata: {
-        totalSubmissions: totalDocuments!.value,
-        acceptedStudents: Number(metaData!.acceptedStudents),
-        rejectedStudents: Number(metaData!.rejectedStudents),
-        pendingStudents: Number(metaData!.pendingStudents),
+        totalSubmissions: Number(totalDocuments?.value ?? 0),
+        acceptedStudents: Number(metaData?.acceptedStudents ?? 0),
+        rejectedStudents: Number(metaData?.rejectedStudents ?? 0),
+        pendingStudents: Number(metaData?.pendingStudents ?? 0),
       },
     },
     CACHE_TTL.FORM_DATA,
@@ -309,10 +309,10 @@ export const listRecommendations = async (
         totalPages,
       },
       metadata: {
-        totalSubmissions: totalDocuments!.value,
-        acceptedStudents: Number(metaData!.acceptedStudents),
-        rejectedStudents: Number(metaData!.rejectedStudents),
-        pendingStudents: Number(metaData!.pendingStudents),
+        totalSubmissions: Number(totalDocuments?.value ?? 0),
+        acceptedStudents: Number(metaData?.acceptedStudents ?? 0),
+        rejectedStudents: Number(metaData?.rejectedStudents ?? 0),
+        pendingStudents: Number(metaData?.pendingStudents ?? 0),
       },
     },
   };
@@ -1050,28 +1050,28 @@ export const getTacotsTrackersCardsData = async () => {
     key,
     {
       totalRecords:
-        Number(totalTacotsTracking!.value) +
-        Number(totalTacotsOnboarding!.value) +
-        Number(totalTacotsExit!.value),
-      highRiskStudents: Number(highRiskBeneficiaries!.value),
+        Number(totalTacotsTracking?.value ?? 0) +
+        Number(totalTacotsOnboarding?.value ?? 0) +
+        Number(totalTacotsExit?.value ?? 0),
+      highRiskStudents: Number(highRiskBeneficiaries?.value ?? 0),
       onboardingRate: Number(
-        (totalTacotsOnboarding!.value / totalTacotsRecommendations!.value) * 100,
+        ((totalTacotsOnboarding?.value ?? 0) / (totalTacotsRecommendations?.value ?? 0)) * 100,
       ),
-      completed: Number(totalCompletedExitRecords!.value),
+      completed: Number(totalCompletedExitRecords?.value ?? 0),
     },
     CACHE_TTL.DASHBOARD_CARDS,
   );
 
   return {
     totalRecords:
-      Number(totalTacotsTracking!.value) +
-      Number(totalTacotsOnboarding!.value) +
-      Number(totalTacotsExit!.value),
-    highRiskStudents: Number(highRiskBeneficiaries!.value),
+      Number(totalTacotsTracking?.value ?? 0) +
+      Number(totalTacotsOnboarding?.value ?? 0) +
+      Number(totalTacotsExit?.value ?? 0),
+    highRiskStudents: Number(highRiskBeneficiaries?.value ?? 0),
     onboardingRate: Number(
-      (totalTacotsOnboarding!.value / totalTacotsRecommendations!.value) * 100,
+      ((totalTacotsOnboarding?.value ?? 0) / (totalTacotsRecommendations?.value ?? 0)) * 100,
     ),
-    completed: Number(totalCompletedExitRecords!.value),
+    completed: Number(totalCompletedExitRecords?.value ?? 0),
   };
 };
 
@@ -1334,7 +1334,7 @@ export const listTacotsTracking = async (
         limit,
         totalPages,
       },
-      metadata: metaData
+      metadata: metaData,
     },
   };
 };
