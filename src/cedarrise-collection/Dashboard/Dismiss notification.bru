@@ -1,0 +1,75 @@
+meta {
+  name: Dismiss notification
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/dashboard/notifications/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: fcd75d9f-6751-4a3e-a783-89ec3643369f
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Dismiss Notification
+  
+  Dismisses a single **active** notification by setting its status to `dismissed` and recording the current timestamp in `dismissedAt`. If the notification does not exist or is not active, the operation completes silently (no error is thrown).
+  
+  ## Authorization
+  
+  | Middleware      | Value    |
+  |-----------------|----------|
+  | `authenticate`  | ✅       |
+  | `authorize`     | `update` |
+  
+  ## Request
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Required | Description                                      |
+  |-----------|------|----------|--------------------------------------------------|
+  | `id`      | uuid | Yes      | The UUID of the notification to dismiss.         |
+  
+  No query parameters or request body.
+  
+  ### Validation
+  
+  | Field | Rule              | Error Message |
+  |-------|-------------------|---------------|
+  | `id`  | Valid UUID format  | `Invalid ID`  |
+  
+  ## Response
+  
+  **`200 OK`** — Notification dismissed successfully.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Notification dismissed successfully"
+  }
+  ```
+  
+  No `data` field is returned.
+  
+  ## Errors
+  
+  | Status                      | Description                                   |
+  |-----------------------------|-----------------------------------------------|
+  | `400 Bad Request`           | Invalid UUID in path parameter.               |
+  | `401 Unauthorized`          | Missing or invalid authentication token.      |
+  | `403 Forbidden`             | User lacks the `update` permission.           |
+  | `500 Internal Server Error` | Unexpected server error.                      |
+}

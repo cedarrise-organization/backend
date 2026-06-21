@@ -1,0 +1,190 @@
+meta {
+  name: Get notifications
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/dashboard/notifications?page=1&limit=15
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 1
+  limit: 15
+  ~status: active
+  ~type: POTENTIAL_DROPOUT_RISK
+  ~entityType: ash
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Notifications
+  
+  Returns a paginated list of **active** dashboard notifications, ordered by most recent first. Notifications are system-generated alerts surfaced by a weekly BullMQ cron job (`notification-queue`) that checks for at-risk patterns across ASH, TACOTS, and Volunteer data.
+  
+  ## Authorization
+  
+  | Middleware      | Value  |
+  |-----------------|--------|
+  | `authenticate`  | ✅      |
+  | `authorize`     | `read` |
+  
+  ## Request
+  
+  ### Query Parameters
+  
+  | Parameter    | Type   | Required | Default | Description                                                                                                         |
+  |--------------|--------|----------|---------|---------------------------------------------------------------------------------------------------------------------|
+  | `page`       | number | No       | `1`     | Page number (min: 1).                                                                                               |
+  | `limit`      | number | No       | `15`    | Items per page (min: 1, max: 100).                                                                                  |
+  | `status`     | string | No       | —       | Filter by status. One of: `active`, `dismissed`, `resolved`.                                                        |
+  | `type`       | string | No       | —       | Filter by notification type. One of: `POTENTIAL_DROPOUT_RISK`, `LOW_ATTENDANCE_RATE`, `LOW_MENTORSHIP_ENGAGEMENT`, `SCORE_DROP_ALERT`, `VOLUNTEER_INACTIVITY`. |
+  | `entityType` | string | No       | —       | Filter by entity type. One of: `ash`, `volunteer`, `tacots`, `capacity_building`, `administrative`.                 |
+  
+  No request body.
+  
+  ## Response
+  
+  **`200 OK`** — Returns an array of notification objects and pagination metadata.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Notifications found successfully",
+    "data": [
+      {
+        "id": "uuid",
+        "type": "POTENTIAL_DROPOUT_RISK | LOW_ATTENDANCE_RATE | LOW_MENTORSHIP_ENGAGEMENT | SCORE_DROP_ALERT | VOLUNTEER_INACTIVITY",
+        "title": "string",
+        "message": "string",
+        "severity": "low | medium | high | critical",
+        "entityType": "ash | volunteer | tacots | capacity_building | administrative",
+        "dedupeKey": "string",
+        "status": "active | dismissed | resolved",
+        "metadata": "JSON string | null",
+        "dismissedAt": "ISO 8601 | null",
+        "resolvedAt": "ISO 8601 | null",
+        "updatedAt": "ISO 8601 | null",
+        "createdAt": "ISO 8601",
+        "deletedAt": "ISO 8601 | null"
+      }
+    ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 15,
+        "totalPages": 1
+      }
+    }
+  }
+  ```
+  
+  ---
+  
+  ### Notification Types
+  
+  | Type                        | Trigger                                                                                              | Severity          | Entity Type |
+  |-----------------------------|------------------------------------------------------------------------------------------------------|--------------------|-------------|
+  | `POTENTIAL_DROPOUT_RISK`    | Student absent from the latest 3 consecutive ASH weekly attendance sessions.                         | `high`             | `ash`       |
+  | `LOW_ATTENDANCE_RATE`       | Student's attendance rate is below 75% for the current academic term.                                | `high` or `medium` | `ash`       |
+  | `LOW_MENTORSHIP_ENGAGEMENT` | Onboarded TACOTS student has no tracking record for the current academic term.                        | `medium`           | `tacots`    |
+  | `SCORE_DROP_ALERT`          | Student's post-test average dropped ≥15 points compared to the prior term in the same session.       | `high` or `medium` | `ash`       |
+  | `VOLUNTEER_INACTIVITY`      | Accepted volunteer has not appeared in any ASH attendance record in the last 30 days.                | `medium`           | `volunteer` |
+  
+  ---
+  
+  ### `metadata` Field (JSON string)
+  
+  The `metadata` field contains a serialised JSON object whose shape varies by notification type:
+  
+  **`POTENTIAL_DROPOUT_RISK`**
+  ```json
+  {
+    "studentId": "uuid",
+    "studentName": "string",
+    "assignedMentor": "string | null",
+    "missedConsecutiveSessions": 3,
+    "reason": "Student absent from the latest 3 ASH attendance sessions"
+  }
+  ```
+  
+  **`LOW_ATTENDANCE_RATE`**
+  ```json
+  {
+    "studentId": "uuid",
+    "studentName": "string",
+    "assignedMentor": "string | null",
+    "academicSession": "string",
+    "academicTerm": "string",
+    "termStartDate": "YYYY-MM-DD",
+    "termEndDate": "YYYY-MM-DD",
+    "attendedSessions": "number",
+    "totalSessions": "number",
+    "attendanceRate": "number",
+    "threshold": 75
+  }
+  ```
+  
+  **`LOW_MENTORSHIP_ENGAGEMENT`**
+  ```json
+  {
+    "onboardingId": "uuid",
+    "recommendationId": "uuid",
+    "studentName": "string",
+    "mentorName": "string | null",
+    "academicSession": "string",
+    "academicTerm": "string",
+    "reason": "No TACOTS tracking record found for current academic term"
+  }
+  ```
+  
+  **`SCORE_DROP_ALERT`**
+  ```json
+  {
+    "studentId": "uuid",
+    "studentName": "string",
+    "academicSession": "string",
+    "previousTerm": "string",
+    "currentTerm": "string",
+    "previousPosttestAverage": "number",
+    "currentPosttestAverage": "number",
+    "scoreDrop": "number",
+    "threshold": 15
+  }
+  ```
+  
+  **`VOLUNTEER_INACTIVITY`**
+  ```json
+  {
+    "volunteerId": "uuid",
+    "volunteerName": "string",
+    "emailAddress": "string",
+    "phoneNumber": "string | null",
+    "thresholdDays": 30
+  }
+  ```
+  
+  ## Caching
+  
+  - **Key:** `cedarrise:dashboard:notifications`
+  - **TTL:** `CACHE_TTL.GALLERY` (43200s / 12 hours)
+  - Set after the first successful database fetch; subsequent requests within the TTL window return cached data.
+  
+  ## Errors
+  
+  | Status                      | Description                                   |
+  |-----------------------------|-----------------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid authentication token.      |
+  | `403 Forbidden`             | User lacks the `read` permission.             |
+  | `500 Internal Server Error` | Unexpected server error.                      |
+}

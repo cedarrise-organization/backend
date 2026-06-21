@@ -83,9 +83,10 @@
 | `cedarrise:dashboard:student-performance`                                           | Cached student performance chart data (graduation rate, attendance, test scores, dropout trend, risk). Set on read.                                                    | `services/dashboard.services.ts`            |
 | `cedarrise:dashboard:enrollment`                                                    | Cached enrollment & recruitment chart data (application numbers, gender diversity, class distribution, acceptance rate, geographical distribution). Set on read.       | `services/dashboard.services.ts`            |
 | `cedarrise:dashboard:institutional-effectiveness`                                   | Cached institutional effectiveness chart data (community service hours, mentorship hours, spend per student, total accumulated hours, student benchmark). Set on read. | `services/dashboard.services.ts`            |
+| `cedarrise:dashboard:notifications`                                                 | Cached paginated active notifications list (ordered by most recent). Set on read.                                                                                      | `services/dashboard.services.ts`            |
 | `cedarrise:dashboard:projects`                                                      | Cached list of all projects. Set on read, deleted on project creation, status update, or deletion.                                                                     | `services/general.services.ts`              |
 | `cedarrise:general:receipts:{page}:{limit}:{orderBy}:{sortBy}`                      | Cached paginated receipts list. Set on read, bypassed on search.                                                                                                       | `services/general.services.ts`              |
-| `cedarrise:general:googleform`                                                      | Cached active Google Form details (src + title). Set on read, cleared on upload.                                                                                      | `services/general.services.ts`              |
+| `cedarrise:general:googleform`                                                      | Cached active Google Form details (src + title). Set on read, cleared on upload.                                                                                       | `services/general.services.ts`              |
 | `cedarrise:general:metadata`                                                        | Cached general uploads' page metadata (active projects, receipts, users, and photos). Set on read.                                                                     | `services/general.services.ts`              |
 
 ---
@@ -158,13 +159,14 @@
 
 # BullMQ Queues
 
-| Queue Name      | Default Attempts | Backoff               | Concurrency | Source                                  |
-| :-------------- | :--------------- | :-------------------- | :---------- | :-------------------------------------- |
-| `asset-removal` | 3                | Exponential, 3s delay | 3           | `queues/deleteCloudinaryAsset.queue.ts` |
+| Queue Name           | Default Attempts | Backoff               | Concurrency | Scheduled Job                              | Source                                  |
+| :------------------- | :--------------- | :-------------------- | :---------- | :----------------------------------------- | :-------------------------------------- |
+| `asset-removal`      | 3                | Exponential, 3s delay | 3           | —                                          | `queues/deleteCloudinaryAsset.queue.ts` |
+| `notification-queue` | 3                | Exponential, 3s delay | 1           | `weekly-notification-check` (Sun 6 PM WAT) | `queues/notifications.queue.ts`         |
 
 ---
 
-# BullMQ Queues
+# BullMQ Queues Example
 
 | Queue Name      | Default Attempts | Backoff               | Concurrency | Source                    |
 | :-------------- | :--------------- | :-------------------- | :---------- | :------------------------ |

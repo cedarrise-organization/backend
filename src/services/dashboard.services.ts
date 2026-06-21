@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { cacheGet, CACHE_TTL, cacheSet, cacheDel } from "../lib/cache.js";
 import {
   eq,
   gt,
@@ -12,11 +11,13 @@ import {
   avg,
   max,
   min,
-  aliasedTable,
+  desc,
   count,
-  isNotNull,
   isNull,
   inArray,
+  isNotNull,
+  notInArray,
+  aliasedTable,
   arrayContains,
   countDistinct,
 } from "drizzle-orm";
@@ -37,8 +38,12 @@ import {
   outreachTracker,
 } from "../db/models/admin.js";
 import db from "../db/db.js";
+import { invalidateCache } from "../utils/cache.util.js";
+import { notifications } from "../db/models/dashboard.js";
+import { cacheGet, CACHE_TTL, cacheSet, cacheDel } from "../lib/cache.js";
 import { Dataset, Linedata, Notificationcandidate } from "../types/dashboard.js";
 
+// return Dashboard cards Data
 export const getCards = async () => {
   /// cache
   const key = `cedarrise:dashboard:cards`;
@@ -262,6 +267,7 @@ export const getCards = async () => {
   };
 };
 
+// return Student Performance Data
 export const getStudentPerformance = async () => {
   /// cache
   const key = `cedarrise:dashboard:student-performance`;
@@ -580,6 +586,7 @@ export const getStudentPerformance = async () => {
   };
 };
 
+// return Enrollment Data
 export const getEnrollment = async () => {
   /// cache
   const key = `cedarrise:dashboard:enrollment`;
@@ -897,6 +904,7 @@ export const getEnrollment = async () => {
   };
 };
 
+// return Institutional Effectiveness Data
 export const getInstEffectiveness = async () => {
   /// cache
   const key = `cedarrise:dashboard:institutional-effectiveness`;
@@ -1103,7 +1111,7 @@ export const getInstEffectiveness = async () => {
   // Avg spend per student = total amount for that category / unique students in current academic session
   const c_spendPerstudent: Dataset = {
     type: "bar",
-    labels: ["Tuition", "Resources", "Sundries", "Total"],
+    labels: ["Tuition", "Resources", "Sundries" /*, "Total"*/],
     datasets: [
       {
         label: "Avg spend",
@@ -1111,7 +1119,7 @@ export const getInstEffectiveness = async () => {
           formatMoneyValue(spendPerStudent?.avgTuition),
           formatMoneyValue(spendPerStudent?.avgResources),
           formatMoneyValue(spendPerStudent?.avgSundries),
-          formatMoneyValue(spendPerStudent?.avgTotal),
+          // formatMoneyValue(spendPerStudent?.avgTotal),
         ],
       },
     ],
@@ -1649,6 +1657,169 @@ export const checkVolunteerInactivity = async (): Promise<Notificationcandidate[
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
     };
   });
+};
+
+// Auto-resolve function
+const CHECKED_NOTIFICATION_TYPES = [
+  "POTENTIAL_DROPOUT_RISK",
+  "LOW_ATTENDANCE_RATE",
+  "LOW_MENTORSHIP_ENGAGEMENT",
+  "SCORE_DROP_ALERT",
+  "VOLUNTEER_INACTIVITY",
+] as const;
+
+export const autoResolveStaleNotifications = async (currentCandidates: Notificationcandidate[]) => {
+  const currentDedupeKeys = currentCandidates.map((candidate) => candidate.dedupeKey);
+
+  const checkedTypes = CHECKED_NOTIFICATION_TYPES as unknown as string[];
+
+  if (currentDedupeKeys.length === 0) {
+    const resolvedNotifications = await db
+      .update(notifications)
+      .set({
+        status: "resolved",
+        resolvedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(notifications.status, "active"), inArray(notifications.type, checkedTypes)))
+      .returning();
+
+    return resolvedNotifications.length;
+  }
+
+  const resolvedNotifications = await db
+    .update(notifications)
+    .set({
+      status: "resolved",
+      resolvedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(notifications.status, "active"),
+        inArray(notifications.type, checkedTypes),
+        notInArray(notifications.dedupeKey, currentDedupeKeys),
+      ),
+    )
+    .returning();
+
+  return resolvedNotifications.length;
+};
+
+// Add notifications to notification table
+export const syncNotificationCandidates = async (candidates: Notificationcandidate[]) => {
+  if (candidates.length === 0) return 0;
+
+  await db
+    .insert(notifications)
+    .values(
+      candidates.map((candidate) => ({
+        type: candidate.type,
+        title: candidate.title,
+        message: candidate.message,
+        severity: candidate.severity,
+        entityType: candidate.entityType,
+        dedupeKey: candidate.dedupeKey,
+        status: "active",
+        metadata: candidate.metadata,
+      })),
+    )
+    .onConflictDoUpdate({
+      target: notifications.dedupeKey,
+      set: {
+        title: sql`excluded.title`,
+        message: sql`excluded.message`,
+        severity: sql`excluded.severity`,
+        entityType: sql`excluded.entity_type`,
+        status: "active",
+        metadata: sql`excluded.metadata`,
+        updatedAt: new Date(),
+      },
+    });
+
+  return candidates.length;
+};
+
+// Return notifications
+export const getNotifications = async (page: number, limit: number) => {
+  /// cache
+  const key = `cedarrise:dashboard:notifications`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Notifications found successfully",
+      data: cacheRes.data,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages: Number(cacheRes.totalPages),
+        },
+      },
+    };
+  }
+  ///
+
+  const [notificationsData, [totalResult]] = await Promise.all([
+    db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.status, "active"))
+      .orderBy(desc(notifications.createdAt))
+      .limit(limit)
+      .offset((page - 1) * limit),
+    db
+      .select({ value: count(notifications.id) })
+      .from(notifications)
+      .where(eq(notifications.status, "active")),
+  ]);
+  const totalPages = Math.ceil(totalResult!.value / limit);
+
+  /// cache set
+  await cacheSet(key, { data: notificationsData, totalPages }, CACHE_TTL.GALLERY);
+  ///
+
+  return {
+    code: 200,
+    message: "Notifications found successfully",
+    data: notificationsData,
+    meta: {
+      pagination: {
+        page,
+        limit,
+        totalPages: Number(totalPages) ?? 0,
+      },
+    },
+  };
+};
+
+// Dismiss a notification
+export const dismissNotification = async (id: string) => {
+  /* const [notification] = */ await db
+    .update(notifications)
+    .set({
+      status: "dismissed",
+      dismissedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(and(eq(notifications.id, id), eq(notifications.status, "active")))
+    .returning();
+
+  // if (!notification) {
+  //   return {
+  //     code: 404,
+  //     message: "Active notification not found",
+  //   };
+  // }
+
+  // delete all related cache
+  await invalidateCache("cedarrise:dashboard:notifications", undefined);
+
+  return {
+    code: 200,
+    message: "Notification dismissed successfully",
+  };
 };
 
 export const feature = async (req: Request, options: any) => {};

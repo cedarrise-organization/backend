@@ -16,7 +16,24 @@ const notificationEntityTypeEnum = z.enum([
   "capacity_building",
   "administrative",
 ]);
-const notificationStatusEnum = z.enum(["active", "dismissed", "resolved", "expired"]);
+const notificationStatusEnum = z.enum(["active", "dismissed", "resolved"]);
+
+export const notificationIdSchema = z.object({
+  params: z.object({
+    id: z.uuid("Invalid ID"),
+  }),
+});
+
+export const notificationQuerySchema = z.object({
+  query: z.object({
+    status: notificationStatusEnum.optional(),
+    type: notificationTypeEnum.optional(),
+    entityType: notificationEntityTypeEnum.optional(),
+
+    page: z.coerce.number().min(1).optional().default(1),
+    limit: z.coerce.number().min(1).max(100).optional().default(15),
+  }),
+});
 
 export const createNotificationSchema = z.object({
   body: z.object({
@@ -30,26 +47,11 @@ export const createNotificationSchema = z.object({
     expiresAt: z.coerce.date().optional(),
   }),
 });
-export const notificationIdSchema = z.object({
-  params: z.object({
-    id: z.uuid("Invalid ID"),
-  }),
-});
 export const updateNotificationStatusSchema = z.object({
   params: z.object({
     id: z.uuid("Invalid ID"),
   }),
   body: z.object({
     status: z.enum(["dismissed", "resolved", "expired"]),
-  }),
-});
-export const notificationQuerySchema = z.object({
-  query: z.object({
-    status: notificationStatusEnum.optional(),
-    type: notificationTypeEnum.optional(),
-    entityType: notificationEntityTypeEnum.optional(),
-
-    page: z.coerce.number().min(1).optional().default(1),
-    limit: z.coerce.number().min(1).max(100).optional().default(10),
   }),
 });

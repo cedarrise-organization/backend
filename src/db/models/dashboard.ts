@@ -45,7 +45,6 @@ export const notifications = p.pgTable(
 
     dismissedAt: p.timestamp("dismissed_at"),
     resolvedAt: p.timestamp("resolved_at"),
-    expiresAt: p.timestamp("expires_at"),
     ...timestamps,
   },
   (table) => [

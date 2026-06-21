@@ -6,6 +6,8 @@ import {
   getStudentPerformance,
   getEnrollment,
   getInstEffectiveness,
+  getNotifications,
+  dismissNotification,
 } from "../../services/dashboard.services.js";
 
 export const getCardsController = async (req: Request, res: Response, next: NextFunction) => {
@@ -33,7 +35,7 @@ export const getStudentPerformanceController = async (
 export const getEnrollmentController = async (req: Request, res: Response, next: NextFunction) => {
   const response = await getEnrollment();
   try {
-    successResponse(res, response.code, response.message, response.data)
+    successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }
@@ -46,7 +48,35 @@ export const getInstEffectivenessController = async (
 ) => {
   const response = await getInstEffectiveness();
   try {
-    successResponse(res, response.code, response.message, response.data)
+    successResponse(res, response.code, response.message, response.data);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getNotificationsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { page, limit } = req.qtransformed;
+  try {
+    const response = await getNotifications(page, limit);
+    successResponse(res, response.code, response.message, response.data, response.meta);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const dismissNotificationController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const id = (req as any).params.id.toString();
+  try {
+    const response = await dismissNotification(id);
+    successResponse(res, response.code, response.message);
   } catch (err) {
     next(err);
   }
@@ -54,6 +84,7 @@ export const getInstEffectivenessController = async (
 
 // export const featureController = async (req: Request, res: Response, next: NextFunction) => {
 //   try {
+//     // const response = await exampleService();
 //     // successResponse(res, response.code, response.message, response.data)
 //   } catch (err) {
 //     next(err);

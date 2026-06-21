@@ -433,8 +433,9 @@ export const getGoogleForm = async () => {
     message: "Form Link Retrieved Successfully",
     data: googleFormDetails,
   };
-};
+}; 
 
+// GENERAL UPLOADS METADATA
 export const getMetadata = async () => {
   /// cache
   const key = `cedarrise:general:metadata`;

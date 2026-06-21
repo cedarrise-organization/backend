@@ -20,8 +20,8 @@ const worker = new Worker(
       host: redis_host,
       port: redis_port,
     },
-    // 3 jobs can run concurrently i.e this worker processes up to 3 documents simultaneously.
-    // If you have 10 documents in the queue, the worker handles 3 at a time. The rest wait.
+    // 3 jobs can run concurrently i.e this worker processes up to 3 jobs simultaneously.
+    // If you have 10 jobs in the queue, the worker handles 3 at a time. The rest wait.
     // Set based on server cpu and memory
     concurrency: 3,
   },

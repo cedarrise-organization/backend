@@ -1,14 +1,17 @@
 //ROUTES
 import express from "express";
-import { validateRequest } from "../../middleware/validate.middleware.js";
-// import { } from "./dashboard.schema.js";
-import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import {
   getCardsController,
   getStudentPerformanceController,
   getEnrollmentController,
   getInstEffectivenessController,
+  getNotificationsController,
+  dismissNotificationController,
 } from "./dashboard.controller.js";
+import { notificationIdSchema, notificationQuerySchema } from "./dashboard.schema.js";
+import { validateRequest } from "../../middleware/validate.middleware.js";
+import { authenticate, authorize } from "../../middleware/auth.middleware.js";
+
 const router = express.Router();
 
 router.get("/cards", authenticate(), authorize("read"), getCardsController);
@@ -25,6 +28,19 @@ router.get(
   authorize("read"),
   getInstEffectivenessController,
 );
-
+router.get(
+  "/notifications",
+  authenticate(),
+  authorize("read"),
+  validateRequest(notificationQuerySchema),
+  getNotificationsController,
+);
+router.patch(
+  "/notifications/:id",
+  authenticate(),
+  authorize("update"),
+  validateRequest(notificationIdSchema),
+  dismissNotificationController,
+);
 
 export default router;
