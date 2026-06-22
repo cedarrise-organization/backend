@@ -19,6 +19,7 @@ import outreachRouter from "./modules/outreaches/outreaches.routes.js";
 import dashboardRouter from "./modules/dashboard/dashboard.routes.js";
 import generalRouter from "./modules/general/general.routes.js";
 // import featureRouter from "./modules/feature/feature.routes.js";
+import "./events/general.events.js";
 import "./events/donate.events.js";
 import "./events/tacots.events.js";
 // import "./events/delete.events.js";

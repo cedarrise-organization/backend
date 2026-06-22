@@ -54,3 +54,11 @@ export const googleForms = p.pgTable("google_forms", {
   deadline: p.timestamp(),
   createdAt: p.timestamp("created_at").defaultNow().notNull(),
 });
+
+export const photoCount = p.pgTable(
+  "photo_count",
+  {
+    numberOfPhotos: p.integer("numberOfPhotos").default(259).notNull().unique(),
+  },
+  (table) => [index("photo_count_index").on(table.numberOfPhotos)],
+);

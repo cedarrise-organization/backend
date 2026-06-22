@@ -1,14 +1,16 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/storage.util.js";
+import { googleForms, photoCount, receipts } from "../db/models/general.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
-import { invalidateCache } from "../utils/cache.util.js";
 import { eq, lt, asc, sql, desc, count } from "drizzle-orm";
+import { invalidateCache } from "../utils/cache.util.js";
 import { projects } from "../db/models/dashboard.js";
-import { googleForms, receipts } from "../db/models/general.js";
 import { UploadApiResponse } from "cloudinary";
-import { Request } from "express";
-import db from "../db/db.js";
-import logger from "../configs/logger.config.js";
+import { appEvents } from "../lib/events.js";
 import { users } from "../db/models/auth.js";
+import { Request } from "express";
+import logger from "../configs/logger.config.js";
+import db from "../db/db.js";
+import { GENERAL_EVENTS } from "../events/general.events.js";
 
 const sortMap = {
   name: receipts.name,
@@ -354,10 +356,14 @@ export const uploadPhotos = async (
   folder: keyof typeof FOLDER_MAP,
 ) => {
   // console.log(files);
+  let i = 0;
   const uploadFolder = FOLDER_MAP[folder] ?? FOLDER_MAP.ASH;
   for (const file of files) {
+    i++;
     await uploadToCloudinary(file, uploadFolder);
   }
+
+  appEvents.emit(GENERAL_EVENTS.UPLOAD_PHOTO, { newPhotosCount: i });
 
   return {
     code: 201,
@@ -433,7 +439,7 @@ export const getGoogleForm = async () => {
     message: "Form Link Retrieved Successfully",
     data: googleFormDetails,
   };
-}; 
+};
 
 // GENERAL UPLOADS METADATA
 export const getMetadata = async () => {
@@ -450,7 +456,8 @@ export const getMetadata = async () => {
   }
   ///
 
-  const [[activeProjects], [receiptsLogged], [systemUsers]] = await Promise.all([
+  const [[noOfPhotos], [activeProjects], [receiptsLogged], [systemUsers]] = await Promise.all([
+    db.select().from(photoCount),
     db
       .select({ value: count(projects.id) })
       .from(projects)
@@ -463,10 +470,10 @@ export const getMetadata = async () => {
   await cacheSet(
     key,
     {
-      photosUploaded: 0,
-      activeProjects: Number(activeProjects!.value) ?? 0,
-      receiptsLogged: Number(receiptsLogged!.value) ?? 0,
-      systemUsers: Number(systemUsers!.value) ?? 0,
+      photosUploaded: Number(noOfPhotos?.numberOfPhotos ?? 0),
+      activeProjects: Number(activeProjects?.value ?? 0),
+      receiptsLogged: Number(receiptsLogged?.value ?? 0),
+      systemUsers: Number(systemUsers?.value ?? 0),
     },
     CACHE_TTL.GALLERY,
   );
@@ -476,10 +483,10 @@ export const getMetadata = async () => {
     code: 200,
     message: "General uploads' page metadata found successfully",
     data: {
-      photosUploaded: 0,
-      activeProjects: Number(activeProjects!.value) ?? 0,
-      receiptsLogged: Number(receiptsLogged!.value) ?? 0,
-      systemUsers: Number(systemUsers!.value) ?? 0,
+      photosUploaded: Number(noOfPhotos?.numberOfPhotos ?? 0),
+      activeProjects: Number(activeProjects?.value ?? 0),
+      receiptsLogged: Number(receiptsLogged?.value ?? 0),
+      systemUsers: Number(systemUsers?.value ?? 0),
     },
   };
 };

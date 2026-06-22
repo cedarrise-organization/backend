@@ -22,7 +22,7 @@ import {
 } from "./models/admin.js";
 import { projects } from "./models/dashboard.js";
 import { refreshtoken } from "./models/auth.js";
-import { receipts } from "./models/general.js";
+import { receipts, photoCount } from "./models/general.js";
 
 // CLEAR TABLES
 const clearTables = async () => {
@@ -50,6 +50,7 @@ const clearTables = async () => {
     await db.delete(capacityBuildingEvaluation);
     await db.delete(projects);
     await db.delete(receipts);
+    await db.delete(photoCount);
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -731,6 +732,19 @@ async function seedReceipts() {
   }
 }
 
+// PHOTO COUNT
+async function seedPhotoCount() {
+  try {
+    await db.insert(photoCount).values({
+      numberOfPhotos: 259,
+    });
+
+    logger.info(`Seeded photoCount`);
+  } catch (error) {
+    logger.error("could not seed photoCount table");
+  }
+}
+
 await clearTables();
 await installExtensions();
 await seedRolesAndPermissions();
@@ -751,3 +765,4 @@ await seedOutreachTracker();
 await seedCapacityBuildingEvaluation();
 await seedProjects();
 await seedReceipts();
+await seedPhotoCount();
