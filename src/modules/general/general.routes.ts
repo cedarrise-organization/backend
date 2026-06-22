@@ -90,7 +90,7 @@ router.get("/download/receipts", authenticate(), authorize("read"), exportReceip
 // PHOTO UPLOADS
 router.post(
   "/gallery",
-  upload.array("photos", 3),
+  upload.array("photos", 10),
   authenticate(),
   authorize("create"),
   validateRequest(gallerySchema),

@@ -1,11 +1,13 @@
 import { cacheGet, cacheSet } from "../lib/cache.js";
 import { CACHE_TTL } from "../lib/cache.js";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull, isNotNull } from "drizzle-orm";
 import {
   ashStudent,
+  ashExit,
   tacotsRecommendation,
   tacotsOnboarding,
   volunteerRegistration,
+  tacotsExit,
 } from "../db/models/admin.js";
 import db from "../db/db.js";
 
@@ -30,7 +32,8 @@ export const ashDropdown = async () => {
       status: ashStudent.status,
     })
     .from(ashStudent)
-    .where(eq(ashStudent.status, "accepted"));
+    .leftJoin(ashExit, eq(ashExit.studentId, ashStudent.id))
+    .where(and(eq(ashStudent.status, "accepted"), isNull(ashExit.studentId)));
 
   const returnStudents = students.map((student) => {
     return {
@@ -72,7 +75,10 @@ export const recommendedDropdown = async () => {
       status: tacotsRecommendation.adminStatus,
     })
     .from(tacotsRecommendation)
-    .where(eq(tacotsRecommendation.adminStatus, "SELECTED"));
+    .leftJoin(tacotsOnboarding, eq(tacotsOnboarding.studentId, tacotsRecommendation.id))
+    .where(
+      and(eq(tacotsRecommendation.adminStatus, "SELECTED"), isNull(tacotsOnboarding.studentId)),
+    );
 
   const returnStudents = students.map((student) => {
     return {
@@ -118,12 +124,14 @@ export const onboardedDropdown = async () => {
         eq(tacotsRecommendation.id, tacotsOnboarding.studentId),
         eq(tacotsRecommendation.adminStatus, "SELECTED"),
       ),
-    );
+    )
+    .leftJoin(tacotsExit, eq(tacotsExit.studentId, tacotsOnboarding.id))
+    .where(isNull(tacotsExit.studentId));
 
   const returnStudents = students.map((student) => {
     return {
       id: student.id,
-      name: `${student.firstName} ${student.surname}`
+      name: `${student.firstName} ${student.surname}`,
     };
   });
 

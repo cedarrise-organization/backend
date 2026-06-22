@@ -6,6 +6,7 @@ import { appEvents } from "../lib/events.js";
 import { users } from "../db/models/auth.js";
 import { cacheDel } from "../lib/cache.js";
 import { eq } from "drizzle-orm";
+import { invalidateCache } from "../utils/cache.util.js";
 
 export const ADMIN_EVENTS = {
   ASSIGN_ROLE: "admin:role-assigned",
@@ -43,41 +44,41 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
 });
 
 // INFORM USER OF NEW ROLE ASSIGNED VIA EMAIL
-appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
-  try {
-    const [user] = await db
-      .select({ name: users.name, email: users.email })
-      .from(users)
-      .where(eq(users.id, data.userId));
+// appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
+//   try {
+//     const [user] = await db
+//       .select({ name: users.name, email: users.email })
+//       .from(users)
+//       .where(eq(users.id, data.userId));
 
-    if (!user) {
-      throw new Error();
-    }
+//     if (!user) {
+//       throw new Error();
+//     }
 
-    let content = await ejs.renderFile(
-      process.cwd() + "/src/views/emails/rolechange.ejs",
-      { name: user.name, role: data.role, email: user.email },
-      { async: true },
-    );
+//     let content = await ejs.renderFile(
+//       process.cwd() + "/src/views/emails/rolechange.ejs",
+//       { name: user.name, role: data.role, email: user.email },
+//       { async: true },
+//     );
 
-    const info = await sendEmail(user.email, "You've been assigned a new Role!", content);
+//     const info = await sendEmail(user.email, "You've been assigned a new Role!", content);
 
-    if (!info) {
-      throw new Error();
-    }
+//     if (!info) {
+//       throw new Error();
+//     }
 
-    logger.info("Role assignment email sent successully", {
-      info: info.accepted,
-      // correlationId
-    });
-  } catch (error: any) {
-    logger.info("Failed to send Role assignment email", {
-      email: data.email,
-      message: error.message,
-      // correlationId
-    });
-  }
-});
+//     logger.info("Role assignment email sent successully", {
+//       info: info.accepted,
+//       // correlationId
+//     });
+//   } catch (error: any) {
+//     logger.info("Failed to send Role assignment email", {
+//       email: data.email,
+//       message: error.message,
+//       // correlationId
+//     });
+//   }
+// });
 
 // LOG REVOKED ROLE
 appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
@@ -113,6 +114,24 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
     userId: data.userId,
     // correlationId: data.correlationId
   });
+});
+
+// DELETE USER LOOKUP AND USER PAGE CACHE
+appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
+  const key = `cedarrise:lookup:*`;
+  try {
+    await invalidateCache(undefined, key);
+    logger.info("User Lookup and User Page cache removed", {
+      user: data.userId,
+      // correlationId: data.correlationId
+    });
+  } catch (error: any) {
+    logger.error("Could not remove user lookup and user page cache", {
+      message: error.message,
+      user: data.userId,
+      // correlationId: data.correlationId
+    });
+  }
 });
 
 // SEND CREDENTIALS TO NEW USER VIA EMAIL

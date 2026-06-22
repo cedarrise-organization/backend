@@ -28,6 +28,7 @@
 | FORM_DATA       | 1800 (30 mins)  | `lib/cache.ts` |
 | LISTS           | 600 (10 mins)   | `lib/cache.ts` |
 | DASHBOARD_CARDS | 3600s (1 hr)    | `lib/cache.ts` |
+| USERS           | 1800 (30 mins)  | `lib/cache.ts` |
 
 ---
 

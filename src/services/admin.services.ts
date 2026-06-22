@@ -18,6 +18,18 @@ export const listAllRoles = async () => {
 };
 
 export const listUserRoles = async (userId: string) => {
+  /// cache
+  const key = `cedarrise:lookup:userroles`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: `Roles for user ${userId} found successfully`,
+      data: cacheRes,
+    };
+  }
+  ///
+
   const userRoles = await db
     .select({
       id: roles.id,
@@ -28,6 +40,10 @@ export const listUserRoles = async (userId: string) => {
     .from(userroles)
     .innerJoin(roles, eq(roles.id, userroles.roleId))
     .where(eq(userroles.userId, userId));
+
+  /// cache set
+  await cacheSet(key, userRoles, CACHE_TTL.LISTS);
+  ///
 
   return {
     code: 200,
@@ -109,7 +125,7 @@ export const createUser = async (options: {
       department,
     })
     .returning();
-
+  // delete lookup cache
   if (!newUser) {
     throw new Error("User could not be created");
   }
@@ -137,7 +153,7 @@ export const createUser = async (options: {
     })
     .returning();
 
-  // appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: "volunteer", user: newUser.id });
+  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: "volunteer", user: newUser.id });
 
   return {
     code: 200,
@@ -243,7 +259,7 @@ export const listUsersForUserPage = async (page: number, limit: number, search: 
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, { data: allUsers, totalPages }, CACHE_TTL.DASHBOARD_CARDS);
+  await cacheSet(key, { data: allUsers, totalPages }, CACHE_TTL.USERS);
   ///
 
   return {

@@ -9,6 +9,7 @@ export const CACHE_TTL = {
   FORM_DATA: 1800, // 30 mins
   LISTS: 600, // 10 mins
   DASHBOARD_CARDS: 3600, // 1 hr
+  USERS: 1800, // 30 mins
   /*
     ...other TTLs
     */

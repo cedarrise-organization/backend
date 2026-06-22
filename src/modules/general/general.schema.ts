@@ -76,7 +76,7 @@ export const gallerySchema = z.object({
 
   files: imageFileSchema
     .min(1, "At least one photo is required")
-    .max(3, "Maximum of 3 photos allowed"),
+    .max(10, "Maximum of 10 photos allowed"),
 });
 
 export const googleSchema = z.object({
