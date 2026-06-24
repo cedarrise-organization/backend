@@ -44,41 +44,41 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
 });
 
 // INFORM USER OF NEW ROLE ASSIGNED VIA EMAIL
-// appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
-//   try {
-//     const [user] = await db
-//       .select({ name: users.name, email: users.email })
-//       .from(users)
-//       .where(eq(users.id, data.userId));
+appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
+  try {
+    const [user] = await db
+      .select({ name: users.name, email: users.email })
+      .from(users)
+      .where(eq(users.id, data.userId));
 
-//     if (!user) {
-//       throw new Error();
-//     }
+    if (!user) {
+      throw new Error();
+    }
 
-//     let content = await ejs.renderFile(
-//       process.cwd() + "/src/views/emails/rolechange.ejs",
-//       { name: user.name, role: data.role, email: user.email },
-//       { async: true },
-//     );
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/rolechange.ejs",
+      { name: user.name, role: data.role, email: user.email },
+      { async: true },
+    );
 
-//     const info = await sendEmail(user.email, "You've been assigned a new Role!", content);
+    const info = await sendEmail(user.email, "You've been assigned a new Role!", content);
 
-//     if (!info) {
-//       throw new Error();
-//     }
+    if (!info) {
+      throw new Error();
+    }
 
-//     logger.info("Role assignment email sent successully", {
-//       info: info.accepted,
-//       // correlationId
-//     });
-//   } catch (error: any) {
-//     logger.info("Failed to send Role assignment email", {
-//       email: data.email,
-//       message: error.message,
-//       // correlationId
-//     });
-//   }
-// });
+    logger.info("Role assignment email sent successully", {
+      // info: info.accepted,
+      // correlationId
+    });
+  } catch (error: any) {
+    logger.info("Failed to send Role assignment email", {
+      email: data.email,
+      message: error.message,
+      // correlationId
+    });
+  }
+});
 
 // LOG REVOKED ROLE
 appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
@@ -103,6 +103,43 @@ appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
       message: error.message,
       user: data.userId,
       // correlationId: data.correlationId
+    });
+  }
+});
+
+// INFORM USER OF ROLE REVOKED  VIA EMAIL
+appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
+  try {
+    const [user] = await db
+      .select({ name: users.name, email: users.email })
+      .from(users)
+      .where(eq(users.id, data.userId));
+
+    if (!user) {
+      throw new Error();
+    }
+
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/rolerevoked.ejs",
+      { name: user.name, role: data.role, email: user.email },
+      { async: true },
+    );
+
+    const info = await sendEmail(user.email, "Role revocation", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("Role revocation email sent successully", {
+      // info: info.accepted,
+      // correlationId
+    });
+  } catch (error: any) {
+    logger.info("Failed to send Role revocation email", {
+      email: data.email,
+      message: error.message,
+      // correlationId
     });
   }
 });
