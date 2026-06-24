@@ -1,7 +1,8 @@
-import logger from "../configs/logger.config.js";
-import ejs from "ejs";
+import { invalidateCache } from "../utils/cache.util.js";
 import { sendEmail } from "../utils/sendEmail.util.js";
 import { appEvents } from "../lib/events.js";
+import logger from "../configs/logger.config.js";
+import ejs from "ejs";
 
 // DEFINE EVENT NAMES AS CONSTANTS
 export const DELETE_EVENTS = {
@@ -11,11 +12,24 @@ export const DELETE_EVENTS = {
    */
 } as const;
 
+// DELETE CACHE ON TRIGGER
 appEvents.on(DELETE_EVENTS.DELETE_CACHE, async (data) => {
   try {
-    logger.info("success", { data });
-  } catch (err) {
-    logger.error("failure", { data });
+    await invalidateCache(data.singleKey, data.patternKey);
+    logger.info("success. cache removed", {
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      affectedService: data.affectedService,
+      // correlationId: data.correlationId
+    });
+  } catch (error: any) {
+    logger.error("failure. cache was not removed", {
+      message: error.message,
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      affectedService: data.affectedService,
+      // correlationId: data.correlationId
+    });
   }
 });
 

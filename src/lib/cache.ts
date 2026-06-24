@@ -19,7 +19,7 @@ export const cacheGet = async <T>(key: string): Promise<T | null> => {
   const raw = await redisClient.get(key);
   if (!raw) return null;
   try {
-    logger.debug(`cache hit @${new Date(Date.now())}`)
+    logger.debug(`*cacheGet fxn* cache hit @${new Date(Date.now())}`);
     return JSON.parse(raw) as T;
   } catch {
     return null;
@@ -27,20 +27,20 @@ export const cacheGet = async <T>(key: string): Promise<T | null> => {
 };
 
 export const cacheSet = async (key: string, value: any, ttlseconds: number): Promise<void> => {
-  logger.debug(`cache set @${new Date(Date.now())}`)
   await redisClient.setEx(key, ttlseconds, JSON.stringify(value));
+  logger.debug(`*cacheSet fxn* cache set @${new Date(Date.now())}`);
 };
 
 export const cacheDel = async (key: string) => {
-  logger.debug(`cache key deleted @${new Date(Date.now())}`)
   await redisClient.del(key);
+  logger.debug(`*cacheDel fxn* cache key deleted @${new Date(Date.now())}`);
 };
 
 export const cacheDelPattern = async (pattern: string): Promise<void> => {
-  logger.debug(`cache keys deleted @${new Date(Date.now())}`)
   for await (const key of redisClient.scanIterator({ MATCH: pattern, COUNT: 100 })) {
     await redisClient.del(key);
   }
+  logger.debug(`*cacheDelPattern fxn* cache key pattern deleted @${new Date(Date.now())}`);
 };
 
 export const hashKey = async (...parts: string[]): Promise<string> => {

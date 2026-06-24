@@ -1,7 +1,6 @@
-import { invalidateCache } from "../utils/cache.util.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
-import { CACHE_TTL, cacheSet, cacheGet, cacheDel } from "../lib/cache.js";
+import { CACHE_TTL, cacheSet, cacheGet } from "../lib/cache.js";
 import { ASH_EVENTS } from "../events/ash.events.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
@@ -127,20 +126,15 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:ash:ashStudents:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:ash:ashStudent:${newAshStudent?.id}`,
-    newAshStudent,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:ashStudents:*`,
+    affectedService: "ASH REGISRATION FORM",
+  });
 
-  // emitter or job to delete cache
   return {
     code: 201,
-    message: "Ash registeration form submitted successfully",
+    message: "Ash registration form submitted successfully",
     data: newAshStudent,
   };
 };
@@ -303,7 +297,7 @@ export const listRegistrations = async (
 };
 export const getRegistration = async (id: string) => {
   /// cache
-  const key = `cedarrise:ash:ashStudent:${id}`;
+  const key = `cedarrise:ash:ashStudents:${id}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -340,8 +334,11 @@ export const updateAshStudentStatus = async (id: string, status: string) => {
       name: ashStudent.firstName,
     });
 
-  // delete all related cache
-  await invalidateCache(`cedarrise:ash:ashStudent:${id}`, `cedarrise:ash:ashStudents:*`);
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:ashStudents:*`,
+    affectedService: "UPDATE ASH STUDENT STATUS",
+  });
 
   // emitter to send email on accept or reject
   // if (status === "accepted") {
@@ -370,8 +367,11 @@ export const assignAshMentor = async (id: string, mentor: string) => {
       assignedMentor: ashStudent.assignedMentor,
     });
 
-  // delete all related cache
-  await invalidateCache(`cedarrise:ash:ashStudent:${id}`, `cedarrise:ash:ashStudents:*`);
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:ashStudents:*`,
+    affectedService: "ASSIGN ASH STUDENT MENTOR",
+  });
 
   // emitter to send email on notifying mentor and mentee
 
@@ -382,14 +382,17 @@ export const assignAshMentor = async (id: string, mentor: string) => {
   };
 };
 export const deleteRegistration = async (id: string) => {
-  const [data] = await db
-    .select({
-      passportPhotoPublicId: ashStudent.passportPhotoPublicId,
-      lastResultPublicId: ashStudent.lastResultPublicId,
-      parentSignaturePublicId: ashStudent.parentSignaturePublicId,
-    })
-    .from(ashStudent)
-    .where(eq(ashStudent.id, id));
+  const [data] = await db.delete(ashStudent).where(eq(ashStudent.id, id)).returning({
+    passportPhotoPublicId: ashStudent.passportPhotoPublicId,
+    lastResultPublicId: ashStudent.lastResultPublicId,
+    parentSignaturePublicId: ashStudent.parentSignaturePublicId,
+  });
+
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:ashStudents:*`,
+    affectedService: "DELETE ASH STUDENT REGISTRATION RECORD",
+  });
 
   if (data?.passportPhotoPublicId) {
     try {
@@ -421,11 +424,6 @@ export const deleteRegistration = async (id: string) => {
     }
   }
 
-  await db.delete(ashStudent).where(eq(ashStudent.id, id));
-
-  /// cache delete
-  await cacheDel(`cedarrise:ash:ashStudent:${id}`);
-  ///
   return {
     code: 200,
     message: "Ash student data deleted successfully",
@@ -466,15 +464,11 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:ash:feedback:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:ash:feedback:${newAshProgramFeedback?.id}`,
-    newAshProgramFeedback,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:feedback:*`,
+    affectedService: "SUBMIT ASH STUDENT FEEDBACK",
+  });
 
   return {
     code: 201,
@@ -603,9 +597,11 @@ export const getFeedback = async (id: string) => {
 export const deleteFeedback = async (id: string) => {
   await db.delete(ashProgramFeedback).where(eq(ashProgramFeedback.id, id));
 
-  /// cache delete
-  await cacheDel(`cedarrise:ash:feedback:${id}`);
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:feedback:*`,
+    affectedService: "SUBMIT ASH STUDENT FEEDBACK",
+  });
 
   return {
     code: 200,
@@ -755,11 +751,11 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:ash:termlytracking:*`);
-  /// cache set
-  await cacheSet(`cedarrise:ash:termlytracking:${tracker?.id}`, tracker, CACHE_TTL.FORM_DATA);
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:termlytracking:*`,
+    affectedService: "SUBMIT ASH STUDENT TRACKING",
+  });
 
   return {
     code: 201,
@@ -1002,12 +998,9 @@ export const getTrack = async (id: string) => {
   };
 };
 export const deleteTrack = async (id: string) => {
-  const [data] = await db
-    .select({
-      termResultPublicId: ashTermlyTracking.termResultPublicId,
-    })
-    .from(ashTermlyTracking)
-    .where(eq(ashTermlyTracking.id, id));
+  const [data] = await db.delete(ashTermlyTracking).where(eq(ashTermlyTracking.id, id)).returning({
+    termResultPublicId: ashTermlyTracking.termResultPublicId,
+  });
 
   if (data?.termResultPublicId) {
     try {
@@ -1019,12 +1012,11 @@ export const deleteTrack = async (id: string) => {
     }
   }
 
-  // delete file from db
-  await db.delete(ashTermlyTracking).where(eq(ashTermlyTracking.id, id));
-
-  /// cache delete
-  await cacheDel(`cedarrise:ash:termlytracking:${id}`);
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:termlytracking:*`,
+    affectedService: "DELETE ASH STUDENT TRACKING",
+  });
 
   return {
     code: 200,
@@ -1051,15 +1043,11 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:ash:weeklyattendance:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:ash:weeklyattendance:${attendance?.id}`,
-    attendance,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:weeklyattendance:*`,
+    affectedService: "SUBMIT ASH STUDENT WEEKLY ATTENDANCE",
+  });
 
   return {
     code: 201,
@@ -1257,9 +1245,12 @@ export const getAttendance = async (id: string) => {
 export const deleteAttendance = async (id: string) => {
   await db.delete(ashWeeklyAttendance).where(eq(ashWeeklyAttendance.id, id));
 
-  /// cache delete
-  await cacheDel(`cedarrise:ash:weeklyattendance:${id}`);
   ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:weeklyattendance:*`,
+    affectedService: "SUBMIT ASH STUDENT WEEKLY ATTENDANCE",
+  });
 
   return {
     code: 200,
@@ -1298,11 +1289,11 @@ export const submitExit = async (options: AshexitbodyType) => {
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:ash:exit:*`);
-  /// cache set
-  await cacheSet(`cedarrise:ash:exit:${exit?.id}`, exit, CACHE_TTL.FORM_DATA);
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:exit:*`,
+    affectedService: "SUBMIT ASH STUDENT EXIT FORM",
+  });
 
   return {
     code: 201,
@@ -1521,9 +1512,11 @@ export const getExit = async (id: string) => {
 export const deleteExit = async (id: string) => {
   await db.delete(ashExit).where(eq(ashExit.id, id));
 
-  /// cache delete
-  await cacheDel(`cedarrise:ash:exit:${id}`);
-  ///
+  appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:ash:exit:*`,
+    affectedService: "DELETE ASH STUDENT EXIT RECORD",
+  });
 
   return {
     code: 200,

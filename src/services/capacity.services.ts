@@ -1,8 +1,9 @@
+import { sql, eq, max, sum, asc, desc, count, countDistinct } from "drizzle-orm";
 import { CapacitybuildingevaluationbodyType } from "../modules/capacity/capacity.schema.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { capacityBuildingEvaluation } from "../db/models/admin.js";
-import { invalidateCache } from "../utils/cache.util.js";
-import { sql, eq, max, sum, asc, desc, count, countDistinct } from "drizzle-orm";
+import { DELETE_EVENTS } from "../events/delete.events.js";
+import { appEvents } from "../lib/events.js";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -61,15 +62,11 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:capacity:evaluation:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:capacity:evaluation:${evaluation?.id}`,
-    evaluation,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:capacity:evaluation:*`,
+    affectedService: "CREATE CAPACITY EVALUATION RECORD",
+  });
 
   return {
     code: 200,
@@ -260,15 +257,14 @@ export const getEvaluation = async (id: string) => {
   };
 };
 export const deleteEvaluation = async (id: string) => {
-  const [evaluation] = await db
-    .delete(capacityBuildingEvaluation)
-    .where(eq(capacityBuildingEvaluation.id, id))
-    .returning();
+  await db.delete(capacityBuildingEvaluation).where(eq(capacityBuildingEvaluation.id, id));
 
-  /// cache Del
-  await cacheDel(`cedarrise:capacity:evaluation:${evaluation?.id}`);
-  ///
-
+  appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:capacity:evaluation:*`,
+    affectedService: "DELETE CAPACITY EVALUATION RECORD",
+  });
+  
   return {
     code: 200,
     message: "Outreach deleted successfully",

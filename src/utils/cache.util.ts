@@ -24,15 +24,19 @@ export const invalidateCache = async (singleKey?: string, patternKey?: string) =
   // delete a single item
   if (singleKey) {
     const cacheRes = await cacheGet<any>(singleKey);
-    if (cacheRes) await cacheDel(singleKey);
-    logger.debug("single cache key invalidated successfully");
+    if (cacheRes) {
+      await cacheDel(singleKey);
+      logger.debug("*invalidateCache fxn* single cache key invalidated successfully");
+    }
   }
 
   // delete items with a pattern
   if (patternKey) {
     const cacheRes = await doKeysForThisPatternExist(patternKey);
-    if (cacheRes) await cacheDelPattern(patternKey);
-    logger.debug("key pattern invalidated successfully");
+    if (cacheRes) {
+      await cacheDelPattern(patternKey);
+      logger.debug("*invalidateCache fxn*  key pattern invalidated successfully");
+    }
   }
 
   return true;

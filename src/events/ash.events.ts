@@ -1,11 +1,14 @@
-import logger from "../configs/logger.config.js";
-import ejs from "ejs";
+import { invalidateCache } from "../utils/cache.util.js";
 import { sendEmail } from "../utils/sendEmail.util.js";
 import { appEvents } from "../lib/events.js";
+import logger from "../configs/logger.config.js";
+import ejs from "ejs";
+
 
 export const ASH_EVENTS = {
-  STUDENT_ACCEPTED: "student:accepted",
-  STUDENT_REJECTED: "student:rejected",
+  STUDENT_ACCEPTED: "ash:student:accepted",
+  STUDENT_REJECTED: "ash:student:rejected",
+  DELETE_CACHE: "ash:delete:cache",
 } as const;
 
 // INFORM STUDENT VIA EMAIL ON ACCEPTANCE
@@ -64,6 +67,27 @@ appEvents.on(ASH_EVENTS.STUDENT_REJECTED, async (data) => {
       email: data.email,
       message: error.message,
       // correlationId
+    });
+  }
+});
+
+// DELETE CACHE ON UPDATE OR DELETE
+appEvents.on(ASH_EVENTS.DELETE_CACHE, async (data) => {
+  try {
+    await invalidateCache(data.singleKey, data.patternKey);
+    logger.info("cache removed", {
+      affectedService: data.affectedService,
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      // correlationId: data.correlationId,
+    });
+  } catch (error: any) {
+    logger.error("Could not remove cache", {
+      message: error.message,
+      affectedService: data.affectedService,
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      // correlationId: data.correlationId
     });
   }
 });

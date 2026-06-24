@@ -52,15 +52,11 @@ export const submitVolunteerRegistration = async (options: Volunteerregistration
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:volunteer:volunteers:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:volunteer:voluntee:${newVolunteerSubmission?.id}`,
-    newVolunteerSubmission,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:volunteer:*`,
+    affectedService: "SUBMIT VOLUNTEER REGISTRATION FORM",
+  });
 
   return {
     code: 201,
@@ -280,17 +276,11 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
     });
   }
 
-  // delete all related cache
-  await invalidateCache(`cedarrise:volunteer:voluntee:${id}`, `cedarrise:volunteer:volunteers:*`);
-
-  // emitter to send email on accept or reject
-  if (status === "accepted") {
-    // emitter
-    console.log("accepted");
-  } else if (status === "rejected") {
-    // emitter
-    console.log("rejected");
-  }
+  appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:volunteer:*`,
+    affectedService: "UPDATE VOLUNTEER STATUS",
+  });
 
   return {
     code: 200,
@@ -301,9 +291,11 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
 export const deleteVolunteer = async (id: string) => {
   await db.delete(volunteerRegistration).where(eq(volunteerRegistration.id, id));
 
-  /// cache delete
-  await cacheDel(`cedarrise:volunteer:voluntee:${id}`);
-  ///
+  appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:volunteer:*`,
+    affectedService: "DELETE VOLUNTEER REGISTRATION RECORD",
+  });
 
   return {
     code: 200,
@@ -344,15 +336,11 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:volunteer:feedback:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:volunteer:feedback:${newVolunteerFeedback?.id}`,
-    newVolunteerFeedback,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:feedback:*`,
+    affectedService: "SUBMIT VOLUNTEER FEEDBACK FORM",
+  });
 
   return {
     code: 201,
@@ -478,9 +466,11 @@ export const getVolunteerFeedback = async (id: string) => {
 export const deleteVolunteerFeedback = async (id: string) => {
   await db.delete(volunteerFeedback).where(eq(volunteerFeedback.id, id));
 
-  /// cache delete
-  await cacheDel(`cedarrise:volunteer:feedback:${id}`);
-  ///
+  appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:feedback:*`,
+    affectedService: "DELETE VOLUNTEER FEEDBACK RECORD",
+  });
 
   return {
     code: 200,

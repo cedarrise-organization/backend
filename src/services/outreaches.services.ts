@@ -1,8 +1,9 @@
 import { OutreachtrackerbodyType } from "../modules/outreaches/outreaches.schema.js";
-import { cacheGet, cacheDel, cacheSet, CACHE_TTL } from "../lib/cache.js";
-import { outreachTracker } from "../db/models/admin.js";
-import { invalidateCache } from "../utils/cache.util.js";
 import { max, sum, sql, asc, desc, eq, count, countDistinct } from "drizzle-orm";
+import { cacheGet, cacheSet, CACHE_TTL } from "../lib/cache.js";
+import { DELETE_EVENTS } from "../events/delete.events.js";
+import { outreachTracker } from "../db/models/admin.js";
+import { appEvents } from "../lib/events.js";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -35,11 +36,11 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:outreaches:*`);
-  /// cache set
-  await cacheSet(`cedarrise:outreaches:outreach:${outreach?.id}`, outreach, CACHE_TTL.FORM_DATA);
-  ///
+  appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:outreaches:*`,
+    affectedService: "DELETE OUTREACH TRACKER FORM",
+  });
 
   return {
     code: 201,
@@ -223,13 +224,13 @@ export const getOneOutreach = async (id: string) => {
   };
 };
 export const deleteOutreach = async (id: string) => {
-  const [search] = await db.select().from(outreachTracker).where(eq(outreachTracker.id, id));
-
   await db.delete(outreachTracker).where(eq(outreachTracker.id, id));
 
-  /// cache Del
-  await cacheDel(`cedarrise:outreaches:outreach:${id}`);
-  ///
+  appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:outreaches:*`,
+    affectedService: "DELETE OUTREACH RECORD",
+  });
 
   return {
     code: 200,

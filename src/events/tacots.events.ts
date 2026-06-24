@@ -1,12 +1,14 @@
-import logger from "../configs/logger.config.js";
-import ejs from "ejs";
+import { invalidateCache } from "../utils/cache.util.js";
 import { sendEmail } from "../utils/sendEmail.util.js";
 import { appEvents } from "../lib/events.js";
+import logger from "../configs/logger.config.js";
+import ejs from "ejs";
 
 // DEFINE EVENT NAMES AS CONSTANTS
 export const TACOTS_EVENTS = {
-  APPLICANT_ACCEPTED: "applicant:accepted",
-  APPLICANT_REJECTED: "applicant:rejected",
+  APPLICANT_ACCEPTED: "tacots:applicant:accepted",
+  APPLICANT_REJECTED: "tacots:applicant:rejected",
+  DELETE_CACHE: "tacots:delete:cache",
 } as const;
 
 // INFORM APPLICANT VIA EMAIL ON ACCEPTANCE
@@ -65,6 +67,27 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
       email: data.email,
       message: error.message,
       // correlationId
+    });
+  }
+});
+
+// DELETE CACHE ON UPDATE OR DELETE
+appEvents.on(TACOTS_EVENTS.DELETE_CACHE, async (data) => {
+  try {
+    await invalidateCache(data.singleKey, data.patternKey);
+    logger.info("cache removed", {
+      affectedService: data.affectedService,
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      // correlationId: data.correlationId
+    });
+  } catch (error: any) {
+    logger.error("Could not remove cache", {
+      message: error.message,
+      affectedService: data.affectedService,
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      // correlationId: data.correlationId
     });
   }
 });

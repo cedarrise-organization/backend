@@ -1,5 +1,5 @@
 import { addAssetToDeletionQueue } from "../queues/deleteCloudinaryAsset.queue.js";
-import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
+import { cacheSet, cacheGet, CACHE_TTL } from "../lib/cache.js";
 import { uploadToCloudinary } from "../utils/storage.util.js";
 import { TACOTS_EVENTS } from "../events/tacots.events.js";
 import { invalidateCache } from "../utils/cache.util.js";
@@ -143,15 +143,11 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:tacots:tacotsRecommendations:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:tacots:tacotsRecommendation:${newTacotsRecommendation?.id}`,
-    newTacotsRecommendation,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:tacotsRecommendation:*`,
+    affectedService: "SUBMIT TACOTS RECOMMENDATION FORM",
+  });
 
   return {
     code: 201,
@@ -214,7 +210,7 @@ export const listRecommendations = async (
   }
 
   /// cache
-  const key = `cedarrise:tacots:tacotsRecommendations:${page}:${limit}:${orderBy}:${status}:${sortBy}`;
+  const key = `cedarrise:tacots:tacotsRecommendation:${page}:${limit}:${orderBy}:${status}:${sortBy}`;
   const cacheRes = await cacheGet<any>(key);
   if (cacheRes) {
     return {
@@ -362,7 +358,7 @@ export const updateRecommendedStudentStatus = async (id: string, status: string)
   // delete all related cache
   await invalidateCache(
     `cedarrise:tacots:tacotsRecommendation:${id}`,
-    `cedarrise:tacots:tacotsRecommendations:*`,
+    `cedarrise:tacots:tacotsRecommendation:*`,
   );
 
   // emitter to send email on SELECTED or NOT SELECTED
@@ -384,12 +380,18 @@ export const updateRecommendedStudentStatus = async (id: string, status: string)
 };
 export const deleteRecommendation = async (id: string) => {
   const [data] = await db
-    .select({
+    .delete(tacotsRecommendation)
+    .where(eq(tacotsRecommendation.id, id))
+    .returning({
       passportPhotoPublicId: tacotsRecommendation.passportPhotoPublicId,
       lastResultPublicId: tacotsRecommendation.lastResultPublicId,
-    })
-    .from(tacotsRecommendation)
-    .where(eq(tacotsRecommendation.id, id));
+    });
+
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:tacotsRecommendation:*`,
+    affectedService: "DELETE TACOTS RECOMMENDATION RECORD",
+  });
 
   if (data?.passportPhotoPublicId) {
     try {
@@ -410,12 +412,6 @@ export const deleteRecommendation = async (id: string) => {
       });
     }
   }
-
-  await db.delete(tacotsRecommendation).where(eq(tacotsRecommendation.id, id));
-
-  /// cache delete
-  await cacheDel(`cedarrise:tacots:tacotsRecommendation:${id}`);
-  ///
 
   return {
     code: 200,
@@ -456,15 +452,11 @@ export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:tacots:feedback:*`);
-  /// cache set
-  await cacheSet(
-    `cedarrise:tacots:feedback:${newTacotsFeedback?.id}`,
-    newTacotsFeedback,
-    CACHE_TTL.FORM_DATA,
-  );
-  ///
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:feedback:*`,
+    affectedService: "SUBMIT TACOTS FEEDBACK FORM",
+  });
 
   return {
     code: 201,
@@ -590,9 +582,11 @@ export const getTacotsFeedback = async (id: string) => {
 export const deleteTacotsFeedback = async (id: string) => {
   await db.delete(tacotsFeedback).where(eq(tacotsFeedback.id, id));
 
-  /// cache delete
-  await cacheDel(`cedarrise:tacots:feedback:${id}`);
-  ///
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:feedback:*`,
+    affectedService: "DELETE TACOTS FEEDBACK RECORD",
+  });
 
   return {
     code: 200,
@@ -672,11 +666,11 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:tacots:onboarding:*`);
-  /// cache set
-  await cacheSet(`cedarrise:tacots:onboarding:${onboarding?.id}`, onboarding, CACHE_TTL.FORM_DATA);
-  ///
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:onboarding:*`,
+    affectedService: "SUBMIT TACOTS ONBOARDING FORM",
+  });
 
   return {
     code: 201,
@@ -957,13 +951,16 @@ export const getOnboarding = async (id: string) => {
   };
 };
 export const deleteOnboarding = async (id: string) => {
-  const [data] = await db
-    .select({
-      parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
-      admissionLetterPublicId: tacotsOnboarding.admissionLetterPublicId,
-    })
-    .from(tacotsOnboarding)
-    .where(eq(tacotsOnboarding.id, id));
+  const [data] = await db.delete(tacotsOnboarding).where(eq(tacotsOnboarding.id, id)).returning({
+    parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
+    admissionLetterPublicId: tacotsOnboarding.admissionLetterPublicId,
+  });
+
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:onboarding:*`,
+    affectedService: "DELETE TACOTS ONBOARDING RECORD",
+  });
 
   if (data?.parentSignaturePublicId) {
     try {
@@ -984,12 +981,6 @@ export const deleteOnboarding = async (id: string) => {
       });
     }
   }
-
-  await db.delete(tacotsOnboarding).where(eq(tacotsOnboarding.id, id));
-
-  /// cache delete
-  await cacheDel(`cedarrise:tacots:onboarding:${id}`);
-  ///
 
   return {
     code: 200,
@@ -1141,11 +1132,11 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:tacots:tracking:*`);
-  /// cache set
-  await cacheSet(`cedarrise:tacots:tracking:${tracking?.id}`, tracking, CACHE_TTL.FORM_DATA);
-  ///
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:tracking:*`,
+    affectedService: "SUBMIT TACOTS TRACKING FORM",
+  });
 
   return {
     code: 201,
@@ -1408,13 +1399,16 @@ export const getTacotsTracking = async (id: string) => {
   };
 };
 export const deleteTacotsTracking = async (id: string) => {
-  const [data] = await db
-    .select({
-      termResultPublicId: tacotsTracking.termResultPublicId,
-      paymentEvidencePublicId: tacotsTracking.paymentEvidencePublicId,
-    })
-    .from(tacotsTracking)
-    .where(eq(tacotsTracking.id, id));
+  const [data] = await db.delete(tacotsTracking).where(eq(tacotsTracking.id, id)).returning({
+    termResultPublicId: tacotsTracking.termResultPublicId,
+    paymentEvidencePublicId: tacotsTracking.paymentEvidencePublicId,
+  });
+
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:tracking:*`,
+    affectedService: "DELETE TACOTS TRACKING RECORD",
+  });
 
   if (data?.termResultPublicId) {
     try {
@@ -1435,12 +1429,6 @@ export const deleteTacotsTracking = async (id: string) => {
       });
     }
   }
-
-  await db.delete(tacotsTracking).where(eq(tacotsTracking.id, id));
-
-  /// cache delete
-  await cacheDel(`cedarrise:tacots:tracking:${id}`);
-  ///
 
   return {
     code: 200,
@@ -1478,15 +1466,15 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
     })
     .returning();
 
-  /// delete related cache
-  await invalidateCache(undefined, `cedarrise:tacots:exit:*`);
-  /// cache set
-  await cacheSet(`cedarrise:tacots:exit:${exit?.id}`, exit, CACHE_TTL.FORM_DATA);
-  ///
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:exit:*`,
+    affectedService: "SUBMIT TACOTS EXIT FORM",
+  });
 
   return {
     code: 201,
-    message: "Ash exit form submitted successfully",
+    message: "TACOTS exit form submitted successfully",
     data: exit,
   };
 };
@@ -1700,9 +1688,11 @@ export const getTacotsExit = async (id: string) => {
 export const deleteTacotsExit = async (id: string) => {
   await db.delete(tacotsExit).where(eq(tacotsExit.id, id));
 
-  /// cache delete
-  await cacheDel(`cedarrise:tacots:exit:${id}`);
-  ///
+  appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:tacots:exit:*`,
+    affectedService: "DELETE TACOTS EXIT RECORD",
+  });
 
   return {
     code: 200,
