@@ -25,7 +25,7 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_ACCEPTED, async (data) => {
     }
 
     logger.info("TACOTS welcome email sent successully", {
-      info: info.accepted,
+      // info: info.accepted,
       message: "new student accepted into TACOTS",
       studentId: data.userId,
       // correlationId
@@ -55,7 +55,7 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
     }
 
     logger.info("TACOTS rejection email sent successully", {
-      info: info.accepted,
+      // info: info.accepted,
       message: "student rejected from TACOTS",
       studentId: data.userId,
       // correlationId

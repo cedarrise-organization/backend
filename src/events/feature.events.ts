@@ -35,7 +35,7 @@ appEvents.on(FEATURE_EVENTS.FEATURE_ACTION, async (data) => {
     }
 
     logger.info("email sent successully", {
-      info: info.accepted,
+      // info: info.accepted,
       // correlationId
     });
   } catch (error: any) {

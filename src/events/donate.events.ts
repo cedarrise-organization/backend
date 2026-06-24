@@ -52,7 +52,7 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
     }
 
     logger.info("Thank you email sent successully", {
-      info: info.accepted,
+      // info: info.accepted,
       // correlationId
     });
   } catch (error: any) {

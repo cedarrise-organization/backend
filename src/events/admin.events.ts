@@ -156,7 +156,7 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
     }
 
     logger.info("Welcome email sent successully", {
-      info: info.accepted,
+      // info: info.accepted,
       // correlationId
     });
   } catch (error: any) {
