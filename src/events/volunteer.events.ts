@@ -3,35 +3,34 @@ import ejs from "ejs";
 import { sendEmail } from "../utils/sendEmail.util.js";
 import { appEvents } from "../lib/events.js";
 
-// DEFINE EVENT NAMES AS CONSTANTS
-export const TACOTS_EVENTS = {
-  APPLICANT_ACCEPTED: "applicant:accepted",
-  APPLICANT_REJECTED: "applicant:rejected",
+export const VOLUNTEER_EVENTS = {
+  VOLUNTEER_ACCEPTED: "volunteer:accepted",
+  VOLUNTEER_REJECTED: "volunteer:rejected",
 } as const;
 
-// INFORM APPLICANT VIA EMAIL ON ACCEPTANCE
-appEvents.on(TACOTS_EVENTS.APPLICANT_ACCEPTED, async (data) => {
+// INFORM STUDENT VIA EMAIL ON ACCEPTANCE
+appEvents.on(VOLUNTEER_EVENTS.VOLUNTEER_ACCEPTED, async (data) => {
   try {
     let content = await ejs.renderFile(
-      process.cwd() + "/src/views/emails/welcometotacots.ejs",
-      { studentName: data.name },
+      process.cwd() + "/src/views/emails/welcomevolunteer.ejs",
+      { name: data.name, volunteerAreas: data.volunteerAreas },
       { async: true },
     );
 
-    const info = await sendEmail(data.email, "Welcome to TACOTS", content);
+    const info = await sendEmail(data.email, "Volunteer Application Accepted", content);
 
     if (!info) {
       throw new Error();
     }
 
-    logger.info("TACOTS welcome email sent successully", {
+    logger.info("Volunteer welcome email sent successully", {
+      message: "new volunteer accepted",
       // info: info.accepted,
-      message: "new student accepted into TACOTS",
       studentId: data.userId,
       // correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send TACOTS welcome email", {
+    logger.info("Failed to send volunteer welcome email", {
       email: data.email,
       message: error.message,
       // correlationId
@@ -39,29 +38,29 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_ACCEPTED, async (data) => {
   }
 });
 
-// INFORM APPLICANT VIA EMAIL ON REJECTED
-appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
+// INFORM STUDENT VIA EMAIL ON REJECTION
+appEvents.on(VOLUNTEER_EVENTS.VOLUNTEER_REJECTED, async (data) => {
   try {
     let content = await ejs.renderFile(
-      process.cwd() + "/src/views/emails/----.ejs",
-      { studentName: data.name },
+      process.cwd() + "/src/views/emails/volunteerapplicationrejection.ejs",
+      { name: data.name },
       { async: true },
     );
 
-    const info = await sendEmail(data.email, "We are sorry to inform you", content);
+    const info = await sendEmail(data.email, "Volunteer Application Update", content);
 
     if (!info) {
       throw new Error();
     }
 
-    logger.info("TACOTS rejection email sent successully", {
+    logger.info("Volunteer Application Update email sent successully", {
+      message: "volunteer applicant rejected",
       // info: info.accepted,
-      message: "student rejected from TACOTS",
       studentId: data.userId,
       // correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send TACOTS rejection email", {
+    logger.info("Failed to send volunteer application update email", {
       email: data.email,
       message: error.message,
       // correlationId
@@ -69,7 +68,7 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
   }
 });
 
-// appEvents.on(TACOTS_EVENTS.FEATURE_ACTION, async (data) => {
+// appEvents.on(VOLUNTEER_EVENTS.FEATURE_ACTION, async (data) => {
 //   try {
 //     logger.info("success", { data });
 //   } catch (err) {
@@ -78,7 +77,7 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
 // });
 
 // /* SEND EMAIL */
-// appEvents.on(TACOTS_EVENTS.FEATURE_ACTION, async (data) => {
+// appEvents.on(VOLUNTEER_EVENTS.FEATURE_ACTION, async (data) => {
 //   try {
 //     let content = await ejs.renderFile(
 //       process.cwd() + "/src/views/emails/----.ejs",
@@ -93,7 +92,6 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
 //     }
 
 //     logger.info("email sent successully", {
-//       info: info.accepted,
 //       // correlationId
 //     });
 //   } catch (error: any) {

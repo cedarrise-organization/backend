@@ -17,11 +17,7 @@ export const sendFeedbackMailController = async (
   );
 
   try {
-    const info = await sendEmail(
-      process.env.SMTP_USER_EMAIL!,
-      `Feedback submitted by ${email}`,
-      content,
-    );
+    const info = await sendEmail("maxmarvict@gmail.com", `Feedback submitted by ${email}`, content);
 
     if (!info) {
       return res.status(500).json({
@@ -35,10 +31,9 @@ export const sendFeedbackMailController = async (
 
     logger.info("Feedback email sent successully", {
       sender: email,
-      info: info.accepted,
       // correlationId
     });
-
+  
     return successResponse(res, 200, "Feedback email sent successully");
   } catch (err) {
     next(err);

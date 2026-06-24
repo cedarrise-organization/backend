@@ -30,6 +30,7 @@
 	"dependencies": {
 		"@bull-board/api": "7.0.0",
 		"@bull-board/express": "7.0.0",
+		"@getbrevo/brevo": "^5.0.4",
 		"@logtail/node": "0.5.8",
 		"@logtail/winston": "0.5.8",
 		"@zayne-labs/callapi": "^1.13.0",

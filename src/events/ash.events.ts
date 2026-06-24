@@ -25,7 +25,7 @@ appEvents.on(ASH_EVENTS.STUDENT_ACCEPTED, async (data) => {
 
     logger.info("ASH welcome email sent successully", {
       message: "new student accepted into ASH",
-      info: info.accepted,
+      // info: info.accepted,
       studentId: data.userId,
       // correlationId
     });
@@ -55,7 +55,7 @@ appEvents.on(ASH_EVENTS.STUDENT_REJECTED, async (data) => {
 
     logger.info("ASH rejection email sent successully", {
       message: "new student rejected from ASH",
-      info: info.accepted,
+      // info: info.accepted,
       studentId: data.userId,
       // correlationId
     });

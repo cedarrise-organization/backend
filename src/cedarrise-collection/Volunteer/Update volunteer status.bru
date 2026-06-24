@@ -5,7 +5,7 @@ meta {
 }
 
 patch {
-  url: {{baseUrl}}/api/v1/forms/volunteer/{{id}}/status?status=accepted
+  url: {{baseUrl}}/api/v1/volunteer/{{id}}/status?status=accepted
   body: none
   auth: inherit
 }
@@ -16,7 +16,7 @@ params:query {
 
 vars:pre-request {
   baseUrl: http://localhost:3000
-  id: ba98f36a-7258-47aa-a128-fa7f781b074e
+  id: cbba684d-acce-483c-9831-aa18290b01d0
 }
 
 settings {
@@ -26,30 +26,54 @@ settings {
 
 docs {
   # Update Volunteer Status
-
+  
   Updates the review status of a volunteer registration record. Used to accept, reject, or reset a volunteer application to pending. On status change, all related cache entries (single record and paginated lists) are invalidated.
-
+  
   ## Authorization
   Requires `update` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                                |
   |-----------|--------|----------|--------------------------------------------|
   | id        | string | Yes      | UUID of the volunteer registration record  |
-
+  
   ## Query Parameters
-
+  
   | Parameter | Type   | Required | Default   | Description / Allowed Values                  |
   |-----------|--------|----------|-----------|-----------------------------------------------|
   | status    | string | No       | `pending` | One of: `accepted`, `rejected`, `pending`     |
-
+  
   ## Response
-
-  **`200 OK`** — Returns the updated volunteer record with `id` and `status` fields.
-
+  
+  **`200 OK`** — Returns the updated volunteer record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Volunteer status updated successfully",
+    "data": {
+      "id": "uuid",
+      "status": "accepted | rejected | pending",
+      "name": "string",
+      "email": "string",
+      "volunteerAreas": ["string"]
+    }
+  }
+  ```
+  
+  ### Response Fields (`data`)
+  
+  | Field          | Type     | Description                                          |
+  |----------------|----------|------------------------------------------------------|
+  | id             | string   | UUID of the volunteer registration record.           |
+  | status         | string   | Updated status (`accepted`, `rejected`, `pending`).  |
+  | name           | string   | Volunteer's first name.                              |
+  | email          | string   | Volunteer's email address.                           |
+  | volunteerAreas | string[] | Areas the volunteer is interested in.                |
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format or unknown `status` value.          |

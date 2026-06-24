@@ -1,0 +1,19 @@
+<p>Hello <%= name %>,</p>
+
+<p>Congratulations! We are pleased to inform you that your application to volunteer with Cedarrise has been accepted.</p>
+
+<p>You have been accepted to support the following volunteer area(s):</p>
+
+<ul>
+  <% volunteerAreas.forEach((area) => { %>
+    <li><%= area %></li>
+  <% }) %>
+</ul>
+
+<p>We are excited to have you join us in supporting Cedarrise's work and contributing meaningfully to the communities we serve.</p>
+
+<p>A member of our team may contact you with further information regarding your responsibilities, schedule, and next steps.</p>
+
+<p>If you have any questions, please contact an administrator.</p>
+
+<p>The Cedarrise Team</p>

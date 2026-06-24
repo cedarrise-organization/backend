@@ -1,11 +1,13 @@
 import { volunteerRegistration, volunteerFeedback } from "../db/models/admin.js";
 import { cacheSet, cacheGet, cacheDel, CACHE_TTL } from "../lib/cache.js";
+import { VOLUNTEER_EVENTS } from "../events/volunteer.events.js";
 import { invalidateCache } from "../utils/cache.util.js";
 import { sql, asc, desc, eq, count } from "drizzle-orm";
 import {
   VolunteerregistrationbodyType,
   VolunteerfeedbackbodyType,
 } from "../modules/volunteer/volunteer.schema.js";
+import { appEvents } from "../lib/events.js";
 import db from "../db/db.js";
 
 const sortMap = {
@@ -258,7 +260,25 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
     .returning({
       id: volunteerRegistration.id,
       status: volunteerRegistration.status,
+      name: volunteerRegistration.firstName,
+      email: volunteerRegistration.emailAddress,
+      volunteerAreas: volunteerRegistration.volunteerAreas,
     });
+
+  if (status === "accepted") {
+    appEvents.emit(VOLUNTEER_EVENTS.VOLUNTEER_ACCEPTED, {
+      name: updatedVolunteer?.name,
+      userId: updatedVolunteer?.id,
+      email: updatedVolunteer?.email,
+      volunteerAreas: updatedVolunteer?.volunteerAreas,
+    });
+  } else if (status === "rejected") {
+    appEvents.emit(VOLUNTEER_EVENTS.VOLUNTEER_REJECTED, {
+      name: updatedVolunteer?.name,
+      userId: updatedVolunteer?.id,
+      email: updatedVolunteer?.email,
+    });
+  }
 
   // delete all related cache
   await invalidateCache(`cedarrise:volunteer:voluntee:${id}`, `cedarrise:volunteer:volunteers:*`);
