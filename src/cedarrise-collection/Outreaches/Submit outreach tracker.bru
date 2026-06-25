@@ -74,11 +74,32 @@ docs {
   ```json
   {
     "success": true,
-    "data": { ... }
+    "message": "Outreach tracker created successfully",
+    "data": {
+      "id": "uuid",
+      "outreachStartDate": "2026-03-01",
+      "outreachEndDate": "2026-03-05",
+      "outreachState": "LAGOS",
+      "outreachLga": "ikeja",
+      "outreachCity": "ikeja",
+      "outreachCommunity": "alausa community",
+      "numVolunteers": 12,
+      "numBeneficiaries": 85,
+      "outreachType": ["EDUCATIONAL", "SOFT SKILLS"],
+      "activityDescription": "educational workshops and soft skills training for community youth",
+      "impactStories": "several beneficiaries reported improved confidence after sessions",
+      "challengesEncountered": "limited space at the community hall",
+      "recommendations": "secure larger venue for future outreaches",
+      "submittedBy": "john doe",
+      "submissionDate": "2026-03-06",
+      "updatedAt": null,
+      "createdAt": "2026-06-25T10:00:00.000Z",
+      "deletedAt": null
+    }
   }
   ```
   
-  The result is cached under the key `cedarrise:outreaches:outreach:<id>` using the `FORM_DATA` TTL.
+  On success, all cached keys matching the pattern `cedarrise:outreaches:*` are invalidated via a `DELETE_CACHE` event.
   
   ## Errors
   
