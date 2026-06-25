@@ -338,7 +338,7 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
 
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
-    patternKey: `cedarrise:feedback:*`,
+    patternKey: `cedarrise:volunteer:feedback:*`,
     affectedService: "SUBMIT VOLUNTEER FEEDBACK FORM",
   });
 
@@ -468,7 +468,7 @@ export const deleteVolunteerFeedback = async (id: string) => {
 
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
-    patternKey: `cedarrise:feedback:*`,
+    patternKey: `cedarrise:volunteer:feedback:*`,
     affectedService: "DELETE VOLUNTEER FEEDBACK RECORD",
   });
 
