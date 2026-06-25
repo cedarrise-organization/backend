@@ -22,7 +22,6 @@ router.use(authenticate());
 // Submit Cedar Outreach Tracker form
 router.post(
   "/",
-  upload.single("file"),
   authorize("create"),
   validateRequest(createOutreachTrackerSchema),
   createOutreachController,

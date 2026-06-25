@@ -74,14 +74,14 @@ appEvents.on(VOLUNTEER_EVENTS.VOLUNTEER_REJECTED, async (data) => {
 appEvents.on(VOLUNTEER_EVENTS.DELETE_CACHE, async (data) => {
   try {
     await invalidateCache(data.singleKey, data.patternKey);
-    logger.info("cache removed", {
+    logger.info("cache **if any** removed", {
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       affectedService: data.affectedService,
       // correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.error("Could not remove cache", {
+    logger.error("Could not remove cache **if any**", {
       message: error.message,
       affectedService: data.affectedService,
       singleKey: data.singleKey,

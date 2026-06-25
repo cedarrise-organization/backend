@@ -17,7 +17,17 @@ export const outreachTrackerBody = z.object({
   outreachCommunity: textSchema,
   numVolunteers: z.coerce.number().int().min(0),
   numBeneficiaries: z.coerce.number().int().min(0),
-  outreachType: z.array(z.enum(["SOFT SKILLS", "VOCATIONAL SKILLS", "MEDICAL", "EDUCATIONAL"])),
+  outreachType: z.preprocess(
+    (v) => {
+      if (v === "" || v == null) return undefined;
+      // already an array
+      if (Array.isArray(v)) return v;
+      // single string value
+      if (typeof v === "string") return [v];
+      return v;
+    },
+    z.array(z.enum(["SOFT SKILLS", "VOCATIONAL SKILLS", "MEDICAL", "EDUCATIONAL"])),
+  ),
   activityDescription: textSchema,
   impactStories: optionalTextSchema,
   challengesEncountered: optionalTextSchema,

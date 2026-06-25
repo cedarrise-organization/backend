@@ -16,14 +16,14 @@ export const DELETE_EVENTS = {
 appEvents.on(DELETE_EVENTS.DELETE_CACHE, async (data) => {
   try {
     await invalidateCache(data.singleKey, data.patternKey);
-    logger.info("success. cache removed", {
+    logger.info("success. cache **if any** removed", {
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       affectedService: data.affectedService,
       // correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.error("failure. cache was not removed", {
+    logger.error("failure. cache **if any** was not removed", {
       message: error.message,
       singleKey: data.singleKey,
       patternKey: data.patternKey,

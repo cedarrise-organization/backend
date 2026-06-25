@@ -30,8 +30,6 @@ export const createOutreachController = async (req: Request, res: Response, next
     submissionDate,
   } = req.body;
 
-  if (!req.files) throw new ValidationError("Please upload a file");
-
   try {
     const response = await createOutreach({
       outreachStartDate,

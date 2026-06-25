@@ -75,14 +75,14 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
 appEvents.on(TACOTS_EVENTS.DELETE_CACHE, async (data) => {
   try {
     await invalidateCache(data.singleKey, data.patternKey);
-    logger.info("cache removed", {
+    logger.info("cache **if any** removed", {
       affectedService: data.affectedService,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       // correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.error("Could not remove cache", {
+    logger.error("Could not remove cache **if any**", {
       message: error.message,
       affectedService: data.affectedService,
       singleKey: data.singleKey,
