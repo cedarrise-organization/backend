@@ -13,6 +13,7 @@ export const ADMIN_EVENTS = {
   REVOKE_ROLE: "admin:role-revoked",
   CREATE_USER: "admin:create-user",
   DELETE_USER: "admin:delete-user",
+  DELETE_CACHE: "admin:delete:cache",
 } as const;
 
 // LOG ASSIGNED ROLE
@@ -212,4 +213,25 @@ appEvents.on(ADMIN_EVENTS.DELETE_USER, async (data) => {
     // originator: data.id
     // correlationId: data.correlationId
   });
+});
+
+// DELETE CACHE ON UPDATE OR DELETE
+appEvents.on(ADMIN_EVENTS.DELETE_CACHE, async (data) => {
+  try {
+    await invalidateCache(data.singleKey, data.patternKey);
+    logger.info("cache **if any** removed", {
+      event: data.affectedService,
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      // correlationId: data.correlationId,
+    });
+  } catch (error: any) {
+    logger.error("Could not remove cache **if any**", {
+      message: error.message,
+      event: data.affectedService,
+      singleKey: data.singleKey,
+      patternKey: data.patternKey,
+      // correlationId: data.correlationId
+    });
+  }
 });

@@ -125,10 +125,16 @@ export const createUser = async (options: {
       department,
     })
     .returning();
-  // delete lookup cache
+
   if (!newUser) {
     throw new Error("User could not be created");
   }
+
+  appEvents.emit(ADMIN_EVENTS.DELETE_CACHE, {
+    singleKey: undefined,
+    patternKey: `cedarrise:lookup:users:*`,
+    affectedService: "USER CREATED",
+  })
 
   appEvents.emit(ADMIN_EVENTS.CREATE_USER, {
     userId: newUser.id,

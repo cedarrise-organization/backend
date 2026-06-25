@@ -1,6 +1,5 @@
 import db from "../../db/db.js";
 import logger from "../../configs/logger.config.js";
-import cloudinary from "../../configs/cloudinary.config.js";
 import { CACHE_TTL, cacheDel, cacheGet, cacheSet } from "../../lib/cache.js";
 import { blogs } from "../../db/models/blogs.js";
 import { UploadApiResponse } from "cloudinary";
@@ -8,9 +7,9 @@ import { asc, desc, eq, sql } from "drizzle-orm";
 import { Request } from "express";
 import {
   uploadToCloudinary,
-  searchCloudinary,
   deleteFromCloudinary,
 } from "../../utils/storage.util.js";
+import { invalidateCache } from "../../utils/cache.util.js";
 
 export const listBlogs = async (page: number, limit: number) => {
   /// cache
@@ -70,7 +69,7 @@ export const getSingleBlog = async (id: string) => {
 };
 
 export const createBlog = async (req: Request, title: string, description: string) => {
-  const response = await uploadToCloudinary((req as any).file, "/Cedarrise Initiative/BLOG");
+  const response: UploadApiResponse | undefined = await uploadToCloudinary((req as any).file, "/Cedarrise Initiative/BLOG");
 
   if (!response) {
     throw new Error("Could not upload pdf");
@@ -86,9 +85,7 @@ export const createBlog = async (req: Request, title: string, description: strin
     })
     .returning();
 
-  /// cache set
-  await cacheSet(`cedarrise:blogs:single:${newBlog?.id}`, newBlog, CACHE_TTL.BLOGS);
-  ///
+  await invalidateCache(undefined, `cedarrise:blogs:*`);
 
   return {
     code: 201,
@@ -99,24 +96,20 @@ export const createBlog = async (req: Request, title: string, description: strin
 
 export const deleteBlog = async (id: string) => {
   const [blog] = await db
-    .select({ id: blogs.id, publicId: blogs.publicId })
-    .from(blogs)
-    .where(eq(blogs.id, id));
+    .delete(blogs)
+    .where(eq(blogs.id, id))
+    .returning({ id: blogs.id, publicId: blogs.publicId });
 
-  if (!blog) {
-    throw new Error("Blog not found");
+  if (blog?.publicId) {
+    const deleteResponse = await deleteFromCloudinary(blog.publicId, "image");
+
+    if (deleteResponse.result !== "ok") {
+      logger.error("Blog pdf was not deleted from s3", {
+        publicId: blogs.publicId,
+        event: "delete_blog",
+      });
+    }
   }
-
-  const deleteResponse = await deleteFromCloudinary(blog.publicId, "image");
-
-  if (deleteResponse.result !== "ok") {
-    logger.error("Blog pdf was not deleted from s3", {
-      publicId: blogs.publicId,
-      event: "delete_blog",
-    });
-  }
-
-  await db.delete(blogs).where(eq(blogs.id, id));
 
   /// cache Del
   await cacheDel(`cedarrise:blogs:single:${blog?.id}`);

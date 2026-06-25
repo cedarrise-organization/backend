@@ -19,7 +19,7 @@ appEvents.on(DELETE_EVENTS.DELETE_CACHE, async (data) => {
     logger.info("success. cache **if any** removed", {
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      affectedService: data.affectedService,
+      event: data.affectedService,
       // correlationId: data.correlationId
     });
   } catch (error: any) {
@@ -27,7 +27,7 @@ appEvents.on(DELETE_EVENTS.DELETE_CACHE, async (data) => {
       message: error.message,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      affectedService: data.affectedService,
+      event: data.affectedService,
       // correlationId: data.correlationId
     });
   }
