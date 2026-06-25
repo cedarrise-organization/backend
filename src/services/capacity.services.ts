@@ -64,7 +64,7 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
 
   appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
-    patternKey: `cedarrise:capacity:evaluation:*`,
+    patternKey: `cedarrise:capacity:*`,
     affectedService: "CREATE CAPACITY EVALUATION RECORD",
   });
 
@@ -261,7 +261,7 @@ export const deleteEvaluation = async (id: string) => {
 
   appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
-    patternKey: `cedarrise:capacity:evaluation:*`,
+    patternKey: `cedarrise:capacity:*`,
     affectedService: "DELETE CAPACITY EVALUATION RECORD",
   });
   
