@@ -11,11 +11,11 @@ import { ValidationError } from "../../../lib/error.js";
 import { successResponse } from "../../../utils/responseHandler.js";
 
 export const listBlogsController = async (req: Request, res: Response, next: NextFunction) => {
-  const { page, limit } = req.qtransformed;
+  const { page, limit, search } = req.qtransformed;
 
   try {
-    const response = await listBlogs(page, limit);
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await listBlogs(page, limit, search);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }

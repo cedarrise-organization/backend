@@ -3,15 +3,49 @@ import logger from "../../configs/logger.config.js";
 import { CACHE_TTL, cacheDel, cacheGet, cacheSet } from "../../lib/cache.js";
 import { blogs } from "../../db/models/blogs.js";
 import { UploadApiResponse } from "cloudinary";
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { count, desc, eq, sql } from "drizzle-orm";
 import { Request } from "express";
-import {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-} from "../../utils/storage.util.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/storage.util.js";
 import { invalidateCache } from "../../utils/cache.util.js";
 
-export const listBlogs = async (page: number, limit: number) => {
+export const listBlogs = async (page: number, limit: number, search: string) => {
+  // search
+  if (search) {
+    const searchVector = sql`
+      setweight(to_tsvector('english', ${blogs.title}), 'A') ||
+      setweight(to_tsvector('english', ${blogs.description}), 'A') 
+    `;
+    const searchQuery = sql`plainto_tsquery('english', ${search})`;
+
+    const [allBlogs, [totalDocuments]] = await Promise.all([
+      db
+        .select()
+        .from(blogs)
+        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .limit(limit)
+        .offset((page - 1) * limit),
+
+      db
+        .select({ value: count(blogs.id) })
+        .from(blogs)
+        .where(sql`${searchVector} @@ ${searchQuery}`),
+    ]);
+    const totalPages = Math.ceil(totalDocuments!.value / limit);
+
+    return {
+      code: 200,
+      message: "Blogs found successfully",
+      data: allBlogs,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages,
+        },
+      },
+    };
+  }
+
   /// cache
   const key = `cedarrise:blogs:list:${page}:${limit}`;
   const cacheRes = await cacheGet<any>(key);
@@ -19,26 +53,44 @@ export const listBlogs = async (page: number, limit: number) => {
     return {
       code: 200,
       message: "Blogs found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
+      meta: {
+        pagination: {
+          page,
+          limit,
+          totalPages: cacheRes.totalPages,
+        },
+      },
     };
   }
   ///
 
-  const allBlogs = await db
-    .select()
-    .from(blogs)
-    .offset((page - 1) * limit)
-    .limit(limit)
-    .orderBy(desc(blogs.date));
+  const [allBlogs, [totalDocuments]] = await Promise.all([
+    db
+      .select()
+      .from(blogs)
+      .offset((page - 1) * limit)
+      .limit(limit)
+      .orderBy(desc(blogs.date)),
+    db.select({ value: count(blogs.id) }).from(blogs),
+  ]);
+  const totalPages = Math.ceil(totalDocuments!.value / limit);
 
   /// cache set
-  await cacheSet(key, allBlogs, CACHE_TTL.BLOGS);
+  await cacheSet(key, { data: allBlogs, totalPages }, CACHE_TTL.BLOGS);
   ///
 
   return {
     code: 200,
     message: "Blogs found successfully",
     data: allBlogs,
+    meta: {
+      pagination: {
+        page,
+        limit,
+        totalPages,
+      },
+    },
   };
 };
 
@@ -69,7 +121,10 @@ export const getSingleBlog = async (id: string) => {
 };
 
 export const createBlog = async (req: Request, title: string, description: string) => {
-  const response: UploadApiResponse | undefined = await uploadToCloudinary((req as any).file, "/Cedarrise Initiative/BLOG");
+  const response: UploadApiResponse | undefined = await uploadToCloudinary(
+    (req as any).file,
+    "/Cedarrise Initiative/BLOG",
+  );
 
   if (!response) {
     throw new Error("Could not upload pdf");
@@ -111,9 +166,7 @@ export const deleteBlog = async (id: string) => {
     }
   }
 
-  /// cache Del
-  await cacheDel(`cedarrise:blogs:single:${blog?.id}`);
-  ///
+  await invalidateCache(undefined, `cedarrise:blogs:*`);
 
   return {
     code: 200,
@@ -167,9 +220,7 @@ export const updateBlog = async (
   // however both cannot be undefined
   await db.update(blogs).set({ title, description }).where(eq(blogs.id, id)).returning();
 
-  /// cache Del
-  await cacheDel(`cedarrise:blogs:single:${blog?.id}`);
-  ///
+  await invalidateCache(undefined, `cedarrise:blogs:*`);
 
   return {
     code: 200,

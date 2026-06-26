@@ -241,7 +241,7 @@ export const listUsersForUserPage = async (page: number, limit: number, search: 
     return {
       code: 200,
       message: "All users  found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,

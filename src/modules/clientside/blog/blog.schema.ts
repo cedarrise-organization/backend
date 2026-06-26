@@ -1,5 +1,6 @@
 //MODELS
 import * as z from "zod";
+import { baseQueryBody } from "../../../db/globalschema/global.schema.js";
 
 export const blogBodySchema = z.object({
   body: z.object({
@@ -27,9 +28,8 @@ export const blogBodySchema = z.object({
 
 export const blogQuerySchema = z.object({
   query: z.object({
-    page: z.coerce.number().int().default(1),
-    limit: z.coerce.number().int().min(1).max(100).default(20),
-  }),
+     ...baseQueryBody,
+   }),
 });
 
 export const blogParamSchema = z.object({
