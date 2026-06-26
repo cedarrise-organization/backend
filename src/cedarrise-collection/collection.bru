@@ -1,0 +1,580 @@
+docs {
+  # Cedarrise API — Collection-Level Overview
+  
+  > **Version:** v1 &nbsp;|&nbsp; **Base URL:** `/api/v1` &nbsp;|&nbsp; **Transport:** JSON over HTTPS (+ `multipart/form-data` for file uploads)
+  
+  ---
+  
+  ## 1. API Purpose
+  
+  The Cedarrise API is the backend service layer for the **Cedarrise Initiative** — a non-profit organisation running educational, mentorship, and community-outreach programmes across Nigeria. The API powers two primary surfaces:
+  
+  | Surface | Description |
+  |---------|-------------|
+  | **Admin Dashboard** | Internal web application used by staff to manage students, volunteers, outreach events, projects, receipts, metrics, and notifications. |
+  | **Public Website** | Client-facing site that displays programme photo galleries, blog posts, donation flows, volunteer registration forms, and feedback collection. |
+  
+  ### Core Platform Modules
+  
+  - **ASH (After-School Hub)** — Student registration, attendance tracking, termly academic tracking, mentor assignment, feedback, exit management.
+  - **TACOTS** — Scholarship recommendation, onboarding, academic tracking, feedback, exit management.
+  - **Capacity Building** — Workshop/programme evaluation submissions and records.
+  - **Outreaches** — Community outreach event tracking and reporting.
+  - **Volunteer** — Volunteer registration, feedback, and status management.
+  - **Dashboard** — Aggregate metrics (cards, charts, notifications) for programme monitoring.
+  - **General** — Projects, receipts, photo gallery uploads, Google Form link management, upload page metadata.
+  - **Admin** — User account and role management (RBAC).
+  - **Auth** — Session-based authentication with JWT access/refresh tokens stored in HTTP-only cookies.
+  - **Lookup** — Lightweight dropdown data endpoints for form select components.
+  - **Clientside** — Public-facing endpoints: blog, photo carousels, donations (Paystack), homepage feedback.
+  
+  ---
+  
+  ## 2. Target Consumer
+  
+  This API is intended **primarily for the Cedarrise frontend application**, which includes:
+  
+  - **Dashboard pages** — metric cards, enrollment charts, student performance charts, institutional effectiveness charts, project management, notification centre.
+  - **Admin pages** — user management, role assignment, team roster.
+  - **Form pages** — ASH registration/attendance/tracking/feedback/exit, TACOTS recommendation/onboarding/tracking/feedback/exit, Capacity Building evaluations, Outreach tracker, Volunteer registration/feedback.
+  - **Record management** — paginated table views with search, sort, filter, status updates, detail views, CSV downloads, and record deletion.
+  - **Notification workflows** — system-generated alerts for at-risk students and inactive volunteers.
+  - **File/media workflows** — photo gallery uploads, receipt image uploads, project image uploads, passport photo uploads, blog document uploads.
+  - **Public website** — blog listing, programme photo carousels, donation flow, active Google Form retrieval, homepage feedback.
+  
+  Frontend engineers should treat this document as the canonical reference for understanding the API's surface area, conventions, and integration expectations.
+  
+  ---
+  
+  ## 3. Key Features and Functionalities
+  
+  ### 3.1 Authentication & Authorization
+  
+  | Endpoint | Method | Route | Description |
+  |----------|--------|-------|-------------|
+  | Login | `POST` | `/auth/login` | Authenticates with email + password; sets `cedaraccess` and `cedarrefresh` HTTP-only cookies. |
+  | Logout | `POST` | `/auth/logout` | Revokes the refresh token; clears session. |
+  | Session | `GET` | `/auth/session` | Validates the current session; silently refreshes expired access tokens. Returns `{ id, name, department }`. |
+  
+  ### 3.2 Admin — User & Role Management
+  
+  | Endpoint | Method | Route | Description |
+  |----------|--------|-------|-------------|
+  | Create user | `POST` | `/admin/users` | Creates a user account; auto-assigns the default `volunteer` role. |
+  | List all users | `GET` | `/admin/users` | Returns all users (lightweight: id, name, email, department). |
+  | List users (paginated) | `GET` | `/admin/listusers` | Full paginated user list with search, sort, and pagination metadata. |
+  | Delete user | `DELETE` | `/admin/users/:userId` | Permanently deletes user and cascaded data. |
+  | List all roles | `GET` | `/admin/roles` | Returns `volunteer`, `admin`, `superadmin` roles. |
+  | List user's roles | `GET` | `/admin/roles/:userId` | Returns roles assigned to a specific user. |
+  | Assign/Revoke role | `PATCH` | `/admin/roles/:userId/action` | Assigns or revokes `admin` / `superadmin` via `?action=assign&rolename=admin`. |
+  
+  ### 3.3 ASH (After-School Hub)
+  
+  **5 sub-modules**, each with Submit, List, Detail, Delete, and Download endpoints:
+  
+  | Sub-module | Submit | List | Detail | Delete | Download |
+  |------------|--------|------|--------|--------|----------|
+  | Registration | `POST` | `GET` (paginated) | `GET /:id` | `DELETE /:id` | `GET /download/ashstudent` |
+  | Weekly Attendance | `POST` | `GET` (paginated) | `GET /:id` | `DELETE /:id` | `GET /download/attendance` |
+  | Termly Tracking | `POST` | `GET` (paginated) | `GET /:id` | `DELETE /:id` | `GET /download/tracking` |
+  | Feedback | `POST` | `GET` (paginated) | `GET /:id` | `DELETE /:id` | `GET /download/feedback` |
+  | Exit | `POST` | `GET` (paginated) | `GET /:id` | `DELETE /:id` | `GET /download/exit` |
+  
+  **Additional endpoints:**
+  - `PATCH /registration/:id/status` — Accept, reject, or reset a student (`?status=accepted|rejected|pending`).
+  - `PATCH /registration/:id/assign-mentor` — Assign a mentor to an ASH student.
+  
+  ### 3.4 TACOTS
+  
+  **5 sub-modules** with the same CRUD + Download pattern as ASH:
+  
+  | Sub-module | Route prefix |
+  |------------|-------------|
+  | Recommendation | `/forms/tacots/recommendation` |
+  | Onboarding | `/forms/tacots/onboarding` |
+  | Tracking | `/forms/tacots/tracking` |
+  | Feedback | `/forms/tacots/feedback` |
+  | Exit | `/forms/tacots/exit` |
+  
+  **Additional endpoint:**
+  - `PATCH /recommendation/:id/status` — Update admin status (`?status=NOT SELECTED|KEEP IN VIEW|SELECTED`).
+  
+  ### 3.5 Capacity Building
+  
+  | Endpoint | Method | Route |
+  |----------|--------|-------|
+  | Submit evaluation | `POST` | `/forms/capacity-building` |
+  | List evaluations | `GET` | `/forms/capacity-building` |
+  | Get detail | `GET` | `/forms/capacity-building/:id` |
+  | Delete | `DELETE` | `/forms/capacity-building/:id` |
+  | Download CSV | `GET` | `/forms/capacity-building/download/evaluation` |
+  
+  ### 3.6 Outreaches
+  
+  | Endpoint | Method | Route |
+  |----------|--------|-------|
+  | Submit outreach | `POST` | `/forms/outreaches` |
+  | List outreaches | `GET` | `/forms/outreaches` |
+  | Get detail | `GET` | `/forms/outreaches/:id` |
+  | Delete | `DELETE` | `/forms/outreaches/:id` |
+  | Download CSV | `GET` | `/forms/outreaches/download/outreach` |
+  
+  ### 3.7 Volunteer
+  
+  | Endpoint | Method | Route |
+  |----------|--------|-------|
+  | Register (public) | `POST` | `/volunteer/register` |
+  | List volunteers | `GET` | `/volunteer` |
+  | Get detail | `GET` | `/volunteer/:id` |
+  | Delete record | `DELETE` | `/volunteer/:id` |
+  | Update status | `PATCH` | `/volunteer/:id/status` |
+  | Submit feedback | `POST` | `/volunteer/feedback` |
+  | List feedback | `GET` | `/volunteer/feedback` |
+  | Get feedback detail | `GET` | `/volunteer/feedback/:id` |
+  | Delete feedback | `DELETE` | `/volunteer/feedback/:id` |
+  | Download registrations | `GET` | `/volunteer/download/registration` |
+  | Download feedback | `GET` | `/volunteer/download/feedback` |
+  
+  ### 3.8 Dashboard — Metrics, Charts & Notifications
+  
+  | Endpoint | Method | Route | Description |
+  |----------|--------|-------|-------------|
+  | Card numbers | `GET` | `/dashboard/cards` | Aggregate counts across all 5 programmes. |
+  | Enrollment metrics | `GET` | `/dashboard/enrollment` | Chart-ready data: application trends, gender diversity, class distribution, acceptance rates, geographical distribution. |
+  | Student performance | `GET` | `/dashboard/student-performance` | Graduation rates, attendance trends, test scores, dropout trends, risk distribution, TACOTS scores. |
+  | Institutional effectiveness | `GET` | `/dashboard/institutional-effectiveness` | Community service hours, mentorship hours, spend per student, accumulated hours, student benchmarks. |
+  | Get notifications | `GET` | `/dashboard/notifications` | Paginated system-generated alerts (filterable by `status`, `type`, `entityType`). |
+  | Dismiss notification | `PATCH` | `/dashboard/notifications/:id` | Sets notification status to `dismissed`. |
+  
+  ### 3.9 General — Projects, Receipts, Uploads & Forms
+  
+  | Endpoint | Method | Route | Description |
+  |----------|--------|-------|-------------|
+  | Create project | `POST` | `/general/projects` | `multipart/form-data` — title, description, optional image. |
+  | List projects | `GET` | `/general/projects` | All projects, ordered by status and date. |
+  | Update project status | `PATCH` | `/general/projects/:id` | `?status=ongoing|completed` |
+  | Delete project | `DELETE` | `/general/projects/:id` | Deletes project + Cloudinary image. |
+  | Create receipt | `POST` | `/general/receipts` | `multipart/form-data` — name, amount, description, file. |
+  | List receipts | `GET` | `/general/receipts` | Paginated with search and sort. |
+  | Delete receipt | `DELETE` | `/general/receipts/:id` | Deletes receipt + Cloudinary image. |
+  | Download receipts CSV | `GET` | `/general/download/receipts` | Full CSV export. |
+  | Upload photos | `POST` | `/general/gallery` | Up to 10 images → Cloudinary (`?folder=ASH|OUTREACHES|CAPACITY_BUILDING`). |
+  | Upload Google Form | `POST` | `/general/google-forms` | JSON — url, title, description, deadline. |
+  | Get active Google Form | `GET` | `/general/google-forms` | Public — returns the form with a future deadline. |
+  | Get upload metadata | `GET` | `/general/metadata` | Stats: photos uploaded, active projects, receipts logged, system users. |
+  
+  ### 3.10 Lookup — Dropdown Data
+  
+  | Endpoint | Route | Returns |
+  |----------|-------|---------|
+  | ASH students | `/lookup/ash-students` | `{ id, name, status }` for accepted ASH students. |
+  | TACOTS recommended | `/lookup/tacots-recommended` | `{ id, name, status }` for `SELECTED` recommendations. |
+  | TACOTS onboarded | `/lookup/tacots-onboarded` | `{ id, name }` for onboarded students. |
+  | Volunteers | `/lookup/volunteers` | `{ id, name, status }` for accepted volunteers. |
+  
+  > All lookup endpoints are **public** (no auth) and cached with a 10-minute TTL.
+  
+  ### 3.11 Clientside — Public Website
+  
+  | Sub-module | Endpoints |
+  |------------|-----------|
+  | **Blog** | `POST /blogs` (create), `GET /blogs` (list, paginated), `GET /blogs/:id`, `PATCH /blogs/:id` (update), `DELETE /blogs/:id` |
+  | **Carousels** | `GET /carousels/ash`, `/carousels/tacots`, `/carousels/outreach`, `/carousels/capacity-building` — programme photo galleries from Cloudinary. |
+  | **Donate** | `POST /donate` (initialize Paystack), `GET /donate/callback` (verify), `POST /donate/webhook` (Paystack webhook). |
+  | **Feedback** | `POST /feedback/home` — submit homepage feedback email. |
+  
+  ---
+  
+  ## 4. API Structure
+  
+  ### 4.1 Route Organisation
+  
+  All routes are mounted under the **`/api/v1`** prefix and grouped by domain:
+  
+  ```
+  /api/v1/auth/*                    → Authentication
+  /api/v1/admin/*                   → User & role management
+  /api/v1/dashboard/*               → Metrics, charts, notifications
+  /api/v1/general/*                 → Projects, receipts, uploads, metadata
+  /api/v1/volunteer/*               → Volunteer registration & feedback
+  /api/v1/lookup/*                  → Dropdown data
+  /api/v1/forms/ash/*               → ASH programme forms
+  /api/v1/forms/tacots/*            → TACOTS programme forms
+  /api/v1/forms/outreaches          → Outreach tracker
+  /api/v1/forms/capacity-building   → Capacity building evaluations
+  /api/v1/blogs                     → Blog management
+  /api/v1/carousels/*               → Photo galleries
+  /api/v1/donate/*                  → Donation flow
+  /api/v1/feedback/*                → Homepage feedback
+  ```
+  
+  ### 4.2 HTTP Methods
+  
+  | Method | Usage |
+  |--------|-------|
+  | `GET` | List, detail, download, metrics, session verification |
+  | `POST` | Create records, form submissions, login, file uploads |
+  | `PATCH` | Status updates, role assignment/revocation, dismiss notification |
+  | `DELETE` | Record deletion (hard delete with cascade) |
+  
+  ### 4.3 Request Body Formats
+  
+  | Format | Used By |
+  |--------|---------|
+  | `application/json` | Most form submissions (ASH, TACOTS, Volunteer, Outreach, Capacity Building, Blog, Donate, Feedback, Google Forms) |
+  | `application/x-www-form-urlencoded` | Login, Create user, Mentor assignment |
+  | `multipart/form-data` | File uploads (photos, projects, receipts, blog posts, ASH/TACOTS registrations with passport photos) |
+  
+  ### 4.4 Path Parameters
+  
+  Path parameters are consistently **UUIDs** (v4), used for:
+  - `:id` — record identifier (most modules)
+  - `:userId` — user identifier (admin routes)
+  
+  ### 4.5 Query Parameters
+  
+  Commonly used across listing endpoints:
+  
+  | Parameter | Type | Default | Description |
+  |-----------|------|---------|-------------|
+  | `page` | number | `1` | Page number (min: 1) |
+  | `limit` | number | `25` | Items per page (min: 1, max: 100) |
+  | `orderBy` | string | `desc` | Sort direction: `asc` or `desc` |
+  | `sortBy` | string | `createdAt` | Column to sort by (varies per module) |
+  | `status` | string | varies | Status filter (e.g. `pending`, `accepted`, `rejected`) |
+  | `search` | string | — | Full-text search query (bypasses cache) |
+  
+  ---
+  
+  ## 5. Common Request/Response Patterns
+  
+  ### 5.1 Standard Success Response
+  
+  ```json
+  {
+    "success": true,
+    "message": "Descriptive success message",
+    "data": { /* object or array */ }
+  }
+  ```
+  
+  ### 5.2 Paginated Response
+  
+  ```json
+  {
+    "success": true,
+    "data": [ /* records */ ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 3
+      }
+    }
+  }
+  ```
+  
+  Many listing endpoints also include a **`metadata`** object inside `meta` with module-specific aggregate counts:
+  
+  ```json
+  "meta": {
+    "pagination": { "page": 1, "limit": 25, "totalPages": 1 },
+    "metadata": {
+      "totalSubmissions": 40,
+      "acceptedStudents": 10,
+      "rejectedStudents": 10,
+      "pendingStudents": 20
+    }
+  }
+  ```
+  
+  ### 5.3 Error Response
+  
+  ```json
+  {
+    "success": false,
+    "error": {
+      "code": "NOT_FOUND",
+      "message": "Route /api/v1/unknown not found"
+    }
+  }
+  ```
+  
+  | Status Code | Common Meaning |
+  |-------------|----------------|
+  | `400` | Validation failure (invalid fields, wrong format, missing required) |
+  | `401` | Missing or invalid authentication token |
+  | `403` | User lacks the required permission |
+  | `404` | Resource not found / invalid credentials |
+  | `409` | Duplicate resource (e.g. email already exists) |
+  | `500` | Unexpected server error |
+  
+  ### 5.4 Full-Text Search
+  
+  Search is powered by **PostgreSQL GIN indexes** with weighted `tsvector` columns. When the `search` query parameter is provided:
+  
+  - Results are fetched **directly from the database** (cache is bypassed).
+  - Sort and status filters are typically bypassed.
+  - Fields are weighted (A = highest priority, D = lowest) for ranking.
+  
+  ### 5.5 CSV Download
+  
+  Download endpoints return **`text/csv`** with a `Content-Disposition: attachment` header. These are **not JSON** responses — the frontend must read them as a `Blob` and trigger a browser download.
+  
+  ### 5.6 Status-Based Workflows
+  
+  Several modules use a status lifecycle managed via `PATCH` endpoints:
+  
+  | Module | Status Values | Query Parameter |
+  |--------|--------------|-----------------|
+  | ASH Registration | `pending` → `accepted` / `rejected` | `?status=accepted` |
+  | Volunteer | `pending` → `accepted` / `rejected` | `?status=accepted` |
+  | TACOTS Recommendation | `KEEP IN VIEW` → `SELECTED` / `NOT SELECTED` | `?status=SELECTED` |
+  | Project | `ongoing` → `completed` | `?status=completed` |
+  | Notification | `active` → `dismissed` / `resolved` | N/A (PATCH body) |
+  
+  ### 5.7 Caching
+  
+  The API uses **Redis** for response caching. Key conventions:
+  
+  | Pattern | TTL | Example |
+  |---------|-----|---------|
+  | `cedarrise:dashboard:*` | 1 hour | `cedarrise:dashboard:cards` |
+  | `cedarrise:{module}:{page}:{limit}:…` | varies | `cedarrise:outreaches:1:25:desc:createdAt` |
+  | `cedarrise:lookup:*` | 10 min | `cedarrise:lookup:ash` |
+  | `cedarrise:gallery:*` | 12 hours | `cedarrise:gallery:ash` |
+  | `cedarrise:blogs:list:*` | 1 hour | `cedarrise:blogs:list:1:25` |
+  
+  > **Important:** Search queries **always bypass cache** and hit the database directly. Write operations (create, update, delete) **invalidate** related cache keys.
+  
+  ### 5.8 Chart-Ready Data (Dashboard)
+  
+  Dashboard metric endpoints return data in two formats, ready for direct consumption by charting libraries (e.g. Chart.js):
+  
+  ```typescript
+  // Dataset — for bar, line, pie, doughnut charts
+  {
+    type: "bar" | "line" | "doughnut" | "pie",
+    labels: string[],
+    datasets: { label?: string, data: (number | null)[] }[]
+  }
+  
+  // Linedata — for key-value lists
+  Array<{ title: string, amount: number }>
+  ```
+  
+  ---
+  
+  ## 6. Frontend Integration Notes
+  
+  ### 6.1 Auth Token Handling
+  
+  - Tokens are stored in **HTTP-only cookies** (`cedaraccess`, `cedarrefresh`) — **not** in `localStorage` or JavaScript-accessible storage.
+  - The frontend does **not** need to manually attach `Authorization` headers. Cookies are sent automatically when `credentials: "include"` (fetch) or `withCredentials: true` (axios) is set.
+  - The `authenticate()` middleware handles **silent token refresh** — if the access token expires, the middleware uses the refresh token to issue new cookies transparently.
+  - On **`401 Unauthorized`**, redirect the user to the login page.
+  
+  ### 6.2 Session Verification
+  
+  On app load or route change, call `GET /api/v1/auth/session` to verify the user's session. The response includes `{ id, name, department }` which can be stored in frontend state.
+  
+  ### 6.3 Protected Routes
+  
+  - All **Admin**, **Dashboard**, **General**, **ASH**, **TACOTS**, **Capacity Building**, and **Outreach** endpoints require authentication.
+  - Most require the `read` permission; mutations require `create`, `update`, or `delete` permissions.
+  - **Public endpoints** (no auth): Login, Volunteer Registration, Lookup dropdowns, Blog listing, Carousels, Donate, Feedback, Google Form retrieval.
+  
+  ### 6.4 Loading States
+  
+  - Use loading indicators for **paginated list** requests, **detail** views, and **dashboard metrics**.
+  - Dashboard metric endpoints execute multiple parallel database queries — expect slightly longer response times on the first request (before caching).
+  - **CSV downloads** may be slow for large datasets — show a download progress indicator.
+  
+  ### 6.5 Error Handling
+  
+  ```typescript
+  // Recommended pattern
+  try {
+    const res = await fetch(url, { credentials: "include" });
+    const data = await res.json();
+    if (!data.success) {
+      // Handle application-level error
+      showError(data.error?.message || data.message);
+    }
+  } catch (err) {
+    // Handle network error
+  }
+  ```
+  
+  - **`400`** — Display validation error messages to the user (field-level where possible).
+  - **`401`** — Redirect to login; session has expired.
+  - **`403`** — Show "insufficient permissions" feedback; the user's role lacks the required capability.
+  - **`409`** — Show duplicate resource message (e.g. "Email already exists").
+  
+  ### 6.6 Pagination Usage
+  
+  ```typescript
+  // Fetch page 2 with 25 items
+  GET /api/v1/forms/ash/registration?page=2&limit=25&status=pending
+  
+  // Use meta.pagination.totalPages for pagination controls
+  // Use meta.metadata for summary stats (e.g. cards above the table)
+  ```
+  
+  ### 6.7 Search Integration
+  
+  - Debounce search input (300–500ms recommended).
+  - When a `search` parameter is provided, the API bypasses cache and sort/status filters — the frontend should reflect this by resetting pagination to page 1 and disabling sort/filter controls during search.
+  - Clear the search parameter to return to normal cached/filtered results.
+  
+  ### 6.8 Form Validation Expectations
+  
+  The backend validates all inputs using **Zod** schemas. The frontend should perform client-side validation as a first pass, but must also handle `400 Bad Request` responses with server-side validation error messages.
+  
+  ### 6.9 Refreshing Dashboard Metrics
+  
+  Dashboard data is cached for **1 hour**. The frontend does not need to poll — simply fetch on page load. For real-time notification counts, fetch `GET /dashboard/notifications` with appropriate filters.
+  
+  ### 6.10 Handling Notification States
+  
+  - Fetch with `?status=active` to show unread/actionable notifications.
+  - Filter by `type` and `entityType` for notification categorization in the UI.
+  - Call `PATCH /dashboard/notifications/:id` to dismiss — update the local state optimistically.
+  - The `metadata` field is a **JSON string** that must be parsed client-side; its shape varies by notification type.
+  
+  ### 6.11 CSV Download Pattern
+  
+  ```typescript
+  const res = await fetch(url, { credentials: "include" });
+  const blob = await res.blob();
+  const downloadUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = downloadUrl;
+  a.download = "filename.csv"; // Use Content-Disposition header value
+  a.click();
+  URL.revokeObjectURL(downloadUrl);
+  ```
+  
+  ---
+  
+  ## 7. Security and Access Control
+  
+  ### 7.1 Authentication
+  
+  - **Cookie-based JWT** — Access tokens (`cedaraccess`) and refresh tokens (`cedarrefresh`) are stored as **HTTP-only, secure cookies**, preventing XSS-based token theft.
+  - The `authenticate()` middleware reads the `cedaraccess` cookie, validates the JWT, and attaches `{ id, name, department }` to the request.
+  - Expired access tokens trigger an automatic refresh via the `cedarrefresh` cookie — the response includes updated cookies.
+  
+  ### 7.2 Role-Based Access Control (RBAC)
+  
+  The system uses a **three-tier role model**:
+  
+  | Role | Permissions | Description |
+  |------|------------|-------------|
+  | `volunteer` | `read` | Default role assigned on user creation. Read-only access. |
+  | `admin` | `read`, `create`, `update` | Can create records, update statuses, manage content. |
+  | `superadmin` | `read`, `create`, `update`, `delete` | Full access including user/record deletion and role management. |
+  
+  The `authorize(...permissions)` middleware checks the user's role-derived permissions against required permissions for each route.
+  
+  ### 7.3 Permission Matrix
+  
+  | Permission | Used By |
+  |------------|---------|
+  | `read` | All listing, detail, download, and metric endpoints |
+  | `create` | Form submissions, user creation, file uploads, project/receipt creation |
+  | `update` | Status updates, role assignment/revocation, notification dismissal |
+  | `delete` | Record deletion, user deletion |
+  
+  ### 7.4 CORS
+  
+  The API restricts origins to a whitelist:
+  - `http://localhost:3002` (development)
+  - `https://cedarrise.vercel.app` (production)
+  
+  Credentials (cookies) are allowed. Preflight responses are cached for 24 hours.
+  
+  ### 7.5 Webhook Security
+  
+  The Paystack webhook endpoint (`POST /donate/webhook`) validates the `x-paystack-signature` header using HMAC SHA-512 signature verification before processing any event.
+  
+  ### 7.6 Rate Limiting
+  
+  A rate-limiting middleware is present in the codebase (`rateLimiter.middleware.ts`) for protecting sensitive endpoints.
+  
+  ### 7.7 Data Sensitivity
+  
+  > [!WARNING]
+  > The `List users for USERS Page` endpoint returns the **hashed password** field in the response. The frontend **must never** display this field to the end user.
+  
+  ---
+  
+  ## 8. Important Notes / Assumptions
+  
+  ### Conventions
+  
+  - **All routes** are prefixed with `/api/v1`.
+  - **UUIDs** are used as primary keys across all tables.
+  - **ISO 8601** timestamps are used for all date/time fields.
+  - **Soft deletes** — Most tables include a `deletedAt` field. However, user deletion and some record deletions are **hard deletes** with cascading.
+  - **Lowercase storage** — User names, emails, and many text fields are stored in lowercase/trimmed form.
+  
+  ### Hardcoded Values
+  
+  The dashboard cards endpoint has **four hardcoded values** (set to `10`) because no corresponding database tables exist:
+  
+  | Section | Field | Note |
+  |---------|-------|------|
+  | Volunteer | Partners | No partners table |
+  | Volunteer | Sponsors | No sponsors table |
+  | Outreaches | Partners | No outreach partners table |
+  | TACOTS | Partners | No TACOTS partners table |
+  
+  These are annotated with `// NOT-SUPPORTED-IN-TABLES` in the service layer.
+  
+  ### Academic Session Scoping
+  
+  Dashboard metrics that reference an **academic session** derive it at runtime:
+  - If the current month is **September or later** → `currentYear/nextYear` (e.g. `2026/27`)
+  - If the current month is **before September** → `previousYear/currentYear` (e.g. `2025/26`)
+  
+  ### Public vs. Protected Endpoints
+  
+  | Public (No Auth) | Protected (Auth Required) |
+  |------------------|--------------------------|
+  | Login | All admin routes |
+  | Volunteer Registration | All dashboard routes |
+  | All Lookup dropdowns | All form listing/detail/delete routes |
+  | Blog listing and detail | All General routes (except Google Form GET) |
+  | Carousel photo galleries | All ASH/TACOTS/Capacity/Outreach management routes |
+  | Donation flow | User management |
+  | Homepage feedback | File uploads |
+  | Google Form retrieval | CSV downloads |
+  
+  ### Event-Driven Side Effects
+  
+  The backend uses an **event emitter** pattern for side effects:
+  - `donation:success` → persists donor record after verified payment.
+  - Cache invalidation, email sending, and Cloudinary asset deletion are handled via events and **BullMQ job queues**.
+  
+  ### Notification System
+  
+  Notifications are generated by a **weekly BullMQ cron job** (`notification-queue`) that scans for at-risk patterns:
+  
+  | Type | Trigger |
+  |------|---------|
+  | `POTENTIAL_DROPOUT_RISK` | Student absent from latest 3 consecutive ASH sessions |
+  | `LOW_ATTENDANCE_RATE` | Attendance below 75% for current term |
+  | `LOW_MENTORSHIP_ENGAGEMENT` | No TACOTS tracking record for current term |
+  | `SCORE_DROP_ALERT` | Post-test average dropped ≥15 points vs. prior term |
+  | `VOLUNTEER_INACTIVITY` | Accepted volunteer not in any attendance record for 30 days |
+  
+  ### File Storage
+  
+  All uploaded files (photos, documents, receipts, passport photos, signatures) are stored in **Cloudinary** under organised folder paths (e.g. `/Cedarrise Initiative/ASH`, `/Cedarrise Initiative/DASHBOARD-ASSETS/PROJECTS`).
+  
+  ---
+  
+  *This document was generated from the Bruno API collection (`cedarrise-collection`) and verified against the backend source code. Last updated: 26 June 2026.*
+  
+}
