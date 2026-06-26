@@ -220,7 +220,7 @@ appEvents.on(ADMIN_EVENTS.DELETE_CACHE, async (data) => {
   try {
     await invalidateCache(data.singleKey, data.patternKey);
     logger.info("cache **if any** removed", {
-      event: data.affectedService,
+      event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       // correlationId: data.correlationId,
@@ -228,7 +228,7 @@ appEvents.on(ADMIN_EVENTS.DELETE_CACHE, async (data) => {
   } catch (error: any) {
     logger.error("Could not remove cache **if any**", {
       message: error.message,
-      event: data.affectedService,
+      event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       // correlationId: data.correlationId

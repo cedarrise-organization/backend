@@ -55,7 +55,7 @@ export const submitVolunteerRegistration = async (options: Volunteerregistration
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:*`,
-    affectedService: "SUBMIT VOLUNTEER REGISTRATION FORM",
+    event: "SUBMIT VOLUNTEER REGISTRATION FORM",
   });
 
   return {
@@ -279,7 +279,7 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:*`,
-    affectedService: "UPDATE VOLUNTEER STATUS",
+    event: "UPDATE VOLUNTEER STATUS",
   });
 
   return {
@@ -294,7 +294,7 @@ export const deleteVolunteer = async (id: string) => {
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:*`,
-    affectedService: "DELETE VOLUNTEER REGISTRATION RECORD",
+    event: "DELETE VOLUNTEER REGISTRATION RECORD",
   });
 
   return {
@@ -339,7 +339,7 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:feedback:*`,
-    affectedService: "SUBMIT VOLUNTEER FEEDBACK FORM",
+    event: "SUBMIT VOLUNTEER FEEDBACK FORM",
   });
 
   return {
@@ -469,7 +469,7 @@ export const deleteVolunteerFeedback = async (id: string) => {
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:feedback:*`,
-    affectedService: "DELETE VOLUNTEER FEEDBACK RECORD",
+    event: "DELETE VOLUNTEER FEEDBACK RECORD",
   });
 
   return {

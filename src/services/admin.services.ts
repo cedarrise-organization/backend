@@ -133,7 +133,7 @@ export const createUser = async (options: {
   appEvents.emit(ADMIN_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:lookup:users:*`,
-    affectedService: "USER CREATED",
+    event: "USER CREATED",
   })
 
   appEvents.emit(ADMIN_EVENTS.CREATE_USER, {

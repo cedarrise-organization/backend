@@ -4,7 +4,6 @@ import { appEvents } from "../lib/events.js";
 import logger from "../configs/logger.config.js";
 import ejs from "ejs";
 
-
 export const ASH_EVENTS = {
   STUDENT_ACCEPTED: "ash:student:accepted",
   STUDENT_REJECTED: "ash:student:rejected",
@@ -76,7 +75,7 @@ appEvents.on(ASH_EVENTS.DELETE_CACHE, async (data) => {
   try {
     await invalidateCache(data.singleKey, data.patternKey);
     logger.info("cache **if any** removed", {
-      event: data.affectedService,
+      event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       // correlationId: data.correlationId,
@@ -84,7 +83,7 @@ appEvents.on(ASH_EVENTS.DELETE_CACHE, async (data) => {
   } catch (error: any) {
     logger.error("Could not remove cache **if any**", {
       message: error.message,
-      event: data.affectedService,
+      event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       // correlationId: data.correlationId

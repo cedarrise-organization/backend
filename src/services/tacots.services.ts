@@ -146,7 +146,7 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tacotsRecommendation:*`,
-    affectedService: "SUBMIT TACOTS RECOMMENDATION FORM",
+    event: "SUBMIT TACOTS RECOMMENDATION FORM",
   });
 
   return {
@@ -390,7 +390,7 @@ export const deleteRecommendation = async (id: string) => {
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tacotsRecommendation:*`,
-    affectedService: "DELETE TACOTS RECOMMENDATION RECORD",
+    event: "DELETE TACOTS RECOMMENDATION RECORD",
   });
 
   if (data?.passportPhotoPublicId) {
@@ -455,7 +455,7 @@ export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:feedback:*`,
-    affectedService: "SUBMIT TACOTS FEEDBACK FORM",
+    event: "SUBMIT TACOTS FEEDBACK FORM",
   });
 
   return {
@@ -585,7 +585,7 @@ export const deleteTacotsFeedback = async (id: string) => {
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:feedback:*`,
-    affectedService: "DELETE TACOTS FEEDBACK RECORD",
+    event: "DELETE TACOTS FEEDBACK RECORD",
   });
 
   return {
@@ -669,7 +669,7 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:onboarding:*`,
-    affectedService: "SUBMIT TACOTS ONBOARDING FORM",
+    event: "SUBMIT TACOTS ONBOARDING FORM",
   });
 
   return {
@@ -959,7 +959,7 @@ export const deleteOnboarding = async (id: string) => {
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:onboarding:*`,
-    affectedService: "DELETE TACOTS ONBOARDING RECORD",
+    event: "DELETE TACOTS ONBOARDING RECORD",
   });
 
   if (data?.parentSignaturePublicId) {
@@ -1135,7 +1135,7 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tracking:*`,
-    affectedService: "SUBMIT TACOTS TRACKING FORM",
+    event: "SUBMIT TACOTS TRACKING FORM",
   });
 
   return {
@@ -1407,7 +1407,7 @@ export const deleteTacotsTracking = async (id: string) => {
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tracking:*`,
-    affectedService: "DELETE TACOTS TRACKING RECORD",
+    event: "DELETE TACOTS TRACKING RECORD",
   });
 
   if (data?.termResultPublicId) {
@@ -1469,7 +1469,7 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:exit:*`,
-    affectedService: "SUBMIT TACOTS EXIT FORM",
+    event: "SUBMIT TACOTS EXIT FORM",
   });
 
   return {
@@ -1691,7 +1691,7 @@ export const deleteTacotsExit = async (id: string) => {
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:exit:*`,
-    affectedService: "DELETE TACOTS EXIT RECORD",
+    event: "DELETE TACOTS EXIT RECORD",
   });
 
   return {

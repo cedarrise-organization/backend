@@ -77,13 +77,13 @@ appEvents.on(VOLUNTEER_EVENTS.DELETE_CACHE, async (data) => {
     logger.info("cache **if any** removed", {
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      event: data.affectedService,
+      event: data.event,
       // correlationId: data.correlationId
     });
   } catch (error: any) {
     logger.error("Could not remove cache **if any**", {
       message: error.message,
-      event: data.affectedService,
+      event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       // correlationId: data.correlationId

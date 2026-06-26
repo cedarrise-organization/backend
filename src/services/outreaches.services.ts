@@ -39,7 +39,7 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
   appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:outreaches:*`,
-    affectedService: "DELETE OUTREACH TRACKER FORM",
+    event: "DELETE OUTREACH TRACKER FORM",
   });
 
   return {
@@ -229,7 +229,7 @@ export const deleteOutreach = async (id: string) => {
   appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:outreaches:*`,
-    affectedService: "DELETE OUTREACH RECORD",
+    event: "DELETE OUTREACH RECORD",
   });
 
   return {
