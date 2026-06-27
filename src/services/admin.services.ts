@@ -133,7 +133,7 @@ export const createUser = async (options: {
   appEvents.emit(ADMIN_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:lookup:users:*`,
-    affectedService: "USER CREATED",
+    event: "USER CREATED",
   })
 
   appEvents.emit(ADMIN_EVENTS.CREATE_USER, {
@@ -241,7 +241,7 @@ export const listUsersForUserPage = async (page: number, limit: number, search: 
     return {
       code: 200,
       message: "All users  found successfully",
-      data: cacheRes,
+      data: cacheRes.data,
       meta: {
         pagination: {
           page,

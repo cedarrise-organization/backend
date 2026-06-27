@@ -2,8 +2,10 @@ import db from "./db.js";
 import fs from "node:fs/promises";
 import logger from "../configs/logger.config.js";
 import { users, roles, permissions, rolepermissions, userroles } from "./models/auth.js";
-import { hashPassword } from "../utils/password.util.js";
-import { eq, sql } from "drizzle-orm";
+import { receipts, photoCount } from "./models/general.js";
+import { projects } from "./models/dashboard.js";
+import { refreshtoken } from "./models/auth.js";
+import { blogs } from "./models/blogs.js";
 import {
   ashStudent,
   ashWeeklyAttendance,
@@ -20,9 +22,8 @@ import {
   volunteerFeedback,
   outreachTracker,
 } from "./models/admin.js";
-import { projects } from "./models/dashboard.js";
-import { refreshtoken } from "./models/auth.js";
-import { receipts, photoCount } from "./models/general.js";
+import { hashPassword } from "../utils/password.util.js";
+import { eq, sql } from "drizzle-orm";
 
 // CLEAR TABLES
 const clearTables = async () => {
@@ -51,6 +52,7 @@ const clearTables = async () => {
     await db.delete(projects);
     await db.delete(receipts);
     await db.delete(photoCount);
+    await db.delete(blogs);
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -745,6 +747,24 @@ async function seedPhotoCount() {
   }
 }
 
+// BLOGS
+async function seedBlogs() {
+  try {
+    const file = await fs.readFile(`${process.cwd()}/src/db/seeddata/blogs.jsonl`, "utf-8");
+
+    const rows = file
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line) => JSON.parse(line));
+
+    await db.insert(blogs).values(rows);
+
+    logger.info(`Inserted ${rows.length} rows into the blogs table`);
+  } catch (error) {
+    logger.error("could not seed blogs table", { error });
+  }
+}
+
 await clearTables();
 await installExtensions();
 await seedRolesAndPermissions();
@@ -765,4 +785,5 @@ await seedOutreachTracker();
 await seedCapacityBuildingEvaluation();
 await seedProjects();
 await seedReceipts();
+await seedBlogs();
 await seedPhotoCount();

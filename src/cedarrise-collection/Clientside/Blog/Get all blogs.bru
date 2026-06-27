@@ -5,14 +5,15 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/blogs?page=1&limit=20
+  url: {{baseUrl}}/api/v1/blogs?page=1&limit=25&search=
   body: none
   auth: inherit
 }
 
-query {
+params:query {
   page: 1
-  limit: 20
+  limit: 25
+  search: 
 }
 
 vars:pre-request {
@@ -27,7 +28,7 @@ settings {
 docs {
   # Get All Blogs
   
-  Retrieves a paginated list of all published blog posts, ordered by date and ID ascending.
+  Retrieves a paginated list of all blog posts, ordered by date descending.
   
   ## Endpoint
   `GET /api/v1/blogs`
@@ -37,10 +38,12 @@ docs {
   
   ## Query Parameters
   
-  | Param | Type   | Required | Default | Constraints         | Description                     |
-  | :---- | :----- | :------- | :------ | :------------------ | :------------------------------ |
-  | page  | number | No       | 1       | Integer             | The page number to retrieve.    |
-  | limit | number | No       | 20      | Integer, 1–100      | Number of blog posts per page.  |
+  | Param   | Type   | Required | Default | Constraints    | Description                                        |
+  | :------ | :----- | :------- | :------ | :------------- | :------------------------------------------------- |
+  | page    | number | No       | 1       | Integer, ≥ 1   | The page number to retrieve.                       |
+  | limit   | number | No       | 25      | Integer, 1–100 | Number of blog posts per page.                     |
+  | orderBy | string | No       | desc    | `asc`, `desc`  | Sort direction (currently applied as date DESC).    |
+  | search  | string | No       | —       | Trimmed        | Full-text search across `title` and `description`. |
   
   ## Success Response
   - **Status Code**: `200 OK`
@@ -53,19 +56,41 @@ docs {
         {
           "id": "uuid",
           "title": "Blog Title",
-          "description": "Blog description",
+          "description": "Blog description or null",
           "documentUrl": "https://res.cloudinary.com/...",
           "publicId": "Cedarrise Initiative/BLOG/...",
           "date": "2026-01-01T00:00:00.000Z"
         }
-      ]
+      ],
+      "meta": {
+        "pagination": {
+          "page": 1,
+          "limit": 25,
+          "totalPages": 3
+        }
+      }
     }
     ```
   
+  ## Response Schema
+  
+  | Field                    | Type     | Nullable | Description                                |
+  | :----------------------- | :------- | :------- | :----------------------------------------- |
+  | data[].id                | uuid     | No       | Blog post primary key.                     |
+  | data[].title             | string   | No       | Title of the blog post.                    |
+  | data[].description       | string   | Yes      | Optional description text.                 |
+  | data[].documentUrl       | string   | No       | Cloudinary URL of the uploaded document.   |
+  | data[].publicId          | string   | No       | Cloudinary public ID for asset management. |
+  | data[].date              | ISO 8601 | No       | Timestamp of blog creation (default: now). |
+  | meta.pagination.page     | number   | No       | Current page number.                       |
+  | meta.pagination.limit    | number   | No       | Items per page.                            |
+  | meta.pagination.totalPages | number | No       | Total number of pages.                     |
+  
   ## Error Responses
-  - **400 Bad Request**: Validation failed (e.g., `page` or `limit` is not a valid integer, `limit` exceeds 100).
+  - **400 Bad Request**: Validation failed (e.g., `page` or `limit` is not a valid integer, `limit` exceeds 100, `orderBy` is not `asc` or `desc`).
   
   ## Notes
   - Results are cached under `cedarrise:blogs:list:{page}:{limit}` with a 1-hour TTL.
-  - Results are ordered by `date ASC`, then `id ASC`.
+  - When `search` is provided, results are **not cached** and are filtered using PostgreSQL full-text search (GIN index with weighted `tsvector` on `title` and `description`).
+  - Default ordering is `date DESC`.
 }
