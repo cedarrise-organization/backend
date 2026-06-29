@@ -22,24 +22,30 @@ settings {
 docs {
   # List TACOTS Onboarded Students Dropdown
 
-  Returns a lightweight list of TACOTS onboarded students for use in tracking and exit form dropdown/select components. Joins `tacots_onboarding` with `tacots_recommendation` to resolve student names. Each entry contains only the student `id` and `name` (first name + surname).
+  Returns a lightweight list of TACOTS onboarded students for use in tracking and exit form dropdown/select components. Joins `tacots_onboarding` with `tacots_recommendation` to resolve student names and school information. Each entry contains the student `id`, `name` (first name + surname), and `schoolName`.
 
   ## Authorization
   No authentication required. This is a public lookup endpoint.
 
   ## Response
 
-  **`200 OK`** — Returns an array of `{ id, name }` objects for onboarded TACOTS students.
+  **`200 OK`** — Returns an array of `{ id, name, schoolName }` objects for onboarded TACOTS students.
 
   ```json
   {
     "success": true,
     "message": "students found successfully",
     "data": [
-      { "id": "uuid", "name": "Alice Wonderland" }
+      { "id": "uuid", "name": "Alice Wonderland", "schoolName": "Greenfield Academy" }
     ]
   }
   ```
+
+  | Field        | Type     | Description                                             |
+  |--------------|----------|---------------------------------------------------------|
+  | `id`         | `string` | The onboarding record UUID.                             |
+  | `name`       | `string` | Full name (first name + surname) from recommendation.   |
+  | `schoolName` | `string` | School name from the linked recommendation record.      |
 
   ## Caching
   Response is cached under `cedarrise:lookup:onboarded` with `LISTS` TTL (10 mins).

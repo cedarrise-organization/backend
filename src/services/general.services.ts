@@ -38,9 +38,9 @@ export const getProjects = async () => {
   ///
 
   const [allProjects, [projectsCount]] = await Promise.all([
-    db.select().from(projects).orderBy(desc(projects.createdAt), desc(projects.status)),
+    db.select().from(projects).orderBy(desc(projects.createdAt), desc(projects.status)).limit(10),
     db
-      .select({ value: count(projects.id) })
+      .select({ value: count(projects.id) }) 
       .from(projects)
       .where(eq(projects.status, "ongoing")),
   ]);

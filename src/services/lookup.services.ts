@@ -116,6 +116,7 @@ export const onboardedDropdown = async () => {
       id: tacotsOnboarding.id,
       firstName: tacotsRecommendation.firstName,
       surname: tacotsRecommendation.surname,
+      schoolName: tacotsRecommendation.schoolName,
     })
     .from(tacotsOnboarding)
     .innerJoin(
@@ -132,6 +133,7 @@ export const onboardedDropdown = async () => {
     return {
       id: student.id,
       name: `${student.firstName} ${student.surname}`,
+      schoolName: student.schoolName,
     };
   });
 
