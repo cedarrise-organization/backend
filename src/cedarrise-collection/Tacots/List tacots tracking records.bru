@@ -56,7 +56,7 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns a paginated array of TACOTS tracking records. Each item includes `firstName` and `surname` joined from the TACOTS recommendation record via the onboarding link.
+  **`200 OK`** — Returns a paginated array of TACOTS tracking records. Each item includes `firstName`, `surname`, and `schoolName` joined from the TACOTS recommendation record via the onboarding link.
   
   ```json
   {
@@ -68,7 +68,7 @@ docs {
         "surname": "string",
         "id": "uuid",
         "studentId": "uuid",
-        "schoolId": "uuid",
+        "schoolName": "string",
         "region": "string",
         "academicSession": "2025/26",
         "academicTerm": "string",
@@ -111,7 +111,7 @@ docs {
         "totalPages": 1
       },
       "metadata": {
-        "totalRecords": 100,
+        "totalRecords": 120,
         "highRiskStudents": 5,
         "onboardingRate": 75.5,
         "completed": 10

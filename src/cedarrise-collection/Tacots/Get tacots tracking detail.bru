@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 9b356123-9151-46e5-bc2d-ed4d96fefc1b
+  id: 627b5ae0-6ae6-4e9e-8151-5623d3a0ff9d
   baseUrl: http://localhost:3000
 }
 
@@ -36,7 +36,7 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns the complete TACOTS tracking record including all uploaded file URLs. `firstName` and `surname` are joined from the TACOTS recommendation record via the onboarding link.
+  **`200 OK`** — Returns the complete TACOTS tracking record including all uploaded file URLs. `firstName`, `surname`, and `schoolName` are joined from the TACOTS recommendation record via the onboarding link.
   
   ```json
   {
@@ -46,7 +46,7 @@ docs {
       "firstName": "string",
       "surname": "string",
       "id": "uuid",
-      "studentId": "uuid",
+      "schoolName": "string",
       "schoolId": "uuid",
       "region": "string",
       "academicSession": "2025/26",
@@ -92,7 +92,7 @@ docs {
   | firstName                | string | Student's first name (joined from TACOTS recommendation via onboarding).           |
   | surname                  | string | Student's surname (joined from TACOTS recommendation via onboarding).              |
   | id                       | string | UUID primary key.                                                                  |
-  | studentId                | string | UUID reference to the TACOTS onboarding record.                                    |
+  | schoolName               | string | School name (joined from TACOTS recommendation via onboarding).                    |
   | schoolId                 | string | UUID reference to the TACOTS onboarding record (school).                           |
   | region                   | string | Region of the student.                                                             |
   | academicSession          | string | Academic session (e.g. `2025/26`).                                                 |
