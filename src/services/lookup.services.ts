@@ -138,7 +138,7 @@ export const onboardedDropdown = async () => {
   });
 
   /// cache set
-  await cacheSet(key, students, CACHE_TTL.LISTS);
+  await cacheSet(key, returnStudents, CACHE_TTL.LISTS);
   ///
 
   return {
