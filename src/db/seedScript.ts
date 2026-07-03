@@ -2,8 +2,8 @@ import db from "./db.js";
 import fs from "node:fs/promises";
 import logger from "../configs/logger.config.js";
 import { users, roles, permissions, rolepermissions, userroles } from "./models/auth.js";
+import { projects, notifications } from "./models/dashboard.js";
 import { receipts, photoCount } from "./models/general.js";
-import { projects } from "./models/dashboard.js";
 import { refreshtoken } from "./models/auth.js";
 import { blogs } from "./models/blogs.js";
 import {
@@ -53,6 +53,7 @@ const clearTables = async () => {
     await db.delete(receipts);
     await db.delete(photoCount);
     await db.delete(blogs);
+    await db.delete(notifications);  
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -734,6 +735,24 @@ async function seedReceipts() {
   }
 }
 
+// NOTIFICATIONS
+async function seedNotifications() {
+  try {
+    const file = await fs.readFile(`${process.cwd()}/src/db/seeddata/notifications.jsonl`, "utf-8");
+
+    const rows = file
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line) => JSON.parse(line));
+
+    await db.insert(notifications).values(rows);
+
+    logger.info(`Inserted ${rows.length} rows into notifications`);
+  } catch (error) {
+    logger.error("could not seed notifications table", { error });
+  }
+}
+
 // PHOTO COUNT
 async function seedPhotoCount() {
   try {
@@ -786,4 +805,5 @@ await seedCapacityBuildingEvaluation();
 await seedProjects();
 await seedReceipts();
 await seedBlogs();
+await seedNotifications();
 await seedPhotoCount();
