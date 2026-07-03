@@ -198,6 +198,12 @@ export const getCards = async () => {
       .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"])),
   ]);
 
+  const home = {
+    totalBeneficiaries: Number(outreachesBeneficiariesReached?.value ?? 0),
+    communitiesImpacted: Number(outreachesCommunitiesEngaged?.value ?? 0),
+    yearsOfImpact: Number(new Date().getFullYear() - 2021),
+    volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
+  };
   const volunteer = {
     applied: Number(volunteersApplied?.value ?? 0),
     accepted: Number(volunteersAccepted?.value ?? 0),
@@ -244,6 +250,7 @@ export const getCards = async () => {
   await cacheSet(
     key,
     {
+      home,
       volunteer,
       capacityBuilding,
       outreaches,
@@ -258,6 +265,7 @@ export const getCards = async () => {
     code: 200,
     message: "Cards data found successfully",
     data: {
+      home,
       volunteer,
       capacityBuilding,
       outreaches,

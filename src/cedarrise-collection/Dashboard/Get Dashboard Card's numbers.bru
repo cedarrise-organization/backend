@@ -22,7 +22,7 @@ settings {
 docs {
   # Get Dashboard Card Numbers
   
-  Returns aggregate metrics for the admin dashboard, grouped into five programme cards: **Volunteer**, **Capacity Building**, **Outreaches**, **ASH**, and **TACOTS**. Results are cached for 1 hour (`DASHBOARD_CARDS` TTL).
+  Returns aggregate metrics for the admin dashboard, grouped into six sections: **Home**, **Volunteer**, **Capacity Building**, **Outreaches**, **ASH**, and **TACOTS**. Results are cached for 1 hour (`DASHBOARD_CARDS` TTL).
   
   ## Authorization
   Authentication and authorization are currently **disabled** on this route (commented out in `dashboard.routes.ts`).
@@ -32,12 +32,18 @@ docs {
   
   ## Response
   
-  **`200 OK`** — Returns an object with five programme sections.
+  **`200 OK`** — Returns an object with six sections.
   
   ```json
   {
     "success": true,
     "data": {
+      "home": {
+        "totalBeneficiaries": number,
+        "communitiesImpacted": number,
+        "yearsOfImpact": number,
+        "volunteersEngaged": number
+      },
       "volunteer": { 
         "applied": number,
         "accepted": number,
@@ -79,6 +85,19 @@ docs {
     }
   }
   ```
+  
+  ---
+  
+  ### `home`
+  
+  High-level impact summary for the public-facing landing page.
+  
+  | Field                | Type   | Calculation                                                                                                                       |
+  |----------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------|
+  | totalBeneficiaries   | number | Reuses the outreaches `beneficiariesReached` value — `SUM(outreachTracker.numBeneficiaries)`.                                      |
+  | communitiesImpacted  | number | Reuses the outreaches `communitiesEngaged` value — `COUNT(DISTINCT lower(trim(outreachTracker.outreachCommunity)))`.               |
+  | yearsOfImpact        | number | `currentYear - 2021` — computed at request time, not stored in the database.                                                      |
+  | volunteersEngaged    | number | Reuses the capacity-building `volunteersEngaged` value — `MAX(capacityBuildingEvaluation.numberOfVolunteers)`.                     |
   
   ---
   
