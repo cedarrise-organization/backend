@@ -16,6 +16,7 @@ export const login = async (email: string, password: string) => {
   const [user] = await db.select().from(users).where(eq(users.email, email));
 
   if (!user) {
+    console.log("THIS IS THE USER:", user); 
     appEvents.emit(AUTH_EVENTS.AUTH_LOGIN_FAIL, {
       email,
       reason: "user_not_found",
