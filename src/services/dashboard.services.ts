@@ -42,6 +42,7 @@ import { invalidateCache } from "../utils/cache.util.js";
 import { notifications } from "../db/models/dashboard.js";
 import { cacheGet, CACHE_TTL, cacheSet, cacheDel } from "../lib/cache.js";
 import { Dataset, Linedata, Notificationcandidate } from "../types/dashboard.js";
+import { donors } from "../db/models/donors.js";
 
 // return Dashboard cards Data
 export const getCards = async () => {
@@ -58,8 +59,6 @@ export const getCards = async () => {
   ///
 
   let volunteerPartners: number = 10;
-  let volunteercurrentVolunteers: number = 10;
-  let volunteersponsors: number = 10;
   let outreachesPartners: number = 10;
   let tacotsPartners: number = 10;
   // If these values are going to be a yearly thing, just add a where clause to check createdat for current year
@@ -87,6 +86,7 @@ export const getCards = async () => {
     [tacotsBenefactors],
     [tacotsSponsors],
     [tacotsGraduated],
+    [regularSponsors],
   ] = await Promise.all([
     // volunteersApplied
     db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration), // Count ids because it has an index
@@ -196,6 +196,8 @@ export const getCards = async () => {
       .select({ value: countDistinct(tacotsExit.studentId) })
       .from(tacotsExit)
       .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"])),
+    // regularSponsors
+    db.select({ value: countDistinct(donors.email) }).from(donors),
   ]);
 
   const home = {
@@ -209,7 +211,7 @@ export const getCards = async () => {
     accepted: Number(volunteersAccepted?.value ?? 0),
     Partners: volunteerPartners, // NOT-SUPPORTED-IN-TABLES
     currentVolunteers: Number(volunteersAccepted?.value ?? 0),
-    sponsors: volunteersponsors, // NOT-SUPPORTED-IN-TABLES
+    sponsors: Number(regularSponsors?.value ?? 0),
   };
   const capacityBuilding = {
     participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),

@@ -1,0 +1,86 @@
+meta {
+  name: Send program link email
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/send-links/initiatives?program=ASH&type=REGISTRATION
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}
+
+params:query {
+  program: ASH
+  type: REGISTRATION
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+docs {
+  # Send Program Link Email
+  
+  Sends a program-specific link (registration or feedback form) to a recipient via email. The service renders an EJS email template based on the `program` and `type` query parameters, then dispatches the email using Brevo.
+  
+  ## Endpoint
+  `POST /api/v1/send-links/initiatives`
+  
+  ## Query Parameters
+  
+  | Parameter | Type | Required | Allowed Values | Description |
+  | :--- | :--- | :--- | :--- | :--- |
+  | `program` | string | Yes | `ASH`, `TACOTS`, `VOLUNTEER` | The program whose link should be sent. |
+  | `type` | string | Yes | `REGISTRATION`, `FEEDBACK` | The type of form link to send. |
+  
+  ## Request Body
+  The request expects a JSON object with the following fields:
+  
+  | Field | Type | Required | Constraints | Description |
+  | :--- | :--- | :--- | :--- | :--- |
+  | `email` | string | Yes | Must be a valid email address | The recipient's email address. |
+  | `name` | string | Yes | Min: 3 characters, Max: 256 characters | The recipient's name (used in the email template). |
+  
+  ## Link Mapping
+  The generated form link is derived from `FRONTEND_BASEURL` and the `program`/`type` combination:
+  
+  | Program | Type | Generated Link Path |
+  | :--- | :--- | :--- |
+  | `ASH` | `REGISTRATION` | `/social-initiatives/ash/register` |
+  | `ASH` | `FEEDBACK` | `/social-initiatives/ash/feedback` |
+  | `TACOTS` | `REGISTRATION` | `/social-initiatives/tacots/recommendation` |
+  | `TACOTS` | `FEEDBACK` | `/social-initiatives/tacots/feedback` |
+  | `VOLUNTEER` | `REGISTRATION` | `/get-involved/volunteer/register` |
+  | `VOLUNTEER` | `FEEDBACK` | `/get-involved/volunteer/feedback` |
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "ASH REGISTRATION email sent successfully"
+    }
+    ```
+  
+  > The `message` field dynamically reflects the `program` and `type` values used in the request.
+  
+  ## Error Responses
+  - **400 Bad Request**: Validation failed (e.g., invalid email, name too short, invalid `program` or `type` enum value).
+  - **500 Internal Server Error**: 
+    - Failed to render the EJS email template.
+    - Brevo API error (email transporter failure).
+    - Email delivery verification failed — thrown when `sendEmail` returns a falsy value (e.g., `"ASH Registration Email was not sent"`).
+  
+  ## Notes
+  - Each `program`/`type` combination uses a dedicated EJS template (e.g., `ash-registration-link.ejs`, `tacots-feedback-link.ejs`).
+  - No caching is involved — this endpoint triggers a transactional email on every call.
+}

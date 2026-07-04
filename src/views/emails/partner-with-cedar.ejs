@@ -1,0 +1,29 @@
+<p>Hello CedarRise Team,</p>
+
+<p>
+  <strong><%= name %></strong> has expressed interest in partnering with CedarRise.
+</p>
+
+<p>
+  They selected the following partnership area(s):
+</p>
+
+<% if (Array.isArray(partnerAreas)) { %>
+  <ul>
+    <% partnerAreas.forEach(function(area) { %>
+      <li><%= area %></li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <p><strong><%= partnerAreas %></strong></p>
+<% } %>
+
+<p>
+  Please reach out to them via email:
+  <a href="mailto:<%= email %>"><%= email %></a>
+</p>
+
+<p>
+  Warm regards,<br />
+  CedarRise Website
+</p>

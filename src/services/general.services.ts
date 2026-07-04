@@ -1,5 +1,5 @@
 import { deleteFromCloudinary, uploadToCloudinary } from "../utils/storage.util.js";
-import { googleForms, photoCount, receipts } from "../db/models/general.js";
+import { googleForms, miscellaneous, receipts } from "../db/models/general.js";
 import { cacheGet, cacheSet, cacheDel, CACHE_TTL } from "../lib/cache.js";
 import { eq, lt, asc, sql, desc, count } from "drizzle-orm";
 import { invalidateCache } from "../utils/cache.util.js";
@@ -457,7 +457,7 @@ export const getMetadata = async () => {
   ///
 
   const [[noOfPhotos], [activeProjects], [receiptsLogged], [systemUsers]] = await Promise.all([
-    db.select().from(photoCount),
+    db.select({value: miscellaneous.numberOfPhotos}).from(miscellaneous),
     db
       .select({ value: count(projects.id) })
       .from(projects)
@@ -470,7 +470,7 @@ export const getMetadata = async () => {
   await cacheSet(
     key,
     {
-      photosUploaded: Number(noOfPhotos?.numberOfPhotos ?? 0),
+      photosUploaded: Number(noOfPhotos?.value ?? 0),
       activeProjects: Number(activeProjects?.value ?? 0),
       receiptsLogged: Number(receiptsLogged?.value ?? 0),
       systemUsers: Number(systemUsers?.value ?? 0),
@@ -483,7 +483,7 @@ export const getMetadata = async () => {
     code: 200,
     message: "General uploads' page metadata found successfully",
     data: {
-      photosUploaded: Number(noOfPhotos?.numberOfPhotos ?? 0),
+      photosUploaded: Number(noOfPhotos?.value ?? 0),
       activeProjects: Number(activeProjects?.value ?? 0),
       receiptsLogged: Number(receiptsLogged?.value ?? 0),
       systemUsers: Number(systemUsers?.value ?? 0),

@@ -55,10 +55,14 @@ export const googleForms = p.pgTable("google_forms", {
   createdAt: p.timestamp("created_at").defaultNow().notNull(),
 });
 
-export const photoCount = p.pgTable(
-  "photo_count",
+export const miscellaneous = p.pgTable(
+  "miscellaneous",
   {
-    numberOfPhotos: p.integer("numberOfPhotos").default(252).notNull().unique(),
+    numberOfPhotos: p.integer("number_of_photos").default(252).notNull(),
+    numberOfPartners: p.integer("number_of_partners").default(0),
   },
-  (table) => [index("photo_count_index").on(table.numberOfPhotos)],
+  (table) => [
+    index("photo_count_index").on(table.numberOfPhotos),
+    index("partner_count_index").on(table.numberOfPartners),
+  ],
 );

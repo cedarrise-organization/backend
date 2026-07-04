@@ -1,0 +1,75 @@
+meta {
+  name: Send partner with us email
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/send-links/partners
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "partner@example.com",
+    "name": "Jane Doe",
+    "option": ["CO_HOST_PROGRAMS", "SPONSOR_INITIATIVES"]
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+docs {
+  # Send Partner With Us Email
+  
+  Submits a partnership request from the website. The service renders a `partner-with-cedar.ejs` email template with the requester's details and sends it to the Cedarrise admin inbox. It also emits a `SEND_PARTNER_REQUEST_EMAIL` event to update the necessary counters.
+  
+  ## Endpoint
+  `POST /api/v1/send-links/partners`
+  
+  ## Request Body
+  The request expects a JSON object with the following fields:
+  
+  | Field | Type | Required | Constraints | Description |
+  | :--- | :--- | :--- | :--- | :--- |
+  | `email` | string | Yes | Must be a valid email address | The email address of the person requesting a partnership. |
+  | `name` | string | Yes | Min: 3 characters, Max: 256 characters | The name of the person requesting a partnership. |
+  | `option` | string[] | Yes | Array of allowed enum values (see below) | The partnership areas the requester is interested in. |
+  
+  ### Allowed `option` Values
+  | Value | Description |
+  | :--- | :--- |
+  | `CO_HOST_PROGRAMS` | Co-host programs with Cedarrise. |
+  | `PROVIDE_RESOURCES` | Provide resources to initiatives. |
+  | `SPONSOR_INITIATIVES` | Sponsor Cedarrise initiatives. |
+  | `OFFER_EXPERTISE` | Offer professional expertise. |
+  | `OTHER` | Other partnership interest. |
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "Partner request email sent successfully"
+    }
+    ```
+  
+  ## Error Responses
+  - **400 Bad Request**: Validation failed (e.g., invalid email, name too short, invalid `option` enum value).
+  - **500 Internal Server Error**: 
+    - Failed to render the EJS email template.
+    - Brevo API error (email transporter failure).
+    - Email delivery verification failed — thrown when `sendEmail` returns a falsy value (`"Partner With us Email was not sent"`).
+  
+  ## Side Effects
+  - Emits `GENERAL_EVENTS.SEND_PARTNER_REQUEST_EMAIL` with `{ newPartnersCount: 1 }`, which triggers counter updates.
+  
+  ## Notes
+  - The email is sent to a hardcoded admin address, not to the requester.
+  - The `option` array is passed to the EJS template as `partnerAreas`.
+  - No caching is involved — this endpoint triggers a transactional email on every call.
+}

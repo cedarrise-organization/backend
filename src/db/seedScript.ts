@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import logger from "../configs/logger.config.js";
 import { users, roles, permissions, rolepermissions, userroles } from "./models/auth.js";
 import { projects, notifications } from "./models/dashboard.js";
-import { receipts, photoCount } from "./models/general.js";
+import { receipts, miscellaneous } from "./models/general.js";
 import { refreshtoken } from "./models/auth.js";
 import { blogs } from "./models/blogs.js";
 import {
@@ -51,9 +51,9 @@ const clearTables = async () => {
     await db.delete(capacityBuildingEvaluation);
     await db.delete(projects);
     await db.delete(receipts);
-    await db.delete(photoCount);
+    await db.delete(miscellaneous);
     await db.delete(blogs);
-    await db.delete(notifications);  
+    await db.delete(notifications);
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -754,15 +754,16 @@ async function seedNotifications() {
 }
 
 // PHOTO COUNT
-async function seedPhotoCount() {
+async function seedMiscellaneous() {
   try {
-    await db.insert(photoCount).values({
-      numberOfPhotos: 259,
+    await db.insert(miscellaneous).values({
+      numberOfPhotos: 252,
+      numberOfPartners: 5,
     });
 
-    logger.info(`Seeded photoCount`);
+    logger.info(`Seeded miscellaneous`);
   } catch (error) {
-    logger.error("could not seed photoCount table");
+    logger.error("could not seed miscellaneous table");
   }
 }
 
@@ -806,4 +807,4 @@ await seedProjects();
 await seedReceipts();
 await seedBlogs();
 await seedNotifications();
-await seedPhotoCount();
+await seedMiscellaneous();
