@@ -1,0 +1,33 @@
+<p>Hello Cedarrise Team,</p>
+
+<p>A new donation has been made to Cedarrise.</p>
+
+<p><strong>Donor Name:</strong> <%= donorName %></p>
+<p><strong>Donor Email:</strong> <%= donorEmail %></p>
+
+<% if (typeof amount !== "undefined" && amount) { %>
+
+  <p><strong>Amount Donated:</strong> <%= amount %></p>
+<% } %>
+
+<% if (supportAreas && supportAreas.length > 0) { %>
+
+  <p><strong>Selected Support Area(s):</strong></p>
+
+  <ul>
+    <% supportAreas.forEach((area) => { %>
+      <li><%= area %></li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <p><strong>Selected Support Area(s):</strong> No specific support area selected.</p>
+<% } %>
+
+<% if (otherSupportAreaNote) { %>
+
+  <p><strong>Additional Note:</strong> <%= otherSupportAreaNote %></p>
+<% } %>
+
+<p>Please review this donation.</p>
+
+<p>The Cedarrise Website</p>

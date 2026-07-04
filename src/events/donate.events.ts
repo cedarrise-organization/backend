@@ -20,7 +20,8 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       name: data.name,
       email: data.email,
       comment: data.comment,
-      metaData: JSON.stringify(data.metaData)
+      supportAreas: data.supportAreas,
+      metaData: JSON.stringify(data.metaData),
     });
 
     logger.info("Donotion record created!", {
@@ -57,6 +58,40 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
     });
   } catch (error: any) {
     logger.info("Failed to send Donation email", {
+      email: data.email,
+      message: error.message,
+      // correlationId
+    });
+  }
+});
+
+// INFORM CEDAR OF A DONATION
+appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
+  try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/donation-received.ejs",
+      {
+        donorName: data.name,
+        donorEmail: data.email,
+        amount: data.amount,
+        supportAreas: data.supportAreas,
+        otherSupportAreaNote: data.comment,
+      },
+      { async: true },
+    );
+
+    const info = await sendEmail("maxmarvict@gmail.com", "New Donation Received", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("Donation record email sent successully", {
+      // info: info.accepted,
+      // correlationId
+    });
+  } catch (error: any) {
+    logger.info("Failed to send Donation record email", {
       email: data.email,
       message: error.message,
       // correlationId

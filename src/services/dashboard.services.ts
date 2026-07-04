@@ -19,6 +19,7 @@ import {
   notInArray,
   aliasedTable,
   arrayContains,
+  arrayOverlaps, 
   countDistinct,
 } from "drizzle-orm";
 import {
@@ -43,6 +44,7 @@ import { notifications } from "../db/models/dashboard.js";
 import { cacheGet, CACHE_TTL, cacheSet, cacheDel } from "../lib/cache.js";
 import { Dataset, Linedata, Notificationcandidate } from "../types/dashboard.js";
 import { donors } from "../db/models/donors.js";
+import { miscellaneous } from "../db/models/general.js";
 
 // return Dashboard cards Data
 export const getCards = async () => {
@@ -87,6 +89,7 @@ export const getCards = async () => {
     [tacotsSponsors],
     [tacotsGraduated],
     [regularSponsors],
+    [regularPartners],
   ] = await Promise.all([
     // volunteersApplied
     db.select({ value: count(volunteerRegistration.id) }).from(volunteerRegistration), // Count ids because it has an index
@@ -197,7 +200,17 @@ export const getCards = async () => {
       .from(tacotsExit)
       .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"])),
     // regularSponsors
-    db.select({ value: countDistinct(donors.email) }).from(donors),
+    db
+      .select({ value: countDistinct(donors.email) })
+      .from(donors)
+      .where(
+        arrayOverlaps(donors.supportAreas, [
+          "SPONSOR_ASH_BENEFICIARY",
+          "SPONSOR_TACOTS_BENEFICIARY",
+        ]),
+      ),
+    // regularPartners
+    db.select({ value: miscellaneous.numberOfPartners }).from(miscellaneous),
   ]);
 
   const home = {
@@ -209,7 +222,7 @@ export const getCards = async () => {
   const volunteer = {
     applied: Number(volunteersApplied?.value ?? 0),
     accepted: Number(volunteersAccepted?.value ?? 0),
-    Partners: volunteerPartners, // NOT-SUPPORTED-IN-TABLES
+    Partners: Number(regularPartners?.value ?? 0), // STILL NOT THE BEST METHOD OF DERIVATION BEING USED
     currentVolunteers: Number(volunteersAccepted?.value ?? 0),
     sponsors: Number(regularSponsors?.value ?? 0),
   };
@@ -222,7 +235,7 @@ export const getCards = async () => {
   const outreaches = {
     communitiesEngaged: Number(outreachesCommunitiesEngaged?.value ?? 0),
     beneficiariesReached: Number(outreachesBeneficiariesReached?.value ?? 0),
-    partners: outreachesPartners, // NOT-SUPPORTED-IN-TABLES
+    partners: Number(regularPartners?.value ?? 0), // STILL NOT THE BEST METHOD OF DERIVATION BEING USED
     volunteers: Number(outreachesVolunteers?.value ?? 0),
     outreachEvents: Number(outreachesOutreachEvents?.value ?? 0),
   };
@@ -244,7 +257,7 @@ export const getCards = async () => {
     partnerSchools: Number(tacotsPartnerSchools?.value ?? 0),
     benefactors: Number(tacotsBenefactors?.value ?? 0),
     sponsors: Number(tacotsSponsors?.value ?? 0),
-    partners: tacotsPartners, // NOT-SUPPORTED-IN-TABLES
+    partners: Number(regularPartners?.value ?? 0), // STILL NOT THE BEST METHOD OF DERIVATION BEING USED
     graduated: Number(tacotsGraduated?.value ?? 0),
   };
 

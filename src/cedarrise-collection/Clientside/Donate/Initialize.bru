@@ -15,7 +15,8 @@ body:json {
     "amount": 900,
     "email": "maximilianogbuabor@gmail.com",
     "name": "kolbe",
-    "comment": "Love your work"
+    "comment": "Love your work",
+    "supportAreas": ["FUND_BOOTCAMP", "SPONSOR_ASH_BENEFICIARY"]
   }
 }
 
@@ -41,12 +42,24 @@ docs {
   
   ## Request Body (`JSON`)
   
-  | Field   | Type   | Required | Description                                                        |
-  | :------ | :----- | :------- | :----------------------------------------------------------------- |
-  | amount  | number | Yes      | Donation amount in Naira. Minimum of 100 (₦100). Converted to kobo server-side. |
-  | email   | string | Yes      | Email address of the donor. Must be a valid email.                 |
-  | name    | string | Yes      | Name of the donor. Minimum 3 characters.                           |
-  | comment | string | No       | Optional message or comment from the donor.                        |
+  | Field | Type | Required | Description |
+  | :--- | :--- | :--- | :--- |
+  | `amount` | number | Yes | Donation amount in Naira. Minimum of 100 (₦100). Converted to kobo server-side. |
+  | `email` | string | Yes | Email address of the donor. Must be a valid email. |
+  | `name` | string | Yes | Name of the donor. Minimum 3 characters. |
+  | `comment` | string | No | Optional message or comment from the donor. |
+  | `supportAreas` | string[] | No | Areas the donor wishes to support (see allowed values below). Accepts a single string or an array. |
+  
+  ### Allowed `supportAreas` Values
+  | Value | Description |
+  | :--- | :--- |
+  | `SPONSOR_ASH_BENEFICIARY` | Sponsor an ASH program beneficiary. |
+  | `SPONSOR_TACOTS_BENEFICIARY` | Sponsor a TACOTS program beneficiary. |
+  | `FUND_BOOTCAMP` | Fund a bootcamp initiative. |
+  | `FUND_TEACHER_REFRESHER_COURSE` | Fund teacher refresher courses. |
+  | `FUND_YOUTH_INITIATIVE` | Fund youth-focused initiatives. |
+  | `DONATE_OUTREACH_EVENTS_AND_MATERIALS` | Donate towards outreach events and materials. |
+  | `OTHER` | Other support area. |
   
   ## Success Response
   - **Status Code**: `200 OK`
@@ -74,4 +87,5 @@ docs {
   ## Notes
   - The `amount` is transformed from Naira to kobo (multiplied by 100) before being sent to Paystack.
   - On successful payment, the donor is redirected to the configured `PAYSTACK_CALLBACK` URL with a `reference` query parameter.
+  - The `supportAreas` field is passed through to Paystack as part of the transaction `metadata` and is persisted to the `donors` table upon successful verification.
 }

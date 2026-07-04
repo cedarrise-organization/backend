@@ -6,7 +6,7 @@ export const initialtize = async (body: {
   amount: number;
   email: string;
   callback_url: string;
-  metadata: { name: string; comment: string };
+  metadata: { name: string; comment: string, supportAreas: any };
 }) => {
   const { data } = await callPaystackApi("/transaction/initialize", {
     body,
@@ -32,6 +32,7 @@ export const verifyTransaction = async (reference: string) => {
       email: data.data.customer.email,
       name: data.data.metadata.name,
       comment: data.data.metadata.comment,
+      supportAreas:  data.data.metadata.supportAreas,
       metaData: {
         code: 200,
         message: "Transaction verified successfully",

@@ -56,7 +56,7 @@ docs {
           "reference": "abc123ref",
           "amount": 90000,
           "customer": { "email": "donor@example.com" },
-          "metadata": { "name": "John Doe", "comment": "Keep it up" }
+          "metadata": { "name": "John Doe", "comment": "Keep it up", "supportAreas": ["FUND_BOOTCAMP"] }
         }
       }
     }
@@ -81,5 +81,6 @@ docs {
   
   ## Notes
   - On a `success` status, a `donation:success` event is emitted internally which persists the donor record to the `donors` table.
-  - The donor record stores: amount (converted back from kobo to Naira), email, name, and comment.
+  - The donor record stores: amount (converted back from kobo to Naira), email, name, comment, and `supportAreas`.
+  - `supportAreas` is an optional string array passed through Paystack's `metadata` — see the **Initialize** endpoint for allowed values.
 }

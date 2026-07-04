@@ -5,7 +5,7 @@ import { successResponse } from "../../../utils/responseHandler.js";
 import { trackTransactionStatus } from "../../../lib/https/trackTransactionStatus.js";
 
 export const initializeController = async (req: Request, res: Response, next: NextFunction) => {
-  const { amount, email, name, comment } = req.body;
+  const { amount, email, name, supportAreas, comment } = req.body;
   const callback_url = process.env.PAYSTACK_CALLBACK!;
 
   try {
@@ -13,7 +13,7 @@ export const initializeController = async (req: Request, res: Response, next: Ne
       amount,
       email,
       callback_url,
-      metadata: { name, comment },
+      metadata: { name, comment, supportAreas },
     });
 
     return successResponse(res, response.code, response.message, response.data);
