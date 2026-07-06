@@ -24,6 +24,7 @@ import {
 } from "../db/models/admin.js";
 import db from "../db/db.js";
 import logger from "../configs/logger.config.js";
+import { NotFoundError } from "../lib/error.js";
 
 const sortMap = {
   // ashStudent
@@ -436,6 +437,15 @@ export const exportAshStudentTableToCSV = async () => {
 
 // ASH FEEDBACK
 export const submitFeedback = async (options: AshprogramfeedbackType) => {
+  const [user] = await db
+    .select()
+    .from(ashStudent)
+    .where(eq(ashStudent.surname, options.studentSurname));
+
+  if (!user) {
+    throw new NotFoundError("ASH student not found");
+  }
+
   const [newAshProgramFeedback] = await db
     .insert(ashProgramFeedback)
     .values({

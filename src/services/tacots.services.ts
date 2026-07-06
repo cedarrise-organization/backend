@@ -23,6 +23,7 @@ import {
 } from "../db/models/admin.js";
 import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
+import { NotFoundError } from "../lib/error.js";
 
 const sortMap = {
   firstName: tacotsRecommendation.firstName,
@@ -425,6 +426,15 @@ export const exportTacotsRecommendationTableToCSV = async () => {
 
 // FEEDBACK
 export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
+  const [user] = await db
+    .select()
+    .from(tacotsRecommendation)
+    .where(eq(tacotsRecommendation.surname, options.studentSurname));
+
+  if (!user) {
+    throw new NotFoundError("TACOTS Beneficiary not found");
+  }
+
   const [newTacotsFeedback] = await db
     .insert(tacotsFeedback)
     .values({

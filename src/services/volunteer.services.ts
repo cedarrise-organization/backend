@@ -9,6 +9,7 @@ import {
 } from "../modules/volunteer/volunteer.schema.js";
 import { appEvents } from "../lib/events.js";
 import db from "../db/db.js";
+import { NotFoundError } from "../lib/error.js";
 
 const sortMap = {
   firstName: volunteerRegistration.firstName,
@@ -308,6 +309,15 @@ export const exportVolunteerRegistrationTableToCSV = async () => {
 };
 
 export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType) => {
+  const [user] = await db
+    .select()
+    .from(volunteerRegistration)
+    .where(eq(volunteerRegistration.surname, options.surname));
+  
+  if(!user){
+    throw new NotFoundError("Volunteer not found")
+  }
+
   const [newVolunteerFeedback] = await db
     .insert(volunteerFeedback)
     .values({
