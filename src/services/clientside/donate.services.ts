@@ -6,7 +6,7 @@ export const initialtize = async (body: {
   amount: number;
   email: string;
   callback_url: string;
-  metadata: { name: string; comment: string, supportAreas: any };
+  metadata: { name: string; comment: string, supportAreas: string[] };
 }) => {
   const { data } = await callPaystackApi("/transaction/initialize", {
     body,

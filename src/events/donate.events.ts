@@ -1,7 +1,6 @@
 import { sendEmail } from "../utils/sendEmail.util.js";
 import { donors } from "../db/models/donors.js";
 import { appEvents } from "../lib/events.js";
-import { sql } from "drizzle-orm";
 import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
 import ejs from "ejs";
@@ -24,7 +23,7 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       metaData: JSON.stringify(data.metaData),
     });
 
-    logger.info("Donotion record created!", {
+    logger.info("Donation record created!", {
       email: data.email,
       // correlationId
     });
@@ -57,7 +56,7 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       // correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send Donation email", {
+    logger.info("Failed to send `Thank you For Your Donation` email", {
       email: data.email,
       message: error.message,
       // correlationId
@@ -80,18 +79,18 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
       { async: true },
     );
 
-    const info = await sendEmail("maxmarvict@gmail.com", "New Donation Received", content);
+    const info = await sendEmail(process.env.CEDAR_EMAIL!.toString(), "New Donation Received", content);
 
     if (!info) {
       throw new Error();
     }
 
-    logger.info("Donation record email sent successully", {
+    logger.info("Donation Record email sent successully", {
       // info: info.accepted,
       // correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send Donation record email", {
+    logger.info("Failed to send Donation Record email", {
       email: data.email,
       message: error.message,
       // correlationId

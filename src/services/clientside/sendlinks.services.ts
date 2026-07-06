@@ -151,7 +151,7 @@ export const sendPartnerWithUsEmail = async (options: Sendpwsemailtype) => {
   );
 
   const info = await sendEmail(
-    "maxmarvict@gmail.com",
+    process.env.CEDAR_EMAIL!.toString(),
     `${name} wants to Partner with us!`,
     content,
   );

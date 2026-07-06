@@ -17,7 +17,7 @@ export const sendFeedbackMailController = async (
   );
 
   try {
-    const info = await sendEmail("maxmarvict@gmail.com", `Feedback submitted by ${email}`, content);
+    const info = await sendEmail(process.env.CEDAR_EMAIL!.toString(), `Feedback submitted by ${email}`, content);
 
     if (!info) {
       return res.status(500).json({
