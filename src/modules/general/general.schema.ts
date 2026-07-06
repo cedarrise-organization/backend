@@ -82,7 +82,7 @@ export const gallerySchema = z.object({
 export const googleSchema = z.object({
   body: z.object({
     title: z.string().min(3, "title should be at least 3 characters").max(100),
-    src: z.string(),
+    src: z.string("please input a valid src"),
     description: z.string().optional(),
     deadline: z.coerce.date(),
   }),
