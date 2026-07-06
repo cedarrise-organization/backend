@@ -470,7 +470,15 @@ export const ashExitQuerySchema = z.object({
     sortBy: z.preprocess(
       (v) => (v === "" ? undefined : v),
       z
-        .enum(["schoolName", "classAtExit", "exitDate", "createdAt"])
+        .enum([
+          "ageAtExit",
+          "schoolName",
+          "classAtExit",
+          "durationInProgram",
+          "facilitatorName",
+          "exitDate",
+          "createdAt",
+        ])
         .default("createdAt"),
     ),
   }),

@@ -46,8 +46,11 @@ const termlySortMap = {
 } as const;
 const exitSortMap = {
   // ashExit
+  ageAtExit: ashExit.ageAtExit,
   schoolName: ashExit.schoolName,
   classAtExit: ashExit.classAtExit,
+  durationInProgram: ashExit.durationInProgram,
+  facilitatorName: ashExit.facilitatorName,
   exitDate: ashExit.exitDate,
   createdAt: ashExit.createdAt,
 } as const;

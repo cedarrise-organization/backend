@@ -10,6 +10,8 @@ const sortMap = {
   outreachStartDate: outreachTracker.outreachStartDate,
   outreachEndDate: outreachTracker.outreachEndDate,
   outreachState: outreachTracker.outreachState,
+  numBeneficiaries: outreachTracker.numBeneficiaries,
+  numVolunteers: outreachTracker.numVolunteers,
   outreachType: outreachTracker.outreachType,
   createdAt: outreachTracker.createdAt,
 } as const;

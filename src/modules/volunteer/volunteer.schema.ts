@@ -143,9 +143,10 @@ export const volunteerRegistrationQuerySchema = z.object({
         .enum([
           "firstName",
           "surname",
-          "emailAddress",
-          "phoneNumber",
+          "gender",
           "state",
+          "emailAddress",
+          "availability",
           "volunteerAreas",
           "createdAt",
         ])

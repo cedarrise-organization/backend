@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/forms/ash/exit?page=&limit=&orderBy=&search=&sortBy=
+  url: {{baseUrl}}/api/v1/forms/ash/exit?page=&limit=&orderBy=&search=&sortBy=facilitatorName
   body: none
   auth: inherit
 }
@@ -15,7 +15,7 @@ params:query {
   limit: 
   orderBy: 
   search: 
-  sortBy: 
+  sortBy: facilitatorName
 }
 
 vars:pre-request {
@@ -42,7 +42,7 @@ docs {
   | page      | number | No       | `1`         | Page number (integer ≥ 1)                                                                                             |
   | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                       |
   | orderBy   | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                                 |
-  | sortBy    | string | No       | `createdAt` | One of: `schoolName`, `classAtExit`, `exitDate`, `createdAt`                                                          |
+  | sortBy    | string | No       | `createdAt` | One of: `ageAtExit`, `schoolName`, `classAtExit`, `durationInProgram`, `facilitatorName`, `exitDate`, `createdAt`      |
   | search    | string | No       | —           | Full-text search query. When provided, cache and sort filters are bypassed and results are matched against the GIN index. |
   
   ### Searchable Fields

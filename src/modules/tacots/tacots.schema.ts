@@ -616,6 +616,8 @@ export const tacotsTrackingQuerySchema = z.object({
         .enum([
           "academicSession",
           "academicTerm",
+          "region",
+          "studentAveragePct",
           "assessmentPeriod",
           "createdAt",
         ])
@@ -696,7 +698,7 @@ export const tacotsExitQuerySchema = z.object({
     sortBy: z.preprocess(
       (v) => (v === "" ? undefined : v),
       z
-        .enum(["schoolAttendedDuringProgram", "yearOfExit", "exitReason", "createdAt"])
+        .enum(["schoolAttendedDuringProgram", "yearOfExit", "exitReason", "highestEducationAttained", "createdAt"])
         .default("createdAt"),
     ),
   }),

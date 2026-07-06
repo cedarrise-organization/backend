@@ -14,9 +14,10 @@ import { NotFoundError } from "../lib/error.js";
 const sortMap = {
   firstName: volunteerRegistration.firstName,
   surname: volunteerRegistration.surname,
+  gender: volunteerRegistration.gender,
   emailAddress: volunteerRegistration.emailAddress,
-  phoneNumber: volunteerRegistration.phoneNumber,
   state: volunteerRegistration.state,
+  availability: volunteerRegistration.availability,
   volunteerAreas: volunteerRegistration.volunteerAreas,
   createdAt: volunteerRegistration.createdAt,
 } as const;

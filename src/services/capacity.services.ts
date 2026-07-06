@@ -11,6 +11,7 @@ const sortMap = {
   programType: capacityBuildingEvaluation.programType,
   programDate: capacityBuildingEvaluation.programDate,
   location: capacityBuildingEvaluation.location,
+  numberOfParticipants: capacityBuildingEvaluation.numberOfParticipants,
   programCoordinator: capacityBuildingEvaluation.programCoordinator,
   createdAt: capacityBuildingEvaluation.createdAt,
 } as const;

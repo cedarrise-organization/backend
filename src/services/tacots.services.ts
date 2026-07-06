@@ -36,6 +36,8 @@ const sortMap = {
 const trackingSortMap = {
   academicSession: tacotsTracking.academicSession,
   academicTerm: tacotsTracking.academicTerm,
+  region: tacotsTracking.region,
+  studentAveragePct: tacotsTracking.studentAveragePct,
   assessmentPeriod: tacotsTracking.assessmentPeriod,
   createdAt: tacotsTracking.createdAt,
 } as const;
@@ -51,6 +53,7 @@ const exitSortMap = {
   schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,
   yearOfExit: tacotsExit.yearOfExit,
   exitReason: tacotsExit.exitReason,
+  highestEducationAttained: tacotsExit.highestEducationAttained,
   createdAt: tacotsExit.createdAt,
 } as const;
 

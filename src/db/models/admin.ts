@@ -283,6 +283,9 @@ export const ashExit = p.pgTable(
   (table) => [
     index("ash_exit_student_idx").on(table.studentId),
     index("ash_exit_school_idx").on(table.schoolName),
+    index("ash_exit_age_idx").on(table.ageAtExit),
+    index("ash_exit_duration_idx").on(table.durationInProgram),
+    index("ash_exit_facilitator_idx").on(table.facilitatorName),
     index("ash_exit_class_idx").on(table.classAtExit),
     index("ash_exit_date_idx").on(table.exitDate),
     index("ash_exit_created_at_idx").on(table.createdAt),
@@ -409,6 +412,7 @@ export const capacityBuildingEvaluation = p.pgTable(
     index("capacity_program_date_idx").on(table.programDate),
     index("capacity_location_idx").on(table.location),
     index("capacity_coordinator_idx").on(table.programCoordinator),
+    index("capacity_number_of_participants_idx").on(table.numberOfParticipants),
     index("capacity_date_submitted_idx").on(table.dateSubmitted),
     index("capacity_created_at_idx").on(table.createdAt),
     index("capacity_search_index").using(
@@ -702,6 +706,8 @@ export const outreachTracker = p.pgTable(
       table.outreachCity,
     ),
     index("outreach_tracker_outreach_type_idx").on(table.outreachType),
+    index("outreach_tracker_no_of_volunteers_idx").on(table.numVolunteers),
+    index("outreach_tracker_no_of_beneficiaries_idx").on(table.numBeneficiaries),
     index("outreach_tracker_submitted_by_idx").on(table.submittedBy),
     index("outreach_tracker_submission_date_idx").on(table.submissionDate),
     index("outreach_tracker_created_at_idx").on(table.createdAt),
@@ -766,11 +772,12 @@ export const volunteerRegistration = p.pgTable(
   (table) => [
     index("volunteer_registration_name_idx").on(table.firstName, table.surname),
     index("volunteer_registration_email_idx").on(table.emailAddress),
-    index("volunteer_registration_phone_idx").on(table.phoneNumber),
+    index("volunteer_registration_gender_idx").on(table.gender),
     index("volunteer_registration_state_idx").on(table.state),
     index("volunteer_registration_status_idx").on(table.status),
     index("volunteer_registration_created_at_idx").on(table.createdAt),
     index("volunteer_areas_idx").using("gin", table.volunteerAreas),
+    index("availability_idx").using("gin", table.availability),
     index("volunteer_registration_search_index").using(
       "gin",
       sql`(
@@ -1110,6 +1117,8 @@ export const tacotsTracking = p.pgTable(
   (table) => [
     index("tacots_tracking_student_idx").on(table.studentId),
     index("tacots_tracking_school_idx").on(table.schoolId),
+    index("tacots_tracking_region_idx").on(table.region),
+    index("tacots_tracking_student_average_idx").on(table.studentAveragePct),
     index("tacots_tracking_session_term_idx").on(table.academicSession, table.academicTerm),
     index("tacots_tracking_assessment_period_idx").on(table.assessmentPeriod),
     index("tacots_tracking_submission_date_idx").on(table.submissionDate),
@@ -1186,6 +1195,7 @@ export const tacotsExit = p.pgTable(
     index("tacots_exit_year_idx").on(table.yearOfExit),
     index("tacots_exit_reason_idx").on(table.exitReason),
     index("tacots_exit_submission_date_idx").on(table.submissionDate),
+    index("tacots_exit_highest_education_attained_idx").on(table.highestEducationAttained),
     index("tacots_exit_created_at_idx").on(table.createdAt),
     index("tacots_exit_search_index").using(
       "gin",

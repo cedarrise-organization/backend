@@ -107,6 +107,7 @@ export const capacityBuildingEvaluationQuerySchema = z.object({
           "programType",
           "programDate",
           "location",
+          "numberOfParticipants",
           "programCoordinator",
           "createdAt",
         ])

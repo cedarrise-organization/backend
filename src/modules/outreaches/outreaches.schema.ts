@@ -58,6 +58,8 @@ export const outreachTrackerQuerySchema = z.object({
           "outreachStartDate",
           "outreachEndDate",
           "outreachState",
+          "numVolunteers",
+          "numBeneficiaries",
           "outreachType",
           "createdAt",
         ])

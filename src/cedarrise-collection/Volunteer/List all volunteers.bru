@@ -46,7 +46,7 @@ docs {
   | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                                               |
   | orderBy   | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                                                         |
   | status    | string | No       | `pending`   | One of: `accepted`, `rejected`, `pending`                                                                                                     |
-  | sortBy    | string | No       | `createdAt` | One of: `firstName`, `surname`, `emailAddress`, `phoneNumber`, `state`, `volunteerAreas`, `createdAt`                                         |
+  | sortBy    | string | No       | `createdAt` | One of: `firstName`, `surname`, `gender`, `emailAddress`, `state`, `availability`, `volunteerAreas`, `createdAt`                               |
   | search    | string | No       | —           | Full-text search query. When provided, cache and sort/status filters are bypassed and results are matched against the GIN index.               |
   
   ### Searchable Fields
