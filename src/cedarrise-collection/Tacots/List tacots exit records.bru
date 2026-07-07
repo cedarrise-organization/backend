@@ -47,12 +47,14 @@ docs {
   
   ### Searchable Fields
   
-  | Field                          | Weight |
-  |--------------------------------|--------|
-  | `schoolAttendedDuringProgram`  | A      |
-  | `exitReason`                   | C      |
-  | `currentStatus`                | C      |
-  | `completedBy`                  | C      |
+  | Field                          | Weight | Notes                                          |
+  |--------------------------------|--------|-------------------------------------------------|
+  | `schoolAttendedDuringProgram`  | A      | Combined with `firstName` + `surname` from the joined TACOTS recommendation record |
+  | `firstName`                    | A      | From the joined TACOTS recommendation record    |
+  | `surname`                      | A      | From the joined TACOTS recommendation record    |
+  | `exitReason`                   | C      |                                                 |
+  | `currentStatus`                | C      |                                                 |
+  | `completedBy`                  | C      |                                                 |
   
   ## Response
   

@@ -43,11 +43,12 @@ docs {
   
   ### Searchable Fields
   
-  | Field                    | Weight |
-  |--------------------------|--------|
-  | `sessionsConducted`      | A      |
-  | `volunteersInAttendance` | A      |
-  | `sessionDetails`         | A      |
+  | Field                    | Weight | Notes                                          |
+  |--------------------------|--------|-------------------------------------------------|
+  | `volunteersInAttendance` | A      |                                                 |
+  | `sessionDetails`         | A      |                                                 |
+  | `sessionsConducted`      | A      |                                                 |
+  | `student names`          | A      | Resolved from `studentsInAttendance` and `studentsMentored` UUID arrays via ASH student join |
   
   ## Response
   

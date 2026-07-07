@@ -47,12 +47,14 @@ docs {
   
   ### Searchable Fields
   
-  | Field              | Weight |
-  |--------------------|--------|
-  | `academicTerm`     | A      |
-  | `assessmentPeriod` | A      |
-  | `region`           | B      |
-  | `mentorName`       | B      |
+  | Field              | Weight | Notes                                          |
+  |--------------------|--------|-------------------------------------------------|
+  | `academicTerm`     | A      | Combined with `firstName` + `surname` from the joined TACOTS recommendation record |
+  | `firstName`        | A      | From the joined TACOTS recommendation record    |
+  | `surname`          | A      | From the joined TACOTS recommendation record    |
+  | `assessmentPeriod` | A      |                                                 |
+  | `region`           | B      |                                                 |
+  | `mentorName`       | B      |                                                 |
   
   ## Response
   

@@ -47,19 +47,21 @@ docs {
   
   ### Searchable Fields
   
-  | Field                  | Weight |
-  |------------------------|--------|
-  | `enrolledSchoolName`   | A      |
-  | `enrolledSchoolState`  | A      |
-  | `mentorName`           | B      |
-  | `sponsorName`          | B      |
-  | `generalHealthStatus`  | C      |
-  | `enrolledClass`        | C      |
-  | `diagnosedConditions`  | D      |
-  | `behavioralIndicators` | D      |
-  | `chronicConditions`    | D      |
-  | `allergies`            | D      |
-  | `supportTypesApproved` | D      |
+  | Field                  | Weight | Notes                                          |
+  |------------------------|--------|-------------------------------------------------|
+  | `enrolledSchoolName`   | A      | Combined with `firstName` + `surname` from the joined TACOTS recommendation record |
+  | `firstName`            | A      | From the joined TACOTS recommendation record    |
+  | `surname`              | A      | From the joined TACOTS recommendation record    |
+  | `enrolledSchoolState`  | A      |                                                 |
+  | `mentorName`           | B      |                                                 |
+  | `sponsorName`          | B      |                                                 |
+  | `generalHealthStatus`  | C      |                                                 |
+  | `enrolledClass`        | C      |                                                 |
+  | `diagnosedConditions`  | D      |                                                 |
+  | `behavioralIndicators` | D      |                                                 |
+  | `chronicConditions`    | D      |                                                 |
+  | `allergies`            | D      |                                                 |
+  | `supportTypesApproved` | D      |                                                 |
   
   ## Response
   

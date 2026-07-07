@@ -47,12 +47,14 @@ docs {
   
   ### Searchable Fields
   
-  | Field              | Weight |
-  |--------------------|--------|
-  | `academicSession`  | A      |
-  | `term`             | A      |
-  | `schoolName`       | B      |
-  | `mentorName`       | B      |
+  | Field              | Weight | Notes                                          |
+  |--------------------|--------|-------------------------------------------------|
+  | `academicSession`  | A      | Combined with `firstName` + `surname` from the joined ASH student record |
+  | `firstName`        | A      | From the joined ASH student record              |
+  | `surname`          | A      | From the joined ASH student record              |
+  | `term`             | A      |                                                 |
+  | `schoolName`       | B      |                                                 |
+  | `mentorName`       | B      |                                                 |
   
   ## Response
   

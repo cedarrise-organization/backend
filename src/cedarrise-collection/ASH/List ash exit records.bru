@@ -47,13 +47,15 @@ docs {
   
   ### Searchable Fields
   
-  | Field                | Weight |
-  |----------------------|--------|
-  | `schoolName`         | A      |
-  | `classAtExit`        | B      |
-  | `durationInProgram`  | B      |
-  | `exitReason`         | C      |
-  | `areasOfImprovement` | C      |
+  | Field                | Weight | Notes                                          |
+  |----------------------|--------|-------------------------------------------------|
+  | `schoolName`         | A      | Combined with `firstName` + `surname` from the joined ASH student record |
+  | `firstName`          | A      | From the joined ASH student record              |
+  | `surname`            | A      | From the joined ASH student record              |
+  | `classAtExit`        | B      |                                                 |
+  | `durationInProgram`  | B      |                                                 |
+  | `exitReason`         | C      |                                                 |
+  | `areasOfImprovement` | C      |                                                 |
   
   ## Response
   
