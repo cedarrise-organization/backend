@@ -701,7 +701,7 @@ export const listOnboarding = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolName}), 'A') ||
+      setweight(to_tsvector('english', concat_ws(' ', ${tacotsOnboarding.enrolledSchoolName}, ${tacotsRecommendation.firstName}, ${tacotsRecommendation.surname})), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledSchoolState}), 'A') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.enrolledClass}), 'C') ||
       setweight(to_tsvector('english', ${tacotsOnboarding.generalHealthStatus}), 'C') ||
@@ -772,6 +772,7 @@ export const listOnboarding = async (
       db
         .select({ value: count(tacotsOnboarding.id) })
         .from(tacotsOnboarding)
+        .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`),
     ]);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
@@ -1167,7 +1168,7 @@ export const listTacotsTracking = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${tacotsTracking.academicTerm}), 'A') ||
+      setweight(to_tsvector('english', concat_ws(' ', ${tacotsTracking.academicTerm}, ${tacotsRecommendation.firstName}, ${tacotsRecommendation.surname})), 'A') ||
       setweight(to_tsvector('english', ${tacotsTracking.assessmentPeriod}), 'A') ||
       setweight(to_tsvector('english', ${tacotsTracking.region}), 'B') ||
       setweight(to_tsvector('english', ${tacotsTracking.mentorName}), 'B') 
@@ -1226,6 +1227,8 @@ export const listTacotsTracking = async (
       db
         .select({ value: count(tacotsTracking.id) })
         .from(tacotsTracking)
+        .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsTracking.studentId))
+        .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`),
     ]);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
@@ -1501,7 +1504,7 @@ export const listTacotsExit = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${tacotsExit.schoolAttendedDuringProgram}), 'A') ||
+      setweight(to_tsvector('english', concat_ws(' ', ${tacotsExit.schoolAttendedDuringProgram}, ${tacotsRecommendation.firstName}, ${tacotsRecommendation.surname})), 'A') ||
       setweight(to_tsvector('english', ${tacotsExit.exitReason}), 'C') ||
       setweight(to_tsvector('english', ${tacotsExit.currentStatus}), 'C') ||
       setweight(to_tsvector('english', ${tacotsExit.completedBy}), 'C') 
@@ -1512,7 +1515,7 @@ export const listTacotsExit = async (
       db
         .select({
           firstName: tacotsRecommendation.firstName,
-          surname: tacotsRecommendation.firstName,
+          surname: tacotsRecommendation.surname,
           id: tacotsExit.id,
           studentId: tacotsExit.studentId,
           schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,
@@ -1546,6 +1549,8 @@ export const listTacotsExit = async (
       db
         .select({ value: count(tacotsExit.id) })
         .from(tacotsExit)
+        .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsExit.studentId))
+        .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`),
     ]);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
@@ -1593,7 +1598,7 @@ export const listTacotsExit = async (
     db
       .select({
         firstName: tacotsRecommendation.firstName,
-        surname: tacotsRecommendation.firstName,
+        surname: tacotsRecommendation.surname,
         id: tacotsExit.id,
         studentId: tacotsExit.studentId,
         schoolAttendedDuringProgram: tacotsExit.schoolAttendedDuringProgram,

@@ -786,7 +786,7 @@ export const listTracking = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${ashTermlyTracking.academicSession}), 'A') ||
+      setweight(to_tsvector('english', concat_ws(' ', ${ashTermlyTracking.academicSession}, ${ashStudent.firstName}, ${ashStudent.surname})), 'A') ||
       setweight(to_tsvector('english', ${ashTermlyTracking.term}), 'A') ||
       setweight(to_tsvector('english', ${ashTermlyTracking.schoolName}), 'B') ||
       setweight(to_tsvector('english', ${ashTermlyTracking.mentorName}), 'B') 
@@ -838,6 +838,7 @@ export const listTracking = async (
       db
         .select({ value: count(ashTermlyTracking.id) })
         .from(ashTermlyTracking)
+        .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`),
     ]);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
@@ -1324,7 +1325,7 @@ export const listExit = async (
   // search
   if (search) {
     const searchVector = sql`
-      setweight(to_tsvector('english', ${ashExit.schoolName}), 'A') ||
+      setweight(to_tsvector('english', concat_ws(' ', ${ashExit.schoolName}, ${ashStudent.firstName}, ${ashStudent.surname})), 'A') ||
       setweight(to_tsvector('english', ${ashExit.classAtExit}), 'B') ||
       setweight(to_tsvector('english', ${ashExit.durationInProgram}), 'B') ||
       setweight(to_tsvector('english', ${ashExit.exitReason}), 'C') ||
@@ -1370,6 +1371,7 @@ export const listExit = async (
       db
         .select({ value: count(ashExit.id) })
         .from(ashExit)
+        .innerJoin(ashStudent, eq(ashStudent.id, ashExit.studentId))
         .where(sql`${searchVector} @@ ${searchQuery}`),
     ]);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
