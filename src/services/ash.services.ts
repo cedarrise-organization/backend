@@ -4,7 +4,18 @@ import { CACHE_TTL, cacheSet, cacheGet } from "../lib/cache.js";
 import { ASH_EVENTS } from "../events/ash.events.js";
 import { UploadApiResponse } from "cloudinary";
 import { appEvents } from "../lib/events.js";
-import { sql, asc, and, eq, lt, count, countDistinct, desc, inArray } from "drizzle-orm";
+import {
+  sql,
+  asc,
+  and,
+  eq,
+  lt,
+  count,
+  countDistinct,
+  desc,
+  inArray,
+  getTableColumns,
+} from "drizzle-orm";
 import { Request } from "express";
 import {
   AshstudentbodyType,
@@ -1072,26 +1083,46 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
 export const listAttendance = async (page: number, limit: number, search: string) => {
   // search
   if (search) {
-    const searchVector = sql` 
-      setweight(to_tsvector('english', ${ashWeeklyAttendance.volunteersInAttendance}), 'A') ||
+    const studentName = sql<string>`
+      concat_ws(' ', ${ashStudent.firstName}, ${ashStudent.surname})
+    `;
+
+    const joinCondition = sql`
+      ${ashStudent.id} = ANY(${ashWeeklyAttendance.studentsInAttendance})
+      OR
+      ${ashStudent.id} = ANY(${ashWeeklyAttendance.studentsMentored})
+    `;
+
+    const searchVector = sql`
+      setweight(to_tsvector('english', coalesce(${ashWeeklyAttendance.volunteersInAttendance}, '')), 'A') ||
       setweight(to_tsvector('english', coalesce(${ashWeeklyAttendance.sessionDetails}, '')), 'A') ||
-      setweight(to_tsvector('english', coalesce(array_to_string(${ashWeeklyAttendance.sessionsConducted}, ' '), '')), 'A')
-  `;
+      setweight(to_tsvector('english', coalesce(array_to_string(${ashWeeklyAttendance.sessionsConducted}, ' '), '')), 'A') ||
+      setweight(to_tsvector('english', coalesce(string_agg(distinct ${studentName}, ' '), '')), 'A')
+    `;
+
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-    const [attendance, [totalDocuments]] = await Promise.all([
+    const [attendance, matchingRows] = await Promise.all([
       db
-        .select()
+        .select({
+          ...getTableColumns(ashWeeklyAttendance),
+        })
         .from(ashWeeklyAttendance)
-        .where(sql`${searchVector} @@ ${searchQuery}`)
+        .leftJoin(ashStudent, joinCondition)
+        .groupBy(ashWeeklyAttendance.id)
+        .having(sql`${searchVector} @@ ${searchQuery}`)
         .limit(limit)
         .offset((page - 1) * limit),
 
       db
-        .select({ value: count(ashWeeklyAttendance.id) })
+        .select({ id: ashWeeklyAttendance.id })
         .from(ashWeeklyAttendance)
-        .where(sql`${searchVector} @@ ${searchQuery}`),
+        .innerJoin(ashStudent, joinCondition)
+        .groupBy(ashWeeklyAttendance.id)
+        .having(sql`${searchVector} @@ ${searchQuery}`)
+        .as("matching_rows"),
     ]);
+    const [totalDocuments] = await db.select({ value: count() }).from(matchingRows);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
 
     const allStudentIds = [
