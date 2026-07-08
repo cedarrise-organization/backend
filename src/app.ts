@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { connectRedis } from "./configs/cache.config.js";
 import { bullBoardAdapter } from "./configs/bull-board.config.js";
+import { keepEmailAlive, keepRedisAlive } from "./lib/stayalive.js";
 import carouselRouter from "./modules/clientside/carousels/carousels.routes.js";
 import sendlinksRouter from "./modules/clientside/sendlinks/sendlinks.routes.js";
 import feedbackRouter from "./modules/clientside/feedback/feedback.routes.js";
@@ -63,11 +64,15 @@ app.use(cors(corsOptions));
 (async () => {
   await connectRedis();
 })();
-
 (async () => {
   await scheduleWeeklyNotificationJob();
 })();
-
+(async () => {
+  await keepEmailAlive();
+})();
+(async () => {
+  await keepRedisAlive();
+})();
 // (async () => {
 //   await testAddtoQueue();
 // })();

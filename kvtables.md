@@ -270,3 +270,12 @@
 | `test`        | `PG_DATABASE_TEST_URL` |
 | `development` | `PG_DATABASE_DEV_URL`  |
 | `production`  | `PG_DATABASE_PROD_URL` |
+
+---
+
+# Scheduled Keep-Alive Jobs
+
+| Function           | Cron Schedule    | Runs                              | Purpose                                         | Source              |
+| :----------------- | :--------------- | :-------------------------------- | :----------------------------------------------- | :------------------ |
+| `keepEmailAlive`   | `0 0 1 * *`     | Midnight on the 1st of each month | Sends a keep-alive email via Brevo to prevent the API key from rotating due to inactivity | `lib/stayalive.ts`  |
+| `keepRedisAlive`   | `0 0 14 * *`    | Midnight on the 14th of each month | Sets a temporary Redis key (`foo`/`bar`, 60s TTL) to prevent the Redis instance from dying due to inactivity | `lib/stayalive.ts`  |
