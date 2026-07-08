@@ -1,6 +1,7 @@
 {
 	"name": "ts-node-template",
 	"version": "1.0.0",
+	"packageManager":"npm@11.18.0",
 	"description": "",
 	"scripts": {
 		"build": "npm install --include=dev && npx tsc",
