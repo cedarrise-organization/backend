@@ -2,6 +2,7 @@
 import express from "express";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
+import { formUploadLimiter } from "../../middleware/rateLimiter.middleware.js";
 import {
   submitVolunteerRegistrationController,
   listVolunteersController,
@@ -31,6 +32,7 @@ const router = express.Router();
 // Submit volunteer registration
 router.post(
   "/register",
+  formUploadLimiter,
   validateRequest(createVolunteerRegistrationSchema),
   submitVolunteerRegistrationController,
 );
@@ -72,6 +74,7 @@ router.get("/download/volunteerregistration", authenticate(), authorize("read"),
 // Submit volunteer feedback form
 router.post(
   "/feedback",
+  formUploadLimiter,
   validateRequest(createVolunteerFeedbackSchema),
   submitVolunteerFeedbackController,
 );

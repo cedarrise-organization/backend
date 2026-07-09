@@ -33,10 +33,15 @@ export async function keepEmailAlive() {
 
 // KEEP REDIS DB FROM DYING
 export async function keepRedisAlive() {
-  logger.info("Running keepRedisAlive function...");
   schedule.scheduleJob("0 0 14 * *", async () => {
-    await cacheSet("foo", "bar", 60);
+    logger.info("Running keepRedisAlive function...");
+    try {
+      await cacheSet("foo", "bar", 60);
+      logger.info("[cron] KEEP ALIVE redis key set successully");
+    } catch (error: any) {
+      logger.error("[cron] failed to set KEEP ALIVE redis key", {
+        message: error.message,
+      });
+    }
   });
-
-  logger.info("[cron] KEEP ALIVE redis key set successully");
 }

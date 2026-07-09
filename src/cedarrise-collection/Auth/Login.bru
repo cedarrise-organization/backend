@@ -16,7 +16,7 @@ body:form-urlencoded {
 }
 
 vars:pre-request {
-  baseUrl: https://cedar-backend-test.up.railway.app
+  baseUrl: http://localhost:3000
 }
 
 settings {
@@ -45,4 +45,8 @@ docs {
   ## Errors
   - `400 Bad Request` — Validation failed (missing/invalid fields).
   - `404 Not Found` — Invalid credentials (wrong email or password).
+  - `429 Too Many Requests` — Rate limit exceeded (`authLimiter`: 5 requests per 15-minute window, keyed by IP).
+  
+  ## Rate Limiting
+  This endpoint is protected by `authLimiter` — a maximum of **5 requests per 15-minute window**, keyed by the client's IP address. Exceeds return a `429` with `{ code: "RATE_LIMITED", message: "Too many login attempts. Please try again later." }`.
 }

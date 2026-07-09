@@ -82,7 +82,11 @@ docs {
   
   ## Error Responses
   - **400 Bad Request**: Validation failed (e.g., amount below 100, invalid email, name too short).
+  - **429 Too Many Requests**: Rate limit exceeded (`donationLimiter`: 5 requests per 10-minute window, keyed by IP).
   - **500 Internal Server Error**: Paystack API call failed.
+  
+  ## Rate Limiting
+  This endpoint is protected by `donationLimiter` — a maximum of **5 requests per 10-minute window**, keyed by the client's IP address. Exceeds return a `429` with `{ code: "RATE_LIMITED", message: "Too many donation attempts. Please try again in 10 minutes" }`.
   
   ## Notes
   - The `amount` is transformed from Naira to kobo (multiplied by 100) before being sent to Paystack.

@@ -275,7 +275,19 @@
 
 # Scheduled Keep-Alive Jobs
 
-| Function           | Cron Schedule    | Runs                              | Purpose                                         | Source              |
-| :----------------- | :--------------- | :-------------------------------- | :----------------------------------------------- | :------------------ |
-| `keepEmailAlive`   | `0 0 1 * *`     | Midnight on the 1st of each month | Sends a keep-alive email via Brevo to prevent the API key from rotating due to inactivity | `lib/stayalive.ts`  |
-| `keepRedisAlive`   | `0 0 14 * *`    | Midnight on the 14th of each month | Sets a temporary Redis key (`foo`/`bar`, 60s TTL) to prevent the Redis instance from dying due to inactivity | `lib/stayalive.ts`  |
+| Function         | Cron Schedule | Runs                               | Purpose                                                                                                      | Source             |
+| :--------------- | :------------ | :--------------------------------- | :----------------------------------------------------------------------------------------------------------- | :----------------- |
+| `keepEmailAlive` | `0 0 1 * *`   | Midnight on the 1st of each month  | Sends a keep-alive email via Brevo to prevent the API key from rotating due to inactivity                    | `lib/stayalive.ts` |
+| `keepRedisAlive` | `0 0 14 * *`  | Midnight on the 14th of each month | Sets a temporary Redis key (`foo`/`bar`, 60s TTL) to prevent the Redis instance from dying due to inactivity | `lib/stayalive.ts` |
+
+---
+
+# Rate Limiters
+
+| Limiter             | Window     | Max Requests | Key Strategy | Rate-Limited Message                                       | Source                                 |
+| :------------------ | :--------- | :----------- | :----------- | :--------------------------------------------------------- | :------------------------------------- |
+| `authLimiter`       | 15 minutes | 5            | IP           | Too many login attempts. Please try again later.           | `middleware/rateLimiter.middleware.ts` |
+| `formUploadLimiter` | 15 minutes | 3            | IP           | Too many submission attempts. Please try again later       | `middleware/rateLimiter.middleware.ts` |
+| `sendLinksLimiter`  | 15 minutes | 5            | IP           | Too many request attempts. Please try again later          | `middleware/rateLimiter.middleware.ts` |
+| `donationLimiter`   | 10 minutes | 5            | IP           | Too many donation attempts. Please try again in 10 minutes | `middleware/rateLimiter.middleware.ts` |
+| `generalLimiter`    | 15 minutes | 60           | IP           | Too many request attempts. Please try again later          | `middleware/rateLimiter.middleware.ts` |

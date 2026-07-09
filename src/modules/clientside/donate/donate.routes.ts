@@ -1,6 +1,7 @@
 import express from "express";
 import { donateSchema, verifySchema } from "./donate.schema.js";
 import { validateRequest } from "../../../middleware/validate.middleware.js";
+import { donationLimiter } from "../../../middleware/rateLimiter.middleware.js";
 import { verifyPaystackHook } from "../../../middleware/verifyWebhook.middleware.js";
 import {
   initializeController,
@@ -24,8 +25,11 @@ router.get("/", (req, res) => {
     message,
   });
 });
-router.post("/", validateRequest(donateSchema), initializeController);
+// START DONATION REQUEST TO PAYSTACK SERVER
+router.post("/", donationLimiter, validateRequest(donateSchema), initializeController);
+// VERIFY DONATION VIA WEBHOOK
 router.post("/webhook", verifyPaystackHook, verifyViaWebhookController);
+// VERIFY DONATION VIA CALLBACK
 router.get("/callback", validateRequest(verifySchema), verifyViaCallbackController);
 
 export default router;

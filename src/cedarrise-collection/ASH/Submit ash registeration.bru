@@ -21,7 +21,7 @@ body:multipart-form {
   primaryLanguage: ENGLISH
   homeAddress: 9A
   studentPhone: 
-  passportPhoto: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  passportPhoto: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
   schoolName: Naim
   schoolTown: Naim
   schoolLga: Naim
@@ -46,7 +46,7 @@ body:multipart-form {
   learningConditions: OTHER
   parentConsent: true
   declarationConfirmed: true
-  parentSignature: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  parentSignature: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
   assignedMentor: 
   pretestScore: 
 }
@@ -157,5 +157,9 @@ docs {
   |--------|-----------------------------------------------------------------------------|
   | `400 Bad Request`        | Validation failed — missing required fields or invalid enum values. |
   | `400 Bad Request`        | No files were attached to the request.                              |
+  | `429 Too Many Requests`     | Rate limit exceeded (`formUploadLimiter`: 3 requests per 15-minute window, keyed by IP). |
   | `500 Internal Server Error` | Cloudinary upload failed for `passportPhoto` or `parentSignature`. |
+
+  ## Rate Limiting
+  This endpoint is protected by `formUploadLimiter` — a maximum of **3 requests per 15-minute window**, keyed by the client's IP address. Exceeds return a `429` with `{ code: "RATE_LIMITED", message: "Too many submission attempts. Please try again later" }`.
 }

@@ -3,6 +3,7 @@ import express from "express";
 import { upload } from "../../configs/multer.config.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
+import { formUploadLimiter } from "../../middleware/rateLimiter.middleware.js";
 import {
   createTacotsRecommendationSchema,
   tacotsRecommendationQuerySchema,
@@ -55,6 +56,7 @@ const router = express.Router();
 // Submit TACOTS Recommendation Form
 router.post(
   "/recommendation",
+  formUploadLimiter,
   upload.fields([
     { name: "passportPhoto", maxCount: 1 },
     { name: "lastResult", maxCount: 1 },
@@ -103,7 +105,12 @@ router.get(
 );
 
 // Submit ASH TACOTS Feedback
-router.post("/feedback", validateRequest(createTacotsFeedbackSchema), submitFeedbackController);
+router.post(
+  "/feedback",
+  formUploadLimiter,
+  validateRequest(createTacotsFeedbackSchema),
+  submitFeedbackController,
+);
 // List TACOTS feedback submissions
 router.get(
   "/feedback",

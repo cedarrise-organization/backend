@@ -94,9 +94,13 @@ docs {
   
   ## Errors
   
-  | Status                      | Description                                                           |
-  |-----------------------------|-----------------------------------------------------------------------|
-  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.   |
-  | `404 Not Found`             | No recommended TACOTS beneficiary matches the provided `studentSurname`. |
-  | `500 Internal Server Error` | Unexpected server error.                                              |
+  | Status                      | Description                                                                          |
+  |-----------------------------|--------------------------------------------------------------------------------------|
+  | `400 Bad Request`           | Validation failed — missing required fields or invalid enum values.                  |
+  | `404 Not Found`             | No recommended TACOTS beneficiary matches the provided `studentSurname`.             |
+  | `429 Too Many Requests`     | Rate limit exceeded (`formUploadLimiter`: 3 requests per 15-minute window, keyed by IP). |
+  | `500 Internal Server Error` | Unexpected server error.                                                             |
+  
+  ## Rate Limiting
+  This endpoint is protected by `formUploadLimiter` — a maximum of **3 requests per 15-minute window**, keyed by the client's IP address. Exceeds return a `429` with `{ code: "RATE_LIMITED", message: "Too many submission attempts. Please try again later" }`.
 }

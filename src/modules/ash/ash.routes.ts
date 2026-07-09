@@ -3,6 +3,7 @@ import express from "express";
 import { upload } from "../../configs/multer.config.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
+import { formUploadLimiter } from "../../middleware/rateLimiter.middleware.js";
 import {
   createAshStudentSchema,
   ashStudentQuerySchema,
@@ -57,6 +58,7 @@ const router = express.Router();
 // Submit ASH Student Registration
 router.post(
   "/registration",
+  formUploadLimiter,
   upload.fields([
     { name: "passportPhoto", maxCount: 1 },
     { name: "lastResult", maxCount: 1 },
@@ -109,7 +111,12 @@ router.delete(
 router.get("/download/ashstudent", authenticate(), authorize("read"), exportAshStudentController);
 
 // Submit ASH Program Feedback
-router.post("/feedback", validateRequest(createAshProgramFeedbackSchema), submitFeedbackController);
+router.post(
+  "/feedback",
+  formUploadLimiter,
+  validateRequest(createAshProgramFeedbackSchema),
+  submitFeedbackController,
+);
 // List ASH feedback submissions
 router.get(
   "/feedback",

@@ -75,10 +75,14 @@ docs {
   
   ## Error Responses
   - **400 Bad Request**: Validation failed (e.g., invalid email, name too short, invalid `program` or `type` enum value).
+  - **429 Too Many Requests**: Rate limit exceeded (`sendLinksLimiter`: 5 requests per 15-minute window, keyed by IP).
   - **500 Internal Server Error**: 
     - Failed to render the EJS email template.
     - Brevo API error (email transporter failure).
     - Email delivery verification failed — thrown when `sendEmail` returns a falsy value (e.g., `"ASH Registration Email was not sent"`).
+  
+  ## Rate Limiting
+  This endpoint is protected by `sendLinksLimiter` — a maximum of **5 requests per 15-minute window**, keyed by the client's IP address. Exceeds return a `429` with `{ code: "RATE_LIMITED", message: "Too many request attempts. Please try again later" }`.
   
   ## Notes
   - Each `program`/`type` combination uses a dedicated EJS template (e.g., `ash-registration-link.ejs`, `tacots-feedback-link.ejs`).
