@@ -159,9 +159,9 @@ export const uploadGoogleFormController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { src, title, deadline, description } = req.body;
+  const { url, title, deadline, description } = req.body;
   try {
-    const response = await uploadGoogleForm(src, title, deadline, description);
+    const response = await uploadGoogleForm(url, title, deadline, description);
     return successResponse(res, response.code, response.message, response.data, {correlationId: (req as any).correlationId});
   } catch (err) {
     next(err);

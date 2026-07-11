@@ -379,7 +379,7 @@ export const uploadPhotos = async (
 
 // GOOGLE-FORM UPLOADS
 export const uploadGoogleForm = async (
-  src: string,
+  url: string,
   title: string,
   deadline: Date,
   description?: string,
@@ -387,7 +387,7 @@ export const uploadGoogleForm = async (
   const [googleFormDetails] = await db
     .insert(googleForms)
     .values({
-      src,
+      src: url,
       title,
       deadline: sql`TO_DATE(${deadline}, 'YYYY-MM-DD')`,
       description,
