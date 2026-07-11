@@ -1,7 +1,7 @@
 meta {
   name: Delete ASH exit
   type: http
-  seq: 25
+  seq: 26
 }
 
 delete {
@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 7f229c5e-7619-4522-9f6c-b8e383f7d0d7
+  id: bd0761a8-8eb0-45da-b330-a1ee1d7ab323
   baseUrl: http://localhost:3000
 }
 
@@ -37,6 +37,17 @@ docs {
   ## Response
   
   **`200 OK`** — Confirmation that the record was deleted.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

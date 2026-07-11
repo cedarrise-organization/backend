@@ -8,7 +8,7 @@ import { Request } from "express";
 import { uploadToCloudinary, deleteFromCloudinary } from "../../utils/storage.util.js";
 import { invalidateCache } from "../../utils/cache.util.js";
 
-export const listBlogs = async (page: number, limit: number, search: string) => {
+export const listBlogs = async (page: number, limit: number, search: string, correlationId: string) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -60,6 +60,7 @@ export const listBlogs = async (page: number, limit: number, search: string) => 
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId
       },
     };
   }
@@ -90,6 +91,7 @@ export const listBlogs = async (page: number, limit: number, search: string) => 
         limit,
         totalPages,
       },
+      correlationId
     },
   };
 };

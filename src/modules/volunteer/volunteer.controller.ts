@@ -49,33 +49,38 @@ export const submitVolunteerRegistrationController = async (
   } = req.body;
 
   try {
-    const response = await submitVolunteerRegistration({
-      firstName,
-      middleName,
-      surname,
-      gender,
-      dob,
-      age,
-      phoneNumber,
-      emailAddress,
-      homeAddress,
-      city,
-      state,
-      occupation,
-      highestEducation,
-      reasonForVolunteering,
-      volunteerAreas,
-      skillsToContribute,
-      availability,
-      commitmentDuration,
-      ashSaturdayAvailability,
-      ashAcademicArea,
-      ashExtracurricular,
-      safeguardingAgreement,
-      mediaConsent,
-      additionalInfo,
+    const response = await submitVolunteerRegistration(
+      {
+        firstName,
+        middleName,
+        surname,
+        gender,
+        dob,
+        age,
+        phoneNumber,
+        emailAddress,
+        homeAddress,
+        city,
+        state,
+        occupation,
+        highestEducation,
+        reasonForVolunteering,
+        volunteerAreas,
+        skillsToContribute,
+        availability,
+        commitmentDuration,
+        ashSaturdayAvailability,
+        ashAcademicArea,
+        ashExtracurricular,
+        safeguardingAgreement,
+        mediaConsent,
+        additionalInfo,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
     });
-    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }
@@ -83,7 +88,15 @@ export const submitVolunteerRegistrationController = async (
 export const listVolunteersController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, orderBy, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listVolunteers(page, limit, orderBy, search, status, sortBy);
+    const response = await listVolunteers(
+      page,
+      limit,
+      orderBy,
+      search,
+      status,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -93,7 +106,9 @@ export const getVolunteerController = async (req: Request, res: Response, next: 
   const id = (req as any).params.id.toString();
   try {
     const response = await getVolunteer(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -107,8 +122,10 @@ export const updateVolunteerStatusController = async (
   const { status } = req.qtransformed;
 
   try {
-    const response = await updateVolunteerStatus(id, status);
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await updateVolunteerStatus(id, status, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -120,8 +137,10 @@ export const deleteVolunteerController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteVolunteer(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteVolunteer(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -206,30 +225,35 @@ export const submitVolunteerFeedbackController = async (
     submissionDate,
   } = req.body;
   try {
-    const response = await submitVolunteerFeedback({
-      firstName,
-      surname,
-      programVolunteered,
-      specificProgramDetails,
-      volunteerDuration,
-      overallExperienceRating,
-      roleClarityRating,
-      teamSupportRating,
-      organizationRating,
-      programMadeImpact,
-      waysProgramHelped,
-      activitiesInvolvedIn,
-      skillsDeveloped,
-      skillsGained,
-      enjoyedMost,
-      challengesExperienced,
-      improvementSuggestions,
-      continueVolunteering,
-      wouldRecommend,
-      additionalComments,
-      submissionDate,
+    const response = await submitVolunteerFeedback(
+      {
+        firstName,
+        surname,
+        programVolunteered,
+        specificProgramDetails,
+        volunteerDuration,
+        overallExperienceRating,
+        roleClarityRating,
+        teamSupportRating,
+        organizationRating,
+        programMadeImpact,
+        waysProgramHelped,
+        activitiesInvolvedIn,
+        skillsDeveloped,
+        skillsGained,
+        enjoyedMost,
+        challengesExperienced,
+        improvementSuggestions,
+        continueVolunteering,
+        wouldRecommend,
+        additionalComments,
+        submissionDate,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
     });
-    return successResponse(res, response.code, response.message, response.data);
   } catch (error) {
     next(error);
   }
@@ -241,7 +265,7 @@ export const listVolunteerFeedbackController = async (
 ) => {
   const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listVolunteerFeedback(page, limit, search);
+    const response = await listVolunteerFeedback(page, limit, search, (req as any).correlationId);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -255,7 +279,9 @@ export const getVolunteerFeedbackController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await getVolunteerFeedback(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -267,8 +293,10 @@ export const deleteVolunteerFeedbackController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteVolunteerFeedback(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteVolunteerFeedback(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }

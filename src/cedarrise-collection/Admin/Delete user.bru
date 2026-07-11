@@ -11,7 +11,7 @@ delete {
 }
 
 params:path {
-  userId: b9074c3c-dd16-4b3d-ac73-86f6c9761b06
+  userId: 80ffc459-4652-4f51-b69a-e77a9cb6f85c
 }
 
 vars:pre-request {
@@ -46,7 +46,10 @@ docs {
   ```json
   {
     "success": true,
-    "message": "User deleted"
+    "message": "User deleted",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

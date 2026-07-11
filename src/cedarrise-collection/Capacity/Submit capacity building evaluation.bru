@@ -164,6 +164,17 @@ docs {
   ## Response
 
   **`200 OK`** — Returns the newly created capacity building evaluation record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
 
   The created record is also cached under the key `cedarrise:capacity:evaluation:<id>` using the `FORM_DATA` TTL.
 

@@ -16,7 +16,7 @@ const sortMap = {
   createdAt: outreachTracker.createdAt,
 } as const;
 
-export const createOutreach = async (options: OutreachtrackerbodyType) => {
+export const createOutreach = async (options: OutreachtrackerbodyType, correlationId: string) => {
   const [outreach] = await db
     .insert(outreachTracker)
     .values({
@@ -42,6 +42,7 @@ export const createOutreach = async (options: OutreachtrackerbodyType) => {
     singleKey: undefined,
     patternKey: `cedarrise:outreaches:*`,
     event: "DELETE OUTREACH TRACKER FORM",
+    correlationId
   });
 
   return {
@@ -101,6 +102,7 @@ export const listOutreaches = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof sortMap,
+  correlationId: string
 ) => {
   // search
   if (search) {
@@ -139,6 +141,7 @@ export const listOutreaches = async (
           limit,
           totalPages,
         },
+        correlationId
       },
     };
   }
@@ -158,6 +161,7 @@ export const listOutreaches = async (
           totalPages: cacheRes.totalPages,
         },
         metadata: cacheRes.metadata,
+        correlationId
       },
     };
   }
@@ -197,6 +201,7 @@ export const listOutreaches = async (
         totalPages,
       },
       metadata: metaData,
+      correlationId
     },
   };
 };
@@ -225,13 +230,14 @@ export const getOneOutreach = async (id: string) => {
     data: outreach,
   };
 };
-export const deleteOutreach = async (id: string) => {
+export const deleteOutreach = async (id: string, correlationId: string) => {
   await db.delete(outreachTracker).where(eq(outreachTracker.id, id));
 
   appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:outreaches:*`,
     event: "DELETE OUTREACH RECORD",
+    correlationId
   });
 
   return {

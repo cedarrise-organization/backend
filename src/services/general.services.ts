@@ -21,7 +21,7 @@ const sortMap = {
 } as const;
 
 // PROJECTS
-export const getProjects = async () => {
+export const getProjects = async (correlationId: string) => {
   ///
   const key = `cedarrise:dashboard:projects`;
   const cacheRes = await cacheGet<any>(key);
@@ -32,6 +32,7 @@ export const getProjects = async () => {
       data: cacheRes.data,
       meta: {
         ongoingProjectCount: cacheRes.ongoingProjectCount,
+        correlationId,
       },
     };
   }
@@ -40,7 +41,7 @@ export const getProjects = async () => {
   const [allProjects, [projectsCount]] = await Promise.all([
     db.select().from(projects).orderBy(desc(projects.createdAt), desc(projects.status)).limit(10),
     db
-      .select({ value: count(projects.id) }) 
+      .select({ value: count(projects.id) })
       .from(projects)
       .where(eq(projects.status, "ongoing")),
   ]);
@@ -59,6 +60,7 @@ export const getProjects = async () => {
     data: allProjects,
     meta: {
       ongoingProjectCount: projectsCount!.value,
+      correlationId,
     },
   };
 };
@@ -169,6 +171,7 @@ export const getReceipts = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof sortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -212,6 +215,7 @@ export const getReceipts = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -230,6 +234,7 @@ export const getReceipts = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -267,6 +272,7 @@ export const getReceipts = async (
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -373,7 +379,7 @@ export const uploadPhotos = async (
 
 // GOOGLE-FORM UPLOADS
 export const uploadGoogleForm = async (
-  url: string,
+  src: string,
   title: string,
   deadline: Date,
   description?: string,
@@ -381,7 +387,7 @@ export const uploadGoogleForm = async (
   const [googleFormDetails] = await db
     .insert(googleForms)
     .values({
-      src: url,
+      src,
       title,
       deadline: sql`TO_DATE(${deadline}, 'YYYY-MM-DD')`,
       description,
@@ -457,7 +463,7 @@ export const getMetadata = async () => {
   ///
 
   const [[noOfPhotos], [activeProjects], [receiptsLogged], [systemUsers]] = await Promise.all([
-    db.select({value: miscellaneous.numberOfPhotos}).from(miscellaneous),
+    db.select({ value: miscellaneous.numberOfPhotos }).from(miscellaneous),
     db
       .select({ value: count(projects.id) })
       .from(projects)

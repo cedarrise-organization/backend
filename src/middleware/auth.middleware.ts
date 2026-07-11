@@ -24,7 +24,12 @@ export const authenticate = () => async (req: Request, res: Response, next: Next
       const refreshToken = req.cookies["cedarrefresh"];
       if (!refreshToken) throw new UnauthorizedError("No refresh token provided");
 
-      const authResponse = await refresh(refreshToken);
+      const authResponse = await refresh(
+        refreshToken,
+        (req as any).correlationId,
+        (req.headers["user-agent"] as string),
+      );
+
       res.cookie("cedaraccess", authResponse.meta.accessToken, accessCookieOptions);
       res.cookie("cedarrefresh", authResponse.meta.refreshToken, refreshCookieOptions);
 

@@ -31,7 +31,19 @@ docs {
   None.
   
   ## Response
-  Returns a `200` success message: `"Logged out successfully"`.
+  
+  **`200 OK`** — Confirms the user has been logged out.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Logged out successfully",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   - `401 Unauthorized` — Missing or invalid refresh token cookie.

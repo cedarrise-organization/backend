@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 4362b356-45cc-4c8d-93b4-ff8c72078a5d
+  id: c4d080a4-2705-4d05-afdc-89446c433f7a
   baseUrl: http://localhost:3000
 }
 
@@ -37,6 +37,17 @@ docs {
   ## Response
   
   **`200 OK`** — Confirms the tracking record has been deleted.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

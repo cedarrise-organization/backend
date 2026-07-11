@@ -56,7 +56,7 @@ const router = express.Router();
 // Submit TACOTS Recommendation Form
 router.post(
   "/recommendation",
-  formUploadLimiter,
+  /*formUploadLimiter,*/
   upload.fields([
     { name: "passportPhoto", maxCount: 1 },
     { name: "lastResult", maxCount: 1 },
@@ -107,7 +107,7 @@ router.get(
 // Submit ASH TACOTS Feedback
 router.post(
   "/feedback",
-  formUploadLimiter,
+  /*formUploadLimiter,*/
   validateRequest(createTacotsFeedbackSchema),
   submitFeedbackController,
 );

@@ -1,7 +1,7 @@
 meta {
   name: Delete ASH feedback
   type: http
-  seq: 10
+  seq: 11
 }
 
 delete {
@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: d9f0f036-c43a-4472-9cc0-15b03d57b4f7
+  id: ddd654b2-080d-4660-9310-2b59228b6560
   baseUrl: http://localhost:3000
 }
 
@@ -41,7 +41,10 @@ docs {
   ```json
   {
     "success": true,
-    "message": "Ash feedback data deleted successfully"
+    "message": "Ash feedback data deleted successfully",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

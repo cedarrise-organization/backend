@@ -16,14 +16,20 @@ export const initializeController = async (req: Request, res: Response, next: Ne
       metadata: { name, comment, supportAreas },
     });
 
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
 };
 
 // NOT COMPLETE
-export const verifyViaWebhookController = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyViaWebhookController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const event = req.body;
   console.log("\n WEBOOK ROUTE GOT HIT \n");
   console.log(event);

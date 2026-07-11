@@ -80,45 +80,49 @@ export const submitRegistrationController = async (
   if (!req.files) throw new ValidationError("Please upload the relevant file");
 
   try {
-    const response = await submitRegistration(req, {
-      programType,
-      firstName,
-      middleName,
-      surname,
-      gender,
-      age,
-      dob,
-      primaryLanguage,
-      homeAddress,
-      studentPhone,
-      schoolName,
-      schoolTown,
-      schoolLga,
-      schoolState,
-      currentClass,
-      classPositionLastTerm,
-      prevAfterschoolProgram,
-      reasonForJoining,
-      fathersName,
-      fathersPhone,
-      fathersOccupation,
-      mothersName,
-      mothersPhone,
-      mothersOccupation,
-      guardianName,
-      guardianRelationship,
-      guardianPhone,
-      guardianOccupation,
-      householdIncomeRange,
-      hasLearningCondition,
-      learningConditions,
-      parentConsent,
-      declarationConfirmed,
-      assignedMentor,
-      pretestScore,
-    });
+    const response = await submitRegistration(
+      req,
+      {
+        programType,
+        firstName,
+        middleName,
+        surname,
+        gender,
+        age,
+        dob,
+        primaryLanguage,
+        homeAddress,
+        studentPhone,
+        schoolName,
+        schoolTown,
+        schoolLga,
+        schoolState,
+        currentClass,
+        classPositionLastTerm,
+        prevAfterschoolProgram,
+        reasonForJoining,
+        fathersName,
+        fathersPhone,
+        fathersOccupation,
+        mothersName,
+        mothersPhone,
+        mothersOccupation,
+        guardianName,
+        guardianRelationship,
+        guardianPhone,
+        guardianOccupation,
+        householdIncomeRange,
+        hasLearningCondition,
+        learningConditions,
+        parentConsent,
+        declarationConfirmed,
+        assignedMentor,
+        pretestScore,
+      },
+      (req as any).correlationId,
+    );
 
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }
@@ -130,7 +134,15 @@ export const listRegistrationsController = async (
 ) => {
   const { page, limit, orderBy, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listRegistrations(page, limit, orderBy, search, status, sortBy);
+    const response = await listRegistrations(
+      page,
+      limit,
+      orderBy,
+      search,
+      status,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -144,7 +156,9 @@ export const getRegistrationController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await getRegistration(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -157,8 +171,8 @@ export const updateAshStudentStatusController = async (
   const id = (req as any).params.id.toString();
   const { status } = req.qtransformed;
   try {
-    const response = await updateAshStudentStatus(id, status);
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await updateAshStudentStatus(id, status, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -171,8 +185,8 @@ export const assignAshMentorController = async (
   const id = (req as any).params.id.toString();
   const { mentor } = req.body;
   try {
-    const response = await assignAshMentor(id, mentor);
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await assignAshMentor(id, mentor, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -184,8 +198,8 @@ export const deleteRegistrationController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteRegistration(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteRegistration(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -287,32 +301,35 @@ export const submitFeedbackController = async (req: Request, res: Response, next
   } = req.body;
 
   try {
-    const response = await submitFeedback({
-      studentFirstName,
-      studentSurname,
-      schoolName,
-      currentClass,
-      attendanceFrequency,
-      enjoyedParts,
-      learningImprovementRating,
-      confidenceRating,
-      volunteerSupportRating,
-      studentEnjoyedMost,
-      studentImprovementSuggestions,
-      parentGuardianName,
-      parentGuardianRelationship,
-      parentPhone,
-      childBenefited,
-      academicImprovementNoticed,
-      confidenceBehaviorChange,
-      mostValuableAspects,
-      parentSatisfactionRating,
-      programImpactOnChild,
-      parentImprovementSuggestions,
-      additionalComments,
-    });
+    const response = await submitFeedback(
+      {
+        studentFirstName,
+        studentSurname,
+        schoolName,
+        currentClass,
+        attendanceFrequency,
+        enjoyedParts,
+        learningImprovementRating,
+        confidenceRating,
+        volunteerSupportRating,
+        studentEnjoyedMost,
+        studentImprovementSuggestions,
+        parentGuardianName,
+        parentGuardianRelationship,
+        parentPhone,
+        childBenefited,
+        academicImprovementNoticed,
+        confidenceBehaviorChange,
+        mostValuableAspects,
+        parentSatisfactionRating,
+        programImpactOnChild,
+        parentImprovementSuggestions,
+        additionalComments,
+      },
+      (req as any).correlationId,
+    );
 
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -320,7 +337,7 @@ export const submitFeedbackController = async (req: Request, res: Response, next
 export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listFeedback(page, limit, search);
+    const response = await listFeedback(page, limit, search, (req as any).correlationId);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -330,7 +347,9 @@ export const getFeedbackController = async (req: Request, res: Response, next: N
   const id = (req as any).params.id.toString();
   try {
     const response = await getFeedback(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -338,8 +357,8 @@ export const getFeedbackController = async (req: Request, res: Response, next: N
 export const deleteFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteFeedback(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteFeedback(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -425,33 +444,37 @@ export const submitTrackingController = async (req: Request, res: Response, next
   if (!req.file) throw new ValidationError("Please upload the relevant file");
 
   try {
-    const response = await submitTracking(req, {
-      studentId,
-      academicSession,
-      term,
-      schoolName,
-      schoolNumeracyScore,
-      schoolLiteracyScore,
-      schoolAverage,
-      schoolPosition,
-      pretestNumeracyScore,
-      pretestLiteracyScore,
-      pretestAverage,
-      midtestNumeracyScore,
-      midtestLiteracyScore,
-      midtestAverage,
-      posttestNumeracyScore,
-      posttestLiteracyScore,
-      posttestAverage,
-      disciplineRating,
-      responsibilityRating,
-      leadershipRating,
-      notableAchievements,
-      challengesObserved,
-      nextTermRecommendations,
-      mentorName,
-    });
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await submitTracking(
+      req,
+      {
+        studentId,
+        academicSession,
+        term,
+        schoolName,
+        schoolNumeracyScore,
+        schoolLiteracyScore,
+        schoolAverage,
+        schoolPosition,
+        pretestNumeracyScore,
+        pretestLiteracyScore,
+        pretestAverage,
+        midtestNumeracyScore,
+        midtestLiteracyScore,
+        midtestAverage,
+        posttestNumeracyScore,
+        posttestLiteracyScore,
+        posttestAverage,
+        disciplineRating,
+        responsibilityRating,
+        leadershipRating,
+        notableAchievements,
+        challengesObserved,
+        nextTermRecommendations,
+        mentorName,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -459,7 +482,14 @@ export const submitTrackingController = async (req: Request, res: Response, next
 export const listTrackingController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listTracking(page, limit, orderBy, search, sortBy);
+    const response = await listTracking(
+      page,
+      limit,
+      orderBy,
+      search,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -469,7 +499,9 @@ export const getTrackController = async (req: Request, res: Response, next: Next
   const id = (req as any).params.id.toString();
   try {
     const response = await getTrack(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -477,8 +509,8 @@ export const getTrackController = async (req: Request, res: Response, next: Next
 export const deleteTrackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteTrack(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteTrack(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -552,16 +584,19 @@ export const submitAttendanceController = async (
     programReview,
   } = req.body;
   try {
-    const response = await submitAttendance({
-      sessionDate,
-      studentsInAttendance,
-      studentsMentored,
-      sessionsConducted,
-      sessionDetails,
-      volunteersInAttendance,
-      programReview,
-    });
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await submitAttendance(
+      {
+        sessionDate,
+        studentsInAttendance,
+        studentsMentored,
+        sessionsConducted,
+        sessionDetails,
+        volunteersInAttendance,
+        programReview,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -569,7 +604,7 @@ export const submitAttendanceController = async (
 export const listAttendanceController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listAttendance(page, limit, search);
+    const response = await listAttendance(page, limit, search, (req as any).correlationId);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -579,7 +614,9 @@ export const getAttendanceController = async (req: Request, res: Response, next:
   const id = (req as any).params.id.toString();
   try {
     const response = await getAttendance(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -591,8 +628,8 @@ export const deleteAttendanceController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteAttendance(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteAttendance(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -655,28 +692,31 @@ export const submitExitController = async (req: Request, res: Response, next: Ne
     exitDate,
   } = req.body;
   try {
-    const response = await submitExit({
-      studentId,
-      ageAtExit,
-      schoolName,
-      classAtExit,
-      durationInProgram,
-      exitReason,
-      academicImpactRating,
-      areasOfImprovement,
-      mentorshipReceived,
-      mentorshipImpactRating,
-      postAshStatus,
-      institutionName,
-      courseOfStudy,
-      vocationalSkill,
-      enjoyedMost,
-      programImpact,
-      improvementSuggestions,
-      facilitatorName,
-      exitDate,
-    });
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await submitExit(
+      {
+        studentId,
+        ageAtExit,
+        schoolName,
+        classAtExit,
+        durationInProgram,
+        exitReason,
+        academicImpactRating,
+        areasOfImprovement,
+        mentorshipReceived,
+        mentorshipImpactRating,
+        postAshStatus,
+        institutionName,
+        courseOfStudy,
+        vocationalSkill,
+        enjoyedMost,
+        programImpact,
+        improvementSuggestions,
+        facilitatorName,
+        exitDate,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -684,7 +724,14 @@ export const submitExitController = async (req: Request, res: Response, next: Ne
 export const listExitController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listExit(page, limit, orderBy, search, sortBy);
+    const response = await listExit(
+      page,
+      limit,
+      orderBy,
+      search,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -694,7 +741,9 @@ export const getExitController = async (req: Request, res: Response, next: NextF
   const id = (req as any).params.id.toString();
   try {
     const response = await getExit(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -702,8 +751,8 @@ export const getExitController = async (req: Request, res: Response, next: NextF
 export const deleteExitController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteExit(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteExit(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }

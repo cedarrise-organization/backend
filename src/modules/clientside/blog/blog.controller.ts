@@ -14,7 +14,7 @@ export const listBlogsController = async (req: Request, res: Response, next: Nex
   const { page, limit, search } = req.qtransformed;
 
   try {
-    const response = await listBlogs(page, limit, search);
+    const response = await listBlogs(page, limit, search, (req as any).correlationId);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -25,7 +25,9 @@ export const getSingleBlogController = async (req: Request, res: Response, next:
   const id = req.params.id!.toString();
   try {
     const response = await getSingleBlog(id!);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -36,7 +38,9 @@ export const createBlogController = async (req: Request, res: Response, next: Ne
   if (!req.file) throw new ValidationError("Please upload a file");
   try {
     const response = await createBlog(req, title, description);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -47,7 +51,9 @@ export const updateBlogController = async (req: Request, res: Response, next: Ne
   const id = req.params.id!.toString();
   try {
     const response = await updateBlog(id!, req, title, description);
-    return successResponse(res, response.code, response.message);
+    return successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -57,7 +63,9 @@ export const deleteBlogController = async (req: Request, res: Response, next: Ne
   const id = req.params.id!.toString();
   try {
     const response = await deleteBlog(id!);
-    return successResponse(res, response.code, response.message);
+    return successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }

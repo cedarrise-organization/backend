@@ -1,7 +1,7 @@
 meta {
   name: Get ASH exit detail
   type: http
-  seq: 24
+  seq: 25
 }
 
 get {
@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 7f229c5e-7619-4522-9f6c-b8e383f7d0d7
+  id: bd0761a8-8eb0-45da-b330-a1ee1d7ab323
   baseUrl: http://localhost:3000
 }
 
@@ -68,6 +68,9 @@ docs {
       "updatedAt": "ISO 8601" | null,
       "createdAt": "ISO 8601",
       "deletedAt": "ISO 8601" | null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

@@ -26,7 +26,7 @@ router.get("/", (req, res) => {
   });
 });
 // START DONATION REQUEST TO PAYSTACK SERVER
-router.post("/", donationLimiter, validateRequest(donateSchema), initializeController);
+router.post("/", /*donationLimiter,*/ validateRequest(donateSchema), initializeController);
 // VERIFY DONATION VIA WEBHOOK
 router.post("/webhook", verifyPaystackHook, verifyViaWebhookController);
 // VERIFY DONATION VIA CALLBACK

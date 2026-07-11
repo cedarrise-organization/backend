@@ -20,7 +20,7 @@ appEvents.on(DELETE_EVENTS.DELETE_CACHE, async (data) => {
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       event: data.event,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
     logger.error("failure. cache **if any** was not removed", {
@@ -28,7 +28,7 @@ appEvents.on(DELETE_EVENTS.DELETE_CACHE, async (data) => {
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       event: data.event,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -50,13 +50,13 @@ appEvents.on(DELETE_EVENTS.DELETE_CACHE, async (data) => {
 
 //     logger.info("email sent successully", {
 //       info: info.accepted,
-//       // correlationId
+//       correlationId: data.correlationId
 //     });
 //   } catch (error: any) {
-//     logger.info("Failed to send email", {
+//     logger.error("Failed to send email", {
 //       email: data.email,
 //       message: error.message
-//       // correlationId
+//       correlationId: data.correlationId
 //     });
 //   }
 // });

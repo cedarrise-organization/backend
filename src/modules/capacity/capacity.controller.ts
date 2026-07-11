@@ -58,49 +58,54 @@ export const createEvaluationController = async (
     dateSubmitted,
   } = req.body;
   try {
-    const response = await createEvaluation({
-      programName,
-      programType,
-      programDate,
-      location,
-      programCoordinator,
-      numberOfSponsors,
-      listOfSponsors,
-      sponsorshipType,
-      partnerOrganizations,
-      partnershipLevel,
-      numberOfParticipants,
-      targetAudience,
-      numberOfFacilitators,
-      numberOfVolunteers,
-      participantEngagementLevel,
-      programObjectives,
-      objectiveAchievement,
-      programOutcome,
-      programImpact,
-      majorActivities,
-      effectiveActivities,
-      venueSuitability,
-      timeManagement,
-      resourceAvailability,
-      communicationAndCoordination,
-      teamworkAmongOrganizers,
-      challengesEncountered,
-      challengesAddressed,
-      lessonsLearned,
-      budgetAllocated,
-      budgetUtilized,
-      wereResourcesAdequate,
-      inadequateResourcesExplanation,
-      overallSuccess,
-      recommendTheProgram,
-      improvementSuggestions,
-      recommendFuturePrograms,
-      name,
-      role,
-      dateSubmitted,
+    const response = await createEvaluation(
+      {
+        programName,
+        programType,
+        programDate,
+        location,
+        programCoordinator,
+        numberOfSponsors,
+        listOfSponsors,
+        sponsorshipType,
+        partnerOrganizations,
+        partnershipLevel,
+        numberOfParticipants,
+        targetAudience,
+        numberOfFacilitators,
+        numberOfVolunteers,
+        participantEngagementLevel,
+        programObjectives,
+        objectiveAchievement,
+        programOutcome,
+        programImpact,
+        majorActivities,
+        effectiveActivities,
+        venueSuitability,
+        timeManagement,
+        resourceAvailability,
+        communicationAndCoordination,
+        teamworkAmongOrganizers,
+        challengesEncountered,
+        challengesAddressed,
+        lessonsLearned,
+        budgetAllocated,
+        budgetUtilized,
+        wereResourcesAdequate,
+        inadequateResourcesExplanation,
+        overallSuccess,
+        recommendTheProgram,
+        improvementSuggestions,
+        recommendFuturePrograms,
+        name,
+        role,
+        dateSubmitted,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
     });
-    return successResponse(res, response.code, response.message, response.data);
   } catch (err) {
     next(err);
   }
@@ -110,9 +115,16 @@ export const listAllEvaluationController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit, orderBy, search, sortBy} = req.qtransformed;
+  const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listAllEvaluation(page, limit, orderBy, search, sortBy);
+    const response = await listAllEvaluation(
+      page,
+      limit,
+      orderBy,
+      search,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -122,7 +134,9 @@ export const getEvaluationController = async (req: Request, res: Response, next:
   const id = (req as any).params.id;
   try {
     const response = await getEvaluation(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -134,8 +148,10 @@ export const deleteEvaluationController = async (
 ) => {
   const id = (req as any).params.id;
   try {
-    const response = await deleteEvaluation(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteEvaluation(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }

@@ -27,15 +27,14 @@ appEvents.on(ASH_EVENTS.STUDENT_ACCEPTED, async (data) => {
 
     logger.info("ASH welcome email sent successully", {
       message: "new student accepted into ASH",
-      // info: info.accepted,
       studentId: data.userId,
-      // correlationId
+      correlationId: data.correlationId,
     });
   } catch (error: any) {
-    logger.info("Failed to send ash welcome email", {
+    logger.error("Failed to send ash welcome email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId,
     });
   }
 });
@@ -59,13 +58,13 @@ appEvents.on(ASH_EVENTS.STUDENT_REJECTED, async (data) => {
       message: "new student rejected from ASH",
       // info: info.accepted,
       studentId: data.userId,
-      // correlationId
+      correlationId: data.correlationId,
     });
   } catch (error: any) {
-    logger.info("Failed to send ash rejection email", {
+    logger.error("Failed to send ash rejection email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId,
     });
   }
 });
@@ -78,7 +77,7 @@ appEvents.on(ASH_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      // correlationId: data.correlationId,
+      correlationId: data.correlationId,
     });
   } catch (error: any) {
     logger.error("Could not remove cache **if any**", {
@@ -86,7 +85,7 @@ appEvents.on(ASH_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId,
     });
   }
 });
@@ -116,13 +115,13 @@ appEvents.on(ASH_EVENTS.DELETE_CACHE, async (data) => {
 
 //     logger.info("email sent successully", {
 //       info: info.accepted,
-//       // correlationId
+//       correlationId: data.correlationId
 //     });
 //   } catch (error: any) {
-//     logger.info("Failed to send email", {
+//     logger.error("Failed to send email", {
 //       email: data.email,
-//       message: error.message
-//       // correlationId
+//       message: error.message,
+//       correlationId: data.correlationId
 //     });
 //   }
 // });

@@ -1,7 +1,7 @@
 meta {
   name: Delete ASH tracking
   type: http
-  seq: 15
+  seq: 16
 }
 
 delete {
@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: c7d6f614-1b5b-4000-b554-cf3d0b158b50
+  id: 648e3392-867a-4c16-839d-09e17a30ce3e
   baseUrl: http://localhost:3000
 }
 
@@ -41,7 +41,10 @@ docs {
   ```json
   {
     "success": true,
-    "message": "Ash tracking data deleted successfully"
+    "message": "Ash tracking data deleted successfully",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

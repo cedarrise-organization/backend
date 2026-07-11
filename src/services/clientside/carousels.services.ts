@@ -1,7 +1,7 @@
 import { CACHE_TTL, cacheGet, cacheSet } from "../../lib/cache.js";
 import { searchCloudinary } from "../../utils/storage.util.js";
 
-export const ashCarousel = async (max: number) => {
+export const ashCarousel = async (max: number, correlationId: string) => {
   /// cache
   const key = `cedarrise:gallery:ash:${max}`;
   const cacheRes = await cacheGet<any>(key);
@@ -13,6 +13,7 @@ export const ashCarousel = async (max: number) => {
       data: cacheRes,
       meta: {
         numberOfPhotos: max,
+        correlationId
       },
     };
   }
@@ -29,11 +30,12 @@ export const ashCarousel = async (max: number) => {
     data: ashPhotos,
     meta: {
       numberOfPhotos: max,
+      correlationId
     },
   };
 };
 
-export const tacotsCarousel = async (max: number) => {
+export const tacotsCarousel = async (max: number, correlationId: string) => {
   /// cache
   const key = `cedarrise:gallery:tacots:${max}`;
   const cacheRes = await cacheGet<any>(key);
@@ -45,6 +47,7 @@ export const tacotsCarousel = async (max: number) => {
       data: cacheRes,
       meta: {
         numberOfPhotos: max,
+        correlationId
       },
     };
   }
@@ -61,11 +64,12 @@ export const tacotsCarousel = async (max: number) => {
     data: tacotsPhotos,
     meta: {
       numberOfPhotos: max,
+      correlationId
     },
   };
 };
 
-export const outreachCarousel = async (max: number) => {
+export const outreachCarousel = async (max: number, correlationId: string) => {
   /// cache
   const key = `cedarrise:gallery:outreaches:${max}`;
   const cacheRes = await cacheGet<any>(key);
@@ -77,6 +81,7 @@ export const outreachCarousel = async (max: number) => {
       data: cacheRes,
       meta: {
         numberOfPhotos: max,
+        correlationId
       },
     };
   }
@@ -96,11 +101,12 @@ export const outreachCarousel = async (max: number) => {
     data: outreachPhotos,
     meta: {
       numberOfPhotos: max,
+      correlationId
     },
   };
 };
 
-export const capacityCarousel = async (max: number) => {
+export const capacityCarousel = async (max: number, correlationId: string) => {
   /// cache
   const key = `cedarrise:gallery:capacity:${max}`;
   const cacheRes = await cacheGet<any>(key);
@@ -112,6 +118,7 @@ export const capacityCarousel = async (max: number) => {
       data: cacheRes,
       meta: {
         numberOfPhotos: max,
+        correlationId
       },
     };
   }
@@ -131,6 +138,7 @@ export const capacityCarousel = async (max: number) => {
     data: capacityPhotos,
     meta: {
       numberOfPhotos: max,
+      correlationId
     },
   };
 };

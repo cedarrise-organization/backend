@@ -12,15 +12,20 @@ import {
   verifyRefreshToken,
 } from "../utils/token.util.js";
 
-export const login = async (email: string, password: string) => {
+export const login = async (
+  email: string,
+  password: string,
+  correlationId: string,
+  deviceInfo: string,
+) => {
   const [user] = await db.select().from(users).where(eq(users.email, email));
 
   if (!user) {
     appEvents.emit(AUTH_EVENTS.AUTH_LOGIN_FAIL, {
       email,
       reason: "user_not_found",
-      // deviceInfo: data.deviceInfo,
-      // correlationId,
+      deviceInfo,
+      correlationId,
     });
 
     throw new ValidationError("Invalid credentials");
@@ -31,8 +36,8 @@ export const login = async (email: string, password: string) => {
     appEvents.emit(AUTH_EVENTS.AUTH_LOGIN_FAIL, {
       email,
       reason: "invalid_password",
-      // deviceInfo: data.deviceInfo,
-      // correlationId,
+      deviceInfo,
+      correlationId,
     });
 
     throw new ValidationError("Invalid credentials");
@@ -40,8 +45,8 @@ export const login = async (email: string, password: string) => {
 
   appEvents.emit(AUTH_EVENTS.AUTH_LOGIN, {
     email,
-    // deviceInfo: data.deviceInfo,
-    // correlationId,
+    deviceInfo,
+    correlationId,
   });
 
   // create tokens
@@ -74,7 +79,11 @@ export const login = async (email: string, password: string) => {
   };
 };
 
-export const refresh = async (rawRefreshToken: string) => {
+export const refresh = async (
+  rawRefreshToken: string,
+  correlationId: string,
+  deviceInfo: string,
+) => {
   let payload;
 
   try {
@@ -94,6 +103,8 @@ export const refresh = async (rawRefreshToken: string) => {
     appEvents.emit(AUTH_EVENTS.AUTH_REFRESH_FAIL, {
       userId: payload.sub,
       reason: "refresh_token_expired",
+      correlationId,
+      deviceInfo,
     });
     throw new UnauthorizedError("Refreshed token expired or revoked");
   }
@@ -104,6 +115,8 @@ export const refresh = async (rawRefreshToken: string) => {
     appEvents.emit(AUTH_EVENTS.AUTH_REFRESH_FAIL, {
       userId: payload.sub,
       reason: "user_not_found",
+      correlationId,
+      deviceInfo,
     });
     throw new UnauthorizedError("user not found");
   }
@@ -133,6 +146,8 @@ export const refresh = async (rawRefreshToken: string) => {
     userId: payload.sub,
     name: payload.name,
     department: payload.department,
+    correlationId,
+    deviceInfo,
   });
 
   return {

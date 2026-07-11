@@ -67,7 +67,11 @@ const exitSortMap = {
 } as const;
 
 // ASH REGISTRATION
-export const submitRegistration = async (req: Request, options: AshstudentbodyType) => {
+export const submitRegistration = async (
+  req: Request,
+  options: AshstudentbodyType,
+  correlationId: string,
+) => {
   const files = req.files as {
     passportPhoto: Express.Multer.File[];
     lastResult?: Express.Multer.File[];
@@ -145,12 +149,16 @@ export const submitRegistration = async (req: Request, options: AshstudentbodyTy
     singleKey: undefined,
     patternKey: `cedarrise:ash:ashStudents:*`,
     event: "ASH REGISRATION FORM",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Ash registration form submitted successfully",
     data: newAshStudent,
+    meta: {
+      correlationId,
+    },
   };
 };
 export const listRegistrations = async (
@@ -160,6 +168,7 @@ export const listRegistrations = async (
   search: string,
   status: string,
   sortBy: keyof typeof sortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -202,6 +211,7 @@ export const listRegistrations = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -221,6 +231,7 @@ export const listRegistrations = async (
           totalPages: cacheRes.totalPages,
         },
         metadata: cacheRes.metadata,
+        correlationId,
       },
     };
   }
@@ -307,6 +318,7 @@ export const listRegistrations = async (
         rejectedStudents: Number(metaData?.rejectedStudents ?? 0),
         pendingStudents: Number(metaData?.pendingStudents ?? 0),
       },
+      correlationId,
     },
   };
 };
@@ -335,7 +347,7 @@ export const getRegistration = async (id: string) => {
     data: ashstudent,
   };
 };
-export const updateAshStudentStatus = async (id: string, status: string) => {
+export const updateAshStudentStatus = async (id: string, status: string, correlationId: string) => {
   // update
   const [updatedStudent] = await db
     .update(ashStudent)
@@ -353,22 +365,26 @@ export const updateAshStudentStatus = async (id: string, status: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:ash:ashStudents:*`,
     event: "UPDATE ASH STUDENT STATUS",
+    correlationId,
   });
 
   // emitter to send email on accept or reject
   // if (status === "accepted") {
-  //   appEvents.emit(ASH_EVENTS.STUDENT_ACCEPTED, {name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/});
+  //   appEvents.emit(ASH_EVENTS.STUDENT_ACCEPTED, {name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email,*/ correlationId});
   // } else if (status === "rejected") {
-  //   appEvents.emit(ASH_EVENTS.STUDENT_ACCEPTED, {name: updatedStudent?.name, userId: updatedStudent?.id, /*email: updatedStudent.email*/});
+  //   appEvents.emit(ASH_EVENTS.STUDENT_ACCEPTED, {name: updatedStudent?.name, userId: updatedStudent?.id, /*email: updatedStudent.email*,/ correlationId});
   // }
 
   return {
     code: 200,
     message: "Ash student status updated successfully",
     data: updatedStudent,
+    meta: {
+      correlationId,
+    },
   };
 };
-export const assignAshMentor = async (id: string, mentor: string) => {
+export const assignAshMentor = async (id: string, mentor: string, correlationId: string) => {
   // update
   const [updatedStudent] = await db
     .update(ashStudent)
@@ -386,6 +402,7 @@ export const assignAshMentor = async (id: string, mentor: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:ash:ashStudents:*`,
     event: "ASSIGN ASH STUDENT MENTOR",
+    correlationId,
   });
 
   // emitter to send email on notifying mentor and mentee
@@ -394,9 +411,12 @@ export const assignAshMentor = async (id: string, mentor: string) => {
     code: 200,
     message: "Mentor assigned to Ash student successfully",
     data: updatedStudent,
+    meta: {
+      correlationId,
+    },
   };
 };
-export const deleteRegistration = async (id: string) => {
+export const deleteRegistration = async (id: string, correlationId: string) => {
   const [data] = await db.delete(ashStudent).where(eq(ashStudent.id, id)).returning({
     passportPhotoPublicId: ashStudent.passportPhotoPublicId,
     lastResultPublicId: ashStudent.lastResultPublicId,
@@ -407,6 +427,7 @@ export const deleteRegistration = async (id: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:ash:ashStudents:*`,
     event: "DELETE ASH STUDENT REGISTRATION RECORD",
+    correlationId,
   });
 
   if (data?.passportPhotoPublicId) {
@@ -442,6 +463,9 @@ export const deleteRegistration = async (id: string) => {
   return {
     code: 200,
     message: "Ash student data deleted successfully",
+    meta: {
+      correlationId,
+    },
   };
 };
 export const exportAshStudentTableToCSV = async () => {
@@ -450,7 +474,7 @@ export const exportAshStudentTableToCSV = async () => {
 };
 
 // ASH FEEDBACK
-export const submitFeedback = async (options: AshprogramfeedbackType) => {
+export const submitFeedback = async (options: AshprogramfeedbackType, correlationId: string) => {
   const [user] = await db
     .select()
     .from(ashStudent)
@@ -492,15 +516,24 @@ export const submitFeedback = async (options: AshprogramfeedbackType) => {
     singleKey: undefined,
     patternKey: `cedarrise:ash:feedback:*`,
     event: "SUBMIT ASH STUDENT FEEDBACK",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Ash Program feedback form submitted successfully",
     data: newAshProgramFeedback,
+    meta: {
+      correlationId,
+    },
   };
 };
-export const listFeedback = async (page: number, limit: number, search: string) => {
+export const listFeedback = async (
+  page: number,
+  limit: number,
+  search: string,
+  correlationId: string,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -539,6 +572,7 @@ export const listFeedback = async (page: number, limit: number, search: string) 
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -557,6 +591,7 @@ export const listFeedback = async (page: number, limit: number, search: string) 
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -587,6 +622,7 @@ export const listFeedback = async (page: number, limit: number, search: string) 
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -618,18 +654,22 @@ export const getFeedback = async (id: string) => {
     data: feedback,
   };
 };
-export const deleteFeedback = async (id: string) => {
+export const deleteFeedback = async (id: string, correlationId: string) => {
   await db.delete(ashProgramFeedback).where(eq(ashProgramFeedback.id, id));
 
   appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:ash:feedback:*`,
     event: "SUBMIT ASH STUDENT FEEDBACK",
+    correlationId,
   });
 
   return {
     code: 200,
     message: "Ash feedback data deleted successfully",
+    meta: {
+      correlationId,
+    },
   };
 };
 export const exportAshFeedbackTableToCSV = async () => {
@@ -733,7 +773,11 @@ export const getAshTrackersCardsData = async () => {
 };
 
 // ASH TRACKING
-export const submitTracking = async (req: Request, options: AshtermlytrackingbodyType) => {
+export const submitTracking = async (
+  req: Request,
+  options: AshtermlytrackingbodyType,
+  correlationId: string,
+) => {
   const termResultUpload: UploadApiResponse | undefined = await uploadToCloudinary(
     (req as any).file,
     "/Cedarrise Initiative/ASH-ASSETS/TERMLY-RESULTS",
@@ -779,12 +823,16 @@ export const submitTracking = async (req: Request, options: Ashtermlytrackingbod
     singleKey: undefined,
     patternKey: `cedarrise:ash:termlytracking:*`,
     event: "SUBMIT ASH STUDENT TRACKING",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Tracker form submitted successfully",
     data: tracker,
+    meta: {
+      correlationId,
+    },
   };
 };
 export const listTracking = async (
@@ -793,6 +841,7 @@ export const listTracking = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof termlySortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -864,6 +913,7 @@ export const listTracking = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -883,6 +933,7 @@ export const listTracking = async (
           totalPages: cacheRes.totalPages,
         },
         metadata: cacheRes.metadata,
+        correlationId,
       },
     };
   }
@@ -957,6 +1008,7 @@ export const listTracking = async (
         totalPages,
       },
       metadata: metaData,
+      correlationId,
     },
   };
 };
@@ -1022,7 +1074,7 @@ export const getTrack = async (id: string) => {
     data: track,
   };
 };
-export const deleteTrack = async (id: string) => {
+export const deleteTrack = async (id: string, correlationId: string) => {
   const [data] = await db.delete(ashTermlyTracking).where(eq(ashTermlyTracking.id, id)).returning({
     termResultPublicId: ashTermlyTracking.termResultPublicId,
   });
@@ -1041,11 +1093,15 @@ export const deleteTrack = async (id: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:ash:termlytracking:*`,
     event: "DELETE ASH STUDENT TRACKING",
+    correlationId,
   });
 
   return {
     code: 200,
     message: "Ash tracking data deleted successfully",
+    meta: {
+      correlationId,
+    },
   };
 };
 export const exportAshTermlyTrackingTableToCSV = async () => {
@@ -1054,7 +1110,10 @@ export const exportAshTermlyTrackingTableToCSV = async () => {
 };
 
 // ASH ATTENDANCE
-export const submitAttendance = async (options: AshweeklyattendancebodyType) => {
+export const submitAttendance = async (
+  options: AshweeklyattendancebodyType,
+  correlationId: string,
+) => {
   const [attendance] = await db
     .insert(ashWeeklyAttendance)
     .values({
@@ -1072,15 +1131,22 @@ export const submitAttendance = async (options: AshweeklyattendancebodyType) => 
     singleKey: undefined,
     patternKey: `cedarrise:ash:weeklyattendance:*`,
     event: "SUBMIT ASH STUDENT WEEKLY ATTENDANCE",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Attendance form submitted successfully",
     data: attendance,
+    meta: { correlationId },
   };
 };
-export const listAttendance = async (page: number, limit: number, search: string) => {
+export const listAttendance = async (
+  page: number,
+  limit: number,
+  search: string,
+  correlationId: string,
+) => {
   // search
   if (search) {
     const studentName = sql<string>`
@@ -1158,6 +1224,7 @@ export const listAttendance = async (page: number, limit: number, search: string
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -1176,6 +1243,7 @@ export const listAttendance = async (page: number, limit: number, search: string
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -1224,6 +1292,7 @@ export const listAttendance = async (page: number, limit: number, search: string
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -1287,7 +1356,7 @@ export const getAttendance = async (id: string) => {
     },
   };
 };
-export const deleteAttendance = async (id: string) => {
+export const deleteAttendance = async (id: string, correlationId: string) => {
   await db.delete(ashWeeklyAttendance).where(eq(ashWeeklyAttendance.id, id));
 
   ///
@@ -1295,11 +1364,13 @@ export const deleteAttendance = async (id: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:ash:weeklyattendance:*`,
     event: "SUBMIT ASH STUDENT WEEKLY ATTENDANCE",
+    correlationId,
   });
 
   return {
     code: 200,
     message: "Ash attendance data deleted successfully",
+    meta: { correlationId },
   };
 };
 export const exportAshAttendanceTableToCSV = async () => {
@@ -1308,7 +1379,7 @@ export const exportAshAttendanceTableToCSV = async () => {
 };
 
 // ASH EXIT
-export const submitExit = async (options: AshexitbodyType) => {
+export const submitExit = async (options: AshexitbodyType, correlationId: string) => {
   const [exit] = await db
     .insert(ashExit)
     .values({
@@ -1338,12 +1409,16 @@ export const submitExit = async (options: AshexitbodyType) => {
     singleKey: undefined,
     patternKey: `cedarrise:ash:exit:*`,
     event: "SUBMIT ASH STUDENT EXIT FORM",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Exit form submitted successfully",
     data: exit,
+    meta: {
+      correlationId,
+    },
   };
 };
 export const listExit = async (
@@ -1352,6 +1427,7 @@ export const listExit = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof exitSortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -1417,6 +1493,7 @@ export const listExit = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -1434,6 +1511,7 @@ export const listExit = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -1497,6 +1575,7 @@ export const listExit = async (
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -1555,18 +1634,20 @@ export const getExit = async (id: string) => {
     data: exit,
   };
 };
-export const deleteExit = async (id: string) => {
+export const deleteExit = async (id: string, correlationId: string) => {
   await db.delete(ashExit).where(eq(ashExit.id, id));
 
   appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:ash:exit:*`,
     event: "DELETE ASH STUDENT EXIT RECORD",
+    correlationId,
   });
 
   return {
     code: 200,
     message: "Ash exit data deleted successfully",
+    meta: { correlationId },
   };
 };
 export const exportAshExitTableToCSV = async () => {

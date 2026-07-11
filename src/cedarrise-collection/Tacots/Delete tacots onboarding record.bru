@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: d1aa62a0-9df8-43a8-bdc4-dc9b49320038
+  id: 0e2367ac-7e23-4340-8920-73471b6f59f1
   baseUrl: http://localhost:3000
 }
 
@@ -37,6 +37,17 @@ docs {
   ## Response
   
   **`200 OK`** — Confirms the onboarding record has been deleted.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

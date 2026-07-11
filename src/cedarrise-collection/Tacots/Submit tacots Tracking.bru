@@ -11,10 +11,10 @@ post {
 }
 
 body:multipart-form {
-  studentId: d7a5e187-305b-480e-8830-243e82c31f12
-  schoolId: d7a5e187-305b-480e-8830-243e82c31f12
+  studentId: 40a4df97-3cdd-49a7-b9f5-3a87611998f3
+  schoolId: 40a4df97-3cdd-49a7-b9f5-3a87611998f3
   region: ABIA
-  academicSession: 2024/25
+  academicSession: 2025/26
   academicTerm: 1ST TERM
   assessmentPeriod: END OF TERM
   submissionDate: 2025-04-10
@@ -42,8 +42,8 @@ body:multipart-form {
   sundriesSpent: 5000
   totalAmountSpent: 60000
   financialNotes: 
-  termResult: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
-  paymentEvidence: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  termResult: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
+  paymentEvidence: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
 }
 
 vars:pre-request {
@@ -138,6 +138,17 @@ docs {
   ## Response
   
   **`201 Created`** — Returns the newly created TACOTS tracking record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

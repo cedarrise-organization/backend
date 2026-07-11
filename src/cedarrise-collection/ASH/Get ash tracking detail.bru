@@ -1,7 +1,7 @@
 meta {
   name: Get ASH tracking detail
   type: http
-  seq: 14
+  seq: 15
 }
 
 get {
@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 634656f0-9d25-4368-9c71-c0de63529bce
+  id: 648e3392-867a-4c16-839d-09e17a30ce3e
   baseUrl: http://localhost:3000
 }
 
@@ -75,6 +75,9 @@ docs {
       "updatedAt": "ISO 8601" | null,
       "createdAt": "ISO 8601",
       "deletedAt": "ISO 8601" | null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

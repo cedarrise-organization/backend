@@ -7,11 +7,11 @@ import winston from "winston";
 //   endpoint: `https://${process.env.INGESTING_HOST}`,
 // });
 
-const { combine, timestamp, json, errors, align, cli, printf } = winston.format;
+const { combine, timestamp, json, errors, align, colorize, printf } = winston.format;
 const isProduction = process.env.NODE_ENV === "production";
 
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
+  level: process.env.LOG_LEVEL || "http",
   format: combine(
     timestamp({
       format: "YYYY-MM-DD hh:mm:ss.SSS A",
@@ -20,7 +20,7 @@ const logger = winston.createLogger({
     isProduction
       ? combine(json(), align())
       : combine(
-          cli(),
+          colorize(),
           printf(({ timestamp, level, message, ...meta }) => {
             const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : "";
             return `${timestamp} ${level}: ${message}${metaStr}`;

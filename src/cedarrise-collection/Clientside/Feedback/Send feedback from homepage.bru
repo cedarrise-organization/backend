@@ -12,13 +12,13 @@ post {
 
 body:json {
   {
-    "email": "user@example.com",
+    "email": "maximilianogbuabor@gmail.com",
     "feedback": "This is a sample feedback message that must be at least ten characters long."
   }
 }
 
 vars:pre-request {
-  baseUrl: 
+  baseUrl: http://localhost:3000
 }
 
 docs {
@@ -43,7 +43,10 @@ docs {
     ```json
     {
       "success": true,
-      "message": "Feedback email sent successully"
+      "message": "Feedback email sent successully",
+      "meta": {
+        "correlationId": "uuid-v4-string"
+      }
     }
     ```
   

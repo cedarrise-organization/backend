@@ -1,7 +1,7 @@
 meta {
   name: Get ASH feedback detail
   type: http
-  seq: 9
+  seq: 10
 }
 
 get {
@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 843e2b52-1d43-44f7-af9d-22d8d0bf59ba
+  id: ddd654b2-080d-4660-9310-2b59228b6560
   baseUrl: http://localhost:3000
 }
 
@@ -69,6 +69,9 @@ docs {
       "updatedAt": "ISO 8601" | null,
       "createdAt": "ISO 8601",
       "deletedAt": "ISO 8601" | null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

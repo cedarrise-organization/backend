@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 9e66c52e-ea70-4cfe-85a8-0a6c219c1f8d
+  id: 1cf47d0a-3037-4c2a-995d-74704b5f334a
   baseUrl: http://localhost:3000
 }
 
@@ -67,6 +67,9 @@ docs {
       "updatedAt": "ISO 8601" | null,
       "createdAt": "ISO 8601",
       "deletedAt": "ISO 8601" | null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

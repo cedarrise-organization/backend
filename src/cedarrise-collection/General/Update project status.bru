@@ -1,21 +1,21 @@
 meta {
   name: Update project status
   type: http
-  seq: 4
+  seq: 3
 }
 
 patch {
-  url: {{baseUrl}}/api/v1/general/projects/:id?status=
+  url: {{baseUrl}}/api/v1/general/projects/:id?status=complete
   body: none
   auth: inherit
 }
 
 params:query {
-  status: 
+  status: complete
 }
 
 params:path {
-  id: d9082d3f-bfaa-4fd9-88e1-59381c6568a2
+  id: 9eb39631-25d1-4f5d-bb25-0983452343d0
 }
 
 vars:pre-request {
@@ -68,6 +68,9 @@ docs {
       "status": "completed",
       "createdAt": "2026-06-01T00:00:00.000Z",
       "updatedAt": "2026-06-01T00:00:00.000Z"
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

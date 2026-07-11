@@ -13,8 +13,8 @@ export const AUTH_EVENTS = {
 appEvents.on(AUTH_EVENTS.AUTH_LOGIN, async (data) => {
   logger.info("user logged in", {
     email: data.email,
-    // deviceInfo: data.deviceInfo,
-    // correlationId: data.correlationId
+    deviceInfo: data.deviceInfo,
+    correlationId: data.correlationId
   });
 });
 
@@ -23,8 +23,8 @@ appEvents.on(AUTH_EVENTS.AUTH_LOGIN_FAIL, async (data) => {
   logger.info("user failed to log in", {
     email: data.email,
     reason: data.reason,
-    // deviceInfo: data.deviceInfo,
-    // correlationId: data.correlationId
+    deviceInfo: data.deviceInfo,
+    correlationId: data.correlationId
   });
 });
 
@@ -34,8 +34,8 @@ appEvents.on(AUTH_EVENTS.AUTH_REFRESH, async (data) => {
     userId: data.userId,
     userName: data.name,
     userDepartment: data.department,
-    // deviceInfo: data.deviceInfo,
-    // correlationId: data.correlationId
+    deviceInfo: data.deviceInfo,
+    correlationId: data.correlationId
   });
 });
 
@@ -44,7 +44,7 @@ appEvents.on(AUTH_EVENTS.AUTH_REFRESH_FAIL, async (data) => {
   logger.info("user failed to get refresh token ", {
     userId: data.userId,
     reason: data.reason,
-    // deviceInfo: data.deviceInfo,
-    // correlationId: data.correlationId
+    deviceInfo: data.deviceInfo,
+    correlationId: data.correlationId
   });
 });

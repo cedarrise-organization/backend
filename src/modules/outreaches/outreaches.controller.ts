@@ -31,25 +31,30 @@ export const createOutreachController = async (req: Request, res: Response, next
   } = req.body;
 
   try {
-    const response = await createOutreach({
-      outreachStartDate,
-      outreachEndDate,
-      outreachState,
-      outreachLga,
-      outreachCity,
-      outreachCommunity,
-      numVolunteers,
-      numBeneficiaries,
-      outreachType,
-      activityDescription,
-      impactStories,
-      challengesEncountered,
-      recommendations,
-      submittedBy,
-      submissionDate,
-    });
+    const response = await createOutreach(
+      {
+        outreachStartDate,
+        outreachEndDate,
+        outreachState,
+        outreachLga,
+        outreachCity,
+        outreachCommunity,
+        numVolunteers,
+        numBeneficiaries,
+        outreachType,
+        activityDescription,
+        impactStories,
+        challengesEncountered,
+        recommendations,
+        submittedBy,
+        submissionDate,
+      },
+      (req as any).correlationId,
+    );
 
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -58,7 +63,9 @@ export const getOneOutreachController = async (req: Request, res: Response, next
   const id = (req as any).params.id.toString();
   try {
     const response = await getOneOutreach(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -71,7 +78,14 @@ export const listAllOutreachController = async (
   const { page, limit, orderBy, search, sortBy } = req.qtransformed;
 
   try {
-    const response = await listOutreaches(page, limit, orderBy, search, sortBy);
+    const response = await listOutreaches(
+      page,
+      limit,
+      orderBy,
+      search,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -80,8 +94,10 @@ export const listAllOutreachController = async (
 export const deleteOutreachController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteOutreach(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteOutreach(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }

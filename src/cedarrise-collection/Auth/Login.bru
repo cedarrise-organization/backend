@@ -40,7 +40,19 @@ docs {
   | password | string | Yes      | Minimum 8 characters.                              |
   
   ## Response
-  Returns the authenticated user object. Access and refresh tokens are set as HTTP-only cookies (`cedaraccess`, `cedarrefresh`).
+  
+  **`200 OK`** — Returns the authenticated user object. Access and refresh tokens are set as HTTP-only cookies (`cedaraccess`, `cedarrefresh`).
+  
+  ```json
+  {
+    "success": true,
+    "message": "Login successful",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   - `400 Bad Request` — Validation failed (missing/invalid fields).

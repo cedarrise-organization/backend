@@ -16,7 +16,7 @@ params:query {
 
 vars:pre-request {
   baseUrl: http://localhost:3000
-  id: 8725ba3f-680f-42c6-b2d6-f1bf0021e823
+  id: 52d738dd-0bfb-425c-a1b8-31ec3aa3e9ea
 }
 
 settings {
@@ -26,30 +26,41 @@ settings {
 
 docs {
   # Update TACOTS Recommended Student Status
-
+  
   Updates the admin selection status of a TACOTS recommendation record. Used to mark a recommended student as selected, not selected, or keep in view. On status change, all related cache entries (single record and paginated lists) are invalidated.
-
+  
   ## Authorization
   Requires `update` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type   | Required | Description                                |
   |-----------|--------|----------|--------------------------------------------|
   | id        | string | Yes      | UUID of the TACOTS recommendation record   |
-
+  
   ## Query Parameters
-
+  
   | Parameter | Type   | Required | Default        | Description / Allowed Values                          |
   |-----------|--------|----------|----------------|-------------------------------------------------------|
   | status    | string | No       | `KEEP IN VIEW` | One of: `NOT SELECTED`, `KEEP IN VIEW`, `SELECTED`    |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the updated recommendation record with `id` and `adminStatus` fields.
-
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+  
   ## Errors
-
+  
   | Status                      | Description                                             |
   |-----------------------------|---------------------------------------------------------|
   | `400 Bad Request`           | Invalid `id` format or unknown `status` value.          |

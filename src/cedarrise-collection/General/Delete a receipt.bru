@@ -11,7 +11,7 @@ delete {
 }
 
 params:path {
-  id: 9fc2d7d1-7aff-4d73-b27c-997167ca1151
+  id: 8b78d788-e142-4b54-b648-6baf34451d85
 }
 
 vars:pre-request {
@@ -50,7 +50,10 @@ docs {
   ```json
   {
     "success": true,
-    "message": "Receipts deleted successfully"
+    "message": "Receipts deleted successfully",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

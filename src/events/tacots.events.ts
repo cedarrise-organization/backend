@@ -27,16 +27,15 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_ACCEPTED, async (data) => {
     }
 
     logger.info("TACOTS welcome email sent successully", {
-      // info: info.accepted,
       message: "new student accepted into TACOTS",
       studentId: data.userId,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send TACOTS welcome email", {
+    logger.error("Failed to send TACOTS welcome email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -57,16 +56,15 @@ appEvents.on(TACOTS_EVENTS.APPLICANT_REJECTED, async (data) => {
     }
 
     logger.info("TACOTS rejection email sent successully", {
-      // info: info.accepted,
       message: "student rejected from TACOTS",
       studentId: data.userId,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send TACOTS rejection email", {
+    logger.error("Failed to send TACOTS rejection email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -79,7 +77,7 @@ appEvents.on(TACOTS_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
     logger.error("Could not remove cache **if any**", {
@@ -87,7 +85,7 @@ appEvents.on(TACOTS_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -116,14 +114,13 @@ appEvents.on(TACOTS_EVENTS.DELETE_CACHE, async (data) => {
 //     }
 
 //     logger.info("email sent successully", {
-//       info: info.accepted,
-//       // correlationId
+//       correlationId: data.correlationId
 //     });
 //   } catch (error: any) {
-//     logger.info("Failed to send email", {
+//     logger.error("Failed to send email", {
 //       email: data.email,
-//       message: error.message
-//       // correlationId
+//       message: error.message,
+//       correlationId: data.correlationId
 //     });
 //   }
 // });

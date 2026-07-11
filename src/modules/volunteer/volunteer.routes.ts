@@ -32,7 +32,7 @@ const router = express.Router();
 // Submit volunteer registration
 router.post(
   "/register",
-  formUploadLimiter,
+  /*formUploadLimiter,*/
   validateRequest(createVolunteerRegistrationSchema),
   submitVolunteerRegistrationController,
 );
@@ -74,7 +74,7 @@ router.get("/download/volunteerregistration", authenticate(), authorize("read"),
 // Submit volunteer feedback form
 router.post(
   "/feedback",
-  formUploadLimiter,
+  /*formUploadLimiter,*/
   validateRequest(createVolunteerFeedbackSchema),
   submitVolunteerFeedbackController,
 );

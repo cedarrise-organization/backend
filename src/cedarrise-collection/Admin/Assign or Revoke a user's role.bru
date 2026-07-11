@@ -5,18 +5,18 @@ meta {
 }
 
 patch {
-  url: {{baseUrl}}/api/v1/admin/roles/:userId/action?action=assign&rolename=superadmin
+  url: {{baseUrl}}/api/v1/admin/roles/:userId/action?action=revoke&rolename=superadmin
   body: none
   auth: inherit
 }
 
 params:query {
-  action: assign
+  action: revoke
   rolename: superadmin
 }
 
 params:path {
-  userId: b9074c3c-dd16-4b3d-ac73-86f6c9761b06
+  userId: 4f0e73b2-586e-4a3c-898f-ced5ffc472da
 }
 
 vars:pre-request {
@@ -70,7 +70,10 @@ docs {
         "assignedAt": "ISO 8601",
         "assignedBy": "string" | null
       }
-    ]
+    ],
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

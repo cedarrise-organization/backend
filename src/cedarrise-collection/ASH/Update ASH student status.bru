@@ -16,7 +16,7 @@ params:query {
 
 vars:pre-request {
   baseUrl: http://localhost:3000
-  id: 1de0d9d7-5397-4cf4-a114-c577f894fcdd
+  id: ea586548-f63f-41ad-b574-c5adec32eef3
 }
 
 settings {
@@ -47,6 +47,17 @@ docs {
   ## Response
   
   **`200 OK`** — Returns the updated student record with `id` and `status` fields.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

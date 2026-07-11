@@ -1,7 +1,7 @@
 meta {
   name: Delete a project
   type: http
-  seq: 5
+  seq: 4
 }
 
 delete {
@@ -11,7 +11,7 @@ delete {
 }
 
 params:path {
-  id: 7cfaf843-e41d-49d8-a82e-be5495142d48
+  id: 9eb39631-25d1-4f5d-bb25-0983452343d0
 }
 
 vars:pre-request {
@@ -50,7 +50,10 @@ docs {
   ```json
   {
     "success": true,
-    "message": "Project deleted successfully"
+    "message": "Project deleted successfully",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

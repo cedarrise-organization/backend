@@ -1764,7 +1764,7 @@ export const syncNotificationCandidates = async (candidates: Notificationcandida
 };
 
 // Return notifications
-export const getNotifications = async (page: number, limit: number) => {
+export const getNotifications = async (page: number, limit: number, correlationId: string) => {
   /// cache
   const key = `cedarrise:dashboard:notifications`;
   const cacheRes = await cacheGet<any>(key);
@@ -1779,6 +1779,7 @@ export const getNotifications = async (page: number, limit: number) => {
           limit,
           totalPages: Number(cacheRes.totalPages),
         },
+        correlationId
       },
     };
   }
@@ -1813,6 +1814,7 @@ export const getNotifications = async (page: number, limit: number) => {
         limit,
         totalPages: Number(totalPages) ?? 0,
       },
+      correlationId
     },
   };
 };

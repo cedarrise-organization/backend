@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  baseUrl: 
+  baseUrl: http://localhost:3000
 }
 
 settings {
@@ -82,6 +82,9 @@ docs {
         "partners": number,
         "graduated": number
       }
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

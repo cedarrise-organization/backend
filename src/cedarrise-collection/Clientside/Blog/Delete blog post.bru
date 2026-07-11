@@ -12,7 +12,7 @@ delete {
 
 vars:pre-request {
   baseUrl: http://localhost:3000
-  id: 5f218adc-60b1-4ed2-a70f-74eec261c8f1
+  id: 4e2fde93-8d1a-4354-98e0-33e4f3074949
 }
 
 settings {
@@ -44,7 +44,10 @@ docs {
     {
       "success": true,
       "message": "Blog deleted successfully",
-      "data": null
+      "data": null,
+      "meta": {
+        "correlationId": "uuid-v4-string"
+      }
     }
     ```
   

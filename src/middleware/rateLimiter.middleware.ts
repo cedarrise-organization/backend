@@ -26,7 +26,11 @@ const createLimiter = (options: {
     },
     keyGenerator:
       options.keyGenerator ||
-      ((req: Request) => (req as any).user?.id || ipKeyGenerator(req.ip!) || "anonymous"),
+      ((req: Request) =>
+        `${(req as any).body.email.toString()} ${ipKeyGenerator(req.ip!)}` ||
+        (req as any).user?.id ||
+        ipKeyGenerator(req.ip!) ||
+        "anonymous"),
   });
 };
 
@@ -35,7 +39,10 @@ export const authLimiter = createLimiter({
   windowMs: 15 * 60 * 1000, // 15 mins
   limit: 5,
   message: "Too many login attempts. Please try again later.",
-  keyGenerator: (req: Request) => ipKeyGenerator(req.ip!) || "anonymous",
+  keyGenerator: (req: Request) =>
+    `${(req as any).body.email.toString()} ${ipKeyGenerator(req.ip!)}` ||
+    ipKeyGenerator(req.ip!) ||
+    "anonymous",
 });
 
 // Client-side form submission endpoints: keyed by IP (user isn't an authenticated admin)

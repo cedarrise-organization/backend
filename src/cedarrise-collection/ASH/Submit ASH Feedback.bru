@@ -1,7 +1,7 @@
 meta {
   name: Submit ASH Feedback
   type: http
-  seq: 7
+  seq: 8
 }
 
 post {
@@ -93,6 +93,17 @@ docs {
   ## Response
   
   **`201 Created`** — Returns the newly created ASH feedback record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

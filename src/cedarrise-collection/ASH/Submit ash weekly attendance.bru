@@ -1,7 +1,7 @@
 meta {
   name: Submit ASH weekly attendance
   type: http
-  seq: 17
+  seq: 18
 }
 
 post {
@@ -56,6 +56,17 @@ docs {
   ## Response
   
   **`201 Created`** — Returns the newly created ASH weekly attendance record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   The created record is also cached under the key `cedarrise:ash:weeklyattendance:<id>` using the `FORM_DATA` TTL.
   

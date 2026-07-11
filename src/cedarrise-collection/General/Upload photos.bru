@@ -5,17 +5,17 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/api/v1/general/gallery?folder=
+  url: {{baseUrl}}/api/v1/general/gallery?folder=OUTREACHES
   body: multipartForm
   auth: inherit
 }
 
 params:query {
-  folder: 
+  folder: OUTREACHES
 }
 
 body:multipart-form {
-  photos: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  photos: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
 }
 
 vars:pre-request {
@@ -68,7 +68,10 @@ docs {
   ```json
   {
     "success": true,
-    "message": "Photos uploaded successfully"
+    "message": "Photos uploaded successfully",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

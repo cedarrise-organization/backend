@@ -21,7 +21,9 @@ export const sendLinkEmailController = async (req: Request, res: Response, next:
       },
     });
 
-    successResponse(res, response.code, response.message);
+    successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -35,7 +37,9 @@ export const sendPartnerWithUsEmailController = async (
   const { email, name, option } = req.body;
   try {
     const response = await sendPartnerWithUsEmail({ body: { email, name, option } });
-    successResponse(res, response.code, response.message);
+    successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }

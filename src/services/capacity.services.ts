@@ -16,7 +16,7 @@ const sortMap = {
   createdAt: capacityBuildingEvaluation.createdAt,
 } as const;
 
-export const createEvaluation = async (options: CapacitybuildingevaluationbodyType) => {
+export const createEvaluation = async (options: CapacitybuildingevaluationbodyType, correlationId: string) => {
   const [evaluation] = await db
     .insert(capacityBuildingEvaluation)
     .values({
@@ -67,6 +67,7 @@ export const createEvaluation = async (options: CapacitybuildingevaluationbodyTy
     singleKey: undefined,
     patternKey: `cedarrise:capacity:*`,
     event: "CREATE CAPACITY EVALUATION RECORD",
+    correlationId
   });
 
   return {
@@ -132,6 +133,7 @@ export const listAllEvaluation = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof sortMap,
+  correlationId: string
 ) => {
   // search
   if (search) {
@@ -168,6 +170,7 @@ export const listAllEvaluation = async (
           limit,
           totalPages,
         },
+        correlationId
       },
     };
   }
@@ -187,6 +190,7 @@ export const listAllEvaluation = async (
           totalPages: cacheRes.totalPages,
         },
         metadata: cacheRes.metadata,
+        correlationId
       },
     };
   }
@@ -226,6 +230,7 @@ export const listAllEvaluation = async (
         totalPages,
       },
       metadata: metaData,
+      correlationId
     },
   };
 };
@@ -257,13 +262,14 @@ export const getEvaluation = async (id: string) => {
     data: evaluation,
   };
 };
-export const deleteEvaluation = async (id: string) => {
+export const deleteEvaluation = async (id: string, correlationId: string) => {
   await db.delete(capacityBuildingEvaluation).where(eq(capacityBuildingEvaluation.id, id));
 
   appEvents.emit(DELETE_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:capacity:*`,
     event: "DELETE CAPACITY EVALUATION RECORD",
+    correlationId
   });
   
   return {

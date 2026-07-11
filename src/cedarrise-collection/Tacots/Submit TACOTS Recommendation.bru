@@ -69,8 +69,8 @@ body:multipart-form {
   careerGoal: Engineer
   studentStatement: 
   declarationConfirmed: true
-  passportPhoto: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
-  lastResult: @file(C:\Users\Maxmillian\Pictures\mmlogo.jpeg)
+  passportPhoto: @file(C:\Users\Maxmillian\Pictures\mmlogo-dark.jpeg) @contentType(image/jpeg)
+  lastResult: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
 }
 
 vars:pre-request {
@@ -197,6 +197,17 @@ docs {
   ## Response
   
   **`201 Created`** — Returns the newly created TACOTS recommendation record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

@@ -13,7 +13,9 @@ import {
 export const getCardsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const response = await getCards();
-    successResponse(res, response.code, response.message, response.data);
+    successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -26,7 +28,9 @@ export const getStudentPerformanceController = async (
 ) => {
   try {
     const response = await getStudentPerformance();
-    successResponse(res, response.code, response.message, response.data);
+    successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -35,7 +39,9 @@ export const getStudentPerformanceController = async (
 export const getEnrollmentController = async (req: Request, res: Response, next: NextFunction) => {
   const response = await getEnrollment();
   try {
-    successResponse(res, response.code, response.message, response.data);
+    successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -48,7 +54,9 @@ export const getInstEffectivenessController = async (
 ) => {
   const response = await getInstEffectiveness();
   try {
-    successResponse(res, response.code, response.message, response.data);
+    successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }
@@ -61,7 +69,7 @@ export const getNotificationsController = async (
 ) => {
   const { page, limit } = req.qtransformed;
   try {
-    const response = await getNotifications(page, limit);
+    const response = await getNotifications(page, limit, (req as any).correlationId);
     successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -76,7 +84,9 @@ export const dismissNotificationController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await dismissNotification(id);
-    successResponse(res, response.code, response.message);
+    successResponse(res, response.code, response.message, null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }

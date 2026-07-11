@@ -1,7 +1,7 @@
 meta {
   name: Get ASH attendance detail
   type: http
-  seq: 19
+  seq: 20
 }
 
 get {
@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 80d78f0f-c403-49ec-a79a-4c529ca2d3d1
+  id: fa1fac17-bfe6-49a3-982d-3403ed43fb32
   baseUrl: http://localhost:3000
 }
 
@@ -54,6 +54,9 @@ docs {
       "updatedAt": "ISO 8601" | null,
       "createdAt": "ISO 8601",
       "deletedAt": "ISO 8601" | null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

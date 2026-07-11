@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 821bcd99-aa8a-404b-8da4-296f6d77da5f
+  id: fd95447c-a949-4cf7-9765-691c3fd24037
   baseUrl: http://localhost:3000
 }
 
@@ -37,6 +37,17 @@ docs {
   ## Response
   
   **`200 OK`** — Confirms the recommendation record has been deleted.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

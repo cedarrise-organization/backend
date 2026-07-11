@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 34a3ad92-b791-40a7-84b5-e03304ac750e
+  id: 4ed51ee8-2ba1-4928-91c4-37be646dddea
   baseUrl: http://localhost:3000
 }
 
@@ -40,6 +40,17 @@ docs {
   ## Response
   
   **`200 OK`** — Returns a success message confirming deletion.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   The cache key `cedarrise:outreaches:outreach:<id>` is also deleted.
   

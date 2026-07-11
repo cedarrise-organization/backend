@@ -27,15 +27,14 @@ appEvents.on(VOLUNTEER_EVENTS.VOLUNTEER_ACCEPTED, async (data) => {
 
     logger.info("Volunteer welcome email sent successully", {
       message: "new volunteer accepted",
-      // info: info.accepted,
       studentId: data.userId,
-      // correlationId
+      correlationId: data.correlationId,
     });
   } catch (error: any) {
-    logger.info("Failed to send volunteer welcome email", {
+    logger.error("Failed to send volunteer welcome email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId,
     });
   }
 });
@@ -57,15 +56,14 @@ appEvents.on(VOLUNTEER_EVENTS.VOLUNTEER_REJECTED, async (data) => {
 
     logger.info("Volunteer Application Update email sent successully", {
       message: "volunteer applicant rejected",
-      // info: info.accepted,
       studentId: data.userId,
-      // correlationId
+      correlationId: data.correlationId,
     });
   } catch (error: any) {
-    logger.info("Failed to send volunteer application update email", {
+    logger.error("Failed to send volunteer application update email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId,
     });
   }
 });
@@ -78,7 +76,7 @@ appEvents.on(VOLUNTEER_EVENTS.DELETE_CACHE, async (data) => {
       singleKey: data.singleKey,
       patternKey: data.patternKey,
       event: data.event,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId,
     });
   } catch (error: any) {
     logger.error("Could not remove cache **if any**", {
@@ -86,7 +84,7 @@ appEvents.on(VOLUNTEER_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId,
     });
   }
 });
@@ -115,13 +113,13 @@ appEvents.on(VOLUNTEER_EVENTS.DELETE_CACHE, async (data) => {
 //     }
 
 //     logger.info("email sent successully", {
-//       // correlationId
+//       correlationId: data.correlationId
 //     });
 //   } catch (error: any) {
-//     logger.info("Failed to send email", {
+//     logger.error("Failed to send email", {
 //       email: data.email,
 //       message: error.message
-//       // correlationId
+//       correlationId: data.correlationId
 //     });
 //   }
 // });

@@ -102,68 +102,72 @@ export const submitRecommendationController = async (
   if (!req.files) throw new ValidationError("Please upload the file");
 
   try {
-    const response = await submitRecommendation(req, {
-      firstName,
-      middleName,
-      surname,
-      gender,
-      age,
-      dob,
-      religion,
-      catholicSacraments,
-      parishAttended,
-      diocese,
-      primaryLanguage,
-      phoneNumber,
-      nationality,
-      stateOfOrigin,
-      lga,
-      homeAddress,
-      schoolName,
-      schoolTown,
-      schoolState,
-      lastYearAttended,
-      lastClass,
-      classPositionLastTerm,
-      lastTermAverage,
-      fathersName,
-      fathersOccupation,
-      fathersPhone,
-      mothersName,
-      mothersOccupation,
-      mothersPhone,
-      parentsAddress,
-      guardianName,
-      guardianPhone,
-      guardianRelationship,
-      guardianOccupation,
-      guardianAddress,
-      householdSize,
-      numSiblings,
-      familyPosition,
-      specialCircumstances,
-      annualHouseholdIncome,
-      incomeSources,
-      numIncomeEarners,
-      avgMonthlyIncome,
-      livesWith,
-      residenceType,
-      hasElectricity,
-      recommenderFirstName,
-      recommenderLastName,
-      recommenderPhone,
-      recommenderAddress,
-      childBackgroundNotes,
-      supportTypesNeeded,
-      otherImportantInfo,
-      disciplineRating,
-      responsibilityRating,
-      careerGoal,
-      studentStatement,
-      declarationConfirmed,
-    });
+    const response = await submitRecommendation(
+      req,
+      {
+        firstName,
+        middleName,
+        surname,
+        gender,
+        age,
+        dob,
+        religion,
+        catholicSacraments,
+        parishAttended,
+        diocese,
+        primaryLanguage,
+        phoneNumber,
+        nationality,
+        stateOfOrigin,
+        lga,
+        homeAddress,
+        schoolName,
+        schoolTown,
+        schoolState,
+        lastYearAttended,
+        lastClass,
+        classPositionLastTerm,
+        lastTermAverage,
+        fathersName,
+        fathersOccupation,
+        fathersPhone,
+        mothersName,
+        mothersOccupation,
+        mothersPhone,
+        parentsAddress,
+        guardianName,
+        guardianPhone,
+        guardianRelationship,
+        guardianOccupation,
+        guardianAddress,
+        householdSize,
+        numSiblings,
+        familyPosition,
+        specialCircumstances,
+        annualHouseholdIncome,
+        incomeSources,
+        numIncomeEarners,
+        avgMonthlyIncome,
+        livesWith,
+        residenceType,
+        hasElectricity,
+        recommenderFirstName,
+        recommenderLastName,
+        recommenderPhone,
+        recommenderAddress,
+        childBackgroundNotes,
+        supportTypesNeeded,
+        otherImportantInfo,
+        disciplineRating,
+        responsibilityRating,
+        careerGoal,
+        studentStatement,
+        declarationConfirmed,
+      },
+      (req as any).correlationId,
+    );
 
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }
@@ -175,7 +179,15 @@ export const listRecommendationsController = async (
 ) => {
   const { page, limit, orderBy, search, status, sortBy } = req.qtransformed;
   try {
-    const response = await listRecommendations(page, limit, orderBy, search, status, sortBy);
+    const response = await listRecommendations(
+      page,
+      limit,
+      orderBy,
+      search,
+      status,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -189,7 +201,9 @@ export const getRecommendationController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await getRecommendation(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -203,8 +217,8 @@ export const updateRecommendedStudentStatusController = async (
   const { status } = req.qtransformed;
 
   try {
-    const response = await updateRecommendedStudentStatus(id, status);
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await updateRecommendedStudentStatus(id, status, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -216,8 +230,8 @@ export const deleteRecommendationController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteRecommendation(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteRecommendation(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -337,30 +351,33 @@ export const submitFeedbackController = async (req: Request, res: Response, next
     additionalComments,
   } = req.body;
   try {
-    const response = await submitTacotsFeedback({
-      studentFirstName,
-      studentSurname,
-      currentSchool,
-      currentClass,
-      scholarshipHelpedStay,
-      mostHelpfulSupport,
-      studyMotivationRating,
-      mentorshipImpactRating,
-      currentChallenges,
-      likedMost,
-      studentImprovementSuggestions,
-      parentGuardianName,
-      parentGuardianRelationship,
-      parentPhone,
-      scholarshipReducedBurden,
-      academicImprovementNoticed,
-      attitudeChangeNoticed,
-      parentSatisfactionRating,
-      programImpactOnFamily,
-      parentImprovementSuggestions,
-      additionalComments,
-    });
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await submitTacotsFeedback(
+      {
+        studentFirstName,
+        studentSurname,
+        currentSchool,
+        currentClass,
+        scholarshipHelpedStay,
+        mostHelpfulSupport,
+        studyMotivationRating,
+        mentorshipImpactRating,
+        currentChallenges,
+        likedMost,
+        studentImprovementSuggestions,
+        parentGuardianName,
+        parentGuardianRelationship,
+        parentPhone,
+        scholarshipReducedBurden,
+        academicImprovementNoticed,
+        attitudeChangeNoticed,
+        parentSatisfactionRating,
+        programImpactOnFamily,
+        parentImprovementSuggestions,
+        additionalComments,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -368,7 +385,7 @@ export const submitFeedbackController = async (req: Request, res: Response, next
 export const listFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, search } = req.qtransformed;
   try {
-    const response = await listTacotsFeedback(page, limit, search);
+    const response = await listTacotsFeedback(page, limit, search, (req as any).correlationId);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -378,7 +395,9 @@ export const getFeedbackController = async (req: Request, res: Response, next: N
   const id = (req as any).params.id.toString();
   try {
     const response = await getTacotsFeedback(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -386,8 +405,8 @@ export const getFeedbackController = async (req: Request, res: Response, next: N
 export const deleteFeedbackController = async (req: Request, res: Response, next: NextFunction) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteTacotsFeedback(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteTacotsFeedback(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -482,43 +501,47 @@ export const submitOnboardingController = async (
     additionalInfo,
   } = req.body;
   try {
-    const response = await submitOnboarding(req, {
-      studentId,
-      onboardingDate,
-      hasMentalHealthDiagnosis,
-      diagnosedConditions,
-      behavioralIndicators,
-      focusAbilityRating,
-      emotionalStabilityRating,
-      peerInteractionRating,
-      receivedCounseling,
-      needsSpecialSupport,
-      mentalHealthNotes,
-      generalHealthStatus,
-      immunizationStatus,
-      hasChronicCondition,
-      chronicConditions,
-      allergies,
-      requiresMedication,
-      physicalActivityLevel,
-      physicalLimitations,
-      additionalHealthNotes,
-      enrolledSchoolName,
-      enrolledSchoolTown,
-      enrolledSchoolLga,
-      enrolledSchoolState,
-      enrolledClass,
-      termResumptionDate,
-      schoolFeesPerTerm,
-      studentCommitment,
-      parentGuardianCommitment,
-      programOfficerNotes,
-      supportTypesApproved,
-      mentorName,
-      sponsorName,
-      additionalInfo,
-    });
-    return successResponse(res, response.code, response.message, response.data);
+    const response = await submitOnboarding(
+      req,
+      {
+        studentId,
+        onboardingDate,
+        hasMentalHealthDiagnosis,
+        diagnosedConditions,
+        behavioralIndicators,
+        focusAbilityRating,
+        emotionalStabilityRating,
+        peerInteractionRating,
+        receivedCounseling,
+        needsSpecialSupport,
+        mentalHealthNotes,
+        generalHealthStatus,
+        immunizationStatus,
+        hasChronicCondition,
+        chronicConditions,
+        allergies,
+        requiresMedication,
+        physicalActivityLevel,
+        physicalLimitations,
+        additionalHealthNotes,
+        enrolledSchoolName,
+        enrolledSchoolTown,
+        enrolledSchoolLga,
+        enrolledSchoolState,
+        enrolledClass,
+        termResumptionDate,
+        schoolFeesPerTerm,
+        studentCommitment,
+        parentGuardianCommitment,
+        programOfficerNotes,
+        supportTypesApproved,
+        mentorName,
+        sponsorName,
+        additionalInfo,
+      },
+      (req as any).correlationId,
+    );
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -526,7 +549,14 @@ export const submitOnboardingController = async (
 export const listOnboardingController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listOnboarding(page, limit, orderBy, search, sortBy);
+    const response = await listOnboarding(
+      page,
+      limit,
+      orderBy,
+      search,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -536,7 +566,9 @@ export const getOnboardingController = async (req: Request, res: Response, next:
   const id = (req as any).params.id.toString();
   try {
     const response = await getOnboarding(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -548,8 +580,8 @@ export const deleteOnboardingController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteOnboarding(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteOnboarding(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -660,41 +692,45 @@ export const submitTacotsTrackingController = async (
 
   if (!req.files) throw new ValidationError("Please upload the file");
   try {
-    const response = await submitTacotsTracking(req, {
-      studentId,
-      schoolId,
-      region,
-      academicSession,
-      academicTerm,
-      assessmentPeriod,
-      submissionDate,
-      highestSubjectScore,
-      lowestSubjectScore,
-      studentAveragePct,
-      studentPositionInClass,
-      academicComment,
-      socialBehaviorRating,
-      schoolRulesRating,
-      responsibilityRating,
-      formationComments,
-      mentorName,
-      mentorshipSessionDate,
-      mentorshipMode,
-      mentorshipDuration,
-      mentorshipNotes,
-      serviceActivityType,
-      serviceDate,
-      serviceDuration,
-      serviceDescription,
-      serviceSupervisor,
-      tuitionFeePaid,
-      resourcesSpent,
-      sundriesSpent,
-      totalAmountSpent,
-      financialNotes,
-    });
+    const response = await submitTacotsTracking(
+      req,
+      {
+        studentId,
+        schoolId,
+        region,
+        academicSession,
+        academicTerm,
+        assessmentPeriod,
+        submissionDate,
+        highestSubjectScore,
+        lowestSubjectScore,
+        studentAveragePct,
+        studentPositionInClass,
+        academicComment,
+        socialBehaviorRating,
+        schoolRulesRating,
+        responsibilityRating,
+        formationComments,
+        mentorName,
+        mentorshipSessionDate,
+        mentorshipMode,
+        mentorshipDuration,
+        mentorshipNotes,
+        serviceActivityType,
+        serviceDate,
+        serviceDuration,
+        serviceDescription,
+        serviceSupervisor,
+        tuitionFeePaid,
+        resourcesSpent,
+        sundriesSpent,
+        totalAmountSpent,
+        financialNotes,
+      },
+      (req as any).correlationId,
+    );
 
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -704,9 +740,16 @@ export const listTacotsTrackingController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const { page, limit, orderBy ,search, sortBy } = req.qtransformed;
+  const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listTacotsTracking(page, limit, orderBy, search, sortBy);
+    const response = await listTacotsTracking(
+      page,
+      limit,
+      orderBy,
+      search,
+      sortBy,
+      (req as any).correlationId,
+    );
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -720,7 +763,9 @@ export const getTacotsTrackingController = async (
   const id = (req as any).params.id.toString();
   try {
     const response = await getTacotsTracking(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (error) {
     next(error);
   }
@@ -732,8 +777,8 @@ export const deleteTacotsTrackingController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteTacotsTracking(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteTacotsTracking(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }
@@ -845,8 +890,8 @@ export const submitTacotsExitController = async (
       additionalSituationInfo,
       completedBy,
       submissionDate,
-    });
-    return successResponse(res, response.code, response.message, response.data);
+    }, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
   }
@@ -854,7 +899,7 @@ export const submitTacotsExitController = async (
 export const listTacotsExitController = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, orderBy, search, sortBy } = req.qtransformed;
   try {
-    const response = await listTacotsExit(page, limit, orderBy, search, sortBy);
+    const response = await listTacotsExit(page, limit, orderBy, search, sortBy, (req as any).correlationId);
     return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (error) {
     next(error);
@@ -864,7 +909,7 @@ export const getTacotsExitController = async (req: Request, res: Response, next:
   const id = (req as any).params.id.toString();
   try {
     const response = await getTacotsExit(id);
-    return successResponse(res, response.code, response.message, response.data);
+    return successResponse(res, response.code, response.message, response.data, {correlationId: (req as any).correlationId});
   } catch (error) {
     next(error);
   }
@@ -876,8 +921,8 @@ export const deleteTacotsExitController = async (
 ) => {
   const id = (req as any).params.id.toString();
   try {
-    const response = await deleteTacotsExit(id);
-    return successResponse(res, response.code, response.message);
+    const response = await deleteTacotsExit(id, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, null, response.meta);
   } catch (error) {
     next(error);
   }

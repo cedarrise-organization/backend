@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 627b5ae0-6ae6-4e9e-8151-5623d3a0ff9d
+  id: c4d080a4-2705-4d05-afdc-89446c433f7a
   baseUrl: http://localhost:3000
 }
 
@@ -81,6 +81,9 @@ docs {
       "paymentEvidenceUrl": "string" | null,
       "paymentEvidencePublicId": "string" | null,
       "financialNotes": "string" | null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
   }
   ```

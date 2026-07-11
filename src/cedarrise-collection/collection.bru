@@ -254,9 +254,14 @@ docs {
   {
     "success": true,
     "message": "Descriptive success message",
-    "data": { /* object or array */ }
+    "data": { /* object or array */ },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
+  
+  > Every success response includes a `meta.correlationId` — a UUID (v4) string that uniquely identifies the request. This value is consistent across all internal logs and event traces for the same request, enabling end-to-end debugging and observability.
   
   ### 5.2 Paginated Response
   
@@ -269,7 +274,8 @@ docs {
         "page": 1,
         "limit": 25,
         "totalPages": 3
-      }
+      },
+      "correlationId": "uuid-v4-string"
     }
   }
   ```
@@ -284,7 +290,8 @@ docs {
       "acceptedStudents": 10,
       "rejectedStudents": 10,
       "pendingStudents": 20
-    }
+    },
+    "correlationId": "uuid-v4-string"
   }
   ```
   
@@ -575,6 +582,6 @@ docs {
   
   ---
   
-  *This document was generated from the Bruno API collection (`cedarrise-collection`) and verified against the backend source code. Last updated: 26 June 2026.*
+  *This document was generated from the Bruno API collection (`cedarrise-collection`) and verified against the backend source code. Last updated: 11 July 2026.*
   
 }

@@ -52,7 +52,7 @@ export const listUserRoles = async (userId: string) => {
   };
 };
 
-export const roleAction = async (userId: string, options: any) => {
+export const roleAction = async (userId: string, options: any, correlationId: string) => {
   const { action, rolename } = options;
 
   if (action === "revoke") {
@@ -66,7 +66,7 @@ export const roleAction = async (userId: string, options: any) => {
       .delete(userroles)
       .where(sql`${userroles.roleId} = ${role_.id} AND ${userroles.userId} = ${userId}`);
 
-    appEvents.emit(ADMIN_EVENTS.REVOKE_ROLE, { role: rolename, userId });
+    appEvents.emit(ADMIN_EVENTS.REVOKE_ROLE, { role: rolename, userId, correlationId });
 
     return {
       code: 200,
@@ -89,7 +89,7 @@ export const roleAction = async (userId: string, options: any) => {
     .returning()
     .onConflictDoNothing();
 
-  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, userId });
+  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, userId, correlationId });
 
   return {
     code: 200,
@@ -98,12 +98,15 @@ export const roleAction = async (userId: string, options: any) => {
   };
 };
 
-export const createUser = async (options: {
-  name: string;
-  email: string;
-  password: string;
-  department: string;
-}) => {
+export const createUser = async (
+  options: {
+    name: string;
+    email: string;
+    password: string;
+    department: string;
+  },
+  correlationId: string,
+) => {
   const { name, email, password, department } = options;
 
   const [ogUser] = await db
@@ -134,7 +137,8 @@ export const createUser = async (options: {
     singleKey: undefined,
     patternKey: `cedarrise:lookup:users:*`,
     event: "USER CREATED",
-  })
+    correlationId,
+  });
 
   appEvents.emit(ADMIN_EVENTS.CREATE_USER, {
     userId: newUser.id,
@@ -143,6 +147,7 @@ export const createUser = async (options: {
     department,
     email: newUser.email,
     password,
+    correlationId,
   });
 
   const [role_] = await db.select({ id: roles.id }).from(roles).where(eq(roles.isDefault, true));
@@ -159,7 +164,13 @@ export const createUser = async (options: {
     })
     .returning();
 
-  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: "volunteer", user: newUser.id });
+  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, {
+    role: "volunteer",
+    userId: newUser.id,
+    name,
+    email,
+    correlationId,
+  });
 
   return {
     code: 200,
@@ -196,7 +207,12 @@ export const listAllUsers = async () => {
   };
 };
 
-export const listUsersForUserPage = async (page: number, limit: number, search: string) => {
+export const listUsersForUserPage = async (
+  page: number,
+  limit: number,
+  search: string,
+  correlationId: string,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -230,6 +246,7 @@ export const listUsersForUserPage = async (page: number, limit: number, search: 
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -248,6 +265,7 @@ export const listUsersForUserPage = async (page: number, limit: number, search: 
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -278,11 +296,12 @@ export const listUsersForUserPage = async (page: number, limit: number, search: 
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
 
-export const deleteUser = async (userId: string) => {
+export const deleteUser = async (userId: string, correlationId: string) => {
   const [oldUser] = await db.delete(users).where(eq(users.id, userId)).returning();
 
   if (!oldUser) {
@@ -291,6 +310,7 @@ export const deleteUser = async (userId: string) => {
 
   appEvents.emit(ADMIN_EVENTS.DELETE_USER, {
     deletedUser: oldUser.id,
+    correlationId,
   });
 
   return {

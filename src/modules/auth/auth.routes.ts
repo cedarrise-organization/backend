@@ -9,7 +9,7 @@ import { loginController, logoutController, sessionController } from "./auth.con
 const router = express.Router();
 
 // Logs a user in
-router.post("/login", authLimiter, validateRequest(userSchema), loginController);
+router.post("/login", /*authLimiter,*/ validateRequest(userSchema), loginController);
 
 // Logs a user out
 router.post("/logout", logoutController);

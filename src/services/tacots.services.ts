@@ -58,7 +58,11 @@ const exitSortMap = {
 } as const;
 
 // RECOMMENDATION
-export const submitRecommendation = async (req: Request, options: TacotsrecommendationbodyType) => {
+export const submitRecommendation = async (
+  req: Request,
+  options: TacotsrecommendationbodyType,
+  correlationId: string,
+) => {
   const files = req.files as {
     passportPhoto: Express.Multer.File[];
     lastResult: Express.Multer.File[];
@@ -151,12 +155,16 @@ export const submitRecommendation = async (req: Request, options: Tacotsrecommen
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tacotsRecommendation:*`,
     event: "SUBMIT TACOTS RECOMMENDATION FORM",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Tacots reccomendation form submitted successfully",
     data: newTacotsRecommendation,
+    meta: {
+      correlationId,
+    },
   };
 };
 export const listRecommendations = async (
@@ -166,6 +174,7 @@ export const listRecommendations = async (
   search: string,
   status: string,
   sortBy: keyof typeof sortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -209,6 +218,7 @@ export const listRecommendations = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -228,6 +238,7 @@ export const listRecommendations = async (
           totalPages: cacheRes.totalPages,
         },
         metadata: cacheRes.metadata,
+        correlationId,
       },
     };
   }
@@ -314,6 +325,7 @@ export const listRecommendations = async (
         rejectedStudents: Number(metaData?.rejectedStudents ?? 0),
         pendingStudents: Number(metaData?.pendingStudents ?? 0),
       },
+      correlationId,
     },
   };
 };
@@ -345,7 +357,11 @@ export const getRecommendation = async (id: string) => {
     data: tacotBeneficiary,
   };
 };
-export const updateRecommendedStudentStatus = async (id: string, status: string) => {
+export const updateRecommendedStudentStatus = async (
+  id: string,
+  status: string,
+  correlationId: string,
+) => {
   // update
   const [updatedStudent] = await db
     .update(tacotsRecommendation)
@@ -368,11 +384,11 @@ export const updateRecommendedStudentStatus = async (id: string, status: string)
   // emitter to send email on SELECTED or NOT SELECTED
   // if (status === "SELECTED") {
   //   appEvents.emit(TACOTS_EVENTS.APPLICANT_ACCEPTED, {
-  //     name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/,
+  //     name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/, correlationId
   //   });
   // } else if (status === "NOT SELECTED") {
   //   appEvents.emit(TACOTS_EVENTS.APPLICANT_REJECTED, {
-  //     name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/,
+  //     name: updatedStudent?.name, userId: updatedStudent?.id,  /*email: updatedStudent.email*/, correlationId
   //   });
   // }
 
@@ -380,9 +396,12 @@ export const updateRecommendedStudentStatus = async (id: string, status: string)
     code: 200,
     message: "Recommended TACOTS' student's status updated successfully",
     data: updatedStudent,
+    meta: {
+      correlationId,
+    },
   };
 };
-export const deleteRecommendation = async (id: string) => {
+export const deleteRecommendation = async (id: string, correlationId: string) => {
   const [data] = await db
     .delete(tacotsRecommendation)
     .where(eq(tacotsRecommendation.id, id))
@@ -395,6 +414,7 @@ export const deleteRecommendation = async (id: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tacotsRecommendation:*`,
     event: "DELETE TACOTS RECOMMENDATION RECORD",
+    correlationId,
   });
 
   if (data?.passportPhotoPublicId) {
@@ -420,6 +440,9 @@ export const deleteRecommendation = async (id: string) => {
   return {
     code: 200,
     message: "Tacots beneficiary data deleted successfully",
+    meta: {
+      correlationId,
+    },
   };
 };
 export const exportTacotsRecommendationTableToCSV = async () => {
@@ -428,7 +451,10 @@ export const exportTacotsRecommendationTableToCSV = async () => {
 };
 
 // FEEDBACK
-export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
+export const submitTacotsFeedback = async (
+  options: TacotsfeedbackbodyType,
+  correlationId: string,
+) => {
   const [user] = await db
     .select()
     .from(tacotsRecommendation)
@@ -469,15 +495,24 @@ export const submitTacotsFeedback = async (options: TacotsfeedbackbodyType) => {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:feedback:*`,
     event: "SUBMIT TACOTS FEEDBACK FORM",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Tacots feedback form submitted successfully",
     data: newTacotsFeedback,
+    meta: {
+      correlationId,
+    },
   };
 };
-export const listTacotsFeedback = async (page: number, limit: number, search: string) => {
+export const listTacotsFeedback = async (
+  page: number,
+  limit: number,
+  search: string,
+  correlationId: string,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -516,6 +551,7 @@ export const listTacotsFeedback = async (page: number, limit: number, search: st
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -534,6 +570,7 @@ export const listTacotsFeedback = async (page: number, limit: number, search: st
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -564,6 +601,7 @@ export const listTacotsFeedback = async (page: number, limit: number, search: st
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -592,18 +630,22 @@ export const getTacotsFeedback = async (id: string) => {
     data: feedback,
   };
 };
-export const deleteTacotsFeedback = async (id: string) => {
+export const deleteTacotsFeedback = async (id: string, correlationId: string) => {
   await db.delete(tacotsFeedback).where(eq(tacotsFeedback.id, id));
 
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:feedback:*`,
     event: "DELETE TACOTS FEEDBACK RECORD",
+    correlationId,
   });
 
   return {
     code: 200,
     message: "Tacots feedback data deleted successfully",
+    meta: {
+      correlationId,
+    },
   };
 };
 export const exportTacotsFeedbackTableToCSV = async () => {
@@ -612,7 +654,11 @@ export const exportTacotsFeedbackTableToCSV = async () => {
 };
 
 // ONBOARDING
-export const submitOnboarding = async (req: Request, options: TacotsonboardingbodyType) => {
+export const submitOnboarding = async (
+  req: Request,
+  options: TacotsonboardingbodyType,
+  correlationId: string,
+) => {
   const files = req.files as {
     parentSignature: Express.Multer.File[];
     admissionLetter: Express.Multer.File[];
@@ -683,12 +729,16 @@ export const submitOnboarding = async (req: Request, options: Tacotsonboardingbo
     singleKey: undefined,
     patternKey: `cedarrise:tacots:onboarding:*`,
     event: "SUBMIT TACOTS ONBOARDING FORM",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Tacots onboarding form submitted successfully",
     data: onboarding,
+    meta: {
+      correlationId,
+    },
   };
 };
 export const listOnboarding = async (
@@ -697,6 +747,7 @@ export const listOnboarding = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof onboardingSortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -787,6 +838,7 @@ export const listOnboarding = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -805,6 +857,7 @@ export const listOnboarding = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -887,6 +940,7 @@ export const listOnboarding = async (
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -964,7 +1018,7 @@ export const getOnboarding = async (id: string) => {
     data: onboarding,
   };
 };
-export const deleteOnboarding = async (id: string) => {
+export const deleteOnboarding = async (id: string, correlationId: string) => {
   const [data] = await db.delete(tacotsOnboarding).where(eq(tacotsOnboarding.id, id)).returning({
     parentSignaturePublicId: tacotsOnboarding.parentSignaturePublicId,
     admissionLetterPublicId: tacotsOnboarding.admissionLetterPublicId,
@@ -974,6 +1028,7 @@ export const deleteOnboarding = async (id: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:onboarding:*`,
     event: "DELETE TACOTS ONBOARDING RECORD",
+    correlationId,
   });
 
   if (data?.parentSignaturePublicId) {
@@ -999,6 +1054,9 @@ export const deleteOnboarding = async (id: string) => {
   return {
     code: 200,
     message: "Tacots onboarding data deleted successfully",
+    meta: {
+      correlationId,
+    },
   };
 };
 export const exportTacotsOnboardingTableToCSV = async () => {
@@ -1081,7 +1139,11 @@ export const getTacotsTrackersCardsData = async () => {
 };
 
 // TRACKING
-export const submitTacotsTracking = async (req: Request, options: TacotstrackingbodyType) => {
+export const submitTacotsTracking = async (
+  req: Request,
+  options: TacotstrackingbodyType,
+  correlationId: string,
+) => {
   const files = req.files as {
     termResult: Express.Multer.File[];
     paymentEvidence: Express.Multer.File[];
@@ -1150,12 +1212,14 @@ export const submitTacotsTracking = async (req: Request, options: Tacotstracking
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tracking:*`,
     event: "SUBMIT TACOTS TRACKING FORM",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "Tacots tracking form submitted successfully",
     data: tracking,
+    meta: { correlationId },
   };
 };
 export const listTacotsTracking = async (
@@ -1164,6 +1228,7 @@ export const listTacotsTracking = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof trackingSortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -1243,6 +1308,7 @@ export const listTacotsTracking = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -1262,6 +1328,7 @@ export const listTacotsTracking = async (
           totalPages: cacheRes.totalPages,
         },
         metadata: cacheRes.metadata,
+        correlationId,
       },
     };
   }
@@ -1342,6 +1409,7 @@ export const listTacotsTracking = async (
         totalPages,
       },
       metadata: metaData,
+      correlationId,
     },
   };
 };
@@ -1414,7 +1482,7 @@ export const getTacotsTracking = async (id: string) => {
     data: tracking,
   };
 };
-export const deleteTacotsTracking = async (id: string) => {
+export const deleteTacotsTracking = async (id: string, correlationId: string) => {
   const [data] = await db.delete(tacotsTracking).where(eq(tacotsTracking.id, id)).returning({
     termResultPublicId: tacotsTracking.termResultPublicId,
     paymentEvidencePublicId: tacotsTracking.paymentEvidencePublicId,
@@ -1424,6 +1492,7 @@ export const deleteTacotsTracking = async (id: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:tracking:*`,
     event: "DELETE TACOTS TRACKING RECORD",
+    correlationId,
   });
 
   if (data?.termResultPublicId) {
@@ -1449,6 +1518,7 @@ export const deleteTacotsTracking = async (id: string) => {
   return {
     code: 200,
     message: "Tacots tracking data deleted successfully",
+    meta: { correlationId },
   };
 };
 export const exportTacotsTrackingTableToCSV = async () => {
@@ -1457,7 +1527,7 @@ export const exportTacotsTrackingTableToCSV = async () => {
 };
 
 // EXIT
-export const submitTacotsExit = async (options: TacotsexitbodyType) => {
+export const submitTacotsExit = async (options: TacotsexitbodyType, correlationId: string) => {
   const [exit] = await db
     .insert(tacotsExit)
     .values({
@@ -1486,12 +1556,16 @@ export const submitTacotsExit = async (options: TacotsexitbodyType) => {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:exit:*`,
     event: "SUBMIT TACOTS EXIT FORM",
+    correlationId,
   });
 
   return {
     code: 201,
     message: "TACOTS exit form submitted successfully",
     data: exit,
+    meta: {
+      correlationId,
+    },
   };
 };
 export const listTacotsExit = async (
@@ -1500,6 +1574,7 @@ export const listTacotsExit = async (
   orderBy: string,
   search: string,
   sortBy: keyof typeof exitSortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -1565,6 +1640,7 @@ export const listTacotsExit = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -1583,6 +1659,7 @@ export const listTacotsExit = async (
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -1645,6 +1722,7 @@ export const listTacotsExit = async (
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -1703,18 +1781,20 @@ export const getTacotsExit = async (id: string) => {
     data: exit,
   };
 };
-export const deleteTacotsExit = async (id: string) => {
+export const deleteTacotsExit = async (id: string, correlationId: string) => {
   await db.delete(tacotsExit).where(eq(tacotsExit.id, id));
 
   appEvents.emit(TACOTS_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:tacots:exit:*`,
     event: "DELETE TACOTS EXIT RECORD",
+    correlationId,
   });
 
   return {
     code: 200,
     message: "Tacots exit data deleted successfully",
+    meta: { correlationId },
   };
 };
 export const exportTacotsExitTableToCSV = async () => {

@@ -35,14 +35,13 @@ appEvents.on(FEATURE_EVENTS.FEATURE_ACTION, async (data) => {
     }
 
     logger.info("email sent successully", {
-      // info: info.accepted,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send email", {
+    logger.error("Failed to send email", {
       email: data.email,
-      message: error.message
-      // correlationId
+      message: error.message,
+      correlationId: data.correlationId
     });
   }
 });

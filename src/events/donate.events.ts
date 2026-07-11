@@ -25,13 +25,13 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
 
     logger.info("Donation record created!", {
       email: data.email,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to create Donation record", {
+    logger.error("Failed to create Donation record", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -53,13 +53,13 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
 
     logger.info("Thank you email sent successully", {
       // info: info.accepted,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send `Thank you For Your Donation` email", {
+    logger.error("Failed to send `Thank you For Your Donation` email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -86,14 +86,13 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
     }
 
     logger.info("Donation Record email sent successully", {
-      // info: info.accepted,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send Donation Record email", {
+    logger.error("Failed to send Donation Record email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });

@@ -149,6 +149,17 @@ docs {
   
   **`201 Created`** — Returns the newly created ASH student record.
   
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+  
   The created record is also cached under the key `cedarrise:ash:ashStudent:<id>` using the `FORM_DATA` TTL.
   
   ## Errors

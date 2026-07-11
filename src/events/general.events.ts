@@ -8,7 +8,7 @@ import db from "../db/db.js";
 
 export const GENERAL_EVENTS = {
   UPLOAD_PHOTO: "upload:photo",
-  SEND_PARTNER_REQUEST_EMAIL: "send:partner:request:email"
+  SEND_PARTNER_REQUEST_EMAIL: "send:partner:request:email",
 } as const;
 
 appEvents.on(GENERAL_EVENTS.UPLOAD_PHOTO, async (data) => {
@@ -17,10 +17,13 @@ appEvents.on(GENERAL_EVENTS.UPLOAD_PHOTO, async (data) => {
       .update(miscellaneous)
       .set({ numberOfPhotos: sql`${miscellaneous.numberOfPhotos} + ${data.newPhotosCount}` });
 
-    logger.info(`success! updated photo's count with ${data.newPhotosCount} new photos`);
+    logger.info(`success! updated photo's count with ${data.newPhotosCount} new photos`, {
+      correlationId: data.correlationId,
+    });
   } catch (err) {
     logger.error(
       `failure :( could not update photo count to include ${data.newPhotosCount} new photos`,
+      { correlationId: data.correlationId },
     );
   }
 });
@@ -31,10 +34,13 @@ appEvents.on(GENERAL_EVENTS.SEND_PARTNER_REQUEST_EMAIL, async (data) => {
       .update(miscellaneous)
       .set({ numberOfPartners: sql`${miscellaneous.numberOfPartners} + ${data.newPartnersCount}` });
 
-    logger.info(`success! updated partners's count with ${data.newPartnersCount} new partners`);
+    logger.info(`success! updated partners's count with ${data.newPartnersCount} new partners`, {
+      correlationId: data.correlationId,
+    });
   } catch (err) {
     logger.error(
       `failure :( could not update partner count to include ${data.newPartnersCount} new partners`,
+      { correlationId: data.correlationId },
     );
   }
 });
@@ -56,13 +62,13 @@ appEvents.on(GENERAL_EVENTS.SEND_PARTNER_REQUEST_EMAIL, async (data) => {
 
 //     logger.info("email sent successully", {
 //       info: info.accepted,
-//       // correlationId
+//       correlationId: data.correlationId
 //     });
 //   } catch (error: any) {
-//     logger.info("Failed to send email", {
+//     logger.error("Failed to send email", {
 //       email: data.email,
-//       message: error.message
-//       // correlationId
+//       message: error.message,
+//       correlationId: data.correlationId
 //     });
 //   }
 // });

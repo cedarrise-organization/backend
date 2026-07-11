@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: a32eede2-0b08-4fa2-bd27-0835dda7909c
+  id: 342d7b39-abf1-464e-ab5e-2c9810e6fac3
   baseUrl: http://localhost:3000
 }
 
@@ -37,6 +37,17 @@ docs {
   ## Response
   
   **`200 OK`** — Confirms the volunteer feedback record has been deleted.
+  
+  ```json
+  {
+    "success": true,
+    "message": "...",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
   
   ## Errors
   

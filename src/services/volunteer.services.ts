@@ -22,7 +22,10 @@ const sortMap = {
   createdAt: volunteerRegistration.createdAt,
 } as const;
 
-export const submitVolunteerRegistration = async (options: VolunteerregistrationbodyType) => {
+export const submitVolunteerRegistration = async (
+  options: VolunteerregistrationbodyType,
+  correlationId: string,
+) => {
   const [newVolunteerSubmission] = await db
     .insert(volunteerRegistration)
     .values({
@@ -58,6 +61,7 @@ export const submitVolunteerRegistration = async (options: Volunteerregistration
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:*`,
     event: "SUBMIT VOLUNTEER REGISTRATION FORM",
+    correlationId,
   });
 
   return {
@@ -73,6 +77,7 @@ export const listVolunteers = async (
   search: string,
   status: string,
   sortBy: keyof typeof sortMap,
+  correlationId: string,
 ) => {
   // search
   if (search) {
@@ -112,6 +117,7 @@ export const listVolunteers = async (
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -131,6 +137,7 @@ export const listVolunteers = async (
           totalPages: cacheRes.totalPages,
         },
         metadata: cacheRes.metadata,
+        correlationId,
       },
     };
   }
@@ -216,6 +223,7 @@ export const listVolunteers = async (
         rejectedStudents: Number(metaData?.rejectedStudents ?? 0),
         pendingStudents: Number(metaData?.pendingStudents ?? 0),
       },
+      correlationId,
     },
   };
 };
@@ -247,7 +255,7 @@ export const getVolunteer = async (id: string) => {
     data: volunteer,
   };
 };
-export const updateVolunteerStatus = async (id: string, status: string) => {
+export const updateVolunteerStatus = async (id: string, status: string, correlationId: string) => {
   // update
   const [updatedVolunteer] = await db
     .update(volunteerRegistration)
@@ -269,12 +277,14 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
       userId: updatedVolunteer?.id,
       email: updatedVolunteer?.email,
       volunteerAreas: updatedVolunteer?.volunteerAreas,
+      correlationId,
     });
   } else if (status === "rejected") {
     appEvents.emit(VOLUNTEER_EVENTS.VOLUNTEER_REJECTED, {
       name: updatedVolunteer?.name,
       userId: updatedVolunteer?.id,
       email: updatedVolunteer?.email,
+      correlationId,
     });
   }
 
@@ -282,6 +292,7 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:*`,
     event: "UPDATE VOLUNTEER STATUS",
+    correlationId,
   });
 
   return {
@@ -290,13 +301,14 @@ export const updateVolunteerStatus = async (id: string, status: string) => {
     data: updatedVolunteer,
   };
 };
-export const deleteVolunteer = async (id: string) => {
+export const deleteVolunteer = async (id: string, correlationId: string) => {
   await db.delete(volunteerRegistration).where(eq(volunteerRegistration.id, id));
 
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:*`,
     event: "DELETE VOLUNTEER REGISTRATION RECORD",
+    correlationId,
   });
 
   return {
@@ -309,14 +321,17 @@ export const exportVolunteerRegistrationTableToCSV = async () => {
   return data;
 };
 
-export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType) => {
+export const submitVolunteerFeedback = async (
+  options: VolunteerfeedbackbodyType,
+  correlationId: string,
+) => {
   const [user] = await db
     .select()
     .from(volunteerRegistration)
     .where(eq(volunteerRegistration.surname, options.surname));
-  
-  if(!user){
-    throw new NotFoundError("Volunteer not found")
+
+  if (!user) {
+    throw new NotFoundError("Volunteer not found");
   }
 
   const [newVolunteerFeedback] = await db
@@ -351,6 +366,7 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:feedback:*`,
     event: "SUBMIT VOLUNTEER FEEDBACK FORM",
+    correlationId,
   });
 
   return {
@@ -359,7 +375,12 @@ export const submitVolunteerFeedback = async (options: VolunteerfeedbackbodyType
     data: newVolunteerFeedback,
   };
 };
-export const listVolunteerFeedback = async (page: number, limit: number, search: string) => {
+export const listVolunteerFeedback = async (
+  page: number,
+  limit: number,
+  search: string,
+  correlationId: string,
+) => {
   // search
   if (search) {
     const searchVector = sql`
@@ -398,6 +419,7 @@ export const listVolunteerFeedback = async (page: number, limit: number, search:
           limit,
           totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -416,6 +438,7 @@ export const listVolunteerFeedback = async (page: number, limit: number, search:
           limit,
           totalPages: cacheRes.totalPages,
         },
+        correlationId,
       },
     };
   }
@@ -446,6 +469,7 @@ export const listVolunteerFeedback = async (page: number, limit: number, search:
         limit,
         totalPages,
       },
+      correlationId,
     },
   };
 };
@@ -474,13 +498,14 @@ export const getVolunteerFeedback = async (id: string) => {
     data: feedback,
   };
 };
-export const deleteVolunteerFeedback = async (id: string) => {
+export const deleteVolunteerFeedback = async (id: string, correlationId: string) => {
   await db.delete(volunteerFeedback).where(eq(volunteerFeedback.id, id));
 
   appEvents.emit(VOLUNTEER_EVENTS.DELETE_CACHE, {
     singleKey: undefined,
     patternKey: `cedarrise:volunteer:feedback:*`,
     event: "DELETE VOLUNTEER FEEDBACK RECORD",
+    correlationId
   });
 
   return {

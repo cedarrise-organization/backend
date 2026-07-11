@@ -10,7 +10,7 @@ import {
   listAllUsersController,
   createUserController,
   deleteUserController,
-  listUsersForUserPageController
+  listUsersForUserPageController,
 } from "./admin.controller.js";
 
 const router = express.Router();
@@ -50,5 +50,10 @@ router.delete(
 );
 
 // List all users for user page
-router.get("/listusers", authorize("read"), validateRequest(userQuerySchema), listUsersForUserPageController);
+router.get(
+  "/listusers",
+  authorize("read"),
+  validateRequest(userQuerySchema),
+  listUsersForUserPageController,
+);
 export default router;

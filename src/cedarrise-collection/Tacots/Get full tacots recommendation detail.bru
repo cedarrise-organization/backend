@@ -11,7 +11,7 @@ get {
 }
 
 vars:pre-request {
-  id: 0ff31daa-6f71-4dc3-980e-1916ca215462
+  id: fd95447c-a949-4cf7-9765-691c3fd24037
   baseUrl: http://localhost:3000
 }
 
@@ -42,7 +42,10 @@ docs {
   {
     "success": true,
     "message": "...",
-    "data": { ... }
+    "data": { ... },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   

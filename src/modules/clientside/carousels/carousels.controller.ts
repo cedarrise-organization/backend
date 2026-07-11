@@ -11,7 +11,7 @@ import { successResponse } from "../../../utils/responseHandler.js";
 export const ashCarouselController = async (req: Request, res: Response, next: NextFunction) => {
   const { limit } = req.qtransformed;
   try {
-    const response = await ashCarousel(limit);
+    const response = await ashCarousel(limit, (req as any).correlationId);
     successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -21,7 +21,7 @@ export const ashCarouselController = async (req: Request, res: Response, next: N
 export const tacotsCarouselController = async (req: Request, res: Response, next: NextFunction) => {
   const { limit } = req.qtransformed;
   try {
-    const response = await tacotsCarousel(limit);
+    const response = await tacotsCarousel(limit, (req as any).correlationId);
     successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -35,7 +35,7 @@ export const outreachCarouselController = async (
 ) => {
   const { limit } = req.qtransformed;
   try {
-    const response = await outreachCarousel(limit);
+    const response = await outreachCarousel(limit, (req as any).correlationId);
     successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
@@ -49,7 +49,7 @@ export const capacityCarouselController = async (
 ) => {
   const { limit } = req.qtransformed;
   try {
-    const response = await capacityCarousel(limit);
+    const response = await capacityCarousel(limit, (req as any).correlationId);
     successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);

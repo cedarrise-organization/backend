@@ -21,7 +21,7 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
   logger.info(`Role assigned to user`, {
     role: data.role,
     user: data.userId,
-    // correlationId: data.correlationId
+    correlationId: data.correlationId
   });
 });
 
@@ -32,14 +32,14 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
     await cacheDel(key);
     logger.info("Permissions cache removed", {
       user: data.userId,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
     logger.error("Could not remove permissions cache", {
       // error,
       user: data.userId,
       message: error.message,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -47,36 +47,26 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
 // INFORM USER OF NEW ROLE ASSIGNED VIA EMAIL
 appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
   try {
-    const [user] = await db
-      .select({ name: users.name, email: users.email })
-      .from(users)
-      .where(eq(users.id, data.userId));
-
-    if (!user) {
-      throw new Error();
-    }
-
     let content = await ejs.renderFile(
       process.cwd() + "/src/views/emails/rolechange.ejs",
-      { name: user.name, role: data.role, email: user.email },
+      { name: data.name, role: data.role, email: data.email },
       { async: true },
     );
 
-    const info = await sendEmail(user.email, "You've been assigned a new Role!", content);
+    const info = await sendEmail(data.email, "You've been assigned a new Role!", content);
 
     if (!info) {
       throw new Error();
     }
 
     logger.info("Role assignment email sent successully", {
-      // info: info.accepted,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send Role assignment email", {
+    logger.error("Failed to send Role assignment email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -86,7 +76,7 @@ appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
   logger.info(`Role revoked from user`, {
     role: data.role,
     user: data.userId,
-    // correlationId: data.correlationId
+    correlationId: data.correlationId
   });
 });
 
@@ -97,13 +87,13 @@ appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
     await cacheDel(key);
     logger.info("Permissions cache removed", {
       user: data.userId,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
     logger.error("Could not remove permissions cache", {
       message: error.message,
       user: data.userId,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -133,14 +123,13 @@ appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
     }
 
     logger.info("Role revocation email sent successully", {
-      // info: info.accepted,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send Role revocation email", {
+    logger.error("Failed to send Role revocation email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -150,7 +139,7 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
   logger.info(`New user created`, {
     name: data.name,
     userId: data.userId,
-    // correlationId: data.correlationId
+    correlationId: data.correlationId
   });
 });
 
@@ -161,13 +150,13 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
     await invalidateCache(undefined, key);
     logger.info("User Lookup and User Page cache removed", {
       user: data.userId,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
     logger.error("Could not remove user lookup and user page cache", {
       message: error.message,
       user: data.userId,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -194,14 +183,13 @@ appEvents.on(ADMIN_EVENTS.CREATE_USER, async (data) => {
     }
 
     logger.info("Welcome email sent successully", {
-      // info: info.accepted,
-      // correlationId
+      correlationId: data.correlationId
     });
   } catch (error: any) {
-    logger.info("Failed to send welcome email", {
+    logger.error("Failed to send welcome email", {
       email: data.email,
       message: error.message,
-      // correlationId
+      correlationId: data.correlationId
     });
   }
 });
@@ -211,7 +199,7 @@ appEvents.on(ADMIN_EVENTS.DELETE_USER, async (data) => {
   logger.info(`user deleted`, {
     deletedUser: data.name,
     // originator: data.id
-    // correlationId: data.correlationId
+    correlationId: data.correlationId
   });
 });
 
@@ -223,7 +211,7 @@ appEvents.on(ADMIN_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      // correlationId: data.correlationId,
+      correlationId: data.correlationId,
     });
   } catch (error: any) {
     logger.error("Could not remove cache **if any**", {
@@ -231,7 +219,7 @@ appEvents.on(ADMIN_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
-      // correlationId: data.correlationId
+      correlationId: data.correlationId
     });
   }
 });

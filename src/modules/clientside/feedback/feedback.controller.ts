@@ -17,7 +17,11 @@ export const sendFeedbackMailController = async (
   );
 
   try {
-    const info = await sendEmail(process.env.CEDAR_EMAIL!.toString(), `Feedback submitted by ${email}`, content);
+    const info = await sendEmail(
+      process.env.CEDAR_EMAIL!.toString(),
+      `Feedback submitted by ${email}`,
+      content,
+    );
 
     if (!info) {
       return res.status(500).json({
@@ -33,8 +37,10 @@ export const sendFeedbackMailController = async (
       sender: email,
       // correlationId
     });
-  
-    return successResponse(res, 200, "Feedback email sent successully");
+
+    return successResponse(res, 200, "Feedback email sent successully", null, {
+      correlationId: (req as any).correlationId,
+    });
   } catch (err) {
     next(err);
   }

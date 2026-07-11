@@ -1,7 +1,7 @@
 meta {
   name: Delete ASH registration
   type: http
-  seq: 5
+  seq: 6
 }
 
 delete {
@@ -11,7 +11,7 @@ delete {
 }
 
 vars:pre-request {
-  id: 1de0d9d7-5397-4cf4-a114-c577f894fcdd
+  id: ea586548-f63f-41ad-b574-c5adec32eef3
   baseUrl: http://localhost:3000
 }
 
@@ -41,7 +41,10 @@ docs {
   ```json
   {
     "success": true,
-    "message": "Ash student data deleted successfully"
+    "message": "Ash student data deleted successfully",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
   
