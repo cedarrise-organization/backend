@@ -30,7 +30,8 @@ export const addAssetToDeletionQueue = async (
   publicId: string,
   resourceType: string,
   ownerId?: string,
+  correlationId?: string
 ) => {
-  const job = await deleteAssetQueue.add("delete-asset", { publicId, resourceType, ownerId });
+  const job = await deleteAssetQueue.add("delete-asset", { publicId, resourceType, ownerId, correlationId });
   return job.id;
 };

@@ -33,6 +33,7 @@ worker.on("completed", (job) => {
   logger.info(`Job completed-> Deleted asset successfully`, {
     jobId: job.id,
     assetOwner: job.data.ownerId,
+    correlationId: job.data.correlationId
   });
 });
 
@@ -46,6 +47,7 @@ worker.on("failed", async (job, error) => {
       jobName: "Delete cloudinary asset",
       jobId: job?.id,
       assetOwner: job?.data.ownerId,
+      correlationId: job?.data.correlationId,
       error,
     });
   }

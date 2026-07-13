@@ -419,7 +419,7 @@ export const deleteRecommendation = async (id: string, correlationId: string) =>
 
   if (data?.passportPhotoPublicId) {
     try {
-      await addAssetToDeletionQueue(data.passportPhotoPublicId, "image", id);
+      await addAssetToDeletionQueue(data.passportPhotoPublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add passportphoto public id to queue`, {
         user: id,
@@ -429,7 +429,7 @@ export const deleteRecommendation = async (id: string, correlationId: string) =>
 
   if (data?.lastResultPublicId) {
     try {
-      await addAssetToDeletionQueue(data.lastResultPublicId, "image", id);
+      await addAssetToDeletionQueue(data.lastResultPublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add last result public id to queue`, {
         user: id,
@@ -1033,7 +1033,7 @@ export const deleteOnboarding = async (id: string, correlationId: string) => {
 
   if (data?.parentSignaturePublicId) {
     try {
-      await addAssetToDeletionQueue(data.parentSignaturePublicId, "image", id);
+      await addAssetToDeletionQueue(data.parentSignaturePublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add parent signature public id to queue`, {
         user: id,
@@ -1043,7 +1043,7 @@ export const deleteOnboarding = async (id: string, correlationId: string) => {
 
   if (data?.admissionLetterPublicId) {
     try {
-      await addAssetToDeletionQueue(data.admissionLetterPublicId, "image", id);
+      await addAssetToDeletionQueue(data.admissionLetterPublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add admission letter public id to queue`, {
         user: id,
@@ -1497,7 +1497,7 @@ export const deleteTacotsTracking = async (id: string, correlationId: string) =>
 
   if (data?.termResultPublicId) {
     try {
-      await addAssetToDeletionQueue(data.termResultPublicId, "image", id);
+      await addAssetToDeletionQueue(data.termResultPublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add term result public id to queue`, {
         user: id,
@@ -1507,7 +1507,7 @@ export const deleteTacotsTracking = async (id: string, correlationId: string) =>
 
   if (data?.paymentEvidencePublicId) {
     try {
-      await addAssetToDeletionQueue(data.paymentEvidencePublicId, "image", id);
+      await addAssetToDeletionQueue(data.paymentEvidencePublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add payment evidence public id to queue`, {
         user: id,

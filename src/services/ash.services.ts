@@ -432,7 +432,7 @@ export const deleteRegistration = async (id: string, correlationId: string) => {
 
   if (data?.passportPhotoPublicId) {
     try {
-      await addAssetToDeletionQueue(data.passportPhotoPublicId, "image", id);
+      await addAssetToDeletionQueue(data.passportPhotoPublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add passport photo public id to queue`, {
         user: id,
@@ -442,7 +442,7 @@ export const deleteRegistration = async (id: string, correlationId: string) => {
 
   if (data?.parentSignaturePublicId) {
     try {
-      await addAssetToDeletionQueue(data.parentSignaturePublicId, "image", id);
+      await addAssetToDeletionQueue(data.parentSignaturePublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add parent signature public id to queue`, {
         user: id,
@@ -452,7 +452,7 @@ export const deleteRegistration = async (id: string, correlationId: string) => {
 
   if (data?.lastResultPublicId) {
     try {
-      await addAssetToDeletionQueue(data.lastResultPublicId, "image", id);
+      await addAssetToDeletionQueue(data.lastResultPublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add last result public id to queue`, {
         user: id,
@@ -1081,7 +1081,7 @@ export const deleteTrack = async (id: string, correlationId: string) => {
 
   if (data?.termResultPublicId) {
     try {
-      await addAssetToDeletionQueue(data.termResultPublicId, "image", id);
+      await addAssetToDeletionQueue(data.termResultPublicId, "image", id, correlationId);
     } catch (error) {
       logger.error(`Could not add term result public id to queue`, {
         user: id,
