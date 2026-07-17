@@ -15,6 +15,6 @@ router.post("/login", /*authLimiter,*/ validateRequest(userSchema), loginControl
 router.post("/logout", logoutController);
 
 // Verifies a users session
-router.get("/session", authenticate(), sessionController)
+router.get("/session", authenticate(), sessionController);
 
 export default router;
