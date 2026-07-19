@@ -10,6 +10,11 @@ post {
   auth: inherit
 }
 
+params:query {
+  program: ASH
+  type: REGISTRATION
+}
+
 body:json {
   {
     "email": "user@example.com",
@@ -17,13 +22,8 @@ body:json {
   }
 }
 
-params:query {
-  program: ASH
-  type: REGISTRATION
-}
-
 vars:pre-request {
-  baseUrl: http://localhost:3000
+  baseUrl: https://cedar-backend-test.up.railway.app
 }
 
 docs {

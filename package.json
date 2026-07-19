@@ -1,5 +1,5 @@
 {
-	"name": "ts-node-template",
+	"name": "cedarrise-backend",
 	"version": "1.0.0",
 	"packageManager": "npm@11.18.0",
 	"description": "",
@@ -18,16 +18,16 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/MaxKolbe/ts-node-template.git"
+		"url": "git+https://github.com/cedarrise-organization/backend.git"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"type": "module",
 	"bugs": {
-		"url": "https://github.com/MaxKolbe/ts-node-template/issues"
+		"url": "https://github.com/cedarrise-organization/backend/issues"
 	},
-	"homepage": "https://github.com/MaxKolbe/ts-node-template#readme",
+	"homepage": "https://github.com/cedarrise-organization/backend#readme",
 	"dependencies": {
 		"@bull-board/api": "7.0.0",
 		"@bull-board/express": "7.0.0",
