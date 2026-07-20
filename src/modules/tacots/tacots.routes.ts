@@ -3,7 +3,7 @@ import express from "express";
 import { upload } from "../../configs/multer.config.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
-import { formUploadLimiter } from "../../middleware/rateLimiter.middleware.js";
+import { formUploadLimiter, generalLimiter } from "../../middleware/rateLimiter.middleware.js";
 import {
   createTacotsRecommendationSchema,
   tacotsRecommendationQuerySchema,
@@ -146,6 +146,7 @@ router.get(
 // Create onboarding record post-shortlisting
 router.post(
   "/onboarding",
+  generalLimiter,
   upload.fields([
     { name: "parentSignature", maxCount: 1 },
     { name: "admissionLetter", maxCount: 1 },
@@ -190,6 +191,7 @@ router.get(
 // Submit TACOTS Student Tracking (midterm/end-of-term)
 router.post(
   "/tracking",
+  generalLimiter,
   upload.fields([
     { name: "termResult", maxCount: 1 },
     { name: "paymentEvidence", maxCount: 1 },
@@ -234,6 +236,7 @@ router.get(
 // Submit TACOTS Exit/Completion Form
 router.post(
   "/exit",
+  generalLimiter,
   authenticate(),
   authorize("create"),
   validateRequest(createTacotsExitSchema),

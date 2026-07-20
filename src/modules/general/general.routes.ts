@@ -1,6 +1,7 @@
 //ROUTES
 import express from "express";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
+import { generalLimiter } from "../../middleware/rateLimiter.middleware.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { upload } from "../../configs/multer.config.js";
 import {
@@ -34,6 +35,7 @@ router.get("/projects", authenticate(), authorize("read"), getProjectsController
 // Create a new project record and optionally upload a project banner/image to Cloudinary.
 router.post(
   "/projects",
+  generalLimiter, 
   upload.single("file"),
   authenticate(),
   authorize("read"),
@@ -43,6 +45,7 @@ router.post(
 // Update the status of an existing project.
 router.patch(
   "/projects/:id",
+  generalLimiter,
   authenticate(),
   authorize("read"),
   validateRequest(projectStatusSchema),
@@ -69,6 +72,7 @@ router.get(
 // Create a new receipt record, upload the receipt image to Cloudinary, and save details.
 router.post(
   "/receipts",
+  generalLimiter,
   upload.single("file"),
   authenticate(),
   authorize("create"),
@@ -90,6 +94,7 @@ router.get("/download/receipts", authenticate(), authorize("read"), exportReceip
 // PHOTO UPLOADS
 router.post(
   "/gallery",
+  generalLimiter,
   upload.array("photos", 10),
   authenticate(),
   authorize("create"),
@@ -104,6 +109,7 @@ router.get("/metadata", authenticate(), authorize("read"), getMetadataController
 // Upload google form
 router.post(
   "/google-forms",
+  generalLimiter,
   authenticate(),
   authorize("create"),
   validateRequest(googleSchema),

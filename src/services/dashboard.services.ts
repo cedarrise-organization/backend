@@ -19,7 +19,7 @@ import {
   notInArray,
   aliasedTable,
   arrayContains,
-  arrayOverlaps, 
+  arrayOverlaps,
   countDistinct,
 } from "drizzle-orm";
 import {
@@ -70,10 +70,12 @@ export const getCards = async () => {
     [capacityParticipantsImpacted],
     [capacityOrganizationsPartneredWith],
     [capacityVolunteersEngaged],
+    [capacityVolunteersEngagedMaxTwo],
     [capacityWorkshopsConducted],
     [outreachesCommunitiesEngaged],
     [outreachesBeneficiariesReached],
     [outreachesVolunteers],
+    [outreachesVolunteersMaxTwo],
     [outreachesOutreachEvents],
     [ashStudentsEnrolled],
     [ashVolunteers],
@@ -108,10 +110,26 @@ export const getCards = async () => {
         value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
       })
       .from(capacityBuildingEvaluation), // transform values to lowercase to avoid counting similar records twice
-    // capacityVolunteersEngaged
+    // capacityVolunteersEngaged (Highest)
     db
       .select({ value: max(capacityBuildingEvaluation.numberOfVolunteers) })
       .from(capacityBuildingEvaluation),
+    // capacityVolunteersEngaged (2nd Highest)
+    db
+      .select({
+        secondHighest: sql<number>`MAX(${capacityBuildingEvaluation.numberOfVolunteers})`,
+      })
+      .from(capacityBuildingEvaluation)
+      .where(
+        lt(
+          capacityBuildingEvaluation.numberOfVolunteers,
+          db
+            .select({
+              value: sql<number>`MAX(${capacityBuildingEvaluation.numberOfVolunteers})`,
+            })
+            .from(capacityBuildingEvaluation),
+        ),
+      ),
     // capacityWorkshopsConducted
     db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation), // Count ids because it has an index
     // outreachesCommunitiesEngaged
@@ -120,8 +138,24 @@ export const getCards = async () => {
       .from(outreachTracker), // count distinct outreach communities, transform values to lowercase to avoid counting similar records twice
     // outreachesBeneficiariesReached
     db.select({ value: sum(outreachTracker.numBeneficiaries) }).from(outreachTracker),
-    // outreachesVolunteers
+    // outreachesVolunteers (highest)
     db.select({ value: max(outreachTracker.numVolunteers) }).from(outreachTracker),
+    // outreachesVolunteers (2nd highest)
+    db
+      .select({
+        secondHighest: sql<number>`MAX(${outreachTracker.numVolunteers})`,
+      })
+      .from(outreachTracker)
+      .where(
+        lt(
+          outreachTracker.numVolunteers,
+          db
+            .select({
+              value: sql<number>`MAX(${outreachTracker.numVolunteers})`,
+            })
+            .from(outreachTracker),
+        ),
+      ),
     // outreachesOutreachEvents
     db.select({ value: count(outreachTracker.id) }).from(outreachTracker), // Count ids because it has an index
     //  ashStudentsEnrolled
@@ -229,14 +263,21 @@ export const getCards = async () => {
   const capacityBuilding = {
     participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
     organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
-    volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
+    volunteersEngaged: Number(
+      (capacityVolunteersEngaged?.value ?? 0) +
+        ((capacityVolunteersEngaged?.value ?? 0) -
+          (capacityVolunteersEngagedMaxTwo?.secondHighest ?? 0)),
+    ),
     workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
   };
   const outreaches = {
     communitiesEngaged: Number(outreachesCommunitiesEngaged?.value ?? 0),
     beneficiariesReached: Number(outreachesBeneficiariesReached?.value ?? 0),
     partners: Number(regularPartners?.value ?? 0), // STILL NOT THE BEST METHOD OF DERIVATION BEING USED
-    volunteers: Number(outreachesVolunteers?.value ?? 0),
+    volunteers: Number(
+      (outreachesVolunteers?.value ?? 0) +
+        ((outreachesVolunteers?.value ?? 0) - (outreachesVolunteersMaxTwo?.secondHighest ?? 0)),
+    ),
     outreachEvents: Number(outreachesOutreachEvents?.value ?? 0),
   };
   const ash = {
@@ -1779,7 +1820,7 @@ export const getNotifications = async (page: number, limit: number, correlationI
           limit,
           totalPages: Number(cacheRes.totalPages),
         },
-        correlationId
+        correlationId,
       },
     };
   }
@@ -1814,7 +1855,7 @@ export const getNotifications = async (page: number, limit: number, correlationI
         limit,
         totalPages: Number(totalPages) ?? 0,
       },
-      correlationId
+      correlationId,
     },
   };
 };

@@ -2,7 +2,7 @@
 import express from "express";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
-import { upload } from "../../configs/multer.config.js";
+import { generalLimiter } from "../../middleware/rateLimiter.middleware.js";
 import {
   createOutreachController,
   getOneOutreachController,
@@ -22,6 +22,7 @@ router.use(authenticate());
 // Submit Cedar Outreach Tracker form
 router.post(
   "/",
+  generalLimiter,
   authorize("create"),
   validateRequest(createOutreachTrackerSchema),
   createOutreachController,
