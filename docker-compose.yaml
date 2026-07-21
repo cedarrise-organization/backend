@@ -23,7 +23,7 @@ services:
    cedarrise-db-setup:
       build:
          context: .
-         dockerfile: Dockerfile
+         dockerfile: Dockerfile.local
       container_name: cedarrise-db-setup
       depends_on:
          cedarrise-postgres-db:
