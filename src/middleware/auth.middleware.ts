@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { refresh } from "../services/auth.services.js";
+import { coordinatedRefresh } from "../services/auth.services.js";
 import { Request, Response, NextFunction } from "express";
 import { getUserPermissions } from "../utils/rbac.util.js";
 import { verifyAccessToken } from "../utils/token.util.js";
@@ -24,7 +24,7 @@ export const authenticate = () => async (req: Request, res: Response, next: Next
       const refreshToken = req.cookies["cedarrefresh"];
       if (!refreshToken) throw new UnauthorizedError("No refresh token provided");
 
-      const authResponse = await refresh(
+      const authResponse = await coordinatedRefresh(
         refreshToken,
         (req as any).correlationId,
         (req.headers["user-agent"] as string),
