@@ -106,7 +106,7 @@ export const refresh = async (
       correlationId,
       deviceInfo,
     });
-    throw new UnauthorizedError("Refreshed token expired or revoked");
+    throw new UnauthorizedError("Refresh token expired or revoked");
   }
 
   const [user] = await db.select().from(users).where(eq(users.id, payload.sub));

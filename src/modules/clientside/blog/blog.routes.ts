@@ -1,6 +1,7 @@
 //ROUTES
 import express from "express";
 import { validateRequest } from "../../../middleware/validate.middleware.js";
+import { generalLimiter } from "../../../middleware/rateLimiter.middleware.js";
 import { authenticate, authorize } from "../../../middleware/auth.middleware.js";
 import {
   blogBodySchema,
@@ -28,6 +29,7 @@ router.get("/:id", validateRequest(blogParamSchema), getSingleBlogController);
 // Create blog post (draft)
 router.post(
   "/",
+  generalLimiter,
   authenticate(),
   upload.single("file"),
   validateRequest(blogBodySchema),
@@ -40,6 +42,7 @@ router.delete("/:id", authenticate(), validateRequest(blogParamSchema), deleteBl
 // Update post content or publish
 router.patch(
   "/:id",
+  generalLimiter,
   authenticate(),
   upload.single("file"),
   validateRequest(updateBlogSchema),

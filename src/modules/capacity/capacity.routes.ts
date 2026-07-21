@@ -1,15 +1,16 @@
 //ROUTES
 import express from "express";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
+import { generalLimiter } from "../../middleware/rateLimiter.middleware.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
+import { upload } from "../../configs/multer.config.js";
 import {
   createEvaluationController,
   listAllEvaluationController,
   getEvaluationController,
   deleteEvaluationController,
-  exportCapacityEvaluationController
+  exportCapacityEvaluationController,
 } from "./capacity.controller.js";
-import { upload } from "../../configs/multer.config.js";
 import {
   createCapacityBuildingEvaluationSchema,
   capacityBuildingEvaluationParamsSchema,
@@ -22,6 +23,7 @@ router.use(authenticate());
 // Submit Capacity Building Program Evaluation
 router.post(
   "/",
+  generalLimiter,
   authorize("create"),
   validateRequest(createCapacityBuildingEvaluationSchema),
   createEvaluationController,
@@ -52,6 +54,11 @@ router.delete(
 );
 
 // Download capacityBuildingEvaluation table
-router.get("/download/capacityevaluation", authenticate(), authorize("read"), exportCapacityEvaluationController);
+router.get(
+  "/download/capacityevaluation",
+  authenticate(),
+  authorize("read"),
+  exportCapacityEvaluationController,
+);
 
 export default router;

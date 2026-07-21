@@ -31,7 +31,7 @@ import "./events/admin.events.js";
 import "./events/auth.events.js";
 import "./events/ash.events.js";
 // import "./events/feature.event.js"
-import { scheduleWeeklyNotificationJob, testAddtoQueue } from "./queues/notifications.queue.js";
+import { scheduleWeeklyNotificationJob, /*testAddtoQueue*/ } from "./queues/notifications.queue.js";
 import "./queues/workers/deleteCloudinaryAsset.worker.js";
 import "./queues/workers/notifications.worker.js";
 // import "./queues/workers/feature.worker.js"

@@ -3,7 +3,7 @@ import express from "express";
 import { upload } from "../../configs/multer.config.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
-import { formUploadLimiter } from "../../middleware/rateLimiter.middleware.js";
+import { formUploadLimiter, generalLimiter } from "../../middleware/rateLimiter.middleware.js";
 import {
   createAshStudentSchema,
   ashStudentQuerySchema,
@@ -147,6 +147,7 @@ router.get("/download/ashfeedback", authenticate(), authorize("read"), exportAsh
 // Submit ASH Termly Tracking record
 router.post(
   "/tracking",
+  generalLimiter,
   upload.single("file"),
   authenticate(),
   authorize("create"),
@@ -188,6 +189,7 @@ router.get(
 // Submit ASH Weekly Attendance
 router.post(
   "/attendance",
+  generalLimiter,
   authenticate(),
   authorize("create"),
   validateRequest(createAshWeeklyAttendanceSchema),
@@ -228,6 +230,7 @@ router.get(
 // Submit ASH Exit Form
 router.post(
   "/exit",
+  generalLimiter,
   authenticate(),
   authorize("create"),
   validateRequest(createAshExitSchema),
