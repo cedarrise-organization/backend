@@ -247,7 +247,7 @@
 | :------------------ | :---------- | :----------------- |
 | `ValidationError`   | 400         | `VALIDATION_ERROR` |
 | `UnauthorizedError` | 401         | `UNAUTHORIZED`     |
-| `ForbiddentError`   | 403         | `FORBIDDEN`        |
+| `ForbiddenError`   | 403         | `FORBIDDEN`        |
 | `NotFoundError`     | 404         | `NOT_FOUND`        |
 | `conflictError`     | 409         | `CONFLICT`         |
 

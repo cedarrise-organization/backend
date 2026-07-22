@@ -3,7 +3,7 @@ import { coordinatedRefresh } from "../services/auth.services.js";
 import { Request, Response, NextFunction } from "express";
 import { getUserPermissions } from "../utils/rbac.util.js";
 import { verifyAccessToken } from "../utils/token.util.js";
-import { ForbiddentError, UnauthorizedError } from "../lib/error.js";
+import { ForbiddenError, UnauthorizedError } from "../lib/error.js";
 import { accessCookieOptions, refreshCookieOptions } from "../lib/cookie.js";
 
 export const authenticate = () => async (req: Request, res: Response, next: NextFunction) => {
@@ -59,7 +59,7 @@ export const authorize =
       const missing = requiredPermissions.filter((p) => !userPermissions.includes(p));
 
       if (missing.length > 0) {
-        throw new ForbiddentError("You do not have the required permission");
+        throw new ForbiddenError("You do not have the required permission");
       }
 
       next();
