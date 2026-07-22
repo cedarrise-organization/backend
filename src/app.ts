@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import requestLogger from "./middleware/requestLogger.middleware.js";
 import errorHandler from "./middleware/errorHandler.middleware.js";
 import { connectRedis } from "./configs/cache.config.js";
+import { authenticate } from "./middleware/auth.middleware.js";
 import { bullBoardAdapter } from "./configs/bull-board.config.js";
 import { keepEmailAlive, keepRedisAlive } from "./lib/stayalive.js";
 import carouselRouter from "./modules/clientside/carousels/carousels.routes.js";
@@ -31,7 +32,7 @@ import "./events/admin.events.js";
 import "./events/auth.events.js";
 import "./events/ash.events.js";
 // import "./events/feature.event.js"
-import { scheduleWeeklyNotificationJob, /*testAddtoQueue*/ } from "./queues/notifications.queue.js";
+import { scheduleWeeklyNotificationJob /*testAddtoQueue*/ } from "./queues/notifications.queue.js";
 import "./queues/workers/deleteCloudinaryAsset.worker.js";
 import "./queues/workers/notifications.worker.js";
 // import "./queues/workers/feature.worker.js"
@@ -61,7 +62,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use(requestLogger); 
+app.use(requestLogger);
 
 (async () => {
   await connectRedis();
@@ -98,7 +99,7 @@ app.use("/api/v1/forms/outreaches", outreachRouter);
 app.use("/api/v1/forms/capacity-building", capacityRouter);
 
 // BULL BOARD DASHBOARD. (ADD AUTH N' AUTH IN PRODUCTION)
-app.use("/api/v1/queues", bullBoardAdapter.getRouter());
+app.use("/api/v1/queues", authenticate(), bullBoardAdapter.getRouter());
 
 // INTRO ROUTE HANDLER
 app.get("/api/v1", (req, res) => {
