@@ -10,7 +10,7 @@ export const loginController = async (req: Request, res: Response, next: NextFun
       email,
       password,
       (req as any).correlationId,
-      (req.headers["user-agent"] as string),
+      req.headers["user-agent"] as string,
     );
 
     res.cookie("cedaraccess", response.meta.accessToken, accessCookieOptions);
@@ -28,6 +28,9 @@ export const logoutController = async (req: Request, res: Response, next: NextFu
   const refreshToken = req.cookies["cedarrefresh"];
 
   await logout(refreshToken);
+
+  res.clearCookie("cedaraccess");
+  res.clearCookie("cedarrefresh");
 
   return successResponse(res, 200, "Logged out successfully", null, {
     correlationId: (req as any).correlationId,

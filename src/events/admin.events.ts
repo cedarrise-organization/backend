@@ -25,7 +25,7 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
   });
 });
 
-// DELETE CACHE ON ROLE ASSIGNED
+// DELETE PERMISSIONS CACHE ON ROLE ASSIGNED
 appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
   const key = `cedarrise:permissions:${data.userId}`;
   try {
@@ -36,6 +36,25 @@ appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
     });
   } catch (error: any) {
     logger.error("Could not remove permissions cache", {
+      // error,
+      user: data.userId,
+      message: error.message,
+      correlationId: data.correlationId
+    });
+  }
+});
+
+// DELETE USERROLES CACHE ON ROLE ASSIGNED
+appEvents.on(ADMIN_EVENTS.ASSIGN_ROLE, async (data) => {
+  const key = `cedarrise:lookup:userroles:${data.userId}`;
+  try {
+    await cacheDel(key);
+    logger.info("Userroles cache removed", {
+      user: data.userId,
+      correlationId: data.correlationId
+    });
+  } catch (error: any) {
+    logger.error("Could not remove Userroles cache", {
       // error,
       user: data.userId,
       message: error.message,
@@ -80,7 +99,7 @@ appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
   });
 });
 
-// DELETE CACHE ON ROLE REVOKED
+// DELETE PERMISSIONS CACHE ON ROLE REVOKED
 appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
   const key = `cedarrise:permissions:${data.userId}`;
   try {
@@ -93,6 +112,25 @@ appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
     logger.error("Could not remove permissions cache", {
       message: error.message,
       user: data.userId,
+      correlationId: data.correlationId
+    });
+  }
+});
+
+// DELETE USERROLES CACHE ON ROLE REVOKED
+appEvents.on(ADMIN_EVENTS.REVOKE_ROLE, async (data) => {
+  const key = `cedarrise:lookup:userroles:${data.userId}`;
+  try {
+    await cacheDel(key);
+    logger.info("Userroles cache removed", {
+      user: data.userId,
+      correlationId: data.correlationId
+    });
+  } catch (error: any) {
+    logger.error("Could not remove Userroles cache", {
+      // error,
+      user: data.userId,
+      message: error.message,
       correlationId: data.correlationId
     });
   }

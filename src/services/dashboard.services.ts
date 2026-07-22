@@ -287,7 +287,7 @@ export const getCards = async () => {
     improvedGrades:
       (ashStudentsEnrolled?.value ?? 0) === 0
         ? 0
-        : ((ashImprovedGrades?.value ?? 0) / (ashStudentsEnrolled?.value ?? 0)) * 100,
+        : Math.round(((ashImprovedGrades?.value ?? 0) / (ashStudentsEnrolled?.value ?? 0)) * 100),
     currentBeneficiaries: Number(ashCurrentBeneficiaries!.value ?? 0),
     graduated: Number(ashGraduated?.value ?? 0),
     dropOuts: Number(ashDropOuts?.value ?? 0),

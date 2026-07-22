@@ -11,6 +11,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../utils/token.util.js";
+import { inflate } from "zlib";
 
 export const login = async (
   email: string,
@@ -169,4 +170,37 @@ export const logout = async (rawRefreshToken: string) => {
   await db.delete(refreshtoken).where(eq(refreshtoken.token, token));
 
   return;
+};
+
+type RefreshResult = Awaited<ReturnType<typeof refresh>>;
+const inFlight = new Map<string, Promise<RefreshResult>>();
+const recentlyCompleted = new Map<string, { result: RefreshResult; expiresAt: number }>();
+const GRACE_MS = 8000;
+
+export const coordinatedRefresh = async (
+  refreshToken: string,
+  correlationId: string,
+  userAgent: string,
+): Promise<RefreshResult> => {
+  const cached = recentlyCompleted.get(refreshToken);
+  if (cached && cached.expiresAt > Date.now()) {
+    return Promise.resolve(cached.result);
+  }
+
+  const existing = inFlight.get(refreshToken);
+  if (existing) return existing;
+
+  const promise = refresh(refreshToken, correlationId, userAgent)
+     .then((result) => {
+      recentlyCompleted.set(refreshToken, { result, expiresAt: Date.now() + GRACE_MS });
+      setTimeout(() => recentlyCompleted.delete(refreshToken), GRACE_MS).unref();
+      return result;
+    })
+    .finally(() => {
+      inFlight.delete(refreshToken);
+    });
+
+  inFlight.set(refreshToken, promise);
+
+  return promise;
 };
