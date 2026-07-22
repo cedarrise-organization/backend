@@ -24,6 +24,9 @@
 	"author": "",
 	"license": "ISC",
 	"type": "module",
+	"overrides": {
+	"esbuild": "0.28.1"
+	},
 	"bugs": {
 		"url": "https://github.com/cedarrise-organization/backend/issues"
 	},
