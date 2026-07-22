@@ -19,9 +19,9 @@ export const listAllRoles = async () => {
 
 export const listUserRoles = async (userId: string) => {
   /// cache
-  const key = `cedarrise:lookup:userroles`;
+  const key = `cedarrise:lookup:userroles:${userId}`;
   const cacheRes = await cacheGet<any>(key);
-  if (cacheRes) {
+  if (cacheRes) { 
     return {
       code: 200,
       message: `Roles for user ${userId} found successfully`,
