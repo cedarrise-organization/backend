@@ -6,7 +6,7 @@ export const accessCookieOptions = {
   secure: isProduction, // should browser send the cookie over https?
   sameSite,
   maxAge: 1000 * 60 * 60 * 24 * 7, // Long lived for retrieval 
-  partioned: true
+  partitioned: isProduction
 } as const;
 
 export const refreshCookieOptions = {
@@ -14,6 +14,5 @@ export const refreshCookieOptions = {
   secure: isProduction, // should browser send the cookie over https?
   sameSite,
   maxAge: 1000 * 60 * 60 * 24 * 7, // matches refresh token exp age
-  partioned: true
-
+  partitioned: isProduction
 } as const;
