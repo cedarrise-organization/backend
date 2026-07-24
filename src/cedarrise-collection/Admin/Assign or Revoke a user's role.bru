@@ -16,7 +16,7 @@ params:query {
 }
 
 params:path {
-  userId: e05cc2d9-3869-4f46-9a26-b2b301a12c7b
+  userId: 6c988057-7d99-4adf-a23f-abe81cea1f0f
 }
 
 vars:pre-request {
@@ -54,23 +54,17 @@ docs {
   
   ## Response
   
+  Both `assign` and `revoke` actions return the same response shape.
+  
   ### Assign (`action=assign`)
   
-  **`200 OK`** — Returns the newly created user-role assignment.
+  **`200 OK`** — Confirms the role was assigned. No data payload is returned.
   
   ```json
   {
     "success": true,
     "message": "Role <rolename> assigned successfully",
-    "data": [
-      {
-        "userId": "uuid",
-        "roleId": "uuid",
-        "description": "string" | null,
-        "assignedAt": "ISO 8601",
-        "assignedBy": "string" | null
-      }
-    ],
+    "data": null,
     "meta": {
       "correlationId": "uuid-v4-string"
     }
@@ -79,12 +73,16 @@ docs {
   
   ### Revoke (`action=revoke`)
   
-  **`200 OK`** — Returns a success message with no data payload.
+  **`200 OK`** — Confirms the role was revoked. No data payload is returned.
   
   ```json
   {
     "success": true,
-    "message": "Role <rolename> revoked successfully"
+    "message": "Role <rolename> revoked successfully",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
   }
   ```
 }

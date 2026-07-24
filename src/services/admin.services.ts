@@ -1,11 +1,12 @@
 import db from "../db/db.js";
-import { eq, sql, asc, count } from "drizzle-orm";
+import { Request } from"express"
 import { appEvents } from "../lib/events.js";
+import { conflictError } from "../lib/error.js";
+import { eq, sql, asc, count } from "drizzle-orm";
 import { ADMIN_EVENTS } from "../events/admin.events.js";
 import { hashPassword } from "../utils/password.util.js";
 import { roles, userroles, users } from "../db/models/auth.js";
 import { cacheGet, cacheSet, CACHE_TTL } from "../lib/cache.js";
-import { conflictError } from "../lib/error.js";
 
 export const listAllRoles = async () => {
   const appRoles = await db.select().from(roles);
@@ -52,7 +53,7 @@ export const listUserRoles = async (userId: string) => {
   };
 };
 
-export const roleAction = async (userId: string, options: any, correlationId: string) => {
+export const roleAction = async (req: Request, userId: string, options: any) => {
   const { action, rolename } = options;
 
   if (action === "revoke") {
@@ -66,7 +67,7 @@ export const roleAction = async (userId: string, options: any, correlationId: st
       .delete(userroles)
       .where(sql`${userroles.roleId} = ${role_.id} AND ${userroles.userId} = ${userId}`);
 
-    appEvents.emit(ADMIN_EVENTS.REVOKE_ROLE, { role: rolename, userId, correlationId });
+    appEvents.emit(ADMIN_EVENTS.REVOKE_ROLE, { role: rolename, userId, correlationId: req.correlationId });
 
     return {
       code: 200,
@@ -80,21 +81,20 @@ export const roleAction = async (userId: string, options: any, correlationId: st
     throw new Error(`Role ${rolename} not found`); //impossible sha
   }
 
-  const newUserRole = await db
+  await db
     .insert(userroles)
     .values({
       userId: userId,
       roleId: role_.id,
+      assignedBy: req.user?.name as string
     })
-    .returning()
     .onConflictDoNothing();
 
-  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, userId, correlationId });
+  appEvents.emit(ADMIN_EVENTS.ASSIGN_ROLE, { role: rolename, userId, correlationId: req.correlationId });
 
   return {
     code: 200,
     message: `Role ${rolename} assigned successfully`,
-    data: newUserRole,
   };
 };
 

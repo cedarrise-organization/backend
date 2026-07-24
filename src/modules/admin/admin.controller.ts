@@ -40,8 +40,8 @@ export const roleActionController = async (req: Request, res: Response, next: Ne
   const userId = (req as any).params.userId.toString();
   const { action, rolename } = req.qtransformed;
   try {
-    const response = await roleAction(userId, { action, rolename }, (req as any).correlationId);
-    return successResponse(res, response.code, response.message, response.data, {
+    const response = await roleAction(req, userId, { action, rolename });
+    return successResponse(res, response.code, response.message, null, {
       correlationId: (req as any).correlationId,
     });
   } catch (err) {
