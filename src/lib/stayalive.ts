@@ -6,7 +6,7 @@ import { sendEmail } from "../utils/sendEmail.util.js";
 
 // KEEP BREVO EMAIL API KEY FROM ROTATING
 export async function keepEmailAlive() {
-  schedule.scheduleJob("0 0 1 * *", async () => {
+  schedule.scheduleJob("0 0 14 * *", async () => {
     logger.info("Running keepEmailAlive function...");
     try {
       let content = await ejs.renderFile(

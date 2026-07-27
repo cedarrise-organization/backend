@@ -14,12 +14,18 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
-pool.on("connect", () => {
-  logger.info("Connected to the database Pool successfully");
-});
+export async function connectDatabase() {
+  try {
+    await pool.connect();
+    logger.info("Connected to database Pool successfully")
+  } catch (err) {
+    logger.error("Failed to connect to database:", err);
+    process.exit(1);
+  }
+}
 
 pool.on("error", () => {
-  logger.info("Error Connecting to the database Pool");
+  logger.error("Unexpected PostgreSQL pool error.")
 });
 
 const db = drizzle({client: pool})
