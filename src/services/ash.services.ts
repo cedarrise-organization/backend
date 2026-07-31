@@ -39,6 +39,7 @@ import { NotFoundError } from "../lib/error.js";
 
 const sortMap = {
   // ashStudent
+  programType: ashStudent.programType,
   firstName: ashStudent.firstName,
   surname: ashStudent.surname,
   gender: ashStudent.gender,

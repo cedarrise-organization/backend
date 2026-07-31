@@ -138,6 +138,7 @@ export const ashStudentQuerySchema = z.object({
       (v) => (v === "" ? undefined : v),
       z
         .enum([
+          "programType",
           "firstName",
           "surname",
           "createdAt",
