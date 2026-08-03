@@ -1254,7 +1254,7 @@ export const listAttendance = async (
     db
       .select()
       .from(ashWeeklyAttendance)
-      .orderBy(ashWeeklyAttendance.createdAt)
+      .orderBy(desc(ashWeeklyAttendance.sessionDate))
       .limit(limit)
       .offset((page - 1) * limit),
 
@@ -1407,7 +1407,7 @@ export const submitExit = async (options: AshexitbodyType, correlationId: string
     .returning();
 
   appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
-    singleKey: undefined,
+    singleKey: "cedarrise:lookup:ash",
     patternKey: `cedarrise:ash:exit:*`,
     event: "SUBMIT ASH STUDENT EXIT FORM",
     correlationId,
