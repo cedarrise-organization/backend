@@ -371,7 +371,7 @@ export const updateRecommendedStudentStatus = async (
     .where(eq(tacotsRecommendation.id, id))
     .returning({
       id: tacotsRecommendation.id,
-      adminStatus: tacotsRecommendation.adminStatus,
+      status: tacotsRecommendation.adminStatus,
       name: tacotsRecommendation.firstName,
     });
 

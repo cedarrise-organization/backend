@@ -25,7 +25,6 @@ export const doKeysForThisPatternExist = async (pattern: string): Promise<boolea
 };
 
 export const invalidateCache = async (singleKey?: string, patternKey?: string) => {
-  console.log(singleKey, patternKey);
   // delete a single item
   if (singleKey) {
     const cacheRes = await cacheGet<any>(singleKey);
@@ -38,7 +37,6 @@ export const invalidateCache = async (singleKey?: string, patternKey?: string) =
   // delete items with a pattern
   if (patternKey) {
     const cacheRes = await doKeysForThisPatternExist(patternKey);
-    console.log("Do keys for this exist:", cacheRes);
     if (cacheRes) {
       await cacheDelPattern(patternKey);
       logger.debug("*invalidateCache fxn*  key pattern invalidated successfully");
