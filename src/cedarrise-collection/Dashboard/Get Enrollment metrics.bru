@@ -62,7 +62,7 @@ docs {
       "c_applicationNumbers": Dataset,
       "c_genderDiversity": Dataset,
       "c_classDistribution": Dataset,
-      "c_acceptanceRate": Linedata,
+      "c_graduationTrends": Linedata,
       "c_geographicalDistribution": Linedata
     },
     "meta": {
@@ -105,43 +105,45 @@ docs {
   
   ### `c_classDistribution` — `Dataset` (bar)
   
-  Accepted ASH student count by class/education level for the current year.
+  Combined ASH and TACOTS student count by class/education level for the current year.
   
   **Calculation:**
-  - Queries the `ash_student` table, counting rows (`COUNT(id)`) grouped by `upper(trim(current_class))`, filtered to the current year **and** `status = 'accepted'` (only accepted students are included).
+  - **ASH class counts:** Queries the `ash_student` table, counting rows (`COUNT(id)`) grouped by `upper(trim(current_class))`, filtered to the current year **and** `status = 'accepted'` (only accepted ASH students are included).
+  - **TACOTS class counts:** Queries the `tacots_onboarding` table, counting rows (`COUNT(id)`) grouped by `upper(trim(enrolled_class))`, filtered to the current year. This includes *all* onboarded TACOTS students regardless of status.
+  - The two result sets are merged into a single `Map<class, count>` by summing counts for matching class keys.
   - Results are mapped onto a fixed 7-bucket axis. The `"Primary"` bucket is an aggregate — it sums the counts for `"PRIMARY 1"` through `"PRIMARY 6"`. All other buckets (`JSS1`–`SS3`) map one-to-one to their class name. Any class with no matching records resolves to `0`.
   
   | Field    | Value                                                                     |
   |----------|---------------------------------------------------------------------------|
   | type     | `"bar"`                                                                   |
   | labels   | `["Primary", "JSS1", "JSS2", "JSS3", "SS1", "SS2", "SS3"]`               |
-  | datasets | Single series `"Students"` — count per class level.                       |
+  | datasets | Single series `"Students"` — combined ASH + TACOTS count per class level. |
   
-  ### `c_acceptanceRate` — `Linedata`
+  ### `c_graduationTrends` — `Linedata`
   
-  Acceptance rate percentage per programme for the current year.
+  Graduation rate percentage per programme for the current year.
   
   **Calculation:**
-  Each programme's rate is computed as `(accepted / total) * 100`, rounded to 2 decimal places. If `total` is `0`, the rate returns `0` to avoid division by zero.
+  Each programme's rate is computed as `(graduated / total) * 100`, rounded to 2 decimal places. If `total` is `0`, the rate returns `0` to avoid division by zero.
   
-  - **ASH:** Queries `ash_student` filtered to the current year. `total` = `COUNT(id)` of all rows; `accepted` = `COUNT(id) FILTER (WHERE status = 'accepted')`. Rate = `(accepted / total) * 100`.
-  - **TACOTS:** Queries `tacots_recommendation` filtered to the current year. `total` = `COUNT(id)` of all rows; `accepted` = `COUNT(id) FILTER (WHERE admin_status = 'SELECTED')`. Rate = `(accepted / total) * 100`.
-  - **Volunteer:** Queries `volunteer_registration` filtered to the current year. `total` = `COUNT(id)` of all rows; `accepted` = `COUNT(id) FILTER (WHERE status = 'accepted')`. Rate = `(accepted / total) * 100`.
+  - **ASH:** Queries `ash_exit` filtered to the current year. `total` = `COUNT(id)` of all exit rows; `graduated` = `COUNT(id) FILTER (WHERE exit_reason IN ('COMPLETED', 'GRADUATED'))`. Rate = `(graduated / total) * 100`.
+  - **TACOTS:** Queries `tacots_exit` filtered to the current year. `total` = `COUNT(id)` of all exit rows; `graduated` = `COUNT(id) FILTER (WHERE exit_reason = 'COMPLETED SECONDARY EDUCATION (GRADUATED)')`. Rate = `(graduated / total) * 100`.
   
   ```json
   [
     { "title": "ASH", "amount": <percentage> },
-    { "title": "TACOTS", "amount": <percentage> },
-    { "title": "Volunteer", "amount": <percentage> }
+    { "title": "TACOTS", "amount": <percentage> }
   ]
   ```
   
   ### `c_geographicalDistribution` — `Linedata`
   
-  ASH applicant count by state for the current year.
+  Combined ASH and TACOTS applicant count by state for the current year.
   
   **Calculation:**
-  - Queries the `ash_student` table, counting rows (`COUNT(id)`) grouped by `upper(trim(school_state))`, filtered to the current year. This includes *all* applicants regardless of status.
+  - **ASH state counts:** Queries the `ash_student` table, counting rows (`COUNT(id)`) grouped by `upper(trim(school_state))`, filtered to the current year. This includes *all* ASH applicants regardless of status.
+  - **TACOTS state counts:** Queries the `tacots_onboarding` table, counting rows (`COUNT(id)`) grouped by `upper(trim(enrolled_school_state))`, filtered to the current year. This includes *all* onboarded TACOTS students.
+  - The two result sets are merged into a single `Map<state, count>` by summing counts for matching state keys.
   - Five featured states are shown individually: `ENUGU`, `EBONYI`, `ANAMBRA`, `ABIA`, `IMO`. All remaining states are aggregated into an `"OTHERS"` bucket by summing their counts.
   
   ```json

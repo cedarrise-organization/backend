@@ -668,9 +668,11 @@ export const getEnrollment = async () => {
   const normalizedAshGender = sql<string>`lower(trim(${ashStudent.gender}))`;
   const normalizedTacotsGender = sql<string>`lower(trim(${tacotsRecommendation.gender}))`;
   const normalizedAshClass = sql<string>`upper(trim(${ashStudent.currentClass}))`;
+  const normalizedTacotsClass = sql<string>`upper(trim(${tacotsOnboarding.enrolledClass}))`;
   const getPercentage = (accepted: number, total: number) =>
-    total === 0 ? 0 : Number(((accepted / total) * 100).toFixed(2));
+    total === 0 ? 0 : Math.round(Number(((accepted / total) * 100).toFixed(2)));
   const normalizedAshSchoolState = sql<string>`upper(trim(${ashStudent.schoolState}))`;
+  const normalizedTacotsSchoolState = sql<string>`upper(trim(${tacotsOnboarding.enrolledSchoolState}))`;
 
   const [
     ashApplications,
@@ -678,10 +680,12 @@ export const getEnrollment = async () => {
     ashGenderCounts,
     tacotsGenderCounts,
     ashClassCounts,
-    [ashAcceptance],
-    [tacotsAcceptance],
-    [volunteerAcceptance],
+    tacotsClassCounts,
+    [ashGraduated],
+    [tacotsGraduated],
+    // [volunteerAcceptance],
     ashStateCounts,
+    tacotsStateCounts,
   ] = await Promise.all([
     // ashApplications
     db
@@ -735,45 +739,54 @@ export const getEnrollment = async () => {
         ),
       )
       .groupBy(normalizedAshClass),
-    // ashAcceptance
+    // tacotsClassCounts
     db
       .select({
-        total: count(ashStudent.id),
+        currentClass: normalizedTacotsClass,
+        value: count(tacotsOnboarding.id),
+      })
+      .from(tacotsOnboarding)
+      .where(sql`EXTRACT(YEAR FROM ${tacotsOnboarding.createdAt}) = ${currentYear}`)
+      .groupBy(normalizedTacotsClass),
+    // ashGraduated
+    db
+      .select({
+        total: count(ashExit.id),
         accepted: sql<number>`
-        COUNT(${ashStudent.id})
+        COUNT(${ashExit.id})
         FILTER (
-          WHERE ${ashStudent.status} = 'accepted'
+          WHERE ${ashExit.exitReason} IN ('COMPLETED', 'GRADUATED')
         )
       `,
       })
-      .from(ashStudent)
-      .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`),
-    // tacotsAcceptance
+      .from(ashExit)
+      .where(sql`EXTRACT(YEAR FROM ${ashExit.createdAt}) = ${currentYear}`),
+    // tacotsGraduated
     db
       .select({
-        total: count(tacotsRecommendation.id),
+        total: count(tacotsExit.id),
         accepted: sql<number>`
-        COUNT(${tacotsRecommendation.id})
+        COUNT(${tacotsExit.id})
         FILTER (
-          WHERE ${tacotsRecommendation.adminStatus} = 'SELECTED'
+          WHERE ${tacotsExit.exitReason} = 'COMPLETED SECONDARY EDUCATION (GRADUATED)'
         )
       `,
       })
-      .from(tacotsRecommendation)
-      .where(sql`EXTRACT(YEAR FROM ${tacotsRecommendation.createdAt}) = ${currentYear}`),
-    // volunteerAcceptance
-    db
-      .select({
-        total: count(volunteerRegistration.id),
-        accepted: sql<number>`
-        COUNT(${volunteerRegistration.id})
-        FILTER (
-          WHERE ${volunteerRegistration.status} = 'accepted'
-        )
-      `,
-      })
-      .from(volunteerRegistration)
-      .where(sql`EXTRACT(YEAR FROM ${volunteerRegistration.createdAt}) = ${currentYear}`),
+      .from(tacotsExit)
+      .where(sql`EXTRACT(YEAR FROM ${tacotsExit.createdAt}) = ${currentYear}`),
+    // // volunteerAcceptance
+    // db
+    //   .select({
+    //     total: count(volunteerRegistration.id),
+    //     accepted: sql<number>`
+    //     COUNT(${volunteerRegistration.id})
+    //     FILTER (
+    //       WHERE ${volunteerRegistration.status} = 'accepted'
+    //     )
+    //   `,
+    //   })
+    //   .from(volunteerRegistration)
+    //   .where(sql`EXTRACT(YEAR FROM ${volunteerRegistration.createdAt}) = ${currentYear}`),
     // ashStateCounts
     db
       .select({
@@ -783,6 +796,15 @@ export const getEnrollment = async () => {
       .from(ashStudent)
       .where(sql`EXTRACT(YEAR FROM ${ashStudent.createdAt}) = ${currentYear}`)
       .groupBy(normalizedAshSchoolState),
+    // tacotsStateCounts
+    db
+      .select({
+        state: normalizedTacotsSchoolState,
+        value: count(tacotsOnboarding.id),
+      })
+      .from(tacotsOnboarding)
+      .where(sql`EXTRACT(YEAR FROM ${tacotsOnboarding.createdAt}) = ${currentYear}`)
+      .groupBy(normalizedTacotsSchoolState),
   ]);
 
   ////
@@ -847,8 +869,15 @@ export const getEnrollment = async () => {
   ////
 
   ////
-  /* ashClassCounts */
-  const classCountMap = new Map(ashClassCounts.map((row) => [row.currentClass, Number(row.value)]));
+  /* ashClassCounts + tacotsClassCounts*/
+  const combinedClassCounts = [...ashClassCounts, ...tacotsClassCounts];
+  const classCountMap = new Map<string, number>();
+  for (const row of combinedClassCounts) {
+    const className = row.currentClass;
+    const value = Number(row.value);
+
+    classCountMap.set(className, (classCountMap.get(className) ?? 0) + value);
+  }
   const primaryClasses = [
     "PRIMARY 1",
     "PRIMARY 2",
@@ -879,60 +908,68 @@ export const getEnrollment = async () => {
   ////
 
   ////
-  /* ashAcceptance, tacotsAcceptance, volunteerAcceptance */
-  const c_acceptanceRate: Linedata = [
+  /* ashGraduated, tacotsGraduated, volunteerAcceptance */
+  const c_graduationTrends: Linedata = [
     {
       title: "ASH",
       amount: getPercentage(
-        Number(ashAcceptance?.accepted ?? 0),
-        Number(ashAcceptance?.total ?? 0),
+        Number(ashGraduated?.accepted ?? 0),
+        Number(ashGraduated?.total ?? 0),
       ),
     },
     {
       title: "TACOTS",
       amount: getPercentage(
-        Number(tacotsAcceptance?.accepted ?? 0),
-        Number(tacotsAcceptance?.total ?? 0),
+        Number(tacotsGraduated?.accepted ?? 0),
+        Number(tacotsGraduated?.total ?? 0),
       ),
     },
-    {
-      title: "Volunteer",
-      amount: getPercentage(
-        Number(volunteerAcceptance?.accepted ?? 0),
-        Number(volunteerAcceptance?.total ?? 0),
-      ),
-    },
+    // {
+    //   title: "Volunteer",
+    //   amount: getPercentage(
+    //     Number(volunteerAcceptance?.accepted ?? 0),
+    //     Number(volunteerAcceptance?.total ?? 0),
+    //   ),
+    // },
   ];
   ////
 
   ////
-  /* ashStateCounts */
-  const ashStateCountMap = new Map(ashStateCounts.map((row) => [row.state, Number(row.value)]));
+  /* ashStateCounts + tacotsStateCounts*/
+  const combinedStateCounts = [...ashStateCounts, ...tacotsStateCounts];
+  const stateCountMap = new Map<string, number>();
+  for (const row of combinedStateCounts) {
+    const state = row.state;
+    const value = Number(row.value);
+    stateCountMap.set(state, (stateCountMap.get(state) ?? 0) + value);
+  }
   const featuredStates = ["ENUGU", "EBONYI", "ANAMBRA", "ABIA", "IMO"];
-  const othersCount = ashStateCounts.reduce((total, row) => {
+  const othersCount = combinedStateCounts.reduce((total, row) => {
     if (featuredStates.includes(row.state)) return total;
+
     return total + Number(row.value);
   }, 0);
+
   const c_geographicalDistribution: Linedata = [
     {
       title: "ENUGU",
-      amount: ashStateCountMap.get("ENUGU") ?? 0,
+      amount: stateCountMap.get("ENUGU") ?? 0,
     },
     {
       title: "EBONYI",
-      amount: ashStateCountMap.get("EBONYI") ?? 0,
+      amount: stateCountMap.get("EBONYI") ?? 0,
     },
     {
       title: "ANAMBRA",
-      amount: ashStateCountMap.get("ANAMBRA") ?? 0,
+      amount: stateCountMap.get("ANAMBRA") ?? 0,
     },
     {
       title: "ABIA",
-      amount: ashStateCountMap.get("ABIA") ?? 0,
+      amount: stateCountMap.get("ABIA") ?? 0,
     },
     {
       title: "IMO",
-      amount: ashStateCountMap.get("IMO") ?? 0,
+      amount: stateCountMap.get("IMO") ?? 0,
     },
     {
       title: "OTHERS",
@@ -948,7 +985,7 @@ export const getEnrollment = async () => {
       c_applicationNumbers,
       c_genderDiversity,
       c_classDistribution,
-      c_acceptanceRate,
+      c_graduationTrends,
       c_geographicalDistribution,
     },
     CACHE_TTL.DASHBOARD_CARDS,
@@ -962,7 +999,7 @@ export const getEnrollment = async () => {
       c_applicationNumbers,
       c_genderDiversity,
       c_classDistribution,
-      c_acceptanceRate,
+      c_graduationTrends,
       c_geographicalDistribution,
     },
   };
