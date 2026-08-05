@@ -51,8 +51,12 @@ docs {
   ```json
   {
     "success": true,
-    "message": "...",
-    "data": { ... },
+    "message": "Recommended TACOTS' student's status updated successfully",
+    "data": { 
+      id: uuid,
+      status: string,
+      name: string,
+    },
     "meta": {
       "correlationId": "uuid-v4-string"
     }

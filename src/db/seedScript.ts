@@ -757,7 +757,8 @@ async function seedNotifications() {
 async function seedMiscellaneous() {
   try {
     await db.insert(miscellaneous).values({
-      numberOfPhotos: 252,
+      id: "74510b55-1342-47e8-b626-e85a6747f29e",
+      numberOfPhotos: 266,
       numberOfPartners: 5,
     });
 

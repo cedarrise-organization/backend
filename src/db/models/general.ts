@@ -58,7 +58,12 @@ export const googleForms = p.pgTable("google_forms", {
 export const miscellaneous = p.pgTable(
   "miscellaneous",
   {
-    numberOfPhotos: p.integer("number_of_photos").default(252).notNull(),
+      id: p
+    .uuid()
+    .primaryKey()
+    .default(sql`uuid_generate_v4()`)
+    .notNull(),
+    numberOfPhotos: p.integer("number_of_photos").default(266).notNull(),
     numberOfPartners: p.integer("number_of_partners").default(0),
   },
   (table) => [
