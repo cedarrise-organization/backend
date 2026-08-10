@@ -17,7 +17,18 @@ export const donors = p.pgTable(
     supportAreas: p.text("support_areas").array(),
     comment: p.text(),
     metaData: p.text("meta_data"),
-    date: p.timestamp().defaultNow().notNull(),
+    createdAt: p.timestamp().defaultNow().notNull(),
   },
-  (table) => [index("donor_idx").on(table.date)],
+  (table) => [
+    index("donor_idx").on(table.createdAt),
+    index("donor_search_index").using(
+      "gin",
+      sql`(
+          setweight(to_tsvector('english', ${table.name}), 'A') ||
+          setweight(to_tsvector('english', ${table.email}), 'A') ||
+          setweight(to_tsvector('english', coalesce(${table.amount}::text, '')), 'B') ||
+          setweight(to_tsvector('english', coalesce(${table.comment}, '')), 'C') 
+        )`,
+    ),
+  ],
 );

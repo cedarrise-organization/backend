@@ -92,6 +92,7 @@
 | `cedarrise:general:receipts:{page}:{limit}:{orderBy}:{sortBy}`                     | Cached paginated receipts list. Set on read, bypassed on search.                                                                                                       | `services/general.services.ts`              |
 | `cedarrise:general:googleform`                                                     | Cached active Google Form details (src + title). Set on read, cleared on upload.                                                                                       | `services/general.services.ts`              |
 | `cedarrise:general:metadata`                                                       | Cached general uploads' page metadata (active projects, receipts, users, and photos). Set on read.                                                                     | `services/general.services.ts`              |
+| `cedarrise:clientside:donations:{page}:{limit}:{orderBy}:{sortBy}`                 | Cached paginated donations list, sorted by field. Set on read, bypassed on search, invalidated on delete.                                                              | `services/clientside/donate.services.ts`    |
 
 ---
 

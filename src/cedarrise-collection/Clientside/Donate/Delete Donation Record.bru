@@ -1,0 +1,76 @@
+meta {
+  name: Delete Donation Record
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/donate/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1a63e9d7-82c4-45bf-a731-94e0582c6006
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete a Donation Record
+  
+  Deletes a single donation record from the `donors` table by its UUID. Invalidates all cached donation lists on success.
+  
+  ## Endpoint
+  `DELETE /api/v1/donate/:id`
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `delete` — enforced by `authorize("delete")`.
+  
+  ## Request
+  
+  ### Path Parameters
+  
+  | Parameter | Type | Required | Description                            |
+  |-----------|------|----------|----------------------------------------|
+  | `id`      | uuid | ✅       | The ID of the donation record to delete. |
+  
+  No query parameters or request body required.
+  
+  ## Response
+  
+  **`200 OK`** — Confirms successful deletion.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Donation record deleted successfully",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+  
+  ## Side Effects
+  
+  - **Invalidated Keys:** Bypasses and deletes all caches matching pattern `cedarrise:clientside:donations:*`
+  
+  ## Errors
+  
+  | Status                      | Description                                          |
+  |-----------------------------|------------------------------------------------------|
+  | `400 Bad Request`           | Invalid ID format (must be a valid UUID).             |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                     |
+  | `403 Forbidden`             | Insufficient permissions.                            |
+  | `500 Internal Server Error` | Unexpected server error.                             |
+}

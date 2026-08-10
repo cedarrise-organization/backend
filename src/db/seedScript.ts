@@ -5,6 +5,7 @@ import { users, roles, permissions, rolepermissions, userroles } from "./models/
 import { projects, notifications } from "./models/dashboard.js";
 import { receipts, miscellaneous } from "./models/general.js";
 import { refreshtoken } from "./models/auth.js";
+import { donors } from "./models/donors.js";
 import { blogs } from "./models/blogs.js";
 import {
   ashStudent,
@@ -54,6 +55,7 @@ const clearTables = async () => {
     await db.delete(miscellaneous);
     await db.delete(blogs);
     await db.delete(notifications);
+    await db.delete(donors);
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -786,6 +788,25 @@ async function seedBlogs() {
   }
 }
 
+// DONORS
+async function seedDonors() {
+  try {
+    const file = await fs.readFile(`${process.cwd()}/src/db/seeddata/donors.jsonl`, "utf-8");
+
+    const rows = file
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line) => JSON.parse(line));
+
+    await db.insert(donors).values(rows);
+
+    logger.info(`Inserted ${rows.length} rows into donors`);
+  } catch (error) {
+    console.log(error)
+    logger.error("could not seed donors table", { error });
+  }
+}
+
 await clearTables();
 await installExtensions();
 await seedRolesAndPermissions();
@@ -809,3 +830,4 @@ await seedReceipts();
 await seedBlogs();
 await seedNotifications();
 await seedMiscellaneous();
+await seedDonors();

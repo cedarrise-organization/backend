@@ -1,0 +1,63 @@
+meta {
+  name: Download Donation Records
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/donate/download
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download Donation Records (CSV Export)
+  
+  Exports the entire `donors` table as a CSV file download. Selects all rows from the table (no filters, no pagination), converts the records to CSV using json2csv, and returns the CSV as raw file bytes with Content-Type: text/csv and Content-Disposition: attachment. The response is not JSON; frontend clients should read it as a Blob and trigger a browser download.
+  
+  ## Endpoint
+  `GET /api/v1/donate/download`
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `update` — enforced by `authorize("update")`.
+  
+  ## Request
+  No path parameters, query parameters, or request body.
+  
+  ## Response — `200 OK`
+  
+  **Content-Type:** `text/csv; charset=utf-8`
+  **Content-Disposition:** `attachment; filename="donations.csv"`
+  
+  The CSV contains one row per donor record with the following columns (in order):
+  
+  | Column         | Description                                                              |
+  |----------------|--------------------------------------------------------------------------|
+  | `id`           | UUID primary key                                                         |
+  | `amount`       | Donation amount in Naira                                                 |
+  | `name`         | Name of the donor                                                        |
+  | `email`        | Email address of the donor                                               |
+  | `supportAreas` | Areas the donor chose to support (string array, may be null)             |
+  | `comment`      | Optional message or comment from the donor                               |
+  | `metaData`     | Raw Paystack transaction metadata (JSON string)                          |
+  | `createdAt`    | Timestamp of when the donation was recorded                              |
+  
+  ## Errors
+  
+  | Status                      | Description                                          |
+  |-----------------------------|------------------------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                     |
+  | `403 Forbidden`             | Insufficient permissions.                            |
+  | `500 Internal Server Error` | Unexpected server error.                             |
+}

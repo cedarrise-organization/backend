@@ -4,6 +4,7 @@ import { appEvents } from "../lib/events.js";
 import logger from "../configs/logger.config.js";
 import db from "../db/db.js";
 import ejs from "ejs";
+import { invalidateCache } from "../utils/cache.util.js";
 
 // DEFINE EVENT NAMES AS CONSTANTS
 export const DONATE_EVENTS = {
@@ -96,3 +97,18 @@ appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
     });
   }
 });
+
+// INVALIDATE CACHE DATA ON DONATION MADE
+appEvents.on(DONATE_EVENTS.DONATION_MADE, async (data) => {
+  try {
+    await invalidateCache("cedarrise:clientside:donations:*")
+    logger.info("Donation cache invalidated", {
+      correlationId: data.correlationId
+    });
+  } catch (error: any) {
+    logger.error("Failed to invalidate cache data", {
+      correlationId: data.correlationId,
+      message: error.message,
+    });
+  }
+})

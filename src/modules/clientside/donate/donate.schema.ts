@@ -1,5 +1,6 @@
 //MODELS
 import * as z from "zod";
+import { baseQueryBody } from "../../../db/globalschema/global.schema.js";
 
 export const donateSchema = z.object({
   body: z.object({
@@ -39,5 +40,21 @@ export const verifySchema = z.object({
     reference: z.string(),
   }),
 });
+
+export const donateQuerySchema = z.object({
+  query: z.object({
+    ...baseQueryBody,
+    sortBy: z.preprocess(
+      (v) => (v === "" ? undefined : v),
+      z.enum(["name", "amount", "email", "createdAt"]).default("createdAt"),
+    ),
+  }),
+});
+
+export const donateParamsSchema = z.object({
+  params: z.object({
+    id: z.uuid("Invalid ID"),
+  })
+})
 
 // create custom types for request bodies with enums

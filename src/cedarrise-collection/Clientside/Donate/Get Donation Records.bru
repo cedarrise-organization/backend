@@ -1,0 +1,112 @@
+meta {
+  name: Get Donation Records
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/donate/records?page=&limit=&orderBy=&search=&sortBy=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+  orderBy: 
+  search: 
+  sortBy: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get Donation Records
+  
+  Returns a paginated list of donation records from the `donors` table. Results can be sorted by multiple fields and filtered by a full-text search query.
+  
+  ## Endpoint
+  `GET /api/v1/donate`
+  
+  ## Authorization
+  
+  - **Authentication:** Required — Bearer token via `authenticate()`.
+  - **Permission:** `update` — enforced by `authorize("update")`.
+  
+  ## Request
+  
+  ### Query Parameters
+  
+  | Parameter | Type   | Required | Default     | Description / Allowed Values                                                                                     |
+  |-----------|--------|----------|-------------|------------------------------------------------------------------------------------------------------------------|
+  | `page`    | number | No       | `1`         | Page number (integer ≥ 1)                                                                                        |
+  | `limit`   | number | No       | `25`        | Items per page (integer, 1–100)                                                                                  |
+  | `orderBy` | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                            |
+  | `sortBy`  | string | No       | `createdAt` | Field to sort by. One of: `name`, `amount`, `email`, `createdAt`                                                 |
+  | `search`  | string | No       | —           | Full-text search query. When provided, cache is bypassed and results are matched against the text search vector. |
+  
+  ### Searchable Fields
+  
+  Full-text search queries match against the following columns using PostgreSQL text search:
+  
+  | Field     | Weight |
+  |-----------|--------|
+  | `name`    | A      |
+  | `email`   | A      |
+  | `comment` | C      |
+  
+  Plain text amount search is also performed using a fallback ILIKE comparison.
+  
+  ## Response
+  
+  **`200 OK`** — Returns a paginated list of donation records.
+  
+  ```json
+  {
+    "success": true,
+    "message": "Found all donation records successfully",
+    "data": [
+      {
+        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "amount": 900,
+        "name": "John Doe",
+        "email": "donor@example.com",
+        "supportAreas": ["FUND_BOOTCAMP", "SPONSOR_ASH_BENEFICIARY"],
+        "comment": "Love your work",
+        "metaData": "{...}",
+        "createdAt": "2026-08-10T12:00:00.000Z"
+      }
+    ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 1
+      },
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+  
+  ## Caching
+  
+  - **Cache Key:** `cedarrise:clientside:donations:{page}:{limit}:{orderBy}:{sortBy}`
+  - **TTL:** 10 minutes (600 seconds — `LISTS`)
+  - **Bypass:** Caching is bypassed entirely when a `search` query parameter is provided.
+  
+  ## Errors
+  
+  | Status                      | Description                                                  |
+  |-----------------------------|--------------------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. invalid `sortBy` or `limit`). |
+  | `401 Unauthorized`          | Missing or invalid Bearer token.                             |
+  | `403 Forbidden`             | Insufficient permissions.                                    |
+  | `500 Internal Server Error` | Unexpected server error.                                     |
+}
