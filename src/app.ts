@@ -7,6 +7,7 @@ import { connectRedis } from "./configs/cache.config.js";
 import { authenticate } from "./middleware/auth.middleware.js";
 import { bullBoardAdapter } from "./configs/bull-board.config.js";
 import { keepEmailAlive, keepRedisAlive } from "./lib/stayalive.js";
+import studentProfileRouter from "./modules/studentprofile/studentprofile.routes.js";
 import carouselRouter from "./modules/clientside/carousels/carousels.routes.js";
 import sendlinksRouter from "./modules/clientside/sendlinks/sendlinks.routes.js";
 import feedbackRouter from "./modules/clientside/feedback/feedback.routes.js";
@@ -97,6 +98,8 @@ app.use("/api/v1/forms/ash", ashRouter);
 app.use("/api/v1/forms/tacots", tacotsRouter);
 app.use("/api/v1/forms/outreaches", outreachRouter);
 app.use("/api/v1/forms/capacity-building", capacityRouter);
+app.use("/api/v1/student-profile", studentProfileRouter);
+
 
 // BULL BOARD DASHBOARD. (ADD AUTH N' AUTH IN PRODUCTION)
 app.use("/api/v1/queues", authenticate(), bullBoardAdapter.getRouter());

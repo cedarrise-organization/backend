@@ -1,12 +1,12 @@
 //ROUTES
 import express from "express";
-import { validateRequest } from "../../middleware/validate.middleware.js";
-import { exampleQuery } from "./lookup.schema.js";
 import {
   ashDropdownController,
   recommendedDropdownController,
   onboardedDropdownController,
   volunteerDropdownController,
+  tacotsProfileDropdownController,
+  ashProfileDropdownController,
 } from "./lookup.controller.js";
 const router = express.Router();
 
@@ -18,5 +18,9 @@ router.get("/tacots-recommended", recommendedDropdownController);
 router.get("/tacots-onboarded", onboardedDropdownController);
 // Searchable list of volunteer records for mentorship assignment
 router.get("/volunteers", volunteerDropdownController);
+// Searchable list of tacots_recommendation records for tacots student profile
+router.get("/tacots-students-profile", tacotsProfileDropdownController);
+// Searchable list of ash_student records for ash student profile
+router.get("/ash-students-profile", ashProfileDropdownController);
 
 export default router;

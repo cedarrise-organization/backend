@@ -1,0 +1,194 @@
+meta {
+  name: GET Ash Student Profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/student-profile/ash/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: a91fe955-0316-43b8-bc0b-0a5c75f589c5
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # GET ASH Student Profile
+
+  Returns the full profile of an ASH student by ID. Aggregates data from `ash_student`, `ash_termly_tracking`, `ash_weekly_attendance`, and `ash_exit` tables.
+
+  ## Authorization
+  Requires authentication and `read` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type     | Required | Description                |
+  |-----------|----------|----------|----------------------------|
+  | `id`      | `string` | Yes      | UUID of the ASH student.   |
+
+  ## Response
+
+  **`200 OK`** — Returns the complete student profile structured as follows:
+
+  ```json
+  {
+    "success": true,
+    "message": "Found Ash Student Profile Successfully",
+    "data": {
+      "student": {
+        "summary": {
+          "id": "uuid",
+          "fullName": "John Doe",
+          "passportPhotoUrl": "https://...",
+          "status": "accepted",
+          "programType": "ASH",
+          "currentClass": "JSS 2",
+          "assignedMentor": "Jane Smith",
+          "enrolledAt": "2024-01-15T00:00:00.000Z"
+        },
+
+        "profile": {
+          "passportPhotoUrl": "https://...",
+          "fullName": "John Doe",
+          "age": 12,
+          "dateOfBirth": "2012-05-20",
+          "gender": "Male",
+          "primaryLanguage": "English",
+          "phone": "08012345678",
+          "homeAddress": "123 Main St",
+          "status": "accepted",
+          "programType": "ASH",
+          "assignedMentor": "Jane Smith",
+          "enrolledAt": "2024-01-15T00:00:00.000Z"
+        },
+
+        "school": {
+          "name": "Greenfield Academy",
+          "town": "Ikeja",
+          "lga": "Ikeja",
+          "state": "Lagos",
+          "currentClass": "JSS 2"
+        },
+
+        "family": {
+          "father": { "name": "...", "phone": "...", "occupation": "..." },
+          "mother": { "name": "...", "phone": "...", "occupation": "..." },
+          "guardian": { "name": "...", "relationship": "...", "phone": "...", "occupation": "..." },
+          "householdIncomeRange": "50000-100000"
+        },
+
+        "background": {
+          "previousAfterschoolProgram": "None",
+          "reasonForJoining": "...",
+          "hasLearningCondition": "No",
+          "learningConditions": []
+        },
+
+        "documents": {
+          "parentSignatureUrl": "https://..."
+        },
+
+        "compliance": {
+          "parentConsent": true,
+          "declarationConfirmed": true
+        },
+
+        "academicPerformance": {
+          "current": {
+            "schoolAverage": 75.5,
+            "pretestAverage": 60.0,
+            "midtestAverage": 70.0,
+            "posttestAverage": 80.0
+          },
+          "history": [
+            {
+              "id": "uuid",
+              "academicSession": "2023/2024",
+              "term": "First Term",
+              "school": {
+                "name": "...",
+                "numeracyScore": 70,
+                "literacyScore": 80,
+                "average": 75,
+                "position": "3rd"
+              },
+              "assessments": {
+                "pretest": { "numeracyScore": 60, "literacyScore": 65, "average": 62.5 },
+                "midtest": { "numeracyScore": 70, "literacyScore": 75, "average": 72.5 },
+                "posttest": { "numeracyScore": 80, "literacyScore": 85, "average": 82.5 }
+              },
+              "development": {
+                "disciplineRating": 4,
+                "responsibilityRating": 3,
+                "leadershipRating": 4
+              },
+              "notableAchievements": "...",
+              "challengesObserved": "...",
+              "nextTermRecommendations": "...",
+              "mentorName": "Jane Smith",
+              "resultUrl": "https://..."
+            }
+          ]
+        },
+
+        "attendance": {
+          "totalSessions": 20,
+          "sessionsAttended": 18,
+          "attendanceRate": 90,
+          "totalMentorshipSessions": 20,
+          "mentorshipSessionsAttended": 15,
+          "mentorshipRate": 75,
+          "history": [
+            {
+              "sessionDate": "2024-03-15",
+              "attended": true,
+              "mentored": false
+            }
+          ]
+        },
+
+        "exit": {
+          "exists": false,
+          "exitDate": null,
+          "ageAtExit": null,
+          "schoolName": null,
+          "classAtExit": null,
+          "durationInProgram": null,
+          "exitReason": null,
+          "academicImpact": { "rating": null, "areasOfImprovement": null },
+          "mentorship": { "received": null, "impactRating": null },
+          "postAshStatus": { "status": null, "institutionName": null, "courseOfStudy": null, "vocationalSkill": null },
+          "feedback": { "enjoyedMost": null, "programImpact": null, "improvementSuggestions": null },
+          "facilitatorName": null
+        }
+      }
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+
+  ## Caching
+  Response is cached under `cedarrise:ashstudentprofile:{id}` with `USERS` TTL (30 mins).
+
+  ## Errors
+
+  | Status                      | Description                        |
+  |-----------------------------|------------------------------------|
+  | `401 Unauthorized`          | Missing or invalid auth token.     |
+  | `403 Forbidden`             | User lacks `read` permission.      |
+  | `404 Not Found`             | No student found with given ID.    |
+  | `500 Internal Server Error` | Unexpected server error.           |
+}

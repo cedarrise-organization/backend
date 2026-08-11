@@ -1,0 +1,61 @@
+meta {
+  name: List ASH Students for Profile dropdown
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/lookup/ash-students-profile
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List ASH Students for Profile Dropdown
+
+  Returns a lightweight list of accepted ASH students for use in student profile dropdown/select components. Queries `ash_student` with a left join on `ash_exit`, filtered to only accepted students. Each entry contains the student `id`, `name` (first name + surname), and `status`.
+
+  ## Authorization
+  No authentication required. This is a public lookup endpoint.
+
+  ## Response
+
+  **`200 OK`** — Returns an array of `{ id, name, status }` objects for accepted ASH students.
+
+  ```json
+  {
+    "success": true,
+    "message": "students found successfully",
+    "data": [
+      { "id": "uuid", "name": "John Doe", "status": "accepted" }
+    ],
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+
+  | Field    | Type     | Description                                              |
+  |----------|----------|----------------------------------------------------------|
+  | `id`     | `string` | The ASH student record UUID.                             |
+  | `name`   | `string` | Full name (first name + surname) from ash_student.       |
+  | `status` | `string` | Student status (always "accepted" for this endpoint).    |
+
+  ## Caching
+  Response is cached under `cedarrise:lookup:ashstudents` with `LISTS` TTL (10 mins).
+
+  ## Errors
+
+  | Status                      | Description              |
+  |-----------------------------|--------------------------|
+  | `500 Internal Server Error` | Unexpected server error. |
+}

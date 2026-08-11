@@ -1,0 +1,61 @@
+meta {
+  name: List TACOTS Students for Profile dropdown
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/lookup/tacots-students-profile
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List TACOTS Students for Profile Dropdown
+
+  Returns a lightweight list of TACOTS students who have been onboarded and have `SELECTED` admin status, for use in student profile dropdown/select components. Joins `tacots_onboarding` with `tacots_recommendation` (inner join on `SELECTED` status) and left joins `tacots_exit`. Each entry contains the student `id` (from `tacots_recommendation`), `name` (first name + surname), and `status`.
+
+  ## Authorization
+  No authentication required. This is a public lookup endpoint.
+
+  ## Response
+
+  **`200 OK`** — Returns an array of `{ id, name, status }` objects.
+
+  ```json
+  {
+    "success": true,
+    "message": "students found successfully",
+    "data": [
+      { "id": "uuid", "name": "Jane Doe", "status": "SELECTED" }
+    ],
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+
+  | Field    | Type     | Description                                                        |
+  |----------|----------|--------------------------------------------------------------------|
+  | `id`     | `string` | The recommendation record UUID (used as student profile ID).       |
+  | `name`   | `string` | Full name (first name + surname) from the recommendation record.   |
+  | `status` | `string` | The admin status from the recommendation record (always SELECTED). |
+
+  ## Caching
+  Response is cached under `cedarrise:lookup:tacotsstudents` with `LISTS` TTL (10 mins).
+
+  ## Errors
+
+  | Status                      | Description              |
+  |-----------------------------|--------------------------|
+  | `500 Internal Server Error` | Unexpected server error. |
+}

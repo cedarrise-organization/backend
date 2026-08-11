@@ -190,4 +190,98 @@ export const volunteerDropdown = async () => {
   };
 };
 
+// FOR ASH STUDENT PROFILE
+export const ashProfileDropdown = async () => {
+  /// cache
+  const key = `cedarrise:lookup:ashstudents`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "students found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const students = await db
+    .select({
+      id: ashStudent.id,
+      firstName: ashStudent.firstName,
+      surname: ashStudent.surname,
+      status: ashStudent.status,
+    })
+    .from(ashStudent)
+    .leftJoin(ashExit, eq(ashExit.studentId, ashStudent.id))
+    .where(eq(ashStudent.status, "accepted"));
+
+  const returnStudents = students.map((student) => {
+    return {
+      id: student.id,
+      name: `${student.firstName} ${student.surname}`,
+      status: student.status,
+    };
+  });
+
+  /// cache set
+  await cacheSet(key, returnStudents, CACHE_TTL.LISTS);
+  ///
+
+  return {
+    code: 200,
+    message: "students found successfully",
+    data: returnStudents,
+  };
+};
+
+// FOR TACOTS STUDENT PROFILE
+export const tacotsProfileDropdown = async () => {
+  /// cache
+  const key = `cedarrise:lookup:tacotsstudents`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "students found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const students = await db
+    .select({
+      id: tacotsRecommendation.id,
+      firstName: tacotsRecommendation.firstName,
+      surname: tacotsRecommendation.surname,
+      status: tacotsRecommendation.adminStatus,
+    })
+    .from(tacotsOnboarding)
+    .innerJoin(
+      tacotsRecommendation,
+      and(
+        eq(tacotsRecommendation.id, tacotsOnboarding.studentId),
+        eq(tacotsRecommendation.adminStatus, "SELECTED"),
+      ),
+    )
+    .leftJoin(tacotsExit, eq(tacotsExit.studentId, tacotsOnboarding.id));
+
+  const returnStudents = students.map((student) => {
+    return {
+      id: student.id,
+      name: `${student.firstName} ${student.surname}`,
+      status: student.status,
+    };
+  });
+
+  /// cache set
+  await cacheSet(key, returnStudents, CACHE_TTL.LISTS);
+  ///
+
+  return {
+    code: 200,
+    message: "students found successfully",
+    data: returnStudents,
+  };
+};
+
 export const example = async () => {};
