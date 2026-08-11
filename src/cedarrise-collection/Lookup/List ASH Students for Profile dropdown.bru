@@ -5,9 +5,16 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/lookup/ash-students-profile
+  url: {{baseUrl}}/api/v1/lookup/ash-students-profile?page=1&limit=10&orderBy=asc&search=
   body: none
-  auth: none
+  auth: inherit
+}
+
+params:query {
+  page: 1
+  limit: 10
+  orderBy: asc
+  search: 
 }
 
 vars:pre-request {
@@ -21,41 +28,56 @@ settings {
 
 docs {
   # List ASH Students for Profile Dropdown
-
-  Returns a lightweight list of accepted ASH students for use in student profile dropdown/select components. Queries `ash_student` with a left join on `ash_exit`, filtered to only accepted students. Each entry contains the student `id`, `name` (first name + surname), and `status`.
-
+  
+  Returns a paginated, searchable list of accepted ASH students for use in student profile components. Queries `ash_student` with a left join on `ash_exit`, filtered to only accepted students. Each entry contains the student `id` and `name` (first name + surname).
+  
   ## Authorization
-  No authentication required. This is a public lookup endpoint.
-
+  Requires authentication and `read` permission.
+  
+  ## Query Parameters
+  
+  | Parameter | Type     | Required | Default | Description                                         |
+  |-----------|----------|----------|---------|-----------------------------------------------------|
+  | `page`    | `number` | No       | `1`     | Page number for pagination.                         |
+  | `limit`   | `number` | No       | `10`    | Number of results per page.                         |
+  | `orderBy` | `string` | No       | `asc`   | Sort direction by first name (`asc` or `desc`).     |
+  | `search`  | `string` | No       | —       | Full-text search on first name and surname. Bypasses cache when provided. |
+  
   ## Response
-
-  **`200 OK`** — Returns an array of `{ id, name, status }` objects for accepted ASH students.
-
+  
+  **`200 OK`** — Returns an array of `{ id, name }` objects for accepted ASH students with pagination metadata.
+  
   ```json
   {
     "success": true,
     "message": "students found successfully",
     "data": [
-      { "id": "uuid", "name": "John Doe", "status": "accepted" }
+      { "id": "uuid", "name": "John Doe" }
     ],
     "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 10,
+        "totalPages": 3
+      },
       "correlationId": "uuid-v4-string"
     }
   }
   ```
-
-  | Field    | Type     | Description                                              |
-  |----------|----------|----------------------------------------------------------|
-  | `id`     | `string` | The ASH student record UUID.                             |
-  | `name`   | `string` | Full name (first name + surname) from ash_student.       |
-  | `status` | `string` | Student status (always "accepted" for this endpoint).    |
-
+  
+  | Field  | Type     | Description                                        |
+  |--------|----------|----------------------------------------------------|
+  | `id`   | `string` | The ASH student record UUID.                       |
+  | `name` | `string` | Full name (first name + surname) from ash_student. |
+  
   ## Caching
-  Response is cached under `cedarrise:lookup:ashstudents` with `LISTS` TTL (10 mins).
-
+  Response is cached under `cedarrise:lookup:ashstudents:{page}:{limit}:{orderBy}` with `STUDENT_PROFILE` TTL (5 mins). Cache is bypassed when `search` is provided.
+  
   ## Errors
-
-  | Status                      | Description              |
-  |-----------------------------|--------------------------|
-  | `500 Internal Server Error` | Unexpected server error. |
+  
+  | Status                      | Description                    |
+  |-----------------------------|--------------------------------|
+  | `401 Unauthorized`          | Missing or invalid auth token. |
+  | `403 Forbidden`             | User lacks `read` permission.  |
+  | `500 Internal Server Error` | Unexpected server error.       |
 }

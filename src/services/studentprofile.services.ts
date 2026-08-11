@@ -47,7 +47,7 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
         status: ashStudent.status,
         programType: ashStudent.programType,
         assignedMentor: ashStudent.assignedMentor,
-        enrolledAt: ashStudent.createdAt,
+        // enrolledAt: ashStudent.createdAt,
         // school
         schoolName: ashStudent.schoolName,
         schoolTown: ashStudent.schoolTown,
@@ -270,7 +270,7 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
       programType: p.programType,
       currentClass: p.currentClass,
       assignedMentor: p.assignedMentor,
-      enrolledAt: p.enrolledAt,
+      // enrolledAt: p.enrolledAt,
     },
     profile: {
       passportPhotoUrl: p.passportPhotoUrl,
@@ -284,7 +284,7 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
       status: p.status,
       programType: p.programType,
       assignedMentor: p.assignedMentor,
-      enrolledAt: p.enrolledAt,
+      // enrolledAt: p.enrolledAt,
     },
     school: {
       name: p.schoolName,
@@ -342,7 +342,7 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
   };
 
   ///
-  await cacheSet(key, student, CACHE_TTL.USERS);
+  await cacheSet(key, student, CACHE_TTL.STUDENT_PROFILE);
   ///
 
   return {
@@ -924,7 +924,7 @@ export const tacotsStudentProfile = async (id: string, correlationId: string) =>
   };
 
   ///
-  await cacheSet(key, student, CACHE_TTL.USERS);
+  await cacheSet(key, student, CACHE_TTL.STUDENT_PROFILE);
   ///
 
   return {

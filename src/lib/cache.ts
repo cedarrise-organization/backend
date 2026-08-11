@@ -10,6 +10,7 @@ export const CACHE_TTL = {
   LISTS: 600, // 10 mins
   DASHBOARD_CARDS: 3600, // 1 hr
   USERS: 1800, // 30 mins
+  STUDENT_PROFILE: 300, // 5 mins
   /*
     ...other TTLs
     */

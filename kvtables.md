@@ -29,6 +29,7 @@
 | LISTS           | 600 (10 mins)   | `lib/cache.ts` |
 | DASHBOARD_CARDS | 3600s (1 hr)    | `lib/cache.ts` |
 | USERS           | 1800 (30 mins)  | `lib/cache.ts` |
+| STUDENT_PROFILE | 300 (5 mins)    | `lib/cache.ts` |
 
 ---
 
@@ -80,8 +81,8 @@
 | `cedarrise:lookup:recommended`                                                     | Cached lightweight list of SELECTED TACOTS recommendations (id + name) for dropdown. Set on read.                                                                      | `services/lookup.services.ts`               |
 | `cedarrise:lookup:onboarded`                                                       | Cached lightweight list of TACOTS onboarded students (id + name) for dropdown. Set on read.                                                                            | `services/lookup.services.ts`               |
 | `cedarrise:lookup:volunteers`                                                      | Cached lightweight list of accepted volunteers (id + name) for dropdown. Set on read.                                                                                  | `services/lookup.services.ts`               |
-| `cedarrise:lookup:ashstudents`                                                     | Cached lightweight list of accepted ASH students (id + name + status) for student profile dropdown. Set on read.                                                       | `services/lookup.services.ts`               |
-| `cedarrise:lookup:tacotsstudents`                                                  | Cached lightweight list of SELECTED TACOTS students (id + name + status) for student profile dropdown. Set on read.                                                    | `services/lookup.services.ts`               |
+| `cedarrise:lookup:ashstudents:{page}:{limit}:{orderBy}`                            | Cached paginated list of accepted ASH students (id + name) for student profile dropdown. Set on read, bypassed on search.                                              | `services/lookup.services.ts`               |
+| `cedarrise:lookup:tacotsstudents:{page}:{limit}:{orderBy}`                         | Cached paginated list of SELECTED TACOTS students (id + name) for student profile dropdown. Set on read, bypassed on search.                                           | `services/lookup.services.ts`               |
 | `cedarrise:lookup:userroles:{userId}`                                                       | Cached list of roles assigned to a user (id, name, description, isDefault). Set on read.                                                                               | `services/admin.services.ts`                |
 | `cedarrise:lookup:users`                                                           | Cached lightweight list of all users (id, name, email, department). Set on read.                                                                                       | `services/admin.services.ts`                |
 | `cedarrise:lookup:users:{page}:{limit}`                                            | Cached paginated users list (ordered by name ascending). Set on read, bypassed on search.                                                                              | `services/admin.services.ts`                |

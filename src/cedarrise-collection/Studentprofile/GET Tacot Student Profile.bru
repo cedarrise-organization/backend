@@ -11,7 +11,7 @@ get {
 }
 
 params:path {
-  id: a91fe955-0316-43b8-bc0b-0a5c75f589c5
+  id: f266100b-1510-4793-8531-474023964bb1
 }
 
 vars:pre-request {
@@ -25,22 +25,22 @@ settings {
 
 docs {
   # GET TACOTS Student Profile
-
+  
   Returns the full profile of a TACOTS student by recommendation ID. Aggregates data from `tacots_recommendation`, `tacots_onboarding`, `tacots_tracking`, and `tacots_exit` tables. Tracking and exit queries use the onboarding ID (since both tables reference `tacots_onboarding.id`).
-
+  
   ## Authorization
   Requires authentication and `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type     | Required | Description                                    |
   |-----------|----------|----------|------------------------------------------------|
   | `id`      | `string` | Yes      | UUID of the TACOTS recommendation record.      |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete student profile structured as follows:
-
+  
   ```json
   {
     "success": true,
@@ -63,7 +63,7 @@ docs {
           "hasExited": false,
           "currentProgramStatus": "SELECTED"
         },
-
+  
         "profile": {
           "id": "uuid",
           "passportPhotoUrl": "https://...",
@@ -81,7 +81,7 @@ docs {
           "lga": "Ikeja",
           "homeAddress": "123 Main St"
         },
-
+  
         "family": {
           "parents": {
             "father": { "name": "...", "occupation": "...", "phone": "..." },
@@ -109,7 +109,7 @@ docs {
             "specialCircumstances": "None"
           }
         },
-
+  
         "education": {
           "previous": {
             "schoolName": "Old School",
@@ -130,14 +130,14 @@ docs {
             "schoolFeesPerTerm": 50000
           }
         },
-
+  
         "religiousBackground": {
           "religion": "Christianity",
           "catholicSacraments": ["Baptism", "Communion"],
           "parishAttended": "St. Mary's",
           "diocese": "Lagos"
         },
-
+  
         "recommendation": {
           "recommender": {
             "firstName": "Rev",
@@ -153,7 +153,7 @@ docs {
           "careerGoal": "Doctor",
           "studentStatement": "..."
         },
-
+  
         "onboarding": {
           "onboardingDate": "2024-01-15",
           "wellbeing": {
@@ -203,7 +203,7 @@ docs {
             "additionalInfo": null
           }
         },
-
+  
         "academicProgress": {
           "current": {
             "academicSession": "2023/2024",
@@ -261,7 +261,7 @@ docs {
             }
           ]
         },
-
+  
         "mentorship": {
           "latest": {
             "mentorName": "Jane Smith",
@@ -280,7 +280,7 @@ docs {
             }
           ]
         },
-
+  
         "serviceEngagement": {
           "totalActivities": 3,
           "totalDuration": 6,
@@ -294,7 +294,7 @@ docs {
             }
           ]
         },
-
+  
         "financialSupport": {
           "totalTuitionPaid": 150000,
           "totalResourcesSpent": 30000,
@@ -314,20 +314,20 @@ docs {
             }
           ]
         },
-
+  
         "documents": {
           "passportPhotoUrl": "https://...",
           "lastResultUrl": "https://...",
           "parentSignatureUrl": "https://...",
           "admissionLetterUrl": "https://..."
         },
-
+  
         "commitments": {
           "studentCommitment": true,
           "parentGuardianCommitment": true,
           "declarationConfirmed": true
         },
-
+  
         "exit": {
           "exitDate": null,
           "schoolAttendedDuringProgram": null,
@@ -359,12 +359,12 @@ docs {
     }
   }
   ```
-
+  
   ## Caching
   Response is cached under `cedarrise:tacotsstudentprofile:{id}` with `USERS` TTL (30 mins).
-
+  
   ## Errors
-
+  
   | Status                      | Description                        |
   |-----------------------------|------------------------------------|
   | `401 Unauthorized`          | Missing or invalid auth token.     |

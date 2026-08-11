@@ -5,9 +5,16 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/v1/lookup/tacots-students-profile
+  url: {{baseUrl}}/api/v1/lookup/tacots-students-profile?page=1&limit=10&orderBy=asc&search=
   body: none
-  auth: none
+  auth: inherit
+}
+
+params:query {
+  page: 1
+  limit: 10
+  orderBy: asc
+  search: 
 }
 
 vars:pre-request {
@@ -21,41 +28,56 @@ settings {
 
 docs {
   # List TACOTS Students for Profile Dropdown
-
-  Returns a lightweight list of TACOTS students who have been onboarded and have `SELECTED` admin status, for use in student profile dropdown/select components. Joins `tacots_onboarding` with `tacots_recommendation` (inner join on `SELECTED` status) and left joins `tacots_exit`. Each entry contains the student `id` (from `tacots_recommendation`), `name` (first name + surname), and `status`.
-
+  
+  Returns a paginated, searchable list of TACOTS students who have been onboarded and have `SELECTED` admin status, for use in student profile components. Joins `tacots_onboarding` with `tacots_recommendation` (inner join on `SELECTED` status) and left joins `tacots_exit`. Each entry contains the student `id` (from `tacots_recommendation`) and `name` (first name + surname).
+  
   ## Authorization
-  No authentication required. This is a public lookup endpoint.
-
+  Requires authentication and `read` permission.
+  
+  ## Query Parameters
+  
+  | Parameter | Type     | Required | Default | Description                                         |
+  |-----------|----------|----------|---------|-----------------------------------------------------|
+  | `page`    | `number` | No       | `1`     | Page number for pagination.                         |
+  | `limit`   | `number` | No       | `10`    | Number of results per page.                         |
+  | `orderBy` | `string` | No       | `asc`   | Sort direction by first name (`asc` or `desc`).     |
+  | `search`  | `string` | No       | —       | Full-text search on first name and surname. Bypasses cache when provided. |
+  
   ## Response
-
-  **`200 OK`** — Returns an array of `{ id, name, status }` objects.
-
+  
+  **`200 OK`** — Returns an array of `{ id, name }` objects with pagination metadata.
+  
   ```json
   {
     "success": true,
     "message": "students found successfully",
     "data": [
-      { "id": "uuid", "name": "Jane Doe", "status": "SELECTED" }
+      { "id": "uuid", "name": "Jane Doe" }
     ],
     "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 10,
+        "totalPages": 2
+      },
       "correlationId": "uuid-v4-string"
     }
   }
   ```
-
-  | Field    | Type     | Description                                                        |
-  |----------|----------|--------------------------------------------------------------------|
-  | `id`     | `string` | The recommendation record UUID (used as student profile ID).       |
-  | `name`   | `string` | Full name (first name + surname) from the recommendation record.   |
-  | `status` | `string` | The admin status from the recommendation record (always SELECTED). |
-
+  
+  | Field  | Type     | Description                                                      |
+  |--------|----------|------------------------------------------------------------------|
+  | `id`   | `string` | The recommendation record UUID (used as student profile ID).     |
+  | `name` | `string` | Full name (first name + surname) from the recommendation record. |
+  
   ## Caching
-  Response is cached under `cedarrise:lookup:tacotsstudents` with `LISTS` TTL (10 mins).
-
+  Response is cached under `cedarrise:lookup:tacotsstudents:{page}:{limit}:{orderBy}` with `STUDENT_PROFILE` TTL (5 mins). Cache is bypassed when `search` is provided.
+  
   ## Errors
-
-  | Status                      | Description              |
-  |-----------------------------|--------------------------|
-  | `500 Internal Server Error` | Unexpected server error. |
+  
+  | Status                      | Description                    |
+  |-----------------------------|--------------------------------|
+  | `401 Unauthorized`          | Missing or invalid auth token. |
+  | `403 Forbidden`             | User lacks `read` permission.  |
+  | `500 Internal Server Error` | Unexpected server error.       |
 }

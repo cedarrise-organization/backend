@@ -71,11 +71,10 @@ export const tacotsProfileDropdownController = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const { page, limit, orderBy, search } = req.qtransformed;
   try {
-    const response = await tacotsProfileDropdown();
-    return successResponse(res, response.code, response.message, response.data, {
-      correlationId: (req as any).correlationId,
-    });
+    const response = await tacotsProfileDropdown(page, limit, orderBy, search, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }
@@ -86,11 +85,10 @@ export const ashProfileDropdownController = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const { page, limit, orderBy, search } = req.qtransformed;
   try {
-    const response = await ashProfileDropdown();
-    return successResponse(res, response.code, response.message, response.data, {
-      correlationId: (req as any).correlationId,
-    });
+    const response = await ashProfileDropdown(page, limit, orderBy, search, (req as any).correlationId);
+    return successResponse(res, response.code, response.message, response.data, response.meta);
   } catch (err) {
     next(err);
   }

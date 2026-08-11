@@ -11,7 +11,7 @@ get {
 }
 
 params:path {
-  id: a91fe955-0316-43b8-bc0b-0a5c75f589c5
+  id: 51fad3c9-130e-4d4a-9f9b-5db88ec4cd15
 }
 
 vars:pre-request {
@@ -25,22 +25,22 @@ settings {
 
 docs {
   # GET ASH Student Profile
-
+  
   Returns the full profile of an ASH student by ID. Aggregates data from `ash_student`, `ash_termly_tracking`, `ash_weekly_attendance`, and `ash_exit` tables.
-
+  
   ## Authorization
   Requires authentication and `read` permission.
-
+  
   ## Path Parameters
-
+  
   | Parameter | Type     | Required | Description                |
   |-----------|----------|----------|----------------------------|
   | `id`      | `string` | Yes      | UUID of the ASH student.   |
-
+  
   ## Response
-
+  
   **`200 OK`** — Returns the complete student profile structured as follows:
-
+  
   ```json
   {
     "success": true,
@@ -54,10 +54,9 @@ docs {
           "status": "accepted",
           "programType": "ASH",
           "currentClass": "JSS 2",
-          "assignedMentor": "Jane Smith",
-          "enrolledAt": "2024-01-15T00:00:00.000Z"
+          "assignedMentor": "Jane Smith"
         },
-
+  
         "profile": {
           "passportPhotoUrl": "https://...",
           "fullName": "John Doe",
@@ -69,10 +68,9 @@ docs {
           "homeAddress": "123 Main St",
           "status": "accepted",
           "programType": "ASH",
-          "assignedMentor": "Jane Smith",
-          "enrolledAt": "2024-01-15T00:00:00.000Z"
+          "assignedMentor": "Jane Smith"
         },
-
+  
         "school": {
           "name": "Greenfield Academy",
           "town": "Ikeja",
@@ -80,30 +78,30 @@ docs {
           "state": "Lagos",
           "currentClass": "JSS 2"
         },
-
+  
         "family": {
           "father": { "name": "...", "phone": "...", "occupation": "..." },
           "mother": { "name": "...", "phone": "...", "occupation": "..." },
           "guardian": { "name": "...", "relationship": "...", "phone": "...", "occupation": "..." },
           "householdIncomeRange": "50000-100000"
         },
-
+  
         "background": {
           "previousAfterschoolProgram": "None",
           "reasonForJoining": "...",
           "hasLearningCondition": "No",
           "learningConditions": []
         },
-
+  
         "documents": {
           "parentSignatureUrl": "https://..."
         },
-
+  
         "compliance": {
           "parentConsent": true,
           "declarationConfirmed": true
         },
-
+  
         "academicPerformance": {
           "current": {
             "schoolAverage": 75.5,
@@ -141,7 +139,7 @@ docs {
             }
           ]
         },
-
+  
         "attendance": {
           "totalSessions": 20,
           "sessionsAttended": 18,
@@ -157,7 +155,7 @@ docs {
             }
           ]
         },
-
+  
         "exit": {
           "exists": false,
           "exitDate": null,
@@ -179,12 +177,12 @@ docs {
     }
   }
   ```
-
+  
   ## Caching
   Response is cached under `cedarrise:ashstudentprofile:{id}` with `USERS` TTL (30 mins).
-
+  
   ## Errors
-
+  
   | Status                      | Description                        |
   |-----------------------------|------------------------------------|
   | `401 Unauthorized`          | Missing or invalid auth token.     |

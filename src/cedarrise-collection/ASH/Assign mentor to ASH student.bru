@@ -10,15 +10,7 @@ patch {
   auth: inherit
 }
 
-params:query {
-  : 
-}
-
 body:form-urlencoded {
-  mentor: Sampson
-}
-
-body:multipart-form {
   mentor: Sampson
 }
 
@@ -30,4 +22,62 @@ vars:pre-request {
 settings {
   encodeUrl: true
   timeout: 0
+}
+
+docs {
+  # Assign Mentor to ASH Student
+
+  Assigns a mentor to an ASH student registration record by updating the `assignedMentor` field. On success, all ASH student cache entries (single records and paginated lists matching `cedarrise:ash:ashStudents:*`) are invalidated.
+
+  ## Authorization
+  Requires `update` permission.
+
+  ## Path Parameters
+
+  | Parameter | Type     | Required | Description                    |
+  |-----------|----------|----------|--------------------------------|
+  | `id`      | `string` | Yes      | UUID of the ASH student record.|
+
+  ## Request Body (`form-urlencoded`)
+
+  | Field    | Type     | Required | Validation    | Description                      |
+  |----------|----------|----------|---------------|----------------------------------|
+  | `mentor` | `string` | Yes      | Min 3 chars   | Full name of the mentor to assign.|
+
+  ## Response
+
+  **`200 OK`** — Returns the updated student record with `id`, `status`, and `assignedMentor`.
+
+  ```json
+  {
+    "success": true,
+    "message": "Mentor assigned to Ash student successfully",
+    "data": {
+      "id": "uuid",
+      "status": "accepted",
+      "assignedMentor": "Sampson"
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+
+  | Field            | Type     | Description                                    |
+  |------------------|--------|--------------------------------------------------|
+  | `id`             | `string` | UUID of the updated ASH student record.        |
+  | `status`         | `string` | Current admin status of the student.           |
+  | `assignedMentor` | `string` | Name of the newly assigned mentor.             |
+
+  ## Side Effects
+  - Emits `ASH_EVENTS.DELETE_CACHE` to invalidate pattern `cedarrise:ash:ashStudents:*`.
+
+  ## Errors
+
+  | Status                      | Description                                              |
+  |-----------------------------|----------------------------------------------------------|
+  | `400 Bad Request`           | Invalid `id` format or `mentor` missing/too short.       |
+  | `401 Unauthorized`          | Missing or invalid authentication token.                 |
+  | `403 Forbidden`             | User does not have `update` permission.                  |
+  | `500 Internal Server Error` | Unexpected server error.                                 |
 }
