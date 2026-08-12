@@ -11,13 +11,13 @@ const router = express.Router();
 
 router.post(
   "/initiatives",
-  /*sendLinksLimiter,*/
+  sendLinksLimiter,
   validateRequest(sendLinkEmailSchema),
   sendLinkEmailController,
 );
 router.post(
   "/partners",
-  /*sendLinksLimiter,*/
+  sendLinksLimiter,
   validateRequest(sendPWSEmailSchema),
   sendPartnerWithUsEmailController,
 );

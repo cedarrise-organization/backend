@@ -58,7 +58,7 @@ const router = express.Router();
 // Submit ASH Student Registration
 router.post(
   "/registration",
-  /*formUploadLimiter,*/
+  formUploadLimiter,
   upload.fields([
     { name: "passportPhoto", maxCount: 1 },
     { name: "lastResult", maxCount: 1 },
@@ -113,7 +113,7 @@ router.get("/download/ashstudent", authenticate(), authorize("read"), exportAshS
 // Submit ASH Program Feedback
 router.post(
   "/feedback",
-  /*formUploadLimiter,*/
+  formUploadLimiter,
   validateRequest(createAshProgramFeedbackSchema),
   submitFeedbackController,
 );

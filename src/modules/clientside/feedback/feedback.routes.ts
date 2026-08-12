@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post(
   "/home",
-  /*formUploadLimiter,*/ 
+  formUploadLimiter,
   validateRequest(homeFeedbackSchema),
   sendFeedbackMailController,
 );
