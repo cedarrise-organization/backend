@@ -266,8 +266,8 @@ export const ashProfileDropdown = async (
         surname: ashStudent.surname,
       })
       .from(ashStudent)
-      .orderBy(sortDirection(ashStudent.firstName))
       .leftJoin(ashExit, eq(ashExit.studentId, ashStudent.id))
+      .orderBy(sql`CASE WHEN ${ashExit.studentId} IS NULL THEN 0 ELSE  1 END`, sortDirection(ashStudent.firstName))
       .where(eq(ashStudent.status, "accepted"))
       .limit(limit)
       .offset((page - 1) * limit),
@@ -395,7 +395,6 @@ export const tacotsProfileDropdown = async (
         surname: tacotsRecommendation.surname,
       })
       .from(tacotsOnboarding)
-      .orderBy(sortDirection(tacotsRecommendation.firstName))
       .innerJoin(
         tacotsRecommendation,
         and(
@@ -404,6 +403,7 @@ export const tacotsProfileDropdown = async (
         ),
       )
       .leftJoin(tacotsExit, eq(tacotsExit.studentId, tacotsOnboarding.id))
+      .orderBy(sql`CASE WHEN ${tacotsExit.studentId} IS NULL THEN 0 ELSE  1 END`, sortDirection(tacotsRecommendation.firstName))
       .limit(limit)
       .offset((page - 1) * limit),
     db
