@@ -72,7 +72,12 @@ export const login = async (
   return {
     code: 201,
     message: "User logged in successfully",
-    data: user,
+    data: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      department: user.department,
+    },
     meta: {
       accessToken,
       refreshToken,

@@ -72,7 +72,7 @@ export const ashStudentBody = z.object({
   guardianOccupation: optionalTextSchema,
 
   householdIncomeRange: z.preprocess(
-    (v) => (v === "" ? undefined : v),
+    (v) => (v === "" || v === "undefined" ? undefined : v),
     z.enum(["NO STABLE INCOME", "< ₦100K", "₦100K-₦300K", "₦300K-₦600K", "₦600K-₦1M"]).optional(),
   ),
   hasLearningCondition: z.enum(["NO", "YES", "NOT SURE"]),

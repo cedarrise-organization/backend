@@ -48,8 +48,8 @@ export const authLimiter = createLimiter({
 // Client-side form submission endpoints: keyed by IP (user isn't an authenticated admin)
 export const formUploadLimiter = createLimiter({
 	windowMs: 15 * 60 * 1000, // 15 mins
-	limit: 3,
-	message: `Too many submission attempts. Please try again later`,
+	limit: 4,
+	message: `Too many submission attempts. Please try again in 15 mins`,
 	keyGenerator: (req: Request) => ipKeyGenerator(req.ip!) || "anonymous",
 });
 
