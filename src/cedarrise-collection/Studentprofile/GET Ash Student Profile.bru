@@ -11,7 +11,7 @@ get {
 }
 
 params:path {
-  id: 51fad3c9-130e-4d4a-9f9b-5db88ec4cd15
+  id: 27c7dcf2-3a44-465e-961d-7eaaef0fb71e
 }
 
 vars:pre-request {
@@ -46,130 +46,128 @@ docs {
     "success": true,
     "message": "Found Ash Student Profile Successfully",
     "data": {
-      "student": {
-        "summary": {
-          "id": "uuid",
-          "fullName": "John Doe",
-          "passportPhotoUrl": "https://...",
-          "status": "accepted",
-          "programType": "ASH",
-          "currentClass": "JSS 2",
-          "assignedMentor": "Jane Smith"
+      "summary": {
+        "id": "uuid",
+        "fullName": "John Doe",
+        "passportPhotoUrl": "https://...",
+        "status": "accepted",
+        "programType": "ASH",
+        "currentClass": "JSS 2",
+        "assignedMentor": "Jane Smith"
+      },
+
+      "profile": {
+        "passportPhotoUrl": "https://...",
+        "fullName": "John Doe",
+        "age": 12,
+        "dateOfBirth": "2012-05-20",
+        "gender": "Male",
+        "primaryLanguage": "English",
+        "phone": "08012345678",
+        "homeAddress": "123 Main St",
+        "status": "accepted",
+        "programType": "ASH",
+        "assignedMentor": "Jane Smith"
+      },
+
+      "school": {
+        "name": "Greenfield Academy",
+        "town": "Ikeja",
+        "lga": "Ikeja",
+        "state": "Lagos",
+        "currentClass": "JSS 2"
+      },
+
+      "family": {
+        "father": { "name": "...", "phone": "...", "occupation": "..." },
+        "mother": { "name": "...", "phone": "...", "occupation": "..." },
+        "guardian": { "name": "...", "relationship": "...", "phone": "...", "occupation": "..." },
+        "householdIncomeRange": "50000-100000"
+      },
+
+      "background": {
+        "previousAfterschoolProgram": "None",
+        "reasonForJoining": "...",
+        "hasLearningCondition": "No",
+        "learningConditions": []
+      },
+
+      "documents": {
+        "parentSignatureUrl": "https://..."
+      },
+
+      "compliance": {
+        "parentConsent": true,
+        "declarationConfirmed": true
+      },
+
+      "academicPerformance": {
+        "current": {
+          "schoolAverage": 75.5,
+          "pretestAverage": 60.0,
+          "midtestAverage": 70.0,
+          "posttestAverage": 80.0
         },
-  
-        "profile": {
-          "passportPhotoUrl": "https://...",
-          "fullName": "John Doe",
-          "age": 12,
-          "dateOfBirth": "2012-05-20",
-          "gender": "Male",
-          "primaryLanguage": "English",
-          "phone": "08012345678",
-          "homeAddress": "123 Main St",
-          "status": "accepted",
-          "programType": "ASH",
-          "assignedMentor": "Jane Smith"
-        },
-  
-        "school": {
-          "name": "Greenfield Academy",
-          "town": "Ikeja",
-          "lga": "Ikeja",
-          "state": "Lagos",
-          "currentClass": "JSS 2"
-        },
-  
-        "family": {
-          "father": { "name": "...", "phone": "...", "occupation": "..." },
-          "mother": { "name": "...", "phone": "...", "occupation": "..." },
-          "guardian": { "name": "...", "relationship": "...", "phone": "...", "occupation": "..." },
-          "householdIncomeRange": "50000-100000"
-        },
-  
-        "background": {
-          "previousAfterschoolProgram": "None",
-          "reasonForJoining": "...",
-          "hasLearningCondition": "No",
-          "learningConditions": []
-        },
-  
-        "documents": {
-          "parentSignatureUrl": "https://..."
-        },
-  
-        "compliance": {
-          "parentConsent": true,
-          "declarationConfirmed": true
-        },
-  
-        "academicPerformance": {
-          "current": {
-            "schoolAverage": 75.5,
-            "pretestAverage": 60.0,
-            "midtestAverage": 70.0,
-            "posttestAverage": 80.0
-          },
-          "history": [
-            {
-              "id": "uuid",
-              "academicSession": "2023/2024",
-              "term": "First Term",
-              "school": {
-                "name": "...",
-                "numeracyScore": 70,
-                "literacyScore": 80,
-                "average": 75,
-                "position": "3rd"
-              },
-              "assessments": {
-                "pretest": { "numeracyScore": 60, "literacyScore": 65, "average": 62.5 },
-                "midtest": { "numeracyScore": 70, "literacyScore": 75, "average": 72.5 },
-                "posttest": { "numeracyScore": 80, "literacyScore": 85, "average": 82.5 }
-              },
-              "development": {
-                "disciplineRating": 4,
-                "responsibilityRating": 3,
-                "leadershipRating": 4
-              },
-              "notableAchievements": "...",
-              "challengesObserved": "...",
-              "nextTermRecommendations": "...",
-              "mentorName": "Jane Smith",
-              "resultUrl": "https://..."
-            }
-          ]
-        },
-  
-        "attendance": {
-          "totalSessions": 20,
-          "sessionsAttended": 18,
-          "attendanceRate": 90,
-          "totalMentorshipSessions": 20,
-          "mentorshipSessionsAttended": 15,
-          "mentorshipRate": 75,
-          "history": [
-            {
-              "sessionDate": "2024-03-15",
-              "attended": true,
-              "mentored": false
-            }
-          ]
-        },
-  
-        "exit": {
-          "exists": false,
-          "exitDate": null,
-          "ageAtExit": null,
-          "schoolName": null,
-          "classAtExit": null,
-          "durationInProgram": null,
-          "exitReason": null,
-          "academicImpact": { "rating": null, "areasOfImprovement": null },
-          "mentorship": { "received": null, "impactRating": null },
-          "postAshStatus": { "status": null, "institutionName": null, "courseOfStudy": null, "vocationalSkill": null },
-          "feedback": { "enjoyedMost": null, "programImpact": null, "improvementSuggestions": null },
-          "facilitatorName": null
-        }
+        "history": [
+          {
+            "id": "uuid",
+            "academicSession": "2023/2024",
+            "term": "First Term",
+            "school": {
+              "name": "...",
+              "numeracyScore": 70,
+              "literacyScore": 80,
+              "average": 75,
+              "position": "3rd"
+            },
+            "assessments": {
+              "pretest": { "numeracyScore": 60, "literacyScore": 65, "average": 62.5 },
+              "midtest": { "numeracyScore": 70, "literacyScore": 75, "average": 72.5 },
+              "posttest": { "numeracyScore": 80, "literacyScore": 85, "average": 82.5 }
+            },
+            "development": {
+              "disciplineRating": 4,
+              "responsibilityRating": 3,
+              "leadershipRating": 4
+            },
+            "notableAchievements": "...",
+            "challengesObserved": "...",
+            "nextTermRecommendations": "...",
+            "mentorName": "Jane Smith",
+            "resultUrl": "https://..."
+          }
+        ]
+      },
+
+      "attendance": {
+        "totalSessions": 20,
+        "sessionsAttended": 18,
+        "attendanceRate": 90,
+        "totalMentorshipSessions": 20,
+        "mentorshipSessionsAttended": 15,
+        "mentorshipRate": 75,
+        "history": [
+          {
+            "sessionDate": "2024-03-15",
+            "attended": true,
+            "mentored": false
+          }
+        ]
+      },
+
+      "exit": {
+        "exists": false,
+        "exitDate": null,
+        "ageAtExit": null,
+        "schoolName": null,
+        "classAtExit": null,
+        "durationInProgram": null,
+        "exitReason": null,
+        "academicImpact": { "rating": null, "areasOfImprovement": null },
+        "mentorship": { "received": null, "impactRating": null },
+        "postAshStatus": { "status": null, "institutionName": null, "courseOfStudy": null, "vocationalSkill": null },
+        "feedback": { "enjoyedMost": null, "programImpact": null, "improvementSuggestions": null },
+        "facilitatorName": null
       }
     },
     "meta": {

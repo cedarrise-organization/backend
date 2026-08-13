@@ -1240,7 +1240,7 @@ export const listTacotsTracking = async (
     `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 
-    const [tracking, [totalDocuments]] = await Promise.all([
+    const [trackingData, [totalDocuments]] = await Promise.all([
       db
         .select({
           firstName: tacotsRecommendation.firstName,
@@ -1248,6 +1248,7 @@ export const listTacotsTracking = async (
           id: tacotsTracking.id,
           studentId: tacotsTracking.studentId,
           schoolId: tacotsTracking.schoolId,
+          schoolName: tacotsRecommendation.schoolName,
           region: tacotsTracking.region,
           academicSession: tacotsTracking.academicSession,
           academicTerm: tacotsTracking.academicTerm,
@@ -1298,6 +1299,62 @@ export const listTacotsTracking = async (
     ]);
     const totalPages = Math.ceil(totalDocuments!.value / limit);
 
+    const tracking = trackingData.map((t) => {
+      return {
+        firstName: t.firstName,
+        surname: t.surname,
+        id: t.id,
+        studentId: t.studentId,
+        schoolId: t.schoolId,
+        schoolName: t.schoolName,
+        region: t.region,
+        academicSession: t.academicSession,
+        academicTerm: t.academicTerm,
+        assessmentPeriod: t.assessmentPeriod,
+        submissionDate: t.submissionDate,
+        highestSubjectScore: t.highestSubjectScore,
+        lowestSubjectScore: t.lowestSubjectScore,
+        studentAveragePct: t.studentAveragePct,
+        studentPositionInClass: t.studentPositionInClass,
+        academicComment: t.academicComment,
+        socialBehaviorRating: t.socialBehaviorRating,
+        schoolRulesRating: t.schoolRulesRating,
+        responsibilityRating: t.responsibilityRating,
+        formationComments: t.formationComments,
+        mentorName: t.mentorName,
+        mentorshipSessionDate: t.mentorshipSessionDate,
+        mentorshipMode: t.mentorshipMode,
+        mentorshipDuration: t.mentorshipDuration,
+        mentorshipNotes: t.mentorshipNotes,
+        serviceActivityType: t.serviceActivityType,
+        serviceDate: t.serviceDate,
+        serviceDuration: t.serviceDuration,
+        serviceDescription: t.serviceDescription,
+        serviceSupervisor: t.serviceSupervisor,
+        tuitionFeePaid: t.tuitionFeePaid.toLocaleString("en-US", {
+          style: "currency",
+          currency: "NGN",
+        }),
+        resourcesSpent: t.resourcesSpent.toLocaleString("en-US", {
+          style: "currency",
+          currency: "NGN",
+        }),
+        sundriesSpent: t.sundriesSpent.toLocaleString("en-US", {
+          style: "currency",
+          currency: "NGN",
+        }),
+        totalAmountSpent: t.totalAmountSpent.toLocaleString("en-US", {
+          style: "currency",
+          currency: "NGN",
+        }),
+        financialNotes: t.financialNotes,
+        termResultUrl: t.termResultUrl,
+        termResultPublicId: t.termResultPublicId,
+        paymentEvidenceUrl: t.paymentEvidenceUrl,
+        paymentEvidencePublicId: t.paymentEvidencePublicId,
+      };
+    });
+
     return {
       code: 200,
       message: "All Tacots tracking data found successfully",
@@ -1341,13 +1398,14 @@ export const listTacotsTracking = async (
       ? [desc(tacotsTracking.createdAt)]
       : [sortDirection(sortColumn), desc(tacotsTracking.createdAt)];
 
-  const [tracking, [totalDocuments], metaData] = await Promise.all([
+  const [trackingData, [totalDocuments], metaData] = await Promise.all([
     db
       .select({
         firstName: tacotsRecommendation.firstName,
         surname: tacotsRecommendation.surname,
         id: tacotsTracking.id,
         studentId: tacotsTracking.studentId,
+        schoolId: tacotsTracking.schoolId,
         schoolName: tacotsRecommendation.schoolName,
         region: tacotsTracking.region,
         academicSession: tacotsTracking.academicSession,
@@ -1394,6 +1452,62 @@ export const listTacotsTracking = async (
   ]);
   const totalPages = Math.ceil(totalDocuments!.value / limit);
 
+  const tracking = trackingData.map((t) => {
+    return {
+      firstName: t.firstName,
+      surname: t.surname,
+      id: t.id,
+      studentId: t.studentId,
+      schoolName: t.schoolName,
+      schoolId: t.schoolId,
+      region: t.region,
+      academicSession: t.academicSession,
+      academicTerm: t.academicTerm,
+      assessmentPeriod: t.assessmentPeriod,
+      submissionDate: t.submissionDate,
+      highestSubjectScore: t.highestSubjectScore,
+      lowestSubjectScore: t.lowestSubjectScore,
+      studentAveragePct: t.studentAveragePct,
+      studentPositionInClass: t.studentPositionInClass,
+      academicComment: t.academicComment,
+      socialBehaviorRating: t.socialBehaviorRating,
+      schoolRulesRating: t.schoolRulesRating,
+      responsibilityRating: t.responsibilityRating,
+      formationComments: t.formationComments,
+      mentorName: t.mentorName,
+      mentorshipSessionDate: t.mentorshipSessionDate,
+      mentorshipMode: t.mentorshipMode,
+      mentorshipDuration: t.mentorshipDuration,
+      mentorshipNotes: t.mentorshipNotes,
+      serviceActivityType: t.serviceActivityType,
+      serviceDate: t.serviceDate,
+      serviceDuration: t.serviceDuration,
+      serviceDescription: t.serviceDescription,
+      serviceSupervisor: t.serviceSupervisor,
+      tuitionFeePaid: t.tuitionFeePaid.toLocaleString("en-US", {
+        style: "currency",
+        currency: "NGN",
+      }),
+      resourcesSpent: t.resourcesSpent.toLocaleString("en-US", {
+        style: "currency",
+        currency: "NGN",
+      }),
+      sundriesSpent: t.sundriesSpent.toLocaleString("en-US", {
+        style: "currency",
+        currency: "NGN",
+      }),
+      totalAmountSpent: t.totalAmountSpent.toLocaleString("en-US", {
+        style: "currency",
+        currency: "NGN",
+      }),
+      financialNotes: t.financialNotes,
+      termResultUrl: t.termResultUrl,
+      termResultPublicId: t.termResultPublicId,
+      paymentEvidenceUrl: t.paymentEvidenceUrl,
+      paymentEvidencePublicId: t.paymentEvidencePublicId,
+    };
+  });
+
   /// cache set
   await cacheSet(key, { data: tracking, totalPages, metadata: metaData }, CACHE_TTL.FORM_DATA);
   ///
@@ -1426,13 +1540,13 @@ export const getTacotsTracking = async (id: string) => {
   }
   ///
 
-  const [tracking] = await db
+  const [trackingData] = await db
     .select({
       firstName: tacotsRecommendation.firstName,
       surname: tacotsRecommendation.surname,
       id: tacotsTracking.id,
       schoolName: tacotsRecommendation.schoolName,
-      schoolId: tacotsTracking.schoolId,
+      // schoolId: tacotsTracking.schoolId,
       region: tacotsTracking.region,
       academicSession: tacotsTracking.academicSession,
       academicTerm: tacotsTracking.academicTerm,
@@ -1471,6 +1585,59 @@ export const getTacotsTracking = async (id: string) => {
     .innerJoin(tacotsOnboarding, eq(tacotsOnboarding.id, tacotsTracking.studentId))
     .innerJoin(tacotsRecommendation, eq(tacotsRecommendation.id, tacotsOnboarding.studentId))
     .where(eq(tacotsTracking.id, id));
+
+  const tracking = {
+    firstName: trackingData?.firstName,
+    surname: trackingData?.surname,
+    id: trackingData?.id,
+    schoolName: trackingData?.schoolName,
+    // schoolId: trackingData?.schoolId,
+    region: trackingData?.region,
+    academicSession: trackingData?.academicSession,
+    academicTerm: trackingData?.academicTerm,
+    assessmentPeriod: trackingData?.assessmentPeriod,
+    submissionDate: trackingData?.submissionDate,
+    highestSubjectScore: trackingData?.highestSubjectScore,
+    lowestSubjectScore: trackingData?.lowestSubjectScore,
+    studentAveragePct: trackingData?.studentAveragePct,
+    studentPositionInClass: trackingData?.studentPositionInClass,
+    academicComment: trackingData?.academicComment,
+    socialBehaviorRating: trackingData?.socialBehaviorRating,
+    schoolRulesRating: trackingData?.schoolRulesRating,
+    responsibilityRating: trackingData?.responsibilityRating,
+    formationComments: trackingData?.formationComments,
+    mentorName: trackingData?.mentorName,
+    mentorshipSessionDate: trackingData?.mentorshipSessionDate,
+    mentorshipMode: trackingData?.mentorshipMode,
+    mentorshipDuration: trackingData?.mentorshipDuration,
+    mentorshipNotes: trackingData?.mentorshipNotes,
+    serviceActivityType: trackingData?.serviceActivityType,
+    serviceDate: trackingData?.serviceDate,
+    serviceDuration: trackingData?.serviceDuration,
+    serviceDescription: trackingData?.serviceDescription,
+    serviceSupervisor: trackingData?.serviceSupervisor,
+    tuitionFeePaid: trackingData?.tuitionFeePaid.toLocaleString("en-US", {
+      style: "currency",
+      currency: "NGN",
+    }),
+    resourcesSpent: trackingData?.resourcesSpent.toLocaleString("en-US", {
+      style: "currency",
+      currency: "NGN",
+    }),
+    sundriesSpent: trackingData?.sundriesSpent.toLocaleString("en-US", {
+      style: "currency",
+      currency: "NGN",
+    }),
+    totalAmountSpent: trackingData?.totalAmountSpent.toLocaleString("en-US", {
+      style: "currency",
+      currency: "NGN",
+    }),
+    financialNotes: trackingData?.financialNotes,
+    termResultUrl: trackingData?.termResultUrl,
+    termResultPublicId: trackingData?.termResultPublicId,
+    paymentEvidenceUrl: trackingData?.paymentEvidenceUrl,
+    paymentEvidencePublicId: trackingData?.paymentEvidencePublicId,
+  };
 
   /// cache set
   await cacheSet(key, tracking, CACHE_TTL.FORM_DATA);

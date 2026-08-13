@@ -46,265 +46,211 @@ docs {
     "success": true,
     "message": "Found TACOTS Student Profile Successfully",
     "data": {
-      "student": {
-        "summary": {
-          "status": "SELECTED",
-          "onboardingDate": "2024-01-15",
-          "currentSchool": "Greenfield Academy",
-          "currentClass": "SS 1",
-          "mentorName": "Jane Smith",
-          "sponsorName": "ACME Corp",
-          "latestAcademicAverage": 78.5,
-          "latestAcademicTerm": "2023/2024 - First Term",
-          "latestAcademicPosition": "5th",
-          "supportTypesNeeded": ["Tuition", "Books"],
-          "supportTypesApproved": ["Tuition"],
-          "hasSpecialSupportNeeds": "No",
-          "hasExited": false,
-          "currentProgramStatus": "SELECTED"
+      "summary": {
+        "status": "SELECTED",
+        "fullName": "Adebayo Oluwaseyi Adesina",
+        "onboardingDate": "2024-01-15",
+        "currentSchool": "Greenfield Academy",
+        "currentClass": "SS 1",
+        "mentorName": "Jane Smith",
+        "sponsorName": "ACME Corp",
+        "latestAcademicAverage": 78.5,
+        "latestAcademicTerm": "2023/2024 - First Term",
+        "latestAcademicPosition": "5th",
+        "supportTypesNeeded": ["Tuition", "Books"],
+        "supportTypesApproved": ["Tuition"],
+        "hasSpecialSupportNeeds": "No",
+        "hasExited": false,
+        "currentProgramStatus": "SELECTED"
+      },
+
+      "profile": {
+        "id": "uuid",
+        "passportPhotoUrl": "https://...",
+        "fullName": "Jane Doe",
+        "firstName": "Jane",
+        "middleName": "A",
+        "surname": "Doe",
+        "age": 14,
+        "dateOfBirth": "2010-03-10",
+        "gender": "Female",
+        "primaryLanguage": "English",
+        "phoneNumber": "08012345678",
+        "nationality": "Nigerian",
+        "stateOfOrigin": "Lagos",
+        "lga": "Ikeja",
+        "homeAddress": "123 Main St"
+      },
+
+      "family": {
+        "parents": {
+          "father": { "name": "...", "occupation": "...", "phone": "..." },
+          "mother": { "name": "...", "occupation": "...", "phone": "..." },
+          "address": "456 Parent St"
         },
-  
-        "profile": {
-          "id": "uuid",
-          "passportPhotoUrl": "https://...",
-          "fullName": "Jane Doe",
-          "firstName": "Jane",
-          "middleName": "A",
-          "surname": "Doe",
-          "age": 14,
-          "dateOfBirth": "2010-03-10",
-          "gender": "Female",
-          "primaryLanguage": "English",
-          "phoneNumber": "08012345678",
-          "nationality": "Nigerian",
-          "stateOfOrigin": "Lagos",
-          "lga": "Ikeja",
-          "homeAddress": "123 Main St"
+        "guardian": {
+          "name": "...",
+          "phone": "...",
+          "relationship": "Uncle",
+          "occupation": "...",
+          "address": "789 Guardian Ave"
         },
-  
-        "family": {
-          "parents": {
-            "father": { "name": "...", "occupation": "...", "phone": "..." },
-            "mother": { "name": "...", "occupation": "...", "phone": "..." },
-            "address": "456 Parent St"
+        "household": {
+          "householdSize": 6,
+          "numberOfSiblings": 3,
+          "familyPosition": "2nd",
+          "livesWith": "Both Parents",
+          "residenceType": "Rented",
+          "hasElectricity": "Yes",
+          "annualHouseholdIncome": "100000-500000",
+          "incomeSources": ["Salary", "Business"],
+          "numberOfIncomeEarners": "2",
+          "averageMonthlyIncome": 50000,
+          "specialCircumstances": "None"
+        }
+      },
+
+      "education": {
+        "previous": {
+          "schoolName": "Old School",
+          "schoolTown": "Town",
+          "schoolState": "Lagos",
+          "lastYearAttended": 2023,
+          "lastClass": "JSS 3",
+          "classPositionLastTerm": "5th",
+          "lastTermAverage": 72.5
+        },
+        "current": {
+          "schoolName": "Greenfield Academy",
+          "schoolTown": "Ikeja",
+          "schoolLga": "Ikeja",
+          "schoolState": "Lagos",
+          "class": "SS 1",
+          "termResumptionDate": "2024-01-10",
+          "schoolFeesPerTerm": 50000
+        }
+      },
+
+      "religiousBackground": {
+        "religion": "Christianity",
+        "catholicSacraments": ["Baptism", "Communion"],
+        "parishAttended": "St. Mary's",
+        "diocese": "Lagos"
+      },
+
+      "recommendation": {
+        "recommender": {
+          "firstName": "Rev",
+          "lastName": "Father",
+          "phone": "08099999999",
+          "address": "Church St"
+        },
+        "childBackgroundNotes": "...",
+        "supportTypesNeeded": ["Tuition", "Books"],
+        "otherImportantInfo": "...",
+        "disciplineRating": 4,
+        "responsibilityRating": 5,
+        "careerGoal": "Doctor",
+        "studentStatement": "..."
+      },
+
+      "onboarding": {
+        "onboardingDate": "2024-01-15",
+        "wellbeing": {
+          "mentalHealth": {
+            "hasDiagnosis": "No",
+            "diagnosedConditions": null,
+            "behavioralIndicators": ["None"],
+            "focusAbilityRating": 4,
+            "emotionalStabilityRating": 4,
+            "peerInteractionRating": 5,
+            "receivedCounseling": "No",
+            "needsSpecialSupport": "No",
+            "notes": null
           },
-          "guardian": {
-            "name": "...",
-            "phone": "...",
-            "relationship": "Uncle",
-            "occupation": "...",
-            "address": "789 Guardian Ave"
-          },
-          "household": {
-            "householdSize": 6,
-            "numberOfSiblings": 3,
-            "familyPosition": "2nd",
-            "livesWith": "Both Parents",
-            "residenceType": "Rented",
-            "hasElectricity": "Yes",
-            "annualHouseholdIncome": "100000-500000",
-            "incomeSources": ["Salary", "Business"],
-            "numberOfIncomeEarners": "2",
-            "averageMonthlyIncome": 50000,
-            "specialCircumstances": "None"
+          "physicalHealth": {
+            "generalHealthStatus": "Good",
+            "immunizationStatus": "Complete",
+            "hasChronicCondition": "No",
+            "chronicConditions": null,
+            "allergies": [],
+            "requiresMedication": "No",
+            "physicalActivityLevel": 4,
+            "physicalLimitations": "None",
+            "notes": null
           }
         },
-  
         "education": {
-          "previous": {
-            "schoolName": "Old School",
-            "schoolTown": "Town",
-            "schoolState": "Lagos",
-            "lastYearAttended": 2023,
-            "lastClass": "JSS 3",
-            "classPositionLastTerm": "5th",
-            "lastTermAverage": 72.5
-          },
-          "current": {
-            "schoolName": "Greenfield Academy",
-            "schoolTown": "Ikeja",
-            "schoolLga": "Ikeja",
-            "schoolState": "Lagos",
-            "class": "SS 1",
-            "termResumptionDate": "2024-01-10",
-            "schoolFeesPerTerm": 50000
-          }
+          "schoolName": "Greenfield Academy",
+          "schoolTown": "Ikeja",
+          "schoolLga": "Ikeja",
+          "schoolState": "Lagos",
+          "class": "SS 1",
+          "termResumptionDate": "2024-01-10",
+          "schoolFeesPerTerm": 50000
         },
-  
-        "religiousBackground": {
-          "religion": "Christianity",
-          "catholicSacraments": ["Baptism", "Communion"],
-          "parishAttended": "St. Mary's",
-          "diocese": "Lagos"
+        "commitments": {
+          "studentCommitment": true,
+          "parentGuardianCommitment": true
         },
-  
-        "recommendation": {
-          "recommender": {
-            "firstName": "Rev",
-            "lastName": "Father",
-            "phone": "08099999999",
-            "address": "Church St"
-          },
-          "childBackgroundNotes": "...",
-          "supportTypesNeeded": ["Tuition", "Books"],
-          "otherImportantInfo": "...",
-          "disciplineRating": 4,
-          "responsibilityRating": 5,
-          "careerGoal": "Doctor",
-          "studentStatement": "..."
+        "support": {
+          "supportTypesApproved": ["Tuition"],
+          "mentorName": "Jane Smith",
+          "sponsorName": "ACME Corp"
         },
-  
-        "onboarding": {
-          "onboardingDate": "2024-01-15",
-          "wellbeing": {
-            "mentalHealth": {
-              "hasDiagnosis": "No",
-              "diagnosedConditions": null,
-              "behavioralIndicators": ["None"],
-              "focusAbilityRating": 4,
-              "emotionalStabilityRating": 4,
-              "peerInteractionRating": 5,
-              "receivedCounseling": "No",
-              "needsSpecialSupport": "No",
-              "notes": null
-            },
-            "physicalHealth": {
-              "generalHealthStatus": "Good",
-              "immunizationStatus": "Complete",
-              "hasChronicCondition": "No",
-              "chronicConditions": null,
-              "allergies": [],
-              "requiresMedication": "No",
-              "physicalActivityLevel": 4,
-              "physicalLimitations": "None",
-              "notes": null
-            }
-          },
-          "education": {
-            "schoolName": "Greenfield Academy",
-            "schoolTown": "Ikeja",
-            "schoolLga": "Ikeja",
-            "schoolState": "Lagos",
-            "class": "SS 1",
-            "termResumptionDate": "2024-01-10",
-            "schoolFeesPerTerm": 50000
-          },
-          "commitments": {
-            "studentCommitment": true,
-            "parentGuardianCommitment": true
-          },
-          "support": {
-            "supportTypesApproved": ["Tuition"],
-            "mentorName": "Jane Smith",
-            "sponsorName": "ACME Corp"
-          },
-          "notes": {
-            "programOfficerNotes": "...",
-            "additionalInfo": null
-          }
+        "notes": {
+          "programOfficerNotes": "...",
+          "additionalInfo": null
+        }
+      },
+
+      "academicProgress": {
+        "current": {
+          "academicSession": "2023/2024",
+          "academicTerm": "First Term",
+          "assessmentPeriod": "End of Term",
+          "average": 78.5,
+          "classPosition": "5th",
+          "highestSubjectScore": "Mathematics: 95",
+          "lowestSubjectScore": "French: 55",
+          "academicComment": "Good progress"
         },
-  
-        "academicProgress": {
-          "current": {
+        "history": [
+          {
+            "id": "uuid",
             "academicSession": "2023/2024",
             "academicTerm": "First Term",
             "assessmentPeriod": "End of Term",
-            "average": 78.5,
-            "classPosition": "5th",
-            "highestSubjectScore": "Mathematics: 95",
-            "lowestSubjectScore": "French: 55",
-            "academicComment": "Good progress"
-          },
-          "history": [
-            {
-              "id": "uuid",
-              "academicSession": "2023/2024",
-              "academicTerm": "First Term",
-              "assessmentPeriod": "End of Term",
-              "submissionDate": "2024-04-01",
-              "academic": {
-                "highestSubjectScore": "Mathematics: 95",
-                "lowestSubjectScore": "French: 55",
-                "average": 78.5,
-                "classPosition": "5th",
-                "comment": "Good progress",
-                "resultUrl": "https://..."
-              },
-              "formation": {
-                "socialBehaviorRating": 4,
-                "schoolRulesRating": 5,
-                "responsibilityRating": 4,
-                "comments": "Well behaved"
-              },
-              "mentor": {
-                "name": "Jane Smith",
-                "sessionDate": "2024-03-20",
-                "mode": "In-person",
-                "duration": "1 hour",
-                "notes": "..."
-              },
-              "service": {
-                "activityType": "Community Cleanup",
-                "date": "2024-03-15",
-                "duration": "2 hours",
-                "description": "...",
-                "supervisor": "John Supervisor"
-              },
-              "financialSupport": {
-                "tuitionFeePaid": 50000,
-                "resourcesSpent": 10000,
-                "sundriesSpent": 5000,
-                "totalAmountSpent": 65000,
-                "paymentEvidenceUrl": "https://...",
-                "notes": null
-              }
-            }
-          ]
-        },
-  
-        "mentorship": {
-          "latest": {
-            "mentorName": "Jane Smith",
-            "sessionDate": "2024-03-20",
-            "mode": "In-person",
-            "duration": "1 hour",
-            "notes": "..."
-          },
-          "history": [
-            {
-              "mentorName": "Jane Smith",
+            "submissionDate": "2024-04-01",
+            "academic": {
+              "highestSubjectScore": "Mathematics: 95",
+              "lowestSubjectScore": "French: 55",
+              "average": 78.5,
+              "classPosition": "5th",
+              "comment": "Good progress",
+              "resultUrl": "https://..."
+            },
+            "formation": {
+              "socialBehaviorRating": 4,
+              "schoolRulesRating": 5,
+              "responsibilityRating": 4,
+              "comments": "Well behaved"
+            },
+            "mentor": {
+              "name": "Jane Smith",
               "sessionDate": "2024-03-20",
               "mode": "In-person",
               "duration": "1 hour",
               "notes": "..."
-            }
-          ]
-        },
-  
-        "serviceEngagement": {
-          "totalActivities": 3,
-          "totalDuration": 6,
-          "history": [
-            {
+            },
+            "service": {
               "activityType": "Community Cleanup",
               "date": "2024-03-15",
               "duration": "2 hours",
               "description": "...",
               "supervisor": "John Supervisor"
-            }
-          ]
-        },
-  
-        "financialSupport": {
-          "totalTuitionPaid": 150000,
-          "totalResourcesSpent": 30000,
-          "totalSundriesSpent": 15000,
-          "totalAmountSpent": 195000,
-          "history": [
-            {
-              "academicSession": "2023/2024",
-              "academicTerm": "First Term",
-              "assessmentPeriod": "End of Term",
+            },
+            "financialSupport": {
               "tuitionFeePaid": 50000,
               "resourcesSpent": 10000,
               "sundriesSpent": 5000,
@@ -312,46 +258,99 @@ docs {
               "paymentEvidenceUrl": "https://...",
               "notes": null
             }
-          ]
+          }
+        ]
+      },
+
+      "mentorship": {
+        "latest": {
+          "mentorName": "Jane Smith",
+          "sessionDate": "2024-03-20",
+          "mode": "In-person",
+          "duration": "1 hour",
+          "notes": "..."
         },
-  
-        "documents": {
-          "passportPhotoUrl": "https://...",
-          "lastResultUrl": "https://...",
-          "parentSignatureUrl": "https://...",
-          "admissionLetterUrl": "https://..."
+        "history": [
+          {
+            "mentorName": "Jane Smith",
+            "sessionDate": "2024-03-20",
+            "mode": "In-person",
+            "duration": "1 hour",
+            "notes": "..."
+          }
+        ]
+      },
+
+      "serviceEngagement": {
+        "totalActivities": 3,
+        "totalDuration": 6,
+        "history": [
+          {
+            "activityType": "Community Cleanup",
+            "date": "2024-03-15",
+            "duration": "2 hours",
+            "description": "...",
+            "supervisor": "John Supervisor"
+          }
+        ]
+      },
+
+      "financialSupport": {
+        "totalTuitionPaid": 150000,
+        "totalResourcesSpent": 30000,
+        "totalSundriesSpent": 15000,
+        "totalAmountSpent": 195000,
+        "history": [
+          {
+            "academicSession": "2023/2024",
+            "academicTerm": "First Term",
+            "assessmentPeriod": "End of Term",
+            "tuitionFeePaid": 50000,
+            "resourcesSpent": 10000,
+            "sundriesSpent": 5000,
+            "totalAmountSpent": 65000,
+            "paymentEvidenceUrl": "https://...",
+            "notes": null
+          }
+        ]
+      },
+
+      "documents": {
+        "passportPhotoUrl": "https://...",
+        "lastResultUrl": "https://...",
+        "parentSignatureUrl": "https://...",
+        "admissionLetterUrl": "https://..."
+      },
+
+      "commitments": {
+        "studentCommitment": true,
+        "parentGuardianCommitment": true,
+        "declarationConfirmed": true
+      },
+
+      "exit": {
+        "exitDate": null,
+        "schoolAttendedDuringProgram": null,
+        "yearOfExit": null,
+        "exitReason": null,
+        "highestEducationAttained": null,
+        "currentStatus": null,
+        "nextStep": {
+          "higherInstitutionName": null,
+          "higherInstitutionCity": null,
+          "higherInstitutionState": null,
+          "employmentType": null,
+          "vocationalSkill": null,
+          "newSchoolName": null,
+          "completedSecondaryElsewhere": null
         },
-  
-        "commitments": {
-          "studentCommitment": true,
-          "parentGuardianCommitment": true,
-          "declarationConfirmed": true
+        "programImpact": {
+          "description": null,
+          "rating": null,
+          "additionalSituationInfo": null
         },
-  
-        "exit": {
-          "exitDate": null,
-          "schoolAttendedDuringProgram": null,
-          "yearOfExit": null,
-          "exitReason": null,
-          "highestEducationAttained": null,
-          "currentStatus": null,
-          "nextStep": {
-            "higherInstitutionName": null,
-            "higherInstitutionCity": null,
-            "higherInstitutionState": null,
-            "employmentType": null,
-            "vocationalSkill": null,
-            "newSchoolName": null,
-            "completedSecondaryElsewhere": null
-          },
-          "programImpact": {
-            "description": null,
-            "rating": null,
-            "additionalSituationInfo": null
-          },
-          "completedBy": null,
-          "submissionDate": null
-        }
+        "completedBy": null,
+        "submissionDate": null
       }
     },
     "meta": {

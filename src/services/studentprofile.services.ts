@@ -348,7 +348,7 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
   return {
     code: 200,
     message: "Found Ash Student Profile Successfully",
-    data: { student },
+    data: student,
     meta: {
       correlationId,
     },
@@ -650,19 +650,43 @@ export const tacotsStudentProfile = async (id: string, correlationId: string) =>
   }));
 
   // Build financial support totals
-  const totalTuitionPaid = trackingRows.reduce((sum, t) => sum + (t.tuitionFeePaid ?? 0), 0);
-  const totalResourcesSpent = trackingRows.reduce((sum, t) => sum + (t.resourcesSpent ?? 0), 0);
-  const totalSundriesSpent = trackingRows.reduce((sum, t) => sum + (t.sundriesSpent ?? 0), 0);
-  const totalAmountSpent = trackingRows.reduce((sum, t) => sum + (t.totalAmountSpent ?? 0), 0);
+  const totalTuitionPaid = (trackingRows.reduce((sum, t) => sum + (t.tuitionFeePaid ?? 0), 0)).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'NGN',
+  })
+  const totalResourcesSpent = (trackingRows.reduce((sum, t) => sum + (t.resourcesSpent ?? 0), 0)).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'NGN',
+  })
+  const totalSundriesSpent = (trackingRows.reduce((sum, t) => sum + (t.sundriesSpent ?? 0), 0)).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'NGN',
+  })
+  const totalAmountSpent = (trackingRows.reduce((sum, t) => sum + (t.totalAmountSpent ?? 0), 0)).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'NGN',
+  })
 
   const financialHistory = sortedTracking.map((t) => ({
     academicSession: t.academicSession,
     academicTerm: t.academicTerm,
     assessmentPeriod: t.assessmentPeriod,
-    tuitionFeePaid: t.tuitionFeePaid,
-    resourcesSpent: t.resourcesSpent,
-    sundriesSpent: t.sundriesSpent,
-    totalAmountSpent: t.totalAmountSpent,
+    tuitionFeePaid: (t.tuitionFeePaid).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'NGN',
+    }),
+    resourcesSpent: (t.resourcesSpent).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'NGN',
+    }),
+    sundriesSpent: (t.sundriesSpent).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'NGN',
+    }),
+    totalAmountSpent: (t.totalAmountSpent).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'NGN',
+    }),
     paymentEvidenceUrl: t.paymentEvidenceUrl,
     notes: t.financialNotes,
   }));
@@ -673,6 +697,7 @@ export const tacotsStudentProfile = async (id: string, correlationId: string) =>
   //  Assemble final response
   const student = {
     summary: {
+      fullName,
       status: r.adminStatus,
       onboardingDate: o?.onboardingDate ?? null,
       currentSchool: o?.enrolledSchoolName ?? null,
@@ -930,7 +955,7 @@ export const tacotsStudentProfile = async (id: string, correlationId: string) =>
   return {
     code: 200,
     message: "Found TACOTS Student Profile Successfully",
-    data: { student },
+    data: student,
     meta: {
       correlationId,
     },
