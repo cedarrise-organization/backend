@@ -11,7 +11,6 @@ post {
 }
 
 body:multipart-form {
-  programType: ONLINE
   firstName: Max
   middleName: 
   surname: Ogb
@@ -75,15 +74,14 @@ docs {
   ### Programme & Personal Details
   
   | Field           | Type   | Required | Constraints / Allowed Values                                                                 |
-  |-----------------|--------|----------|---------------------------------------------------------------------------------------------|
-  | programType     | string | Yes      | One of: `ONLINE`, `OFFLINE`                                                                  |
+  |-----------------|--------|----------|----------------------------------------------------------------------------------------------|
   | firstName       | string | Yes      | Non-empty text                                                                               |
   | middleName      | string | No       | Optional text                                                                                |
   | surname         | string | Yes      | Non-empty text                                                                               |
   | gender          | string | Yes      | One of: `MALE`, `FEMALE`                                                                     |
   | age             | number | Yes      | Integer between `6` and `18` (inclusive)                                                     |
-  | dob             | date   | Yes      | ISO date string — e.g. `2003-03-03` should follow `YYYY-MM-DD` format                                                       |
-  | primaryLanguage | string | Yes      | One of: `ENGLISH`, `IGBO`, `HAUSA`, `YORUBA`, `PIDGIN ENGLISH`, `OTHER`                     |
+  | dob             | date   | Yes      | ISO date string — e.g. `2003-03-03` should follow `YYYY-MM-DD` format                        |                                |
+  | primaryLanguage | string | Yes      | One of: `ENGLISH`, `IGBO`, `HAUSA`, `YORUBA`, `PIDGIN ENGLISH`, `OTHER`                      |
   | homeAddress     | string | Yes      | Non-empty text                                                                               |
   | studentPhone    | string | No       | Optional phone number                                                                        |
   

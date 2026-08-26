@@ -39,7 +39,6 @@ import { NotFoundError } from "../lib/error.js";
 
 const sortMap = {
   // ashStudent
-  programType: ashStudent.programType,
   firstName: ashStudent.firstName,
   surname: ashStudent.surname,
   gender: ashStudent.gender,
@@ -102,7 +101,6 @@ export const submitRegistration = async (
   const [newAshStudent] = await db
     .insert(ashStudent)
     .values({
-      programType: options.programType,
       firstName: options.firstName,
       middleName: options.middleName,
       surname: options.surname,

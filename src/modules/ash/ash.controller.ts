@@ -40,7 +40,6 @@ export const submitRegistrationController = async (
   next: NextFunction,
 ) => {
   const {
-    programType,
     firstName,
     middleName,
     surname,
@@ -83,7 +82,6 @@ export const submitRegistrationController = async (
     const response = await submitRegistration(
       req,
       {
-        programType,
         firstName,
         middleName,
         surname,
@@ -214,7 +212,6 @@ export const exportAshStudentController = async (
 
     const fields = [
       "id",
-      "programType",
       "firstName",
       "middleName",
       "surname",

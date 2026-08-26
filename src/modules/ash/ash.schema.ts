@@ -23,7 +23,6 @@ export const ashTermSchema = z.enum(["TERM 1", "TERM 2", "TERM 3"]);
 
 // ASH STUDENT
 export const ashStudentBody = z.object({
-  programType: z.enum(["ONLINE", "OFFLINE"]),
   firstName: textSchema,
   middleName: optionalTextSchema,
   surname: textSchema,
@@ -138,7 +137,6 @@ export const ashStudentQuerySchema = z.object({
       (v) => (v === "" ? undefined : v),
       z
         .enum([
-          "programType",
           "firstName",
           "surname",
           "createdAt",

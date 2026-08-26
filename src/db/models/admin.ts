@@ -17,7 +17,6 @@ export const ashStudent = p.pgTable(
       .default(sql`uuid_generate_v4()`)
       .notNull(),
 
-    programType: p.text("program_type").notNull(),
     firstName: p.text("first_name").notNull(),
     middleName: p.text("middle_name"),
     surname: p.text().notNull(),

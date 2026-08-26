@@ -45,7 +45,6 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
         phone: ashStudent.studentPhone,
         homeAddress: ashStudent.homeAddress,
         status: ashStudent.status,
-        programType: ashStudent.programType,
         assignedMentor: ashStudent.assignedMentor,
         // enrolledAt: ashStudent.createdAt,
         // school
@@ -267,7 +266,6 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
       fullName,
       passportPhotoUrl: p.passportPhotoUrl,
       status: p.status,
-      programType: p.programType,
       currentClass: p.currentClass,
       assignedMentor: p.assignedMentor,
       // enrolledAt: p.enrolledAt,
@@ -282,7 +280,6 @@ export const ashStudentProfile = async (id: string, correlationId: string) => {
       phone: p.phone,
       homeAddress: p.homeAddress,
       status: p.status,
-      programType: p.programType,
       assignedMentor: p.assignedMentor,
       // enrolledAt: p.enrolledAt,
     },
