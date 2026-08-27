@@ -1,1 +1,0 @@
-ALTER TABLE "ash_student" DROP COLUMN "program_type";

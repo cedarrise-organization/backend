@@ -1,5 +1,5 @@
 {
-  "id": "5f7ca88f-07b7-4b4f-809b-c7389b646cc7",
+  "id": "568dc675-4016-4f3b-b592-374a585c5a51",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -320,6 +320,281 @@
       },
       "isRLSEnabled": false
     },
+    "public.ash_online_registration": {
+      "name": "ash_online_registration",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "child_first_name": {
+          "name": "child_first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "child_surname": {
+          "name": "child_surname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dob": {
+          "name": "dob",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "age": {
+          "name": "age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "childClass": {
+          "name": "childClass",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "school_name": {
+          "name": "school_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "school_location": {
+          "name": "school_location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "child_email": {
+          "name": "child_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tutoring_days": {
+          "name": "tutoring_days",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time_availability": {
+          "name": "time_availability",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subjects_of_interest": {
+          "name": "subjects_of_interest",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "current_curriculum_url": {
+          "name": "current_curriculum_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_curriculum_public_id": {
+          "name": "current_curriculum_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "academic_report_url": {
+          "name": "academic_report_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "academic_report_public_id": {
+          "name": "academic_report_public_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prev_term_class_average": {
+          "name": "prev_term_class_average",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prev_term_class_position": {
+          "name": "prev_term_class_position",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_name": {
+          "name": "parent_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_phone": {
+          "name": "parent_phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_email": {
+          "name": "parent_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parental_consent": {
+          "name": "parental_consent",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "ash_online_child_name_idx": {
+          "name": "ash_online_child_name_idx",
+          "columns": [
+            {
+              "expression": "child_first_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "child_surname",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ash_online_childClass_idx": {
+          "name": "ash_online_childClass_idx",
+          "columns": [
+            {
+              "expression": "childClass",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ash_online_school_idx": {
+          "name": "ash_online_school_idx",
+          "columns": [
+            {
+              "expression": "school_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ash_online_child_email_idx": {
+          "name": "ash_online_child_email_idx",
+          "columns": [
+            {
+              "expression": "child_email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ash_online_created_at_idx": {
+          "name": "ash_online_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ash_online_search_index": {
+          "name": "ash_online_search_index",
+          "columns": [
+            {
+              "expression": "(\n        setweight(to_tsvector('english', \"child_first_name\"), 'A') ||\n        setweight(to_tsvector('english', \"child_surname\"), 'A') ||\n        setweight(to_tsvector('english', \"childClass\"), 'B') ||\n        setweight(to_tsvector('english', \"child_email\"), 'B') ||\n        setweight(to_tsvector('english', \"school_name\"), 'B') ||\n        setweight(to_tsvector('english', \"time_availability\"), 'B') ||\n        setweight(array_to_tsvector(coalesce(\"tutoring_days\", ARRAY[]::text[])), 'C') \n      )",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "ash_online_age_check": {
+          "name": "ash_online_age_check",
+          "value": "\"ash_online_registration\".\"age\" >= 3 AND \"ash_online_registration\".\"age\" <= 17"
+        }
+      },
+      "isRLSEnabled": false
+    },
     "public.ash_program_feedback": {
       "name": "ash_program_feedback",
       "schema": "",
@@ -615,12 +890,6 @@
           "primaryKey": true,
           "notNull": true,
           "default": "uuid_generate_v4()"
-        },
-        "program_type": {
-          "name": "program_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         },
         "first_name": {
           "name": "first_name",
@@ -5670,8 +5939,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "date": {
-          "name": "date",
+        "createdAt": {
+          "name": "createdAt",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
@@ -5683,7 +5952,7 @@
           "name": "donor_idx",
           "columns": [
             {
-              "expression": "date",
+              "expression": "createdAt",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -5692,6 +5961,21 @@
           "isUnique": false,
           "concurrently": false,
           "method": "btree",
+          "with": {}
+        },
+        "donor_search_index": {
+          "name": "donor_search_index",
+          "columns": [
+            {
+              "expression": "(\n          setweight(to_tsvector('english', \"name\"), 'A') ||\n          setweight(to_tsvector('english', \"email\"), 'A') ||\n          setweight(to_tsvector('english', coalesce(\"amount_donated\"::text, '')), 'B') ||\n          setweight(to_tsvector('english', coalesce(\"comment\", '')), 'C') \n        )",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
           "with": {}
         }
       },

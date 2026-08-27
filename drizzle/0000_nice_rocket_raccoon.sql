@@ -27,6 +27,36 @@ CREATE TABLE "ash_exit" (
 	CONSTRAINT "ash_exit_mentorship_impact_rating_check" CHECK ("ash_exit"."mentorship_impact_rating" >= 1 AND "ash_exit"."mentorship_impact_rating" <= 10)
 );
 --> statement-breakpoint
+CREATE TABLE "ash_online_registration" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"child_first_name" text NOT NULL,
+	"child_surname" text NOT NULL,
+	"dob" date NOT NULL,
+	"age" integer NOT NULL,
+	"childClass" text NOT NULL,
+	"school_name" text NOT NULL,
+	"school_location" text NOT NULL,
+	"child_email" text NOT NULL,
+	"tutoring_days" text[] NOT NULL,
+	"time_availability" text NOT NULL,
+	"subjects_of_interest" text[] NOT NULL,
+	"current_curriculum_url" text,
+	"current_curriculum_public_id" text,
+	"academic_report_url" text,
+	"academic_report_public_id" text,
+	"prev_term_class_average" text NOT NULL,
+	"prev_term_class_position" text NOT NULL,
+	"parent_name" text NOT NULL,
+	"parent_phone" text NOT NULL,
+	"parent_email" text NOT NULL,
+	"parental_consent" boolean DEFAULT false NOT NULL,
+	"status" text DEFAULT 'pending' NOT NULL,
+	"updated_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp,
+	CONSTRAINT "ash_online_age_check" CHECK ("ash_online_registration"."age" >= 3 AND "ash_online_registration"."age" <= 17)
+);
+--> statement-breakpoint
 CREATE TABLE "ash_program_feedback" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"student_first_name" text NOT NULL,
@@ -62,7 +92,6 @@ CREATE TABLE "ash_program_feedback" (
 --> statement-breakpoint
 CREATE TABLE "ash_student" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-	"program_type" text NOT NULL,
 	"first_name" text NOT NULL,
 	"middle_name" text,
 	"surname" text NOT NULL,
@@ -633,7 +662,7 @@ CREATE TABLE "donors" (
 	"support_areas" text[],
 	"comment" text,
 	"meta_data" text,
-	"date" timestamp DEFAULT now() NOT NULL
+	"createdAt" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "google_forms" (
@@ -689,6 +718,20 @@ CREATE INDEX "ash_exit_search_index" ON "ash_exit" USING gin ((
         setweight(to_tsvector('english', "duration_in_program"), 'B') ||
         setweight(to_tsvector('english', "exit_reason"), 'C') ||
         setweight(array_to_tsvector(coalesce("areas_of_improvement", ARRAY[]::text[])), 'C')
+      ));--> statement-breakpoint
+CREATE INDEX "ash_online_child_name_idx" ON "ash_online_registration" USING btree ("child_first_name","child_surname");--> statement-breakpoint
+CREATE INDEX "ash_online_childClass_idx" ON "ash_online_registration" USING btree ("childClass");--> statement-breakpoint
+CREATE INDEX "ash_online_school_idx" ON "ash_online_registration" USING btree ("school_name");--> statement-breakpoint
+CREATE INDEX "ash_online_child_email_idx" ON "ash_online_registration" USING btree ("child_email");--> statement-breakpoint
+CREATE INDEX "ash_online_created_at_idx" ON "ash_online_registration" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "ash_online_search_index" ON "ash_online_registration" USING gin ((
+        setweight(to_tsvector('english', "child_first_name"), 'A') ||
+        setweight(to_tsvector('english', "child_surname"), 'A') ||
+        setweight(to_tsvector('english', "childClass"), 'B') ||
+        setweight(to_tsvector('english', "child_email"), 'B') ||
+        setweight(to_tsvector('english', "school_name"), 'B') ||
+        setweight(to_tsvector('english', "time_availability"), 'B') ||
+        setweight(array_to_tsvector(coalesce("tutoring_days", ARRAY[]::text[])), 'C') 
       ));--> statement-breakpoint
 CREATE INDEX "ash_feedback_student_name_idx" ON "ash_program_feedback" USING btree ("student_first_name","student_surname");--> statement-breakpoint
 CREATE INDEX "ash_feedback_school_idx" ON "ash_program_feedback" USING btree ("school_name");--> statement-breakpoint
@@ -903,7 +946,13 @@ CREATE INDEX "notifications_status_idx" ON "notifications" USING btree ("status"
 CREATE INDEX "notifications_type_idx" ON "notifications" USING btree ("type");--> statement-breakpoint
 CREATE INDEX "notifications_entity_type_idx" ON "notifications" USING btree ("entity_type");--> statement-breakpoint
 CREATE INDEX "notifications_created_at_idx" ON "notifications" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "donor_idx" ON "donors" USING btree ("date");--> statement-breakpoint
+CREATE INDEX "donor_idx" ON "donors" USING btree ("createdAt");--> statement-breakpoint
+CREATE INDEX "donor_search_index" ON "donors" USING gin ((
+          setweight(to_tsvector('english', "name"), 'A') ||
+          setweight(to_tsvector('english', "email"), 'A') ||
+          setweight(to_tsvector('english', coalesce("amount_donated"::text, '')), 'B') ||
+          setweight(to_tsvector('english', coalesce("comment", '')), 'C') 
+        ));--> statement-breakpoint
 CREATE INDEX "photo_count_index" ON "miscellaneous" USING btree ("number_of_photos");--> statement-breakpoint
 CREATE INDEX "partner_count_index" ON "miscellaneous" USING btree ("number_of_partners");--> statement-breakpoint
 CREATE INDEX "receipts_name_idx" ON "receipts" USING btree ("name");--> statement-breakpoint

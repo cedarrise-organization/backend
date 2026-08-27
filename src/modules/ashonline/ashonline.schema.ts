@@ -146,7 +146,16 @@ export const ashOnlineRegistrationQuerySchema = z.object({
     sortBy: z.preprocess(
       (v) => (v === "" ? undefined : v),
       z
-        .enum(["childFirstName", "childSurname", "childClass", "schoolName", "childEmail", "createdAt"])
+        .enum([
+          "childFirstName",
+          "childSurname",
+          "childClass",
+          "childEmail",
+          "schoolName",
+          "tutoringDays",
+          "timeAvailability",
+          "createdAt",
+        ])
         .default("createdAt"),
     ),
   }),

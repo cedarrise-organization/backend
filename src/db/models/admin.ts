@@ -58,9 +58,10 @@ export const ashOnlineRegistration = p.pgTable(
         setweight(to_tsvector('english', ${table.childFirstName}), 'A') ||
         setweight(to_tsvector('english', ${table.childSurname}), 'A') ||
         setweight(to_tsvector('english', ${table.childClass}), 'B') ||
+        setweight(to_tsvector('english', ${table.childEmail}), 'B') ||
         setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
-        setweight(to_tsvector('english', ${table.tutoringDays}), 'B') ||
-        setweight(array_to_tsvector(coalesce(${table.timeAvailability}, ARRAY[]::text[])), 'C') 
+        setweight(to_tsvector('english', ${table.timeAvailability}), 'B') ||
+        setweight(array_to_tsvector(coalesce(${table.tutoringDays}, ARRAY[]::text[])), 'C') 
       )`,
     ),
   ],

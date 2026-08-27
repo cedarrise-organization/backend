@@ -38,8 +38,10 @@ export const cacheDel = async (key: string) => {
 };
 
 export const cacheDelPattern = async (pattern: string): Promise<void> => {
-  for await (const key of redisClient.scanIterator({ MATCH: pattern, COUNT: 100 })) {
-    await redisClient.del(key);
+  for await (const keys of redisClient.scanIterator({ MATCH: pattern, COUNT: 100 })) {
+    for (const key of keys) {
+      await redisClient.del(key);
+    }
   }
   logger.debug(`*cacheDelPattern fxn* cache key pattern deleted @${new Date(Date.now())}`);
 };

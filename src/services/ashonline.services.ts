@@ -15,8 +15,10 @@ const sortMap = {
   childFirstName: ashOnlineRegistration.childFirstName,
   childSurname: ashOnlineRegistration.childSurname,
   childClass: ashOnlineRegistration.childClass,
-  schoolName: ashOnlineRegistration.schoolName,
   childEmail: ashOnlineRegistration.childEmail,
+  schoolName: ashOnlineRegistration.schoolName,
+  tutoringDays: ashOnlineRegistration.tutoringDays,
+  timeAvailability: ashOnlineRegistration.timeAvailability,
   createdAt: ashOnlineRegistration.createdAt,
 } as const;
 
@@ -98,12 +100,13 @@ export const listAshOnlineRegistrations = async (
   // search
   if (search) {
     const searchVector = sql`
-    setweight(to_tsvector('english', ${ashOnlineRegistration.childFirstName}), 'A') ||
-    setweight(to_tsvector('english', ${ashOnlineRegistration.childSurname}), 'A') ||
-    setweight(to_tsvector('english', ${ashOnlineRegistration.childClass}), 'B') ||
-    setweight(to_tsvector('english', ${ashOnlineRegistration.schoolName}), 'B') ||
-    setweight(to_tsvector('english', ${ashOnlineRegistration.childEmail}), 'C') ||
-    setweight(to_tsvector('english', ${ashOnlineRegistration.schoolLocation}), 'C')
+      setweight(to_tsvector('english', ${ashOnlineRegistration.childFirstName}), 'A') ||
+      setweight(to_tsvector('english', ${ashOnlineRegistration.childSurname}), 'A') ||
+      setweight(to_tsvector('english', ${ashOnlineRegistration.childClass}), 'B') ||
+      setweight(to_tsvector('english', ${ashOnlineRegistration.childEmail}), 'B') ||
+      setweight(to_tsvector('english', ${ashOnlineRegistration.schoolName}), 'B') ||
+      setweight(to_tsvector('english', ${ashOnlineRegistration.timeAvailability}), 'B') ||
+      setweight(to_tsvector('english', array_to_string(${ashOnlineRegistration.tutoringDays}, ' ')), 'C')
   `;
     const searchQuery = sql`plainto_tsquery('english', ${search})`;
 

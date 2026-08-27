@@ -9,6 +9,7 @@ import { donors } from "./models/donors.js";
 import { blogs } from "./models/blogs.js";
 import {
   ashStudent,
+  ashOnlineRegistration,
   ashWeeklyAttendance,
   ashProgramFeedback,
   ashTermlyTracking,
@@ -37,6 +38,7 @@ const clearTables = async () => {
     await db.delete(rolepermissions);
     await db.delete(userroles);
     await db.delete(ashStudent);
+    await db.delete(ashOnlineRegistration);
     await db.delete(ashTermlyTracking);
     await db.delete(ashWeeklyAttendance);
     await db.delete(ashExit);
@@ -337,6 +339,25 @@ async function seedAshStudent() {
     logger.info(`Inserted ${rows.length} rows into ashstudent`);
   } catch (error) {
     logger.error("Could not seed ashstudent tables", { error });
+  }
+}
+async function seedAshOnline() {
+  try {
+    const file = await fs.readFile(
+      `${process.cwd()}/src/db/seeddata/ash_online.jsonl`,
+      "utf-8",
+    );
+
+    const rows = file
+      .split("\n")
+      .filter((line) => line.trim() !== "")
+      .map((line) => JSON.parse(line));
+
+    await db.insert(ashOnlineRegistration).values(rows);
+
+    logger.info(`Inserted ${rows.length} rows into ashOnlineRegistration`);
+  } catch (error) {
+    logger.error("could not seed ashOnlineRegistration table", { error });
   }
 }
 async function seedAshTermlyTracking() {
@@ -812,6 +833,7 @@ await installExtensions();
 await seedRolesAndPermissions();
 await seedUsers();
 await seedAshStudent();
+await seedAshOnline();
 await seedAshTermlyTracking();
 await seedAshWeeklyAttendance();
 await seedAshExit();

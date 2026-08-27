@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1785934008103,
-      "tag": "0000_remarkable_martin_li",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1786359924048,
-      "tag": "0001_fine_vindicator",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1786364556448,
-      "tag": "0002_curved_impossible_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1787778340030,
-      "tag": "0003_opposite_warstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1787829860015,
-      "tag": "0004_ordinary_bloodstorm",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1787836358494,
-      "tag": "0005_slim_karma",
+      "when": 1787844565095,
+      "tag": "0000_nice_rocket_raccoon",
       "breakpoints": true
     }
   ]
