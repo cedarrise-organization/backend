@@ -12,6 +12,7 @@ import carouselRouter from "./modules/clientside/carousels/carousels.routes.js";
 import sendlinksRouter from "./modules/clientside/sendlinks/sendlinks.routes.js";
 import feedbackRouter from "./modules/clientside/feedback/feedback.routes.js";
 import donateRouter from "./modules/clientside/donate/donate.routes.js";
+import ashOnlineRouter from "./modules/ashonline/ashonline.routes.js"
 import blogRouter from "./modules/clientside/blog/blog.routes.js";
 import adminRouter from "./modules/admin/admin.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
@@ -95,6 +96,7 @@ app.use("/api/v1/volunteer", volunteerRouter);
 app.use("/api/v1/lookup", lookupRouter);
 app.use("/api/v1/general", generalRouter);
 app.use("/api/v1/forms/ash", ashRouter);
+app.use("/api/v1/forms/ash-online", ashOnlineRouter);
 app.use("/api/v1/forms/tacots", tacotsRouter);
 app.use("/api/v1/forms/outreaches", outreachRouter);
 app.use("/api/v1/forms/capacity-building", capacityRouter);

@@ -1,0 +1,68 @@
+meta {
+  name: Send ash online link email
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/send-links/ashonline
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+docs {
+  # Send ASH Online Link Email
+  
+  Sends the ASH Online registration link to a recipient via email. The service renders an EJS email template (`ash-online-registration-link.ejs`) and dispatches the email using Brevo.
+  
+  ## Endpoint
+  `POST /api/v1/send-links/ashonline`
+  
+  ## Request Body
+  The request expects a JSON object with the following fields:
+  
+  | Field | Type | Required | Constraints | Description |
+  | :--- | :--- | :--- | :--- | :--- |
+  | `email` | string | Yes | Must be a valid email address | The recipient's email address. |
+  | `name` | string | Yes | Min: 3 characters, Max: 256 characters | The recipient's name (used in the email template). |
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "ASH ONLINE Registration email sent successfully",
+      "data": null,
+      "meta": {
+        "correlationId": "uuid-v4-string"
+      }
+    }
+    ```
+  
+  ## Error Responses
+  - **400 Bad Request**: Validation failed (e.g., invalid email, name too short).
+  - **429 Too Many Requests**: Rate limit exceeded (`sendLinksLimiter`: 5 requests per 15-minute window, keyed by IP).
+  - **500 Internal Server Error**: 
+    - Failed to render the EJS email template.
+    - Brevo API error (email transporter failure).
+    - Email delivery verification failed — thrown when `sendEmail` returns a falsy value (e.g., `"ASH ONLINE Registration Email was not sent"`).
+  
+  ## Rate Limiting
+  This endpoint is protected by `sendLinksLimiter` — a maximum of **5 requests per 15-minute window**, keyed by the client's IP address. Exceeds return a `429` with `{ code: "RATE_LIMITED", message: "Too many request attempts. Please try again later" }`.
+  
+  ## Notes
+  - The generated link points to `/social-initiatives/ash-online/register` based on `FRONTEND_BASEURL`.
+  - No caching is involved — this endpoint triggers a transactional email on every call.
+}

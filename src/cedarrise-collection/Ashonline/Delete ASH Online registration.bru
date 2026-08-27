@@ -1,0 +1,48 @@
+meta {
+  name: Delete ASH Online registration
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/forms/ash-online/registration/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Delete ASH Online Registration
+  
+  Permanently deletes an ASH Online registration record and adds any associated Cloudinary assets (current curriculum, academic report) to the deletion queue.
+  
+  ## Authorization
+  Requires `delete` permission.
+  
+  ## Response
+  
+  **`200 OK`** — Acknowledges successful deletion.
+  
+  ```json
+  {
+    "success": true,
+    "message": "ASH Online registration data deleted successfully",
+    "data": null,
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+}

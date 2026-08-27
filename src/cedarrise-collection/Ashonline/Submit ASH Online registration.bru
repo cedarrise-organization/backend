@@ -1,0 +1,142 @@
+meta {
+  name: Submit ASH Online registration
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/forms/ash-online/registration
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  childFirstName: John
+  childSurname: Doe
+  dob: 2010-05-15
+  age: 14
+  childClass: JSS2
+  schoolName: Example School
+  schoolLocation: Lagos
+  childEmail: john.doe@example.com
+  tutoringDays: MONDAY
+  timeAvailability: Evening
+  subjectsOfInterest: MATHEMATICS
+  currentCurriculum: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
+  academicReport: @file(C:\Users\Maxmillian\Pictures\mmlogo-light.jpeg) @contentType(image/jpeg)
+  prevTermClassAverage: 75%
+  prevTermClassPosition: 5th
+  parentName: Jane Doe
+  parentPhone: 08012345678
+  parentEmail: jane.doe@example.com
+  parentalConsent: true
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Submit ASH Online Registration
+  
+  Registers a new student into the ASH Online programme. Accepts a multipart form that includes student details, academic information, subjects of interest, and required file uploads (current curriculum and academic report).
+  
+  On success, the student record is inserted into the database and cached. The endpoint returns the newly created registration object with a `201 Created` status.
+  
+  ## Authorization
+  No authentication is required for this endpoint (public form submission).
+  
+  ## Request Body (`multipart/form-data`)
+  
+  ### Programme & Personal Details
+  
+  | Field           | Type   | Required | Constraints / Allowed Values                                                                 |
+  |-----------------|--------|----------|----------------------------------------------------------------------------------------------|
+  | childFirstName  | string | Yes      | Non-empty text                                                                               |
+  | childSurname    | string | Yes      | Non-empty text                                                                               |
+  | dob             | date   | Yes      | ISO date string — e.g. `2010-05-15` should follow `YYYY-MM-DD` format                        |
+  | age             | number | Yes      | Integer between `3` and `17` (inclusive)                                                     |
+  | childClass      | string | Yes      | One of: `KG / NURSERY 1`, `KG / NURSERY 2`, `KG / NURSERY 3`, `PRIMARY 1` to `PRIMARY 6`, `JSS1` to `JSS3`, `SS1` to `SS3` |
+  | schoolName      | string | Yes      | Non-empty text                                                                               |
+  | schoolLocation  | string | Yes      | Non-empty text                                                                               |
+  | childEmail      | string | Yes      | Valid email address                                                                          |
+  | tutoringDays    | array  | Yes      | Array of strings, e.g. `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, `SUNDAY` |
+  | timeAvailability| string | Yes      | Non-empty text                                                                               |
+  | subjectsOfInterest| array | Yes      | Array of strings, e.g. `MATHEMATICS`, `ENGLISH`, `SCIENCE`, `PHYSICS`, `CHEMISTRY`, `BIOLOGY`, `LITERATURE IN ENGLISH`, `GOVERNMENT`, `FINANCIAL ACCOUNTING`, `COMMERCE`, `OTHER` |
+  | prevTermClassAverage| string | Yes  | Non-empty text                                                                               |
+  | prevTermClassPosition| string| Yes  | Non-empty text                                                                               |
+  
+  ### Parent Information
+  
+  | Field                | Type   | Required | Constraints / Allowed Values                                                                                 |
+  |----------------------|--------|----------|--------------------------------------------------------------------------------------------------------------|
+  | parentName           | string | Yes      | Non-empty text                                                                                               |
+  | parentPhone          | string | Yes      | Non-empty text                                                                                               |
+  | parentEmail          | string | Yes      | Valid email address                                                                                          |
+  | parentalConsent      | boolean| Yes      | Must be `true`. Defaults to `false`.                                                                         |
+  
+  ## File Uploads
+  
+  | Field             | MIME Types Accepted        | Required | Notes                                      |
+  |-------------------|----------------------------|----------|--------------------------------------------|
+  | currentCurriculum | PDF, image                 | No       | Uploaded to `/Cedarrise Initiative/ASH-ONLINE-ASSETS/CURRICULUMS` on Cloudinary |
+  | academicReport    | PDF, image                 | No       | Uploaded to `/Cedarrise Initiative/ASH-ONLINE-ASSETS/REPORTS` on Cloudinary     |
+  
+  ## Response
+  
+  **`201 Created`** — Returns the newly created ASH Online registration record.
+  
+  ```json
+  {
+    "success": true,
+    "message": "ASH Online registration form submitted successfully",
+    "data": {
+      "id": "uuid",
+      "childFirstName": "john",
+      "childSurname": "doe",
+      "dob": "2010-05-15T00:00:00.000Z",
+      "age": 14,
+      "childClass": "JSS2",
+      "schoolName": "example school",
+      "schoolLocation": "lagos",
+      "childEmail": "john.doe@example.com",
+      "tutoringDays": ["MONDAY"],
+      "timeAvailability": "evening",
+      "subjectsOfInterest": ["MATHEMATICS"],
+      "currentCurriculumUrl": "https://res.cloudinary.com/...",
+      "currentCurriculumPublicId": "Cedarrise Initiative/ASH-ONLINE-ASSETS/CURRICULUMS/...",
+      "academicReportUrl": "https://res.cloudinary.com/...",
+      "academicReportPublicId": "Cedarrise Initiative/ASH-ONLINE-ASSETS/REPORTS/...",
+      "prevTermClassAverage": "75%",
+      "prevTermClassPosition": "5th",
+      "parentName": "jane doe",
+      "parentPhone": "08012345678",
+      "parentEmail": "jane.doe@example.com",
+      "parentalConsent": true,
+      "status": "pending",
+      "createdAt": "2026-08-27T00:00:00.000Z",
+      "updatedAt": null,
+      "deletedAt": null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+  
+  The created record cache for list is invalidated using the key `cedarrise:ashonline:registrations:*`.
+  
+  ## Errors
+  
+  | Status | Description                                                                 |
+  |--------|-----------------------------------------------------------------------------|
+  | `400 Bad Request`        | Validation failed — missing required fields or invalid enum values. |
+  | `400 Bad Request`        | No files were attached to the request.                              |
+  | `429 Too Many Requests`     | Rate limit exceeded (`formUploadLimiter`: 3 requests per 15-minute window, keyed by IP). |
+  | `500 Internal Server Error` | Cloudinary upload failed. |
+}

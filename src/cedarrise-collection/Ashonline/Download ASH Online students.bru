@@ -1,0 +1,37 @@
+meta {
+  name: Download ASH Online students
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash-online/download/ashonlinestudent
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Download ASH Online Students (CSV)
+  
+  Exports all ASH Online registrations as a downloadable CSV file.
+  
+  ## Authorization
+  Requires `read` permission.
+  
+  ## Response
+  
+  **`200 OK`** — Returns the CSV file stream.
+  
+  **Headers:**
+  - `Content-Type: text/csv; charset=utf-8`
+  - `Content-Disposition: attachment; filename="ash_online_students.csv"`
+}

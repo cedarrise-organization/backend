@@ -28,5 +28,13 @@ export const sendPWSEmailSchema = z.object({
   }),
 });
 
+export const sendAshOnlineLinkEmailSchema = z.object({
+  body: z.object({
+    email: z.email("Invalid email"),
+    name: z.string().min(3, "Name must have up to 3 characters").max(256),
+  }),
+});
+
 export type Sendlinkemailtype = z.infer<typeof sendLinkEmailSchema>;
 export type Sendpwsemailtype = z.infer<typeof sendPWSEmailSchema>;
+export type Sendashonlinelinkemailtype = z.infer<typeof sendAshOnlineLinkEmailSchema>;

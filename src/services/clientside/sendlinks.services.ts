@@ -6,6 +6,7 @@ import { sendEmail } from "../../utils/sendEmail.util.js";
 import {
   Sendlinkemailtype,
   Sendpwsemailtype,
+  Sendashonlinelinkemailtype
 } from "../../modules/clientside/sendlinks/sendlinks.schema.js";
 import { GENERAL_EVENTS } from "../../events/general.events.js";
 
@@ -169,5 +170,30 @@ export const sendPartnerWithUsEmail = async (options: Sendpwsemailtype) => {
   return {
     code: 200,
     message: `Partner request email sent successfully`,
+  };
+};
+
+export const sendAshOnlineEmail = async (options: Sendashonlinelinkemailtype) => {
+  const { email, name } = options.body;
+
+  let content = await ejs.renderFile(
+    process.cwd() + "/src/views/emails/ash-online-registration-link.ejs",
+    { name, formLink: `${FRONTEND_BASEURL}/social-initiatives/ash-online/register` },
+    { async: true },
+  );
+
+  const info = await sendEmail(email, "ASH ONLINE Registration Link", content);
+
+  if (!info) {
+    throw new Error("ASH ONLINE Registration Email was not sent");
+  }
+
+  logger.info("ASH Registration Link email sent successully", {
+    // correlationId
+  });
+
+  return {
+    code: 200,
+    message: `ASH ONLINE Registration email sent successfully`,
   };
 };

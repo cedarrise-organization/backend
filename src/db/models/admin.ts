@@ -8,6 +8,64 @@ const timestamps = {
   deletedAt: p.timestamp("deleted_at"),
 };
 
+export const ashOnlineRegistration = p.pgTable(
+  "ash_online_registration",
+  {
+    id: p
+      .uuid()
+      .primaryKey()
+      .default(sql`uuid_generate_v4()`)
+      .notNull(),
+    childFirstName: p.text("child_first_name").notNull(),
+    childSurname: p.text("child_surname").notNull(),
+    dob: p.date().notNull(),
+    age: p.integer().notNull(),
+    childClass: p.text().notNull(),
+
+    schoolName: p.text("school_name").notNull(),
+    schoolLocation: p.text("school_location").notNull(),
+    childEmail: p.text("child_email").notNull(),
+    tutoringDays: p.text("tutoring_days").array().notNull(),
+    timeAvailability: p.text("time_availability").notNull(),
+    subjectsOfInterest: p.text("subjects_of_interest").array().notNull(),
+
+    currentCurriculumUrl: p.text("current_curriculum_url"),
+    currentCurriculumPublicId: p.text("current_curriculum_public_id"),
+    academicReportUrl: p.text("academic_report_url"),
+    academicReportPublicId: p.text("academic_report_public_id"),
+
+    prevTermClassAverage: p.text("prev_term_class_average").notNull(),
+    prevTermClassPosition: p.text("prev_term_class_position").notNull(),
+
+    parentName: p.text("parent_name").notNull(),
+    parentPhone: p.text("parent_phone").notNull(),
+    parentEmail: p.text("parent_email").notNull(),
+    parentalConsent: p.boolean("parental_consent").default(false).notNull(),
+
+    status: p.text().default("pending").notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    check("ash_online_age_check", sql`${table.age} >= 3 AND ${table.age} <= 17`),
+    index("ash_online_child_name_idx").on(table.childFirstName, table.childSurname),
+    index("ash_online_childClass_idx").on(table.childClass),
+    index("ash_online_school_idx").on(table.schoolName),
+    index("ash_online_child_email_idx").on(table.childEmail),
+    index("ash_online_created_at_idx").on(table.createdAt),
+    index("ash_online_search_index").using(
+      "gin",
+      sql`(
+        setweight(to_tsvector('english', ${table.childFirstName}), 'A') ||
+        setweight(to_tsvector('english', ${table.childSurname}), 'A') ||
+        setweight(to_tsvector('english', ${table.childClass}), 'B') ||
+        setweight(to_tsvector('english', ${table.schoolName}), 'B') ||
+        setweight(to_tsvector('english', ${table.tutoringDays}), 'B') ||
+        setweight(array_to_tsvector(coalesce(${table.timeAvailability}, ARRAY[]::text[])), 'C') 
+      )`,
+    ),
+  ],
+);
+
 export const ashStudent = p.pgTable(
   "ash_student",
   {

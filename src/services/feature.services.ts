@@ -1,9 +1,0 @@
-import { uploadToCloudinary } from "../utils/storage.util.js";
-import { UploadApiResponse } from "cloudinary";
-import { Request } from "express";
-import { sql, eq } from "drizzle-orm";
-import db from "../db/db.js";
-
-export const feature = async (req: Request, options: any) => {
- 
-};

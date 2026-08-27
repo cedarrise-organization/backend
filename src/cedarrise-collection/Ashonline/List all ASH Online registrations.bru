@@ -1,0 +1,124 @@
+meta {
+  name: List all ASH Online registrations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash-online/registration?page=&limit=&orderBy=&search=&status=&sortBy=
+  body: none
+  auth: inherit
+}
+
+params:query {
+  page: 
+  limit: 
+  orderBy: 
+  status: 
+  sortBy: 
+  search: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # List All ASH Online Registrations
+  
+  Returns a paginated list of ASH Online registrations. Results can be filtered by approval status and sorted by various fields. Supports full-text search via PostgreSQL GIN index.
+  
+  ## Authorization
+  Requires `read` permission.
+  
+  ## Query Parameters
+  
+  | Parameter | Type   | Required | Default     | Description / Allowed Values                                                                                                      |
+  |-----------|--------|----------|-------------|-----------------------------------------------------------------------------------------------------------------------------------|
+  | page      | number | No       | `1`         | Page number (integer ≥ 1)                                                                                                         |
+  | limit     | number | No       | `25`        | Items per page (integer, 1–100)                                                                                                   |
+  | orderBy   | string | No       | `desc`      | Sort direction. One of: `asc`, `desc`                                                                                             |
+  | status    | string | No       | `pending`   | One of: `accepted`, `rejected`, `pending`                                                                                         |
+  | sortBy    | string | No       | `createdAt` | One of: `childFirstName`, `childSurname`, `childClass`, `schoolName`, `childEmail`, `createdAt`                                   |
+  | search    | string | No       | —           | Full-text search query. When provided, cache and sort/status filters are bypassed and results are matched against the GIN index.   |
+  
+  ### Searchable Fields
+  
+  | Field             | Weight |
+  |-------------------|--------|
+  | `childFirstName`  | A      |
+  | `childSurname`    | A      |
+  | `childClass`      | B      |
+  | `schoolName`      | B      |
+  | `tutoringDays`    | B      |
+  | `childEmail`      | C      |
+  | `schoolLocation`  | C      |
+  | `timeAvailability`| C      |
+  
+  ## Response
+  
+  **`200 OK`** — Returns a paginated array of ASH Online registration records.
+  
+  ```json
+  {
+    "success": true,
+    "message": "ASH Online registrations found successfully",
+    "data": [
+      {
+        "id": "uuid",
+        "childFirstName": "john",
+        "childSurname": "doe",
+        "dob": "2010-05-15T00:00:00.000Z",
+        "age": 14,
+        "childClass": "JSS2",
+        "schoolName": "example school",
+        "schoolLocation": "lagos",
+        "childEmail": "john.doe@example.com",
+        "tutoringDays": ["MONDAY"],
+        "timeAvailability": "evening",
+        "subjectsOfInterest": ["MATHEMATICS"],
+        "currentCurriculumUrl": "https://res.cloudinary.com/...",
+        "currentCurriculumPublicId": "Cedarrise Initiative/ASH-ONLINE-ASSETS/CURRICULUMS/...",
+        "academicReportUrl": "https://res.cloudinary.com/...",
+        "academicReportPublicId": "Cedarrise Initiative/ASH-ONLINE-ASSETS/REPORTS/...",
+        "prevTermClassAverage": "75%",
+        "prevTermClassPosition": "5th",
+        "parentName": "jane doe",
+        "parentPhone": "08012345678",
+        "parentEmail": "jane.doe@example.com",
+        "parentalConsent": true,
+        "status": "pending",
+        "createdAt": "2026-08-27T00:00:00.000Z",
+        "updatedAt": null,
+        "deletedAt": null
+      }
+    ],
+    "meta": {
+      "pagination": {
+        "page": 1,
+        "limit": 25,
+        "totalPages": 1
+      },
+      "metadata": {
+        "totalSubmissions": 40,
+        "acceptedStudents": 10,
+        "rejectedStudents": 10,
+        "pendingStudents": 20
+      },
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+  
+  ## Errors
+  
+  | Status                      | Description                                           |
+  |-----------------------------|-------------------------------------------------------|
+  | `400 Bad Request`           | Invalid query parameters (e.g. unknown `sortBy` key). |
+  | `500 Internal Server Error` | Unexpected server error.                              |
+}

@@ -1,0 +1,77 @@
+meta {
+  name: Get ASH Online registration detail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/forms/ash-online/registration/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get ASH Online Registration Detail
+  
+  Retrieves the full details of a specific ASH Online registration by ID.
+  
+  ## Authorization
+  Requires `read` permission.
+  
+  ## Response
+  
+  **`200 OK`** — Returns the full registration object.
+  
+  ```json
+  {
+    "success": true,
+    "message": "ASH Online registration found successfully",
+    "data": {
+      "id": "uuid",
+      "childFirstName": "john",
+      "childSurname": "doe",
+      "dob": "2010-05-15T00:00:00.000Z",
+      "age": 14,
+      "childClass": "JSS2",
+      "schoolName": "example school",
+      "schoolLocation": "lagos",
+      "childEmail": "john.doe@example.com",
+      "tutoringDays": ["MONDAY"],
+      "timeAvailability": "evening",
+      "subjectsOfInterest": ["MATHEMATICS"],
+      "currentCurriculumUrl": "https://res.cloudinary.com/...",
+      "currentCurriculumPublicId": "Cedarrise Initiative/ASH-ONLINE-ASSETS/CURRICULUMS/...",
+      "academicReportUrl": "https://res.cloudinary.com/...",
+      "academicReportPublicId": "Cedarrise Initiative/ASH-ONLINE-ASSETS/REPORTS/...",
+      "prevTermClassAverage": "75%",
+      "prevTermClassPosition": "5th",
+      "parentName": "jane doe",
+      "parentPhone": "08012345678",
+      "parentEmail": "jane.doe@example.com",
+      "parentalConsent": true,
+      "status": "pending",
+      "createdAt": "2026-08-27T00:00:00.000Z",
+      "updatedAt": null,
+      "deletedAt": null
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+  
+  The result is cached under `cedarrise:ashonline:registrations:<id>`.
+}
