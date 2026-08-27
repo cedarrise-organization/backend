@@ -250,7 +250,7 @@ export const getCards = async () => {
   const home = {
     totalBeneficiaries: Number(outreachesBeneficiariesReached?.value ?? 0),
     communitiesImpacted: Number(outreachesCommunitiesEngaged?.value ?? 0),
-    yearsOfImpact: Number(new Date().getFullYear() - 2021),
+    yearsOfImpact: Number(new Date().getFullYear() - 2023),
     volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
   };
   const volunteer = {
@@ -912,10 +912,7 @@ export const getEnrollment = async () => {
   const c_graduationTrends: Linedata = [
     {
       title: "ASH",
-      amount: getPercentage(
-        Number(ashGraduated?.accepted ?? 0),
-        Number(ashGraduated?.total ?? 0),
-      ),
+      amount: getPercentage(Number(ashGraduated?.accepted ?? 0), Number(ashGraduated?.total ?? 0)),
     },
     {
       title: "TACOTS",
@@ -1925,4 +1922,262 @@ export const dismissNotification = async (id: string) => {
   };
 };
 
-export const feature = async (req: Request, options: any) => {};
+// Get ClientSide Impact Numbers
+export const getClientSideImpactNumbers = async () => {
+  /// cache
+  const key = `cedarrise:clientside:cards`;
+  const cacheRes = await cacheGet<any>(key);
+  if (cacheRes) {
+    return {
+      code: 200,
+      message: "Clientside Impact data found successfully",
+      data: cacheRes,
+    };
+  }
+  ///
+
+  const [
+    // [capacityParticipantsImpacted],
+    // [capacityOrganizationsPartneredWith],
+    [capacityVolunteersEngaged],
+    // [capacityVolunteersEngagedMaxTwo],
+    // [capacityWorkshopsConducted],
+    [outreachesCommunitiesEngaged],
+    [outreachesBeneficiariesReached],
+    [outreachesVolunteers],
+    [outreachesVolunteersMaxTwo],
+    [outreachesOutreachEvents],
+    [ashStudentsEnrolled],
+    [ashVolunteers],
+    [ashCommunitiesEngaged],
+    [ashImprovedGrades],
+    [ashCurrentBeneficiaries],
+    [ashGraduated],
+    [ashDropOuts],
+    [tacotsEnrolled],
+    [tacotsCurrentlyInSchools],
+    [tacotsPartnerSchools],
+    [tacotsBenefactors],
+    [tacotsSponsors],
+    [tacotsGraduated],
+    [regularSponsors],
+    [regularPartners],
+  ] = await Promise.all([
+    // // capacityParticipantsImpacted
+    // db
+    //   .select({ value: sum(capacityBuildingEvaluation.numberOfParticipants) })
+    //   .from(capacityBuildingEvaluation),
+    // // capacityOrganizationsPartneredWith
+    // db
+    //   .select({
+    //     value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
+    //   })
+    //   .from(capacityBuildingEvaluation), // transform values to lowercase to avoid counting similar records twice
+    // capacityVolunteersEngaged (Highest)
+    db
+      .select({ value: max(capacityBuildingEvaluation.numberOfVolunteers) })
+      .from(capacityBuildingEvaluation),
+    // // capacityVolunteersEngaged (2nd Highest)
+    // db
+    //   .select({
+    //     secondHighest: sql<number>`MAX(${capacityBuildingEvaluation.numberOfVolunteers})`,
+    //   })
+    //   .from(capacityBuildingEvaluation)
+    //   .where(
+    //     lt(
+    //       capacityBuildingEvaluation.numberOfVolunteers,
+    //       db
+    //         .select({
+    //           value: sql<number>`MAX(${capacityBuildingEvaluation.numberOfVolunteers})`,
+    //         })
+    //         .from(capacityBuildingEvaluation),
+    //     ),
+    //   ),
+    // // capacityWorkshopsConducted
+    // db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation), // Count ids because it has an index
+    // outreachesCommunitiesEngaged
+    db
+      .select({ value: countDistinct(sql`lower(trim(${outreachTracker.outreachCommunity}))`) })
+      .from(outreachTracker), // count distinct outreach communities, transform values to lowercase to avoid counting similar records twice
+    // outreachesBeneficiariesReached
+    db.select({ value: sum(outreachTracker.numBeneficiaries) }).from(outreachTracker),
+    // outreachesVolunteers (highest)
+    db.select({ value: max(outreachTracker.numVolunteers) }).from(outreachTracker),
+    // outreachesVolunteers (2nd highest)
+    db
+      .select({
+        secondHighest: sql<number>`MAX(${outreachTracker.numVolunteers})`,
+      })
+      .from(outreachTracker)
+      .where(
+        lt(
+          outreachTracker.numVolunteers,
+          db
+            .select({
+              value: sql<number>`MAX(${outreachTracker.numVolunteers})`,
+            })
+            .from(outreachTracker),
+        ),
+      ),
+    // outreachesOutreachEvents
+    db.select({ value: count(outreachTracker.id) }).from(outreachTracker), // Count ids because it has an index
+    //  ashStudentsEnrolled
+    db
+      .select({ value: count(ashStudent.id) })
+      .from(ashStudent)
+      .where(eq(ashStudent.status, "accepted")), // Count ids because it has an index
+    // ashVolunteers
+    db
+      .select({ value: count(volunteerRegistration.id) })
+      .from(volunteerRegistration)
+      .where(
+        and(
+          eq(volunteerRegistration.status, "accepted"),
+          arrayContains(volunteerRegistration.volunteerAreas, ["ASH"]),
+        ),
+      ),
+    // ashCommunitiesEngaged
+    db
+      .select({ value: countDistinct(sql`lower(trim(${ashStudent.schoolLga}))`) })
+      .from(ashStudent)
+      .where(eq(ashStudent.status, "accepted")),
+    // ashImprovedGrades
+    db
+      .select({ value: countDistinct(ashTermlyTracking.studentId) })
+      .from(ashTermlyTracking)
+      .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
+      .where(
+        and(
+          eq(ashStudent.status, "accepted"),
+          gt(ashTermlyTracking.posttestAverage, ashTermlyTracking.pretestAverage),
+        ),
+      ),
+    // ashCurrentBeneficiaries
+    db
+      .select({ value: countDistinct(ashStudent.id) })
+      .from(ashStudent)
+      .leftJoin(ashExit, eq(ashExit.studentId, ashStudent.id))
+      .where(and(eq(ashStudent.status, "accepted"), isNull(ashExit.studentId))),
+    // ashGraduated
+    db
+      .select({ value: countDistinct(ashExit.studentId) })
+      .from(ashExit)
+      .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"])),
+    // ashDropOuts
+    db
+      .select({ value: countDistinct(ashExit.studentId) })
+      .from(ashExit)
+      .where(eq(ashExit.exitReason, "DROPPED OUT")),
+    // tacotsEnrolled
+    db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
+    // tacotsCurrentlyInSchools
+    db
+      .select({ value: countDistinct(tacotsOnboarding.id) })
+      .from(tacotsOnboarding)
+      .leftJoin(tacotsExit, eq(tacotsExit.studentId, tacotsOnboarding.id))
+      .where(isNull(tacotsExit.studentId)),
+    // tacotsPartnerSchools
+    db
+      .select({
+        value: countDistinct(sql`lower(trim(${tacotsOnboarding.enrolledSchoolName}))`),
+      })
+      .from(tacotsOnboarding),
+    // tacotsBenefactors
+    db
+      .select({ value: count(tacotsRecommendation.id) })
+      .from(tacotsRecommendation)
+      .where(eq(tacotsRecommendation.adminStatus, "SELECTED")),
+    // tacotsSponsors
+    db
+      .select({ value: countDistinct(sql`lower(trim(${tacotsOnboarding.sponsorName}))`) })
+      .from(tacotsOnboarding),
+    // tacotsGraduated
+    db
+      .select({ value: countDistinct(tacotsExit.studentId) })
+      .from(tacotsExit)
+      .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"])),
+    // regularSponsors
+    db
+      .select({ value: countDistinct(donors.email) })
+      .from(donors)
+      .where(
+        arrayOverlaps(donors.supportAreas, [
+          "SPONSOR_ASH_BENEFICIARY",
+          "SPONSOR_TACOTS_BENEFICIARY",
+        ]),
+      ),
+    // regularPartners
+    db.select({ value: miscellaneous.numberOfPartners }).from(miscellaneous),
+  ]);
+
+  // const capacityBuilding = {
+  //   participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
+  //   organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
+  //   volunteersEngaged: Number(
+  //     (capacityVolunteersEngaged?.value ?? 0) +
+  //       ((capacityVolunteersEngaged?.value ?? 0) -
+  //         (capacityVolunteersEngagedMaxTwo?.secondHighest ?? 0)),
+  //   ),
+  //   workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
+  // };
+  const home = {
+    totalBeneficiaries: Math.ceil(1200 + Number(outreachesBeneficiariesReached?.value ?? 0)),
+    communitiesImpacted: Math.ceil(7 + Number(outreachesCommunitiesEngaged?.value ?? 0)),
+    yearsOfImpact: Number(new Date().getFullYear() - 2023),
+    volunteersEngaged: Math.ceil(95 + Number(capacityVolunteersEngaged?.value ?? 0)),
+  };
+  const outreaches = {
+    communitiesEngaged: Math.ceil(5 + Number(outreachesCommunitiesEngaged?.value ?? 0)),
+    beneficiariesReached: Math.ceil(990 + Number(outreachesBeneficiariesReached?.value ?? 0)),
+    partners: Math.ceil(5 + Number(regularPartners?.value ?? 0)), // STILL NOT THE BEST METHOD OF DERIVATION BEING USED
+    volunteers: Math.ceil(
+      70 +
+        Number(
+          (outreachesVolunteers?.value ?? 0) +
+            ((outreachesVolunteers?.value ?? 0) - (outreachesVolunteersMaxTwo?.secondHighest ?? 0)),
+        ),
+    ),
+    outreachEvents: Math.ceil(5 + Number(outreachesOutreachEvents?.value ?? 0)),
+  };
+  const ash = {
+    studentsEnrolled: Math.ceil(50 + Number(ashStudentsEnrolled?.value ?? 0)),
+    volunteers: Math.ceil(10 + Number(ashVolunteers?.value ?? 0)),
+    communitiesEngaged: Math.ceil(1 + Number(ashCommunitiesEngaged?.value ?? 0)),
+    improvedGrades:
+      (ashStudentsEnrolled?.value ?? 0) === 0
+        ? 0
+        : Math.round((((ashImprovedGrades?.value ?? 0) / (ashStudentsEnrolled?.value ?? 0)) * 100) + 44),
+  };
+  const tacots = {
+    enrolled: Math.ceil(20 + Number(tacotsEnrolled?.value ?? 0)),
+    currentlyInSchools: Math.ceil(19 + Number(tacotsCurrentlyInSchools?.value ?? 0)),
+    partnerSchools: Math.ceil(6 + Number(tacotsPartnerSchools?.value ?? 0)),
+    graduated: Number(tacotsGraduated?.value ?? 0),
+  };
+  
+  /// cache set
+  await cacheSet(
+    key,
+    {
+      home,
+      ash,
+      tacots,
+      outreaches,
+      // capacityBuilding,
+    },
+    CACHE_TTL.DASHBOARD_CARDS,
+  );
+  ///
+
+  return {
+    code: 200,
+    message: "Clientside Impact data found successfully",
+    data: {
+      home,
+      ash,
+      tacots,
+      outreaches,
+      // capacityBuilding,
+    },
+  };
+};

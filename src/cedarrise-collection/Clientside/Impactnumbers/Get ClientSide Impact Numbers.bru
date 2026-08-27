@@ -1,0 +1,81 @@
+meta {
+  name: Get ClientSide Impact Numbers
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/dashboard/clientsidedata
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Get ClientSide Impact Numbers
+  
+  Retrieves aggregated impact metrics across various programs (Home, Outreaches, ASH, TACOTS) for display on the client-side.
+  
+  ## Endpoint
+  `GET /api/v1/dashboard/clientsidedata`
+  
+  ## Authorization
+  None — this is a public endpoint used by the client application.
+  
+  ## Query Parameters
+  None
+  
+  ## Success Response
+  - **Status Code**: `200 OK`
+  - **Body**:
+    ```json
+    {
+      "success": true,
+      "message": "Clientside Impact data found successfully",
+      "data": {
+        "home": {
+          "totalBeneficiaries": 1500,
+          "communitiesImpacted": 10,
+          "yearsOfImpact": 3,
+          "volunteersEngaged": 120
+        },
+        "ash": {
+          "studentsEnrolled": 60,
+          "volunteers": 15,
+          "communitiesEngaged": 2,
+          "improvedGrades": 75
+        },
+        "tacots": {
+          "enrolled": 25,
+          "currentlyInSchools": 24,
+          "partnerSchools": 8,
+          "graduated": 5
+        },
+        "outreaches": {
+          "communitiesEngaged": 8,
+          "beneficiariesReached": 1050,
+          "partners": 10,
+          "volunteers": 85,
+          "outreachEvents": 7
+        }
+      },
+      "meta": {
+        "correlationId": "uuid-v4-string"
+      }
+    }
+    ```
+  
+  ## Error Responses
+  - **500 Internal Server Error**: Unexpected server error.
+  
+  ## Notes
+  - The result is cached under `cedarrise:clientside:cards`.
+}

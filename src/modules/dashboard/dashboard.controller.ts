@@ -8,6 +8,7 @@ import {
   getInstEffectiveness,
   getNotifications,
   dismissNotification,
+  getClientSideImpactNumbers
 } from "../../services/dashboard.services.js";
 
 export const getCardsController = async (req: Request, res: Response, next: NextFunction) => {
@@ -92,11 +93,13 @@ export const dismissNotificationController = async (
   }
 };
 
-// export const featureController = async (req: Request, res: Response, next: NextFunction) => {
-//   try {
-//     // const response = await exampleService();
-//     // successResponse(res, response.code, response.message, response.data)
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+export const getClientSideImpactNumbersController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await getClientSideImpactNumbers();
+    successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    })
+  } catch (err) {
+    next(err);
+  }
+};

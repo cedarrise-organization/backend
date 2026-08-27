@@ -7,6 +7,7 @@ import {
   getInstEffectivenessController,
   getNotificationsController,
   dismissNotificationController,
+  getClientSideImpactNumbersController
 } from "./dashboard.controller.js";
 import { notificationIdSchema, notificationQuerySchema } from "./dashboard.schema.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
@@ -41,6 +42,10 @@ router.patch(
   authorize("update"),
   validateRequest(notificationIdSchema),
   dismissNotificationController,
+);
+router.get(
+  "/clientsidedata",
+  getClientSideImpactNumbersController,
 );
 
 export default router;
