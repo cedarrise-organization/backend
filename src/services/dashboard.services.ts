@@ -1937,11 +1937,10 @@ export const getClientSideImpactNumbers = async () => {
   ///
 
   const [
-    // [capacityParticipantsImpacted],
-    // [capacityOrganizationsPartneredWith],
+    [capacityParticipantsImpacted],
+    [capacityOrganizationsPartneredWith],
     [capacityVolunteersEngaged],
-    // [capacityVolunteersEngagedMaxTwo],
-    // [capacityWorkshopsConducted],
+    [capacityWorkshopsConducted],
     [outreachesCommunitiesEngaged],
     [outreachesBeneficiariesReached],
     [outreachesVolunteers],
@@ -1963,38 +1962,22 @@ export const getClientSideImpactNumbers = async () => {
     [regularSponsors],
     [regularPartners],
   ] = await Promise.all([
-    // // capacityParticipantsImpacted
-    // db
-    //   .select({ value: sum(capacityBuildingEvaluation.numberOfParticipants) })
-    //   .from(capacityBuildingEvaluation),
-    // // capacityOrganizationsPartneredWith
-    // db
-    //   .select({
-    //     value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
-    //   })
-    //   .from(capacityBuildingEvaluation), // transform values to lowercase to avoid counting similar records twice
+    // capacityParticipantsImpacted
+    db
+      .select({ value: sum(capacityBuildingEvaluation.numberOfParticipants) })
+      .from(capacityBuildingEvaluation),
+    // capacityOrganizationsPartneredWith
+    db
+      .select({
+        value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
+      })
+      .from(capacityBuildingEvaluation), // transform values to lowercase to avoid counting similar records twice
     // capacityVolunteersEngaged (Highest)
     db
       .select({ value: max(capacityBuildingEvaluation.numberOfVolunteers) })
       .from(capacityBuildingEvaluation),
-    // // capacityVolunteersEngaged (2nd Highest)
-    // db
-    //   .select({
-    //     secondHighest: sql<number>`MAX(${capacityBuildingEvaluation.numberOfVolunteers})`,
-    //   })
-    //   .from(capacityBuildingEvaluation)
-    //   .where(
-    //     lt(
-    //       capacityBuildingEvaluation.numberOfVolunteers,
-    //       db
-    //         .select({
-    //           value: sql<number>`MAX(${capacityBuildingEvaluation.numberOfVolunteers})`,
-    //         })
-    //         .from(capacityBuildingEvaluation),
-    //     ),
-    //   ),
-    // // capacityWorkshopsConducted
-    // db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation), // Count ids because it has an index
+    // capacityWorkshopsConducted
+    db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation), // Count ids because it has an index
     // outreachesCommunitiesEngaged
     db
       .select({ value: countDistinct(sql`lower(trim(${outreachTracker.outreachCommunity}))`) })
@@ -2110,16 +2093,12 @@ export const getClientSideImpactNumbers = async () => {
     db.select({ value: miscellaneous.numberOfPartners }).from(miscellaneous),
   ]);
 
-  // const capacityBuilding = {
-  //   participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
-  //   organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
-  //   volunteersEngaged: Number(
-  //     (capacityVolunteersEngaged?.value ?? 0) +
-  //       ((capacityVolunteersEngaged?.value ?? 0) -
-  //         (capacityVolunteersEngagedMaxTwo?.secondHighest ?? 0)),
-  //   ),
-  //   workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
-  // };
+  const capacityBuilding = {
+    participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
+    organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
+    volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
+    workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
+  };
   const home = {
     totalBeneficiaries: Math.ceil(1200 + Number(outreachesBeneficiariesReached?.value ?? 0)),
     communitiesImpacted: Math.ceil(7 + Number(outreachesCommunitiesEngaged?.value ?? 0)),
@@ -2146,7 +2125,9 @@ export const getClientSideImpactNumbers = async () => {
     improvedGrades:
       (ashStudentsEnrolled?.value ?? 0) === 0
         ? 0
-        : Math.round((((ashImprovedGrades?.value ?? 0) / (ashStudentsEnrolled?.value ?? 0)) * 100) + 44),
+        : Math.round(
+            ((ashImprovedGrades?.value ?? 0) / (ashStudentsEnrolled?.value ?? 0)) * 100 + 44,
+          ),
   };
   const tacots = {
     enrolled: Math.ceil(20 + Number(tacotsEnrolled?.value ?? 0)),
@@ -2154,7 +2135,7 @@ export const getClientSideImpactNumbers = async () => {
     partnerSchools: Math.ceil(6 + Number(tacotsPartnerSchools?.value ?? 0)),
     graduated: Number(tacotsGraduated?.value ?? 0),
   };
-  
+
   /// cache set
   await cacheSet(
     key,
@@ -2163,7 +2144,7 @@ export const getClientSideImpactNumbers = async () => {
       ash,
       tacots,
       outreaches,
-      // capacityBuilding,
+      capacityBuilding,
     },
     CACHE_TTL.DASHBOARD_CARDS,
   );
@@ -2177,7 +2158,7 @@ export const getClientSideImpactNumbers = async () => {
       ash,
       tacots,
       outreaches,
-      // capacityBuilding,
+      capacityBuilding,
     },
   };
 };
