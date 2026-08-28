@@ -21,67 +21,124 @@ settings {
 
 docs {
   # Get ClientSide Impact Numbers
-  
-  Retrieves aggregated impact metrics across various programs (Home, Outreaches, ASH, TACOTS) for display on the client-side.
-  
+
+  Retrieves the manually-curated impact metrics stored in the `impactMetrics` table and returns them
+  grouped by program area for display on the public-facing client site.
+
   ## Endpoint
   `GET /api/v1/dashboard/clientsidedata`
-  
+
   ## Authorization
-  None — this is a public endpoint used by the client application.
-  
+
+  | Middleware     | Value  |
+  |----------------|--------|
+  | `authenticate` | ❌     |
+  | `authorize`    | ❌     |
+
+  No authentication is required. This is a public endpoint.
+
   ## Query Parameters
   None
-  
-  ## Success Response
-  - **Status Code**: `200 OK`
-  - **Body**:
-    ```json
-    {
-      "success": true,
-      "message": "Clientside Impact data found successfully",
-      "data": {
-        "home": {
-          "totalBeneficiaries": 1500,
-          "communitiesImpacted": 10,
-          "yearsOfImpact": 3,
-          "volunteersEngaged": 120
-        },
-        "ash": {
-          "studentsEnrolled": 60,
-          "volunteers": 15,
-          "communitiesEngaged": 2,
-          "improvedGrades": 75
-        },
-        "tacots": {
-          "enrolled": 25,
-          "currentlyInSchools": 24,
-          "partnerSchools": 8,
-          "graduated": 5
-        },
-        "outreaches": {
-          "communitiesEngaged": 8,
-          "beneficiariesReached": 1050,
-          "partners": 10,
-          "volunteers": 85,
-          "outreachEvents": 7
-        },
+
+  ## Response
+
+  **`200 OK`** — Impact data found successfully.
+
+  ```json
+  {
+    "success": true,
+    "message": "Clientside Impact data found successfully",
+    "data": {
+      "home": {
+        "totalBeneficiaries": 1500,
+        "communitiesImpacted": 10,
+        "yearsOfImpact": 3,
+        "volunteersEngaged": 120
+      },
+      "ash": {
+        "studentsEnrolled": 60,
+        "volunteers": 15,
+        "communitiesEngaged": 2,
+        "improvedGrades": 75
+      },
+      "tacots": {
+        "enrolled": 25,
+        "currentlyInSchools": 24,
+        "partnerSchools": 8,
+        "graduated": 5
+      },
+      "outreaches": {
+        "communitiesEngaged": 8,
+        "beneficiariesReached": 1050,
+        "partners": 10,
+        "volunteers": 85,
+        "outreachEvents": 7
+      },
       "capacityBuilding": {
         "participantsImpacted": 1810,
         "organizationsPartneredWith": 6,
         "volunteersEngaged": 25,
         "workshopsConducted": 20
       }
-      },
-      "meta": {
-        "correlationId": "uuid-v4-string"
-      }
+    },
+    "meta": {
+      "correlationId": "uuid-v4-string"
     }
-    ```
-  
-  ## Error Responses
-  - **500 Internal Server Error**: Unexpected server error.
-  
+  }
+  ```
+
+  ### Response Fields
+
+  #### `home`
+  | Field                | Type   | Description                                              |
+  |----------------------|--------|----------------------------------------------------------|
+  | `totalBeneficiaries` | number | Total beneficiaries across all programs                  |
+  | `communitiesImpacted`| number | Number of distinct communities impacted                  |
+  | `yearsOfImpact`      | number | Number of years the organisation has been operating      |
+  | `volunteersEngaged`  | number | Total volunteers engaged across programs                 |
+
+  #### `ash`
+  | Field               | Type   | Description                                                 |
+  |---------------------|--------|-------------------------------------------------------------|
+  | `studentsEnrolled`  | number | Total ASH students enrolled                                 |
+  | `volunteers`        | number | Number of volunteers assigned to ASH                        |
+  | `communitiesEngaged`| number | Number of distinct communities with ASH students            |
+  | `improvedGrades`    | number | Percentage of ASH students who showed improved test scores  |
+
+  #### `tacots`
+  | Field               | Type   | Description                                              |
+  |---------------------|--------|----------------------------------------------------------|
+  | `enrolled`          | number | Total TACOTS students onboarded                          |
+  | `currentlyInSchools`| number | Students not yet exited from the program                 |
+  | `partnerSchools`    | number | Number of distinct partner schools                       |
+  | `graduated`         | number | Students who completed secondary education               |
+
+  #### `outreaches`
+  | Field                  | Type   | Description                                          |
+  |------------------------|--------|------------------------------------------------------|
+  | `communitiesEngaged`   | number | Distinct communities reached through outreach        |
+  | `beneficiariesReached` | number | Total beneficiaries across all outreach events       |
+  | `partners`             | number | Number of outreach partner organisations             |
+  | `volunteers`           | number | Number of volunteers engaged in outreach             |
+  | `outreachEvents`       | number | Total number of outreach events conducted            |
+
+  #### `capacityBuilding`
+  | Field                      | Type   | Description                                      |
+  |----------------------------|--------|--------------------------------------------------|
+  | `participantsImpacted`     | number | Total participants across capacity building workshops |
+  | `organizationsPartneredWith`| number| Distinct partner organisations                   |
+  | `volunteersEngaged`        | number | Number of volunteers engaged                     |
+  | `workshopsConducted`       | number | Total workshops conducted                        |
+
+  ## Errors
+
+  | Status                      | Description                   |
+  |-----------------------------|-------------------------------|
+  | `500 Internal Server Error` | Unexpected server error.      |
+
   ## Notes
-  - The result is cached under `cedarrise:clientside:cards`.
+  - Data is sourced from the `impactMetrics` database table (a single managed row).
+  - All fields default to `0` if no row exists in the table.
+  - The response is cached under `cedarrise:clientside:cards` (TTL: `DASHBOARD_CARDS`).
+  - Use `PATCH /api/v1/dashboard/clientsidedata` (authenticated) to update these values.
 }

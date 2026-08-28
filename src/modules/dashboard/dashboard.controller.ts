@@ -8,7 +8,8 @@ import {
   getInstEffectiveness,
   getNotifications,
   dismissNotification,
-  getClientSideImpactNumbers
+  getClientSideImpactNumbers,
+  updateClientSideImpactNumbers
 } from "../../services/dashboard.services.js";
 
 export const getCardsController = async (req: Request, res: Response, next: NextFunction) => {
@@ -97,6 +98,17 @@ export const getClientSideImpactNumbersController = async (req: Request, res: Re
   try {
     const response = await getClientSideImpactNumbers();
     successResponse(res, response.code, response.message, response.data, {
+      correlationId: (req as any).correlationId,
+    })
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateClientSideImpactNumbersController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const response = await updateClientSideImpactNumbers(req.body);
+    successResponse(res, response.code, response.message, null, {
       correlationId: (req as any).correlationId,
     })
   } catch (err) {

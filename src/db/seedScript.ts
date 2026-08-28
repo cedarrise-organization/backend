@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import logger from "../configs/logger.config.js";
 import { users, roles, permissions, rolepermissions, userroles } from "./models/auth.js";
 import { projects, notifications } from "./models/dashboard.js";
-import { receipts, miscellaneous } from "./models/general.js";
+import { receipts, miscellaneous, impactMetrics } from "./models/general.js";
 import { refreshtoken } from "./models/auth.js";
 import { donors } from "./models/donors.js";
 import { blogs } from "./models/blogs.js";
@@ -58,6 +58,7 @@ const clearTables = async () => {
     await db.delete(blogs);
     await db.delete(notifications);
     await db.delete(donors);
+    await db.delete(impactMetrics);
     logger.info("Tables cleared :)");
   } catch (error: any) {
     logger.error("Could not delete all tables", {
@@ -343,10 +344,7 @@ async function seedAshStudent() {
 }
 async function seedAshOnline() {
   try {
-    const file = await fs.readFile(
-      `${process.cwd()}/src/db/seeddata/ash_online.jsonl`,
-      "utf-8",
-    );
+    const file = await fs.readFile(`${process.cwd()}/src/db/seeddata/ash_online.jsonl`, "utf-8");
 
     const rows = file
       .split("\n")
@@ -791,6 +789,17 @@ async function seedMiscellaneous() {
   }
 }
 
+// IMPACT DATA
+async function seedImpactMetrics() {
+  try {
+    await db.insert(impactMetrics).values({});
+
+    logger.info(`Seeded impact metrics table`);
+  } catch (error) {
+    logger.error("could not seed impact metrics table", { error });
+  }
+}
+
 // BLOGS
 async function seedBlogs() {
   try {
@@ -823,7 +832,7 @@ async function seedDonors() {
 
     logger.info(`Inserted ${rows.length} rows into donors`);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     logger.error("could not seed donors table", { error });
   }
 }
@@ -853,3 +862,4 @@ await seedBlogs();
 await seedNotifications();
 await seedMiscellaneous();
 await seedDonors();
+await seedImpactMetrics();

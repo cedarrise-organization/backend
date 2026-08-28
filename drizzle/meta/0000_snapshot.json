@@ -1,5 +1,5 @@
 {
-  "id": "568dc675-4016-4f3b-b592-374a585c5a51",
+  "id": "500e3ed7-8efd-4f7f-bbee-973f3c51a4c4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -6037,6 +6037,207 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.impact_metrics": {
+      "name": "impact_metrics",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "uuid_generate_v4()"
+        },
+        "total_beneficiaries": {
+          "name": "total_beneficiaries",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1193
+        },
+        "communities_impacted": {
+          "name": "communities_impacted",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 7
+        },
+        "years_of_impact": {
+          "name": "years_of_impact",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 3
+        },
+        "volunteers_engaged": {
+          "name": "volunteers_engaged",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 95
+        },
+        "ash_students_enrolled": {
+          "name": "ash_students_enrolled",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 50
+        },
+        "ash_volunteers": {
+          "name": "ash_volunteers",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 10
+        },
+        "ash_communities_engaged": {
+          "name": "ash_communities_engaged",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "ash_improved_grades": {
+          "name": "ash_improved_grades",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 45
+        },
+        "tacots_enrolled": {
+          "name": "tacots_enrolled",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 20
+        },
+        "tacots_currently_in_schools": {
+          "name": "tacots_currently_in_schools",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 19
+        },
+        "tacots_partner_schools": {
+          "name": "tacots_partner_schools",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 6
+        },
+        "tacots_graduated": {
+          "name": "tacots_graduated",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "outreaches_communities_engaged": {
+          "name": "outreaches_communities_engaged",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "outreaches_beneficiaries_reached": {
+          "name": "outreaches_beneficiaries_reached",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 991
+        },
+        "outreaches_partners": {
+          "name": "outreaches_partners",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "outreaches_volunteers": {
+          "name": "outreaches_volunteers",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 70
+        },
+        "outreach_events": {
+          "name": "outreach_events",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "capacity_participants_impacted": {
+          "name": "capacity_participants_impacted",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 132
+        },
+        "capacity_organizations_partnered_with": {
+          "name": "capacity_organizations_partnered_with",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 5
+        },
+        "capacity_volunteers_engaged": {
+          "name": "capacity_volunteers_engaged",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 15
+        },
+        "capacity_workshops_conducted": {
+          "name": "capacity_workshops_conducted",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 6
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "report_date": {
+          "name": "report_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "impact_metrics_created_at_idx": {
+          "name": "impact_metrics_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "impact_metrics_non_negative_check": {
+          "name": "impact_metrics_non_negative_check",
+          "value": "\n        \"impact_metrics\".\"total_beneficiaries\" >= 0 AND\n        \"impact_metrics\".\"communities_impacted\" >= 0 AND\n        \"impact_metrics\".\"years_of_impact\" >= 0 AND\n        \"impact_metrics\".\"volunteers_engaged\" >= 0 AND\n        \"impact_metrics\".\"ash_students_enrolled\" >= 0 AND\n        \"impact_metrics\".\"ash_volunteers\" >= 0 AND\n        \"impact_metrics\".\"ash_communities_engaged\" >= 0 AND\n        \"impact_metrics\".\"ash_improved_grades\" >= 0 AND\n        \"impact_metrics\".\"tacots_enrolled\" >= 0 AND\n        \"impact_metrics\".\"tacots_currently_in_schools\" >= 0 AND\n        \"impact_metrics\".\"tacots_partner_schools\" >= 0 AND\n        \"impact_metrics\".\"tacots_graduated\" >= 0 AND\n        \"impact_metrics\".\"outreaches_communities_engaged\" >= 0 AND\n        \"impact_metrics\".\"outreaches_beneficiaries_reached\" >= 0 AND\n        \"impact_metrics\".\"outreaches_partners\" >= 0 AND\n        \"impact_metrics\".\"outreaches_volunteers\" >= 0 AND\n        \"impact_metrics\".\"outreach_events\" >= 0 AND\n        \"impact_metrics\".\"capacity_participants_impacted\" >= 0 AND\n        \"impact_metrics\".\"capacity_organizations_partnered_with\" >= 0 AND\n        \"impact_metrics\".\"capacity_volunteers_engaged\" >= 0 AND\n        \"impact_metrics\".\"capacity_workshops_conducted\" >= 0\n      "
+        }
+      },
+      "isRLSEnabled": false
+    },
     "public.miscellaneous": {
       "name": "miscellaneous",
       "schema": "",
@@ -6053,7 +6254,7 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": 266
+          "default": 260
         },
         "number_of_partners": {
           "name": "number_of_partners",

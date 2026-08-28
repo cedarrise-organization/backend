@@ -1,0 +1,183 @@
+meta {
+  name: Update ClientSide Impact Numbers
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/api/v1/dashboard/clientsidedata
+  body: json
+  auth: inherit
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+body:json {
+  {
+    "totalBeneficiaries": 1500,
+    "communitiesImpacted": 10,
+    "yearsOfImpact": 3,
+    "volunteersEngaged": 120,
+    "ashStudentsEnrolled": 60,
+    "ashVolunteers": 15,
+    "ashCommunitiesEngaged": 2,
+    "ashImprovedGrades": 75,
+    "tacotsEnrolled": 25,
+    "tacotsCurrentlyInSchools": 24,
+    "tacotsPartnerSchools": 8,
+    "tacotsGraduated": 5,
+    "outreachesCommunitiesEngaged": 8,
+    "outreachesBeneficiariesReached": 1050,
+    "outreachesPartners": 10,
+    "outreachesVolunteers": 85,
+    "outreachEvents": 7,
+    "capacityParticipantsImpacted": 1810,
+    "capacityOrganizationsPartneredWith": 6,
+    "capacityVolunteersEngaged": 25,
+    "capacityWorkshopsConducted": 20
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  # Update ClientSide Impact Numbers
+
+  Manually overwrites the public-facing impact metrics stored in the `impactMetrics` table.
+  All 21 fields must be provided.
+  ## Endpoint
+  `PATCH /api/v1/dashboard/clientsidedata`
+
+  ## Authorization
+
+  | Middleware     | Value    |
+  |----------------|----------|
+  | `authenticate` | ✅       |
+  | `authorize`    | `update` |
+
+  A valid bearer token with the `update` permission is required.
+
+  ## Request Body
+
+  Content-Type: `application/json`
+
+  All fields are **required**. Every value must be a non-negative number (`>= 0`).
+  `ashImprovedGrades` is coerced and stored as an integer string (e.g. `75` → `"75"`).
+
+  ```json
+  {
+    "totalBeneficiaries": 1500,
+    "communitiesImpacted": 10,
+    "yearsOfImpact": 3,
+    "volunteersEngaged": 120,
+    "ashStudentsEnrolled": 60,
+    "ashVolunteers": 15,
+    "ashCommunitiesEngaged": 2,
+    "ashImprovedGrades": 75,
+    "tacotsEnrolled": 25,
+    "tacotsCurrentlyInSchools": 24,
+    "tacotsPartnerSchools": 8,
+    "tacotsGraduated": 5,
+    "outreachesCommunitiesEngaged": 8,
+    "outreachesBeneficiariesReached": 1050,
+    "outreachesPartners": 10,
+    "outreachesVolunteers": 85,
+    "outreachEvents": 7,
+    "capacityParticipantsImpacted": 1810,
+    "capacityOrganizationsPartneredWith": 6,
+    "capacityVolunteersEngaged": 25,
+    "capacityWorkshopsConducted": 20
+  }
+  ```
+
+  ### Field Reference
+
+  #### Home
+  | Field                | Type   | Required | Constraint    | Description                                         |
+  |----------------------|--------|----------|---------------|-----------------------------------------------------|
+  | `totalBeneficiaries` | number | ✅       | `>= 0`        | Total beneficiaries across all programs             |
+  | `communitiesImpacted`| number | ✅       | `>= 0`        | Number of distinct communities impacted             |
+  | `yearsOfImpact`      | number | ✅       | `>= 0`        | Years the organisation has been operating           |
+  | `volunteersEngaged`  | number | ✅       | `>= 0`        | Total volunteers engaged across programs            |
+
+  #### ASH
+  | Field                  | Type   | Required | Constraint    | Description                                              |
+  |------------------------|--------|----------|---------------|----------------------------------------------------------|
+  | `ashStudentsEnrolled`  | number | ✅       | `>= 0`        | Total ASH students enrolled                              |
+  | `ashVolunteers`        | number | ✅       | `>= 0`        | Volunteers assigned to ASH                               |
+  | `ashCommunitiesEngaged`| number | ✅       | `>= 0`        | Distinct communities with ASH students                   |
+  | `ashImprovedGrades`    | number | ✅       | `>= 0`        | % of students with improved test scores (stored as int)  |
+
+  #### TACOTS
+  | Field                    | Type   | Required | Constraint | Description                             |
+  |--------------------------|--------|----------|------------|-----------------------------------------|
+  | `tacotsEnrolled`         | number | ✅       | `>= 0`     | Total TACOTS students onboarded         |
+  | `tacotsCurrentlyInSchools`| number| ✅       | `>= 0`     | Students not yet exited from the program|
+  | `tacotsPartnerSchools`   | number | ✅       | `>= 0`     | Distinct partner schools                |
+  | `tacotsGraduated`        | number | ✅       | `>= 0`     | Students who completed secondary school |
+
+  #### Outreaches
+  | Field                        | Type   | Required | Constraint | Description                                    |
+  |------------------------------|--------|----------|------------|------------------------------------------------|
+  | `outreachesCommunitiesEngaged`| number| ✅       | `>= 0`     | Communities reached through outreach events    |
+  | `outreachesBeneficiariesReached`| number| ✅     | `>= 0`     | Beneficiaries reached across outreach events   |
+  | `outreachesPartners`         | number | ✅       | `>= 0`     | Number of partner organisations                |
+  | `outreachesVolunteers`       | number | ✅       | `>= 0`     | Volunteers engaged in outreach                 |
+  | `outreachEvents`             | number | ✅       | `>= 0`     | Total number of outreach events conducted      |
+
+  #### Capacity Building
+  | Field                           | Type   | Required | Constraint | Description                                     |
+  |---------------------------------|--------|----------|------------|-------------------------------------------------|
+  | `capacityParticipantsImpacted`  | number | ✅       | `>= 0`     | Total participants across workshops             |
+  | `capacityOrganizationsPartneredWith`| number| ✅    | `>= 0`     | Distinct partner organisations                  |
+  | `capacityVolunteersEngaged`     | number | ✅       | `>= 0`     | Volunteers engaged in capacity building         |
+  | `capacityWorkshopsConducted`    | number | ✅       | `>= 0`     | Total workshops conducted                       |
+
+  ### Validation
+
+  All fields are validated via the `impactMetricsSubmitSchema` Zod schema.
+  Values are coerced to numbers before validation — string numbers (e.g. `"75"`) are accepted.
+
+  | Rule                   | Error                                  |
+  |------------------------|----------------------------------------|
+  | Missing field          | `Required`                             |
+  | Value is negative      | `value cannot be negative`             |
+  | Value is not a number  | `value must be a number`               |
+
+  ## Response
+
+  **`200 OK`** — Impact metrics updated successfully.
+
+  ```json
+  {
+    "success": true,
+    "message": "Clientside Impact data Updated successfully",
+    "meta": {
+      "correlationId": "uuid-v4-string"
+    }
+  }
+  ```
+
+  No `data` field is returned.
+
+  ## Errors
+
+  | Status                      | Description                                          |
+  |-----------------------------|------------------------------------------------------|
+  | `400 Bad Request`           | One or more body fields failed validation.           |
+  | `401 Unauthorized`          | Missing or invalid authentication token.             |
+  | `403 Forbidden`             | User lacks the `update` permission.                  |
+  | `500 Internal Server Error` | Unexpected server error or DB update returned no row.|
+
+  ## Notes
+  - The update targets the **single row** in the `impactMetrics` table via a `WHERE`-less `UPDATE`.
+    If no row exists, the update returns no result and a `500` error is thrown.
+  - A `reportDate` timestamp is automatically set to `NOW()` on every update.
+  - The `cedarrise:clientside:cards` cache is **not** invalidated on update. Changes will reflect
+    after the existing `DASHBOARD_CARDS` TTL expires or the cache is manually cleared.
+}

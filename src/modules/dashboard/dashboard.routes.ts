@@ -7,9 +7,14 @@ import {
   getInstEffectivenessController,
   getNotificationsController,
   dismissNotificationController,
-  getClientSideImpactNumbersController
+  getClientSideImpactNumbersController,
+  updateClientSideImpactNumbersController,
 } from "./dashboard.controller.js";
-import { notificationIdSchema, notificationQuerySchema } from "./dashboard.schema.js";
+import {
+  notificationIdSchema,
+  notificationQuerySchema,
+  impactMetricsSubmitSchema,
+} from "./dashboard.schema.js";
 import { validateRequest } from "../../middleware/validate.middleware.js";
 import { authenticate, authorize } from "../../middleware/auth.middleware.js";
 
@@ -43,9 +48,13 @@ router.patch(
   validateRequest(notificationIdSchema),
   dismissNotificationController,
 );
-router.get(
+router.get("/clientsidedata", getClientSideImpactNumbersController);
+router.patch(
   "/clientsidedata",
-  getClientSideImpactNumbersController,
+  authenticate(),
+  authorize("update"),
+  validateRequest(impactMetricsSubmitSchema),
+  updateClientSideImpactNumbersController,
 );
 
 export default router;

@@ -55,3 +55,45 @@ export const updateNotificationStatusSchema = z.object({
     status: z.enum(["dismissed", "resolved", "expired"]),
   }),
 });
+
+const nonNegativeNumber = z.coerce
+  .number("value must be a number")
+  .min(0, "value cannot be negative");
+
+export const impactMetricsSchema = z.object({
+    // HOME
+    totalBeneficiaries: nonNegativeNumber,
+    communitiesImpacted: nonNegativeNumber,
+    yearsOfImpact: nonNegativeNumber,
+    volunteersEngaged: nonNegativeNumber,
+    // ASH
+    ashStudentsEnrolled: nonNegativeNumber,
+    ashVolunteers: nonNegativeNumber,
+    ashCommunitiesEngaged: nonNegativeNumber,
+    ashImprovedGrades: z.coerce
+      .number("value must be a number")
+      .min(0, "value cannot be negative")
+      .transform((v) => v.toFixed(0)),
+    // TACOTS
+    tacotsEnrolled: nonNegativeNumber,
+    tacotsCurrentlyInSchools: nonNegativeNumber,
+    tacotsPartnerSchools: nonNegativeNumber,
+    tacotsGraduated: nonNegativeNumber,
+    // OUTREACHES
+    outreachesCommunitiesEngaged: nonNegativeNumber,
+    outreachesBeneficiariesReached: nonNegativeNumber,
+    outreachesPartners: nonNegativeNumber,
+    outreachesVolunteers: nonNegativeNumber,
+    outreachEvents: nonNegativeNumber,
+    // CAPACITY BUILDING
+    capacityParticipantsImpacted: nonNegativeNumber,
+    capacityOrganizationsPartneredWith: nonNegativeNumber,
+    capacityVolunteersEngaged: nonNegativeNumber,
+    capacityWorkshopsConducted: nonNegativeNumber,
+});
+
+export const impactMetricsSubmitSchema = z.object({
+  body: impactMetricsSchema
+})
+
+export type ImpactmetricsType = z.infer<typeof impactMetricsSchema>

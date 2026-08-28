@@ -38,6 +38,7 @@ import {
   volunteerFeedback,
   outreachTracker,
 } from "../db/models/admin.js";
+import { impactMetrics } from "../db/models/general.js";
 import db from "../db/db.js";
 import { invalidateCache } from "../utils/cache.util.js";
 import { notifications } from "../db/models/dashboard.js";
@@ -45,6 +46,7 @@ import { cacheGet, CACHE_TTL, cacheSet, cacheDel } from "../lib/cache.js";
 import { Dataset, Linedata, Notificationcandidate } from "../types/dashboard.js";
 import { donors } from "../db/models/donors.js";
 import { miscellaneous } from "../db/models/general.js";
+import { ImpactmetricsType } from "../modules/dashboard/dashboard.schema.js";
 
 // return Dashboard cards Data
 export const getCards = async () => {
@@ -1936,204 +1938,38 @@ export const getClientSideImpactNumbers = async () => {
   }
   ///
 
-  const [
-    [capacityParticipantsImpacted],
-    [capacityOrganizationsPartneredWith],
-    [capacityVolunteersEngaged],
-    [capacityWorkshopsConducted],
-    [outreachesCommunitiesEngaged],
-    [outreachesBeneficiariesReached],
-    [outreachesVolunteers],
-    [outreachesVolunteersMaxTwo],
-    [outreachesOutreachEvents],
-    [ashStudentsEnrolled],
-    [ashVolunteers],
-    [ashCommunitiesEngaged],
-    [ashImprovedGrades],
-    [ashCurrentBeneficiaries],
-    [ashGraduated],
-    [ashDropOuts],
-    [tacotsEnrolled],
-    [tacotsCurrentlyInSchools],
-    [tacotsPartnerSchools],
-    [tacotsBenefactors],
-    [tacotsSponsors],
-    [tacotsGraduated],
-    [regularSponsors],
-    [regularPartners],
-  ] = await Promise.all([
-    // capacityParticipantsImpacted
-    db
-      .select({ value: sum(capacityBuildingEvaluation.numberOfParticipants) })
-      .from(capacityBuildingEvaluation),
-    // capacityOrganizationsPartneredWith
-    db
-      .select({
-        value: countDistinct(sql`lower(trim(${capacityBuildingEvaluation.partnerOrganizations}))`),
-      })
-      .from(capacityBuildingEvaluation), // transform values to lowercase to avoid counting similar records twice
-    // capacityVolunteersEngaged (Highest)
-    db
-      .select({ value: max(capacityBuildingEvaluation.numberOfVolunteers) })
-      .from(capacityBuildingEvaluation),
-    // capacityWorkshopsConducted
-    db.select({ value: count(capacityBuildingEvaluation.id) }).from(capacityBuildingEvaluation), // Count ids because it has an index
-    // outreachesCommunitiesEngaged
-    db
-      .select({ value: countDistinct(sql`lower(trim(${outreachTracker.outreachCommunity}))`) })
-      .from(outreachTracker), // count distinct outreach communities, transform values to lowercase to avoid counting similar records twice
-    // outreachesBeneficiariesReached
-    db.select({ value: sum(outreachTracker.numBeneficiaries) }).from(outreachTracker),
-    // outreachesVolunteers (highest)
-    db.select({ value: max(outreachTracker.numVolunteers) }).from(outreachTracker),
-    // outreachesVolunteers (2nd highest)
-    db
-      .select({
-        secondHighest: sql<number>`MAX(${outreachTracker.numVolunteers})`,
-      })
-      .from(outreachTracker)
-      .where(
-        lt(
-          outreachTracker.numVolunteers,
-          db
-            .select({
-              value: sql<number>`MAX(${outreachTracker.numVolunteers})`,
-            })
-            .from(outreachTracker),
-        ),
-      ),
-    // outreachesOutreachEvents
-    db.select({ value: count(outreachTracker.id) }).from(outreachTracker), // Count ids because it has an index
-    //  ashStudentsEnrolled
-    db
-      .select({ value: count(ashStudent.id) })
-      .from(ashStudent)
-      .where(eq(ashStudent.status, "accepted")), // Count ids because it has an index
-    // ashVolunteers
-    db
-      .select({ value: count(volunteerRegistration.id) })
-      .from(volunteerRegistration)
-      .where(
-        and(
-          eq(volunteerRegistration.status, "accepted"),
-          arrayContains(volunteerRegistration.volunteerAreas, ["ASH"]),
-        ),
-      ),
-    // ashCommunitiesEngaged
-    db
-      .select({ value: countDistinct(sql`lower(trim(${ashStudent.schoolLga}))`) })
-      .from(ashStudent)
-      .where(eq(ashStudent.status, "accepted")),
-    // ashImprovedGrades
-    db
-      .select({ value: countDistinct(ashTermlyTracking.studentId) })
-      .from(ashTermlyTracking)
-      .innerJoin(ashStudent, eq(ashStudent.id, ashTermlyTracking.studentId))
-      .where(
-        and(
-          eq(ashStudent.status, "accepted"),
-          gt(ashTermlyTracking.posttestAverage, ashTermlyTracking.pretestAverage),
-        ),
-      ),
-    // ashCurrentBeneficiaries
-    db
-      .select({ value: countDistinct(ashStudent.id) })
-      .from(ashStudent)
-      .leftJoin(ashExit, eq(ashExit.studentId, ashStudent.id))
-      .where(and(eq(ashStudent.status, "accepted"), isNull(ashExit.studentId))),
-    // ashGraduated
-    db
-      .select({ value: countDistinct(ashExit.studentId) })
-      .from(ashExit)
-      .where(inArray(ashExit.exitReason, ["COMPLETED", "GRADUATED"])),
-    // ashDropOuts
-    db
-      .select({ value: countDistinct(ashExit.studentId) })
-      .from(ashExit)
-      .where(eq(ashExit.exitReason, "DROPPED OUT")),
-    // tacotsEnrolled
-    db.select({ value: count(tacotsOnboarding.id) }).from(tacotsOnboarding),
-    // tacotsCurrentlyInSchools
-    db
-      .select({ value: countDistinct(tacotsOnboarding.id) })
-      .from(tacotsOnboarding)
-      .leftJoin(tacotsExit, eq(tacotsExit.studentId, tacotsOnboarding.id))
-      .where(isNull(tacotsExit.studentId)),
-    // tacotsPartnerSchools
-    db
-      .select({
-        value: countDistinct(sql`lower(trim(${tacotsOnboarding.enrolledSchoolName}))`),
-      })
-      .from(tacotsOnboarding),
-    // tacotsBenefactors
-    db
-      .select({ value: count(tacotsRecommendation.id) })
-      .from(tacotsRecommendation)
-      .where(eq(tacotsRecommendation.adminStatus, "SELECTED")),
-    // tacotsSponsors
-    db
-      .select({ value: countDistinct(sql`lower(trim(${tacotsOnboarding.sponsorName}))`) })
-      .from(tacotsOnboarding),
-    // tacotsGraduated
-    db
-      .select({ value: countDistinct(tacotsExit.studentId) })
-      .from(tacotsExit)
-      .where(inArray(tacotsExit.exitReason, ["COMPLETED SECONDARY EDUCATION (GRADUATED)"])),
-    // regularSponsors
-    db
-      .select({ value: countDistinct(donors.email) })
-      .from(donors)
-      .where(
-        arrayOverlaps(donors.supportAreas, [
-          "SPONSOR_ASH_BENEFICIARY",
-          "SPONSOR_TACOTS_BENEFICIARY",
-        ]),
-      ),
-    // regularPartners
-    db.select({ value: miscellaneous.numberOfPartners }).from(miscellaneous),
-  ]);
+  const [result] = await db.select().from(impactMetrics).limit(1);
 
   const capacityBuilding = {
-    participantsImpacted: Number(capacityParticipantsImpacted?.value ?? 0),
-    organizationsPartneredWith: Number(capacityOrganizationsPartneredWith?.value ?? 0),
-    volunteersEngaged: Number(capacityVolunteersEngaged?.value ?? 0),
-    workshopsConducted: Number(capacityWorkshopsConducted?.value ?? 0),
+    participantsImpacted: result?.capacityParticipantsImpacted ?? 0,
+    organizationsPartneredWith: result?.capacityOrganizationsPartneredWith ?? 0,
+    volunteersEngaged: result?.capacityVolunteersEngaged ?? 0,
+    workshopsConducted: result?.capacityWorkshopsConducted ?? 0,
   };
   const home = {
-    totalBeneficiaries: Math.ceil(1200 + Number(outreachesBeneficiariesReached?.value ?? 0)),
-    communitiesImpacted: Math.ceil(7 + Number(outreachesCommunitiesEngaged?.value ?? 0)),
-    yearsOfImpact: Number(new Date().getFullYear() - 2023),
-    volunteersEngaged: Math.ceil(95 + Number(capacityVolunteersEngaged?.value ?? 0)),
+    totalBeneficiaries: result?.totalBeneficiaries ?? 0,
+    communitiesImpacted: result?.communitiesImpacted ?? 0,
+    yearsOfImpact: result?.yearsOfImpact ?? 0,
+    volunteersEngaged: result?.volunteersEngaged ?? 0,
   };
   const outreaches = {
-    communitiesEngaged: Math.ceil(5 + Number(outreachesCommunitiesEngaged?.value ?? 0)),
-    beneficiariesReached: Math.ceil(990 + Number(outreachesBeneficiariesReached?.value ?? 0)),
-    partners: Math.ceil(5 + Number(regularPartners?.value ?? 0)), // STILL NOT THE BEST METHOD OF DERIVATION BEING USED
-    volunteers: Math.ceil(
-      70 +
-        Number(
-          (outreachesVolunteers?.value ?? 0) +
-            ((outreachesVolunteers?.value ?? 0) - (outreachesVolunteersMaxTwo?.secondHighest ?? 0)),
-        ),
-    ),
-    outreachEvents: Math.ceil(5 + Number(outreachesOutreachEvents?.value ?? 0)),
+    communitiesEngaged: result?.outreachesCommunitiesEngaged ?? 0,
+    beneficiariesReached: result?.outreachesBeneficiariesReached ?? 0,
+    partners: result?.outreachesPartners ?? 0,
+    volunteers: result?.outreachesVolunteers ?? 0,
+    outreachEvents: result?.outreachEvents ?? 0,
   };
   const ash = {
-    studentsEnrolled: Math.ceil(50 + Number(ashStudentsEnrolled?.value ?? 0)),
-    volunteers: Math.ceil(10 + Number(ashVolunteers?.value ?? 0)),
-    communitiesEngaged: Math.ceil(1 + Number(ashCommunitiesEngaged?.value ?? 0)),
-    improvedGrades:
-      (ashStudentsEnrolled?.value ?? 0) === 0
-        ? 0
-        : Math.round(
-            ((ashImprovedGrades?.value ?? 0) / (ashStudentsEnrolled?.value ?? 0)) * 100 + 44,
-          ),
+    studentsEnrolled: result?.ashStudentsEnrolled ?? 0,
+    volunteers: result?.ashVolunteers ?? 0,
+    communitiesEngaged: result?.ashCommunitiesEngaged ?? 0,
+    improvedGrades: result?.ashImprovedGrades ?? 0,
   };
   const tacots = {
-    enrolled: Math.ceil(20 + Number(tacotsEnrolled?.value ?? 0)),
-    currentlyInSchools: Math.ceil(19 + Number(tacotsCurrentlyInSchools?.value ?? 0)),
-    partnerSchools: Math.ceil(6 + Number(tacotsPartnerSchools?.value ?? 0)),
-    graduated: Number(tacotsGraduated?.value ?? 0),
+    enrolled: result?.tacotsEnrolled ?? 0,
+    currentlyInSchools: result?.tacotsCurrentlyInSchools ?? 0,
+    partnerSchools: result?.tacotsPartnerSchools ?? 0,
+    graduated: result?.tacotsGraduated ?? 0,
   };
 
   /// cache set
@@ -2160,5 +1996,47 @@ export const getClientSideImpactNumbers = async () => {
       outreaches,
       capacityBuilding,
     },
+  };
+};
+
+// Update ClientSide Impact Numbers
+export const updateClientSideImpactNumbers = async (body: ImpactmetricsType) => {
+  const [result] = await db
+    .update(impactMetrics)
+    .set({
+      totalBeneficiaries: body.totalBeneficiaries,
+      communitiesImpacted: body.communitiesImpacted,
+      yearsOfImpact: body.yearsOfImpact,
+      volunteersEngaged: body.volunteersEngaged,
+      ashStudentsEnrolled: body.ashStudentsEnrolled,
+      ashVolunteers: body.ashVolunteers,
+      ashCommunitiesEngaged: body.ashCommunitiesEngaged,
+      ashImprovedGrades: Number(body.ashImprovedGrades),
+      tacotsEnrolled: body.tacotsEnrolled,
+      tacotsCurrentlyInSchools: body.tacotsCurrentlyInSchools,
+      tacotsPartnerSchools: body.tacotsPartnerSchools,
+      tacotsGraduated: body.tacotsGraduated,
+      outreachesCommunitiesEngaged: body.outreachesCommunitiesEngaged,
+      outreachesBeneficiariesReached: body.outreachesBeneficiariesReached,
+      outreachesPartners: body.outreachesPartners,
+      outreachesVolunteers: body.outreachesVolunteers,
+      outreachEvents: body.outreachEvents,
+      capacityParticipantsImpacted: body.capacityParticipantsImpacted,
+      capacityOrganizationsPartneredWith: body.capacityOrganizationsPartneredWith,
+      capacityVolunteersEngaged: body.capacityVolunteersEngaged,
+      capacityWorkshopsConducted: body.capacityWorkshopsConducted,
+      reportDate: new Date(Date.now()),
+    })
+    .returning();
+
+  if (!result) {
+    throw new Error("Could not update impact numbers");
+  }
+
+  await invalidateCache(`cedarrise:clientside:cards`);
+
+  return {
+    code: 200,
+    message: "Clientside Impact data Updated successfully",
   };
 };

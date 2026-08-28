@@ -674,9 +674,59 @@ CREATE TABLE "google_forms" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "impact_metrics" (
+	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+	"total_beneficiaries" numeric DEFAULT 1193 NOT NULL,
+	"communities_impacted" numeric DEFAULT 7 NOT NULL,
+	"years_of_impact" numeric DEFAULT 3 NOT NULL,
+	"volunteers_engaged" numeric DEFAULT 95 NOT NULL,
+	"ash_students_enrolled" numeric DEFAULT 50 NOT NULL,
+	"ash_volunteers" numeric DEFAULT 10 NOT NULL,
+	"ash_communities_engaged" numeric DEFAULT 1 NOT NULL,
+	"ash_improved_grades" numeric DEFAULT 45 NOT NULL,
+	"tacots_enrolled" numeric DEFAULT 20 NOT NULL,
+	"tacots_currently_in_schools" numeric DEFAULT 19 NOT NULL,
+	"tacots_partner_schools" numeric DEFAULT 6 NOT NULL,
+	"tacots_graduated" numeric DEFAULT 0 NOT NULL,
+	"outreaches_communities_engaged" numeric DEFAULT 5 NOT NULL,
+	"outreaches_beneficiaries_reached" numeric DEFAULT 991 NOT NULL,
+	"outreaches_partners" numeric DEFAULT 5 NOT NULL,
+	"outreaches_volunteers" numeric DEFAULT 70 NOT NULL,
+	"outreach_events" numeric DEFAULT 5 NOT NULL,
+	"capacity_participants_impacted" numeric DEFAULT 132 NOT NULL,
+	"capacity_organizations_partnered_with" numeric DEFAULT 5 NOT NULL,
+	"capacity_volunteers_engaged" numeric DEFAULT 15 NOT NULL,
+	"capacity_workshops_conducted" numeric DEFAULT 6 NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"report_date" timestamp,
+	CONSTRAINT "impact_metrics_non_negative_check" CHECK (
+        "impact_metrics"."total_beneficiaries" >= 0 AND
+        "impact_metrics"."communities_impacted" >= 0 AND
+        "impact_metrics"."years_of_impact" >= 0 AND
+        "impact_metrics"."volunteers_engaged" >= 0 AND
+        "impact_metrics"."ash_students_enrolled" >= 0 AND
+        "impact_metrics"."ash_volunteers" >= 0 AND
+        "impact_metrics"."ash_communities_engaged" >= 0 AND
+        "impact_metrics"."ash_improved_grades" >= 0 AND
+        "impact_metrics"."tacots_enrolled" >= 0 AND
+        "impact_metrics"."tacots_currently_in_schools" >= 0 AND
+        "impact_metrics"."tacots_partner_schools" >= 0 AND
+        "impact_metrics"."tacots_graduated" >= 0 AND
+        "impact_metrics"."outreaches_communities_engaged" >= 0 AND
+        "impact_metrics"."outreaches_beneficiaries_reached" >= 0 AND
+        "impact_metrics"."outreaches_partners" >= 0 AND
+        "impact_metrics"."outreaches_volunteers" >= 0 AND
+        "impact_metrics"."outreach_events" >= 0 AND
+        "impact_metrics"."capacity_participants_impacted" >= 0 AND
+        "impact_metrics"."capacity_organizations_partnered_with" >= 0 AND
+        "impact_metrics"."capacity_volunteers_engaged" >= 0 AND
+        "impact_metrics"."capacity_workshops_conducted" >= 0
+      )
+);
+--> statement-breakpoint
 CREATE TABLE "miscellaneous" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-	"number_of_photos" integer DEFAULT 266 NOT NULL,
+	"number_of_photos" integer DEFAULT 260 NOT NULL,
 	"number_of_partners" integer DEFAULT 0
 );
 --> statement-breakpoint
@@ -953,6 +1003,7 @@ CREATE INDEX "donor_search_index" ON "donors" USING gin ((
           setweight(to_tsvector('english', coalesce("amount_donated"::text, '')), 'B') ||
           setweight(to_tsvector('english', coalesce("comment", '')), 'C') 
         ));--> statement-breakpoint
+CREATE INDEX "impact_metrics_created_at_idx" ON "impact_metrics" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "photo_count_index" ON "miscellaneous" USING btree ("number_of_photos");--> statement-breakpoint
 CREATE INDEX "partner_count_index" ON "miscellaneous" USING btree ("number_of_partners");--> statement-breakpoint
 CREATE INDEX "receipts_name_idx" ON "receipts" USING btree ("name");--> statement-breakpoint
