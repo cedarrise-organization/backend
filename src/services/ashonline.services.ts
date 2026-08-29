@@ -37,7 +37,10 @@ export const submitAshOnlineRegistration = async (
   const reportFile = files.academicReport?.[0];
 
   const curriculumUpload: UploadApiResponse | undefined | null = curriculumFile
-    ? await uploadToCloudinary(curriculumFile, "/Cedarrise Initiative/ASH-ONLINE-ASSETS/CURRICULUMS")
+    ? await uploadToCloudinary(
+        curriculumFile,
+        "/Cedarrise Initiative/ASH-ONLINE-ASSETS/CURRICULUMS",
+      )
     : null;
 
   const reportUpload: UploadApiResponse | undefined | null = reportFile
@@ -291,6 +294,7 @@ export const updateAshOnlineStudentStatus = async (
       id: ashOnlineRegistration.id,
       status: ashOnlineRegistration.status,
       name: ashOnlineRegistration.childFirstName,
+      email: ashOnlineRegistration.childEmail,
     });
 
   appEvents.emit(ASH_EVENTS.DELETE_CACHE, {
@@ -299,6 +303,23 @@ export const updateAshOnlineStudentStatus = async (
     event: "UPDATE ASH ONLINE STUDENT STATUS",
     correlationId,
   });
+
+  // emitter to send email on accept or reject
+  if (status === "accepted") {
+    appEvents.emit(ASH_EVENTS.ONLINE_STUDENT_ACCEPTED, {
+      name: updatedStudent?.name,
+      userId: updatedStudent?.id,
+      email: updatedStudent?.email,
+      correlationId,
+    });
+  } else if (status === "rejected") {
+    appEvents.emit(ASH_EVENTS.ONLINE_STUDENT_REJECTED, {
+      name: updatedStudent?.name,
+      userId: updatedStudent?.id,
+      email: updatedStudent?.email,
+      correlationId,
+    });
+  }
 
   return {
     code: 200,

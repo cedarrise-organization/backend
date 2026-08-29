@@ -194,6 +194,6 @@ export const sendAshOnlineEmail = async (options: Sendashonlinelinkemailtype) =>
 
   return {
     code: 200,
-    message: `ASH ONLINE Registration email sent successfully`,
+    message: `Request received successfully. We will contact you soon`,
   };
 };

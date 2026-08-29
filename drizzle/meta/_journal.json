@@ -8,6 +8,13 @@
       "when": 1787925446849,
       "tag": "0000_noisy_loners",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788046055209,
+      "tag": "0001_narrow_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,8 @@ import ejs from "ejs";
 export const ASH_EVENTS = {
   STUDENT_ACCEPTED: "ash:student:accepted",
   STUDENT_REJECTED: "ash:student:rejected",
+  ONLINE_STUDENT_ACCEPTED: "ash:onlinestudent:accepted",
+  ONLINE_STUDENT_REJECTED: "ash:onlinestudent:rejected",
   DELETE_CACHE: "ash:delete:cache",
 } as const;
 
@@ -85,6 +87,65 @@ appEvents.on(ASH_EVENTS.DELETE_CACHE, async (data) => {
       event: data.event,
       singleKey: data.singleKey,
       patternKey: data.patternKey,
+      correlationId: data.correlationId,
+    });
+  }
+});
+
+// INFORM ASH ONLINE STUDENT VIA EMAIL ON ACCEPTANCE
+appEvents.on(ASH_EVENTS.ONLINE_STUDENT_ACCEPTED, async (data) => {
+  try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/welcometoashonline.ejs",
+      { studentName: data.name },
+      { async: true },
+    );
+
+    const info = await sendEmail(data.email, "Welcome to ASH ONLINE", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("ASH Online welcome email sent successully", {
+      message: "new student accepted into ASH ONLINE",
+      studentId: data.userId,
+      correlationId: data.correlationId,
+    });
+  } catch (error: any) {
+    logger.error("Failed to send ash online welcome email", {
+      email: data.email,
+      message: error.message,
+      correlationId: data.correlationId,
+    });
+  }
+});
+
+// INFORM ASH ONLINE STUDENT VIA EMAIL ON REJECTED
+appEvents.on(ASH_EVENTS.ONLINE_STUDENT_REJECTED, async (data) => {
+  try {
+    let content = await ejs.renderFile(
+      process.cwd() + "/src/views/emails/ashonlinerejection.ejs",
+      { studentName: data.name },
+      { async: true },
+    );
+
+    const info = await sendEmail(data.email, "We are sorry to inform you", content);
+
+    if (!info) {
+      throw new Error();
+    }
+
+    logger.info("ASH ONLINE rejection email sent successully", {
+      message: "new student rejected from ASH ONLINE",
+      // info: info.accepted,
+      studentId: data.userId,
+      correlationId: data.correlationId,
+    });
+  } catch (error: any) {
+    logger.error("Failed to send ash ONLINE rejection email", {
+      email: data.email,
+      message: error.message,
       correlationId: data.correlationId,
     });
   }
