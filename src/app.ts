@@ -41,7 +41,7 @@ import "./queues/workers/notifications.worker.js";
 
 const app = express();
 
-const whitelist = [`http://localhost:3002`, `https://cedarrise.vercel.app`, `https://cedarrise.org`];
+const whitelist = [`http://localhost:3002`, `https://cedarrise.vercel.app`, `https://cedarriseinitiative.org`];
 const corsOptions = {
   origin: function (
     origin: string | undefined,
